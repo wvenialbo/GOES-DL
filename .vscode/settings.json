@@ -5,8 +5,14 @@
     ],
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
+            "scope": "goes"
+        },
+        {
             "scope": "ide-env"
-        }
+        },
+        {
+            "scope": "product"
+        },
     ],
     "python.testing.unittestArgs": [
         "-v",
