@@ -1,10 +1,20 @@
 {
     "cSpell.words": [
+        "gridsat",
         "MCMIP"
     ],
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
             "scope": "ide-env"
         }
-    ]
+    ],
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true
 }
