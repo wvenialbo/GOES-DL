@@ -30,6 +30,7 @@ class GOESRSProduct(GOESProduct):
         product_id: str,
         instrument_id: str,
         origin_id: str,
+        date_format: str = "",
     ) -> None:
         if level_id not in self.AVAILABLE_LEVEL:
             available_level: list[str] = sorted(self.AVAILABLE_LEVEL.keys())
@@ -54,7 +55,7 @@ class GOESRSProduct(GOESProduct):
                 f"Available origin IDs: {available_origin}"
             )
 
-        super(GOESRSProduct, self).__init__(product_id, origin_id)
+        super(GOESRSProduct, self).__init__(product_id, origin_id, date_format)
 
         self._instrument_id: str = instrument_id
         self._level_id: str = level_id

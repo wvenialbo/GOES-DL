@@ -1,14 +1,28 @@
 import unittest
+from datetime import datetime
 
 from GOES_DL.product import GOES2GProduct
 
 
 class GOES2GProductTest(GOES2GProduct):
     def get_baseurl(self, timestamp: str) -> str:
-        return f"https://path/to/{timestamp}"
+        date_obj: datetime = datetime.strptime(timestamp, self._date_format)
+        date: str = date_obj.strftime("%Y/%m")
+        return f"https://path/to/{date}/"
 
-    def get_filename(self, timestamp: str) -> str:
-        return f"{self.product_id}_{self.origin_id}_{timestamp}.nc"
+    def get_filename(
+        self, time_start: str, time_end: str = "", time_create: str = ""
+    ) -> str:
+        if time_create:
+            raise ValueError("time_create parameter is not supported")
+        if time_end:
+            raise ValueError("time_end parameter is not supported")
+        date_obj: datetime = datetime.strptime(time_start, self._date_format)
+        date: str = date_obj.strftime("%Y.%m.%d.%H%M")
+        return f"{self.get_file_id()}.{date}.nc"
+
+    def get_file_id(self) -> str:
+        return f"{self.origin_id}.{self.product_id}"
 
 
 class TestGOES2GProduct(unittest.TestCase):
@@ -27,14 +41,24 @@ class TestGOES2GProduct(unittest.TestCase):
             "G14",
             "G15",
         }
+        self.valid_date_format = "%Y%m%d-%H%M%S"
         self.product = GOES2GProductTest(
-            self.valid_product_id, self.valid_origin_id
+            self.valid_product_id, self.valid_origin_id, self.valid_date_format
         )
 
     def test_init_invalid_origin_parameter(self) -> None:
         INVALID_ORIGIN_ID = "G20"
         with self.assertRaises(ValueError):
             GOES2GProductTest(self.product.product_id, INVALID_ORIGIN_ID)
+
+    def test_default_date_format(self) -> None:
+        self.product = GOES2GProductTest(
+            self.valid_product_id, self.valid_origin_id
+        )
+        self.assertEqual(self.product.date_format, "%Y-%m-%dT%H:%M:%S%z")
+
+    def test_date_format_property(self) -> None:
+        self.assertEqual(self.product.date_format, self.valid_date_format)
 
     def test_origin_id_property(self) -> None:
         self.assertEqual(self.product.origin_id, self.valid_origin_id)
@@ -75,7 +99,8 @@ class TestGOES2GProduct(unittest.TestCase):
         EXPECTED_RESULT = (
             f"<{MODULE_NAME}.{self.CLASS_NAME}("
             f"origin_id='{self.valid_origin_id}',"
-            f"product_id='{self.valid_product_id}'"
+            f"product_id='{self.valid_product_id}',"
+            f"date_format='{self.valid_date_format}'"
             f") at {id(self.product):#x}>"
         )
         repr_result = repr(self.product)
@@ -91,20 +116,42 @@ class TestGOES2GProduct(unittest.TestCase):
         self.assertEqual(str_result, EXPECTED_RESULT)
 
     def test_get_baseurl(self) -> None:
-        TIMESTAMP = "2024-01-01T00:00:00Z"
-        EXPECTED_BASEURL = f"https://path/to/{TIMESTAMP}"
+        TIMESTAMP = "20240307-203000"
+        EXPECTED_BASEURL = "https://path/to/2024/03/"
         self.assertEqual(self.product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
 
+    def test_get_baseurl_invalid_timestamp(self) -> None:
+        TIMESTAMP = "20240307.203000"
+        with self.assertRaises(ValueError):
+            self.product.get_baseurl(TIMESTAMP)
+
     def test_get_filename(self) -> None:
-        TIMESTAMP = "2024-01-01T00:00:00Z"
+        TIMESTAMP = "20240307-203000"
         EXPECTED_FILENAME = (
-            f"{self.valid_product_id}_"
-            f"{self.valid_origin_id}_"
-            f"{TIMESTAMP}.nc"
+            f"{self.valid_origin_id}.{self.valid_product_id}."
+            "2024.03.07.2030.nc"
         )
         self.assertEqual(
             self.product.get_filename(TIMESTAMP), EXPECTED_FILENAME
         )
+
+    def test_get_filename_with_time_end_and_time_create(self) -> None:
+        TIMESTAMP = "20240307-203000"
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP, time_end=TIMESTAMP)
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP, time_create=TIMESTAMP)
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP, TIMESTAMP, TIMESTAMP)
+
+    def test_get_filename_invalid_timestamp(self) -> None:
+        TIMESTAMP = "20240307.203000"
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP)
+
+    def test_get_file_id(self) -> None:
+        EXPECTED_FILE_ID = f"{self.valid_origin_id}.{self.valid_product_id}"
+        self.assertEqual(self.product.get_file_id(), EXPECTED_FILE_ID)
 
 
 if __name__ == "__main__":

@@ -32,7 +32,11 @@ class GOES2GImagerProduct(GOES2GProduct):
     }
 
     def __init__(
-        self, scene_id: str = "F", origin_id: str = "G08", version: str = "v01"
+        self,
+        scene_id: str = "F",
+        origin_id: str = "G08",
+        version: str = "v01",
+        date_format: str = "",
     ) -> None:
         if scene_id not in self.AVAILABLE_SCENE:
             available_scene = sorted(self.AVAILABLE_SCENE.keys())
@@ -50,7 +54,9 @@ class GOES2GImagerProduct(GOES2GProduct):
         available_product: list[str] = list(self.AVAILABLE_PRODUCT.keys())
         product_id: str = available_product[0]
 
-        super(GOES2GImagerProduct, self).__init__(product_id, origin_id)
+        super(GOES2GImagerProduct, self).__init__(
+            product_id, origin_id, date_format
+        )
 
         self._scene_id: str = scene_id
         self._version: str = version
@@ -81,24 +87,36 @@ class GOES2GImagerProduct(GOES2GProduct):
         return (
             f"{super(GOES2GImagerProduct, self)._str_stat()}\n"
             f"  Scene ID   : '{self._scene_id}'\n"
-            f"  Version    : '{self.version}'"
+            f"  Version    : '{self._version}'"
         )
 
     def get_baseurl(self, timestamp: str) -> str:
         scene: str = self.SCENE_MAPPING[self.scene_id]
-        date_obj: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+        date_obj: datetime = datetime.strptime(timestamp, self._date_format)
         date: str = date_obj.strftime("%Y/%m")
         return (
             "https://www.ncei.noaa.gov/data/"
-            f"gridsat-goes/access/{scene.lower()}/{date}"
+            f"gridsat-goes/access/{scene.lower()}/{date}/"
         )
 
-    def get_filename(self, timestamp: str) -> str:
+    def get_filename(
+        self, time_start: str, time_end: str = "", time_create: str = ""
+    ) -> str:
+        if time_end or time_create:
+            raise ValueError(
+                "GOES 2nd generation Imager Products do not support "
+                "time_end and time_create parameters."
+            )
+        file_id = self.get_file_id()
+        prefix, suffix = file_id.rsplit(".", 1)
+        start_date: datetime = datetime.strptime(time_start, self._date_format)
+        start: str = start_date.strftime("%Y.%m.%d.%H%M")
+        return f"{prefix}.{start}.{suffix}.nc"
+
+    def get_file_id(self) -> str:
         scene: str = self.SCENE_MAPPING[self.scene_id]
         origin: str = self.AVAILABLE_ORIGIN[self.origin_id]
-        date_obj: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
-        date: str = date_obj.strftime("%Y.%m.%d.%H%M")
-        return f"GridSat-{scene}.{origin.lower()}.{date}.{self.version}.nc"
+        return f"GridSat-{scene}.{origin.lower()}.{self.version}"
 
     @property
     def scene_id(self) -> str:

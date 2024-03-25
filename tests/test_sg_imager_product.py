@@ -21,8 +21,12 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             "G14",
             "G15",
         }
+        self.valid_date_format = "%Y%m%d-%H%M%S"
         self.product = GOES2GImagerProduct(
-            self.valid_scene_id, self.valid_origin_id, self.valid_version
+            self.valid_scene_id,
+            self.valid_origin_id,
+            self.valid_version,
+            self.valid_date_format,
         )
 
     def test_init_invalid_origin_parameter(self) -> None:
@@ -45,6 +49,17 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             GOES2GImagerProduct(
                 self.valid_scene_id, self.valid_origin_id, invalid_scene_id
             )
+
+    def test_default_date_format(self) -> None:
+        self.product = GOES2GImagerProduct(
+            self.valid_scene_id,
+            self.valid_origin_id,
+            self.valid_version,
+        )
+        self.assertEqual(self.product.date_format, "%Y-%m-%dT%H:%M:%S%z")
+
+    def test_date_format_property(self) -> None:
+        self.assertEqual(self.product.date_format, self.valid_date_format)
 
     def test_product_id_property(self) -> None:
         self.assertEqual(self.product.product_id, self.valid_product_id)
@@ -133,7 +148,8 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             f"origin_id='{self.valid_origin_id}',"
             f"product_id='{self.valid_product_id}',"
             f"scene_id='{self.valid_scene_id}',"
-            f"version='{self.valid_version}'"
+            f"version='{self.valid_version}',"
+            f"date_format='{self.valid_date_format}'"
             f") at {id(self.product):#x}>"
         )
         repr_result = repr(self.product)
@@ -151,41 +167,41 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         self.assertEqual(str_result, EXPECTED_RESULT)
 
     def test_get_baseurl(self) -> None:
-        TIMESTAMP = "20220101102030"
+        TIMESTAMP = "20240307-203000"
         EXPECTED_BASEURL = (
-            "https://www.ncei.noaa.gov/data/gridsat-goes/access/goes/2022/01"
+            "https://www.ncei.noaa.gov/data/gridsat-goes/access/goes/2024/03/"
         )
         self.assertEqual(self.product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
 
-    def test_get_baseurl_with_alternative_data(self) -> None:
-        TIMESTAMP = "20201231201045"
-        SCENE_ID = "C"
-        EXPECTED_BASEURL = (
-            "https://www.ncei.noaa.gov/data/gridsat-goes/access/conus/2020/12"
-        )
-        product = GOES2GImagerProduct(
-            SCENE_ID, self.valid_origin_id, self.valid_version
-        )
-        self.assertEqual(product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
+    def test_get_baseurl_invalid_timestamp(self) -> None:
+        TIMESTAMP = "20240307.203000"
+        with self.assertRaises(ValueError):
+            self.product.get_baseurl(TIMESTAMP)
 
     def test_get_file_name(self) -> None:
-        TIMESTAMP = "20220101102030"
-        EXPECTED_FILE_NAME = "GridSat-GOES.goes08.2022.01.01.1020.v01.nc"
+        TIMESTAMP = "20240307-203000"
+        EXPECTED_FILE_NAME = "GridSat-GOES.goes08.2024.03.07.2030.v01.nc"
         actual_file_name = self.product.get_filename(TIMESTAMP)
         self.assertEqual(EXPECTED_FILE_NAME, actual_file_name)
 
-    def test_get_file_name_alternative_data(
-        self,
-    ) -> None:
-        TIMESTAMP = "20201231201045"
-        EXPECTED_FILE_NAME = "GridSat-CONUS.goes13.2020.12.31.2010.v01.nc"
-        valid_origin_id = "G13"
-        valid_scene_id = "C"
-        self.product = GOES2GImagerProduct(
-            valid_scene_id, valid_origin_id, self.valid_version
-        )
-        actual_file_name = self.product.get_filename(TIMESTAMP)
-        self.assertEqual(EXPECTED_FILE_NAME, actual_file_name)
+    def test_get_filename_with_time_end_and_time_create(self) -> None:
+        TIMESTAMP = "20240307-203000"
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP, time_end=TIMESTAMP)
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP, time_create=TIMESTAMP)
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP, TIMESTAMP, TIMESTAMP)
+
+    def test_get_filename_invalid_timestamp(self) -> None:
+        TIMESTAMP = "20240307.203000"
+        with self.assertRaises(ValueError):
+            self.product.get_filename(TIMESTAMP)
+
+    def test_get_file_id(self) -> None:
+        EXPECTED_FILE_ID = "GridSat-GOES.goes08.v01"
+        actual_file_id = self.product.get_file_id()
+        self.assertEqual(EXPECTED_FILE_ID, actual_file_id)
 
 
 if __name__ == "__main__":
