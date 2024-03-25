@@ -20,6 +20,6 @@ class GOES2GProduct(GOESProduct):
                 f"Available origin IDs: {sorted(available_origin)}"
             )
 
-        super(GOES2GProduct, self).__init__(
-            self.AVAILABLE_PRODUCT[0], origin_id
-        )
+        product_id: str = self.AVAILABLE_PRODUCT[0]
+
+        super(GOES2GProduct, self).__init__(product_id, origin_id)
