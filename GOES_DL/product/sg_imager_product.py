@@ -6,7 +6,9 @@ from .sg_product import GOES2GProduct
 class GOES2GImagerProduct(GOES2GProduct):
     # The only available product is equivalent to GOES-R Series's
     # Multi-band Cloud and Moisture Imagery Product (MCMIP).
-    AVAILABLE_PRODUCT: list[str] = ["MCMIP"]
+    AVAILABLE_PRODUCT: dict[str, str] = {
+        "MCMIP": "Multi-band Cloud and Moisture Imagery"
+    }
 
     # Available scenes/domains from the GOES 2nd generation Imager
     # Products:
@@ -40,7 +42,8 @@ class GOES2GImagerProduct(GOES2GProduct):
                 f"Supported versions: {sorted(self.AVAILABLE_VERSION)}"
             )
 
-        product_id: str = self.AVAILABLE_PRODUCT[0]
+        available_product: list[str] = list(self.AVAILABLE_PRODUCT.keys())
+        product_id: str = available_product[0]
 
         super(GOES2GImagerProduct, self).__init__(product_id, origin_id)
 
