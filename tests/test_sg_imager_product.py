@@ -1,6 +1,6 @@
 import unittest
 
-from GOES_DL.product import GOES2GImagerProduct
+from ..GOES_DL.product import GOES2GImagerProduct
 
 
 class TestGOES2GImagerProduct(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
     def setUp(self) -> None:
         self.valid_origin_id = "G08"
         self.valid_scene_id = "F"
-        self.valid_version = "1"
+        self.valid_version = "v01"
         self.valid_product_id = "MCMIP"
         self.available_origin = {
             "G08",
@@ -39,14 +39,14 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             )
 
     def test_init_invalid_scene(self) -> None:
-        invalid_scene_id = "Z"
+        invalid_scene_id = "M1"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
                 self.valid_origin_id, invalid_scene_id, self.valid_version
             )
 
     def test_init_invalid_version(self) -> None:
-        invalid_scene_id = "2"
+        invalid_scene_id = "v02"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
                 self.valid_origin_id, self.valid_scene_id, invalid_scene_id
@@ -92,7 +92,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
 
     def test_available_version(self) -> None:
         for valid_vernum in range(1, 2):
-            valid_version = f"{valid_vernum}"
+            valid_version = f"v{valid_vernum:02d}"
             self.assertIn(
                 f"{valid_version}", GOES2GImagerProduct.AVAILABLE_VERSION
             )
@@ -102,7 +102,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
 
     def test_unavailable_version(self) -> None:
         for invalid_vernum in range(2, 6):
-            invalid_version = f"{invalid_vernum}"
+            invalid_version = f"v{invalid_vernum:02d}"
             self.assertNotIn(
                 invalid_version, GOES2GImagerProduct.AVAILABLE_VERSION
             )

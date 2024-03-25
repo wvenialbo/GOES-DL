@@ -23,7 +23,7 @@ class GOES2GImagerProduct(GOES2GProduct):
     }
 
     # Available versions of the GOES 2nd generation Imager Products:
-    AVAILABLE_VERSION: list[str] = ["1"]
+    AVAILABLE_VERSION: set[str] = {"v01"}
 
     # Mapping between scene IDs and scene names:
     SCENE_MAPPING: dict[str, str] = {
@@ -32,7 +32,7 @@ class GOES2GImagerProduct(GOES2GProduct):
     }
 
     def __init__(
-        self, origin_id: str, scene_id: str = "F", version: str = "1"
+        self, origin_id: str, scene_id: str = "F", version: str = "v01"
     ) -> None:
         if scene_id not in self.AVAILABLE_SCENE:
             available_scene = sorted(list(self.AVAILABLE_SCENE.keys()))
@@ -81,7 +81,7 @@ class GOES2GImagerProduct(GOES2GProduct):
         return (
             f"{super(GOES2GImagerProduct, self)._str_stat()}\n"
             f"  Scene ID   : '{self._scene_id}'\n"
-            f"  Version    : 'v{int(self.version):02d}'"
+            f"  Version    : '{self.version}'"
         )
 
     def get_baseurl(self, timestamp: str) -> str:
@@ -98,8 +98,7 @@ class GOES2GImagerProduct(GOES2GProduct):
         origin: str = self.AVAILABLE_ORIGIN[self.origin_id]
         date_obj: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
         date: str = date_obj.strftime("%Y.%m.%d.%H%M")
-        version: str = f"v{int(self.version):02d}"
-        return f"GridSat-{scene}.{origin.lower()}.{date}.{version}.nc"
+        return f"GridSat-{scene}.{origin.lower()}.{date}.{self.version}.nc"
 
     @property
     def scene_id(self) -> str:
