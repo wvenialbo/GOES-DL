@@ -1,6 +1,6 @@
 import unittest
 
-from ..GOES_DL.product import GOES2GImagerProduct
+from GOES_DL.product import GOES2GImagerProduct
 
 
 class TestGOES2GImagerProduct(unittest.TestCase):

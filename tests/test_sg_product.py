@@ -1,6 +1,6 @@
 import unittest
 
-from ..GOES_DL.product import GOES2GProduct
+from GOES_DL.product import GOES2GProduct
 
 
 class GOES2GProductTest(GOES2GProduct):
