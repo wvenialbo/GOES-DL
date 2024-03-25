@@ -11,7 +11,7 @@ class GOESProduct(ABC):
             return self._product_id
         if format_spec == "origin":
             return self._origin_id
-        if format_spec == "":
+        if not format_spec:
             return str(self)
         available_format_spec: list[str] = sorted(self._format_spec())
         raise ValueError(
