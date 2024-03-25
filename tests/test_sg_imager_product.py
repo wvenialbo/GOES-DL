@@ -10,7 +10,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         self.valid_origin_id = "G08"
         self.valid_scene_id = "F"
         self.valid_version = "v01"
-        self.valid_product_id = "MCMIP"
+        self.valid_product_id = "MCMIP"  # GOES2GImagerProduct internal
         self.available_origin = {
             "G08",
             "G09",
@@ -25,27 +25,21 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             self.valid_scene_id, self.valid_origin_id, self.valid_version
         )
 
-    def test_init_valid_parameters(self) -> None:
-        self.assertEqual(self.product.product_id, self.valid_product_id)
-        self.assertEqual(self.product.origin_id, self.valid_origin_id)
-        self.assertEqual(self.product.scene_id, self.valid_scene_id)
-        self.assertEqual(self.product.version, self.valid_version)
-
-    def test_init_invalid_origin(self) -> None:
+    def test_init_invalid_origin_parameter(self) -> None:
         invalid_origin_id = "G20"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
                 self.valid_scene_id, invalid_origin_id, self.valid_version
             )
 
-    def test_init_invalid_scene(self) -> None:
+    def test_init_invalid_scene_parameter(self) -> None:
         invalid_scene_id = "M1"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
                 invalid_scene_id, self.valid_origin_id, self.valid_version
             )
 
-    def test_init_invalid_version(self) -> None:
+    def test_init_invalid_version_parameter(self) -> None:
         invalid_scene_id = "v02"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
@@ -111,31 +105,42 @@ class TestGOES2GImagerProduct(unittest.TestCase):
                     self.valid_scene_id, self.valid_origin_id, invalid_version
                 )
 
-    def test_format(self) -> None:
+    def test_format_origin(self) -> None:
+        self.assertEqual(format(self.product, "origin"), self.valid_origin_id)
+
+    def test_format_product(self) -> None:
         self.assertEqual(
             format(self.product, "product"), self.valid_product_id
         )
-        self.assertEqual(format(self.product, "origin"), self.valid_origin_id)
+
+    def test_format_scene(self) -> None:
+        self.assertEqual(format(self.product, "scene"), self.valid_scene_id)
+
+    def test_format_version(self) -> None:
+        self.assertEqual(format(self.product, "version"), self.valid_version)
+
+    def test_format(self) -> None:
         self.assertEqual(format(self.product, ""), str(self.product))
+
+    def test_invalid_format_spec(self) -> None:
         with self.assertRaises(ValueError):
             format(self.product, "invalid")
 
     def test_repr(self) -> None:
         MODULE_NAME = GOES2GImagerProduct.__module__
-        EXPECTED_REPR = (
+        EXPECTED_RESULT = (
             f"<{MODULE_NAME}.{self.CLASS_NAME}("
             f"origin_id='{self.valid_origin_id}',"
             f"product_id='{self.valid_product_id}',"
             f"scene_id='{self.valid_scene_id}',"
             f"version='{self.valid_version}'"
-            ") at 0x"
+            f") at {id(self.product):#x}>"
         )
         repr_result = repr(self.product)
-        self.assertTrue(repr_result.startswith(EXPECTED_REPR))
-        self.assertTrue(repr_result.endswith(">"))
+        self.assertEqual(repr_result, EXPECTED_RESULT)
 
     def test_str(self) -> None:
-        EXPECTED_STR = (
+        EXPECTED_RESULT = (
             f"{self.CLASS_NAME}:\n"
             f"  Origin ID  : '{self.valid_origin_id}'\n"
             f"  Product ID : '{self.valid_product_id}'\n"
@@ -143,8 +148,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             f"  Version    : '{self.valid_version}'"
         )
         str_result = str(self.product)
-        expected_result = EXPECTED_STR
-        self.assertEqual(str_result, expected_result)
+        self.assertEqual(str_result, EXPECTED_RESULT)
 
     def test_get_baseurl(self) -> None:
         TIMESTAMP = "20220101102030"
@@ -153,13 +157,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         )
         self.assertEqual(self.product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
 
-    def test_get_file_name(self) -> None:
-        TIMESTAMP = "20220101102030"
-        EXPECTED_FILE_NAME = "GridSat-GOES.goes08.2022.01.01.1020.v01.nc"
-        actual_file_name = self.product.get_filename(TIMESTAMP)
-        self.assertEqual(EXPECTED_FILE_NAME, actual_file_name)
-
-    def test_get_baseurl_with_different_scene_and_timestamp(self) -> None:
+    def test_get_baseurl_with_alternative_data(self) -> None:
         TIMESTAMP = "20201231201045"
         SCENE_ID = "C"
         EXPECTED_BASEURL = (
@@ -170,7 +168,13 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         )
         self.assertEqual(product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
 
-    def test_get_file_name_with_different_scene_origin_and_timestamp(
+    def test_get_file_name(self) -> None:
+        TIMESTAMP = "20220101102030"
+        EXPECTED_FILE_NAME = "GridSat-GOES.goes08.2022.01.01.1020.v01.nc"
+        actual_file_name = self.product.get_filename(TIMESTAMP)
+        self.assertEqual(EXPECTED_FILE_NAME, actual_file_name)
+
+    def test_get_file_name_alternative_data(
         self,
     ) -> None:
         TIMESTAMP = "20201231201045"

@@ -16,7 +16,7 @@ class TestGOES2GProduct(unittest.TestCase):
 
     def setUp(self) -> None:
         self.valid_origin_id = "G08"
-        self.valid_product_id = "MCMIP"
+        self.valid_product_id = "MCMIP"  # Unchecked by GOES2GProduct
         self.available_origin = {
             "G08",
             "G09",
@@ -31,20 +31,16 @@ class TestGOES2GProduct(unittest.TestCase):
             self.valid_product_id, self.valid_origin_id
         )
 
-    def test_init_valid_parameters(self) -> None:
-        self.assertEqual(self.product.product_id, self.valid_product_id)
-        self.assertEqual(self.product.origin_id, self.valid_origin_id)
-
-    def test_init_invalid_origin(self) -> None:
-        invalid_origin_id = "G20"
+    def test_init_invalid_origin_parameter(self) -> None:
+        INVALID_ORIGIN_ID = "G20"
         with self.assertRaises(ValueError):
-            GOES2GProductTest(self.product.product_id, invalid_origin_id)
-
-    def test_product_id_property(self) -> None:
-        self.assertEqual(self.product.product_id, self.valid_product_id)
+            GOES2GProductTest(self.product.product_id, INVALID_ORIGIN_ID)
 
     def test_origin_id_property(self) -> None:
         self.assertEqual(self.product.origin_id, self.valid_origin_id)
+
+    def test_product_id_property(self) -> None:
+        self.assertEqual(self.product.product_id, self.valid_product_id)
 
     def test_available_origin(self) -> None:
         for id in range(8, 16):
@@ -59,36 +55,40 @@ class TestGOES2GProduct(unittest.TestCase):
             with self.assertRaises(ValueError):
                 GOES2GProductTest(self.product.product_id, invalid_origin_id)
 
-    def test_format(self) -> None:
+    def test_format_origin(self) -> None:
+        self.assertEqual(format(self.product, "origin"), self.valid_origin_id)
+
+    def test_format_product(self) -> None:
         self.assertEqual(
             format(self.product, "product"), self.valid_product_id
         )
-        self.assertEqual(format(self.product, "origin"), self.valid_origin_id)
+
+    def test_format(self) -> None:
         self.assertEqual(format(self.product, ""), str(self.product))
+
+    def test_invalid_format_spec(self) -> None:
         with self.assertRaises(ValueError):
             format(self.product, "invalid")
 
     def test_repr(self) -> None:
         MODULE_NAME = GOES2GProductTest.__module__
-        EXPECTED_REPR = (
+        EXPECTED_RESULT = (
             f"<{MODULE_NAME}.{self.CLASS_NAME}("
             f"origin_id='{self.valid_origin_id}',"
             f"product_id='{self.valid_product_id}'"
-            ") at 0x"
+            f") at {id(self.product):#x}>"
         )
         repr_result = repr(self.product)
-        self.assertTrue(repr_result.startswith(EXPECTED_REPR))
-        self.assertTrue(repr_result.endswith(">"))
+        self.assertEqual(repr_result, EXPECTED_RESULT)
 
     def test_str(self) -> None:
-        EXPECTED_STR = (
+        EXPECTED_RESULT = (
             f"{self.CLASS_NAME}:\n"
             f"  Origin ID  : '{self.valid_origin_id}'\n"
             f"  Product ID : '{self.valid_product_id}'"
         )
         str_result = str(self.product)
-        expected_result = EXPECTED_STR
-        self.assertEqual(str_result, expected_result)
+        self.assertEqual(str_result, EXPECTED_RESULT)
 
     def test_get_baseurl(self) -> None:
         TIMESTAMP = "2024-01-01T00:00:00Z"
