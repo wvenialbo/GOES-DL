@@ -4,11 +4,17 @@ from .sg_product import GOES2GProduct
 
 
 class GOES2GImagerProduct(GOES2GProduct):
+    # Available scenes/domains from the GOES 2nd generation Imager
+    # Products:
     AVAILABLE_SCENE: dict[str, str] = {
         "F": "Full Disk",
         "C": "CONUS (Contiguous U.S.)",
     }
+
+    # Available versions of the GOES 2nd generation Imager Products:
     AVAILABLE_VERSION: list[str] = ["1"]
+
+    # Mapping between scene IDs and scene names:
     SCENE_MAPPING: dict[str, str] = {
         "F": "GOES",
         "C": "CONUS",
