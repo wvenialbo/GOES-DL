@@ -12,6 +12,11 @@ class GOES2GImagerProduct(GOES2GProduct):
 
     # Available scenes/domains from the GOES 2nd generation Imager
     # Products:
+    #
+    # NOTE: In its strictest sense, “contiguous United States” refers
+    # to the lower 48 states in North America (including the District of
+    # of Columbia), and “continental United States” refers to 49 states
+    # (including Alaska and the District of Columbia).
     AVAILABLE_SCENE: dict[str, str] = {
         "F": "Full Disk",
         "C": "CONUS (Contiguous United States)",
