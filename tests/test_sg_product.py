@@ -16,9 +16,20 @@ class TestGOES2GProduct(unittest.TestCase):
 
     def setUp(self) -> None:
         self.valid_origin_id = "G08"
-        self.valid_product_id = GOES2GProduct.AVAILABLE_PRODUCT[0]
-        self.available_origin = GOES2GProduct.AVAILABLE_ORIGIN
-        self.product = GOES2GProductTest(self.valid_origin_id)
+        self.valid_product_id = "MCMIP"
+        self.available_origin = {
+            "G08",
+            "G09",
+            "G10",
+            "G11",
+            "G12",
+            "G13",
+            "G14",
+            "G15",
+        }
+        self.product = GOES2GProductTest(
+            self.valid_product_id, self.valid_origin_id
+        )
 
     def test_init_valid_parameters(self) -> None:
         self.assertEqual(self.product.product_id, self.valid_product_id)
@@ -27,7 +38,7 @@ class TestGOES2GProduct(unittest.TestCase):
     def test_init_invalid_origin(self) -> None:
         invalid_origin_id = "G20"
         with self.assertRaises(ValueError):
-            GOES2GProductTest(invalid_origin_id)
+            GOES2GProductTest(self.product.product_id, invalid_origin_id)
 
     def test_product_id_property(self) -> None:
         self.assertEqual(self.product.product_id, self.valid_product_id)
@@ -39,14 +50,14 @@ class TestGOES2GProduct(unittest.TestCase):
         for id in range(8, 16):
             valid_origin_id = f"G{id:02d}"
             self.assertIn(valid_origin_id, self.available_origin)
-            GOES2GProductTest(valid_origin_id)
+            GOES2GProductTest(self.product.product_id, valid_origin_id)
 
     def test_unavailable_origin(self) -> None:
         for id in range(16, 20):
             invalid_origin_id = f"G{id:02d}"
             self.assertNotIn(invalid_origin_id, self.available_origin)
             with self.assertRaises(ValueError):
-                GOES2GProductTest(invalid_origin_id)
+                GOES2GProductTest(self.product.product_id, invalid_origin_id)
 
     def test_get_baseurl(self) -> None:
         TIMESTAMP = "2024-01-01T00:00:00Z"

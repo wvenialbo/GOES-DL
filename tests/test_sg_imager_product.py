@@ -10,8 +10,17 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         self.valid_origin_id = "G08"
         self.valid_scene_id = "F"
         self.valid_version = "1"
-        self.valid_product_id = GOES2GImagerProduct.AVAILABLE_PRODUCT[0]
-        self.available_origin = GOES2GImagerProduct.AVAILABLE_ORIGIN
+        self.valid_product_id = "MCMIP"
+        self.available_origin = {
+            "G08",
+            "G09",
+            "G10",
+            "G11",
+            "G12",
+            "G13",
+            "G14",
+            "G15",
+        }
         self.product = GOES2GImagerProduct(
             self.valid_origin_id, self.valid_scene_id, self.valid_version
         )
