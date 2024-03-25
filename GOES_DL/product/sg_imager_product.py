@@ -4,6 +4,10 @@ from .sg_product import GOES2GProduct
 
 
 class GOES2GImagerProduct(GOES2GProduct):
+    # The only available product is equivalent to GOES-R Series's
+    # Multi-band Cloud and Moisture Imagery Product (MCMIP).
+    AVAILABLE_PRODUCT: list[str] = ["MCMIP"]
+
     # Available scenes/domains from the GOES 2nd generation Imager
     # Products:
     AVAILABLE_SCENE: dict[str, str] = {
@@ -23,8 +27,6 @@ class GOES2GImagerProduct(GOES2GProduct):
     def __init__(
         self, origin_id: str, scene_id: str = "F", version: str = "1"
     ) -> None:
-        super(GOES2GImagerProduct, self).__init__(origin_id)
-
         if scene_id not in self.AVAILABLE_SCENE:
             available_scene = sorted(list(self.AVAILABLE_SCENE.keys()))
             raise ValueError(
@@ -37,6 +39,10 @@ class GOES2GImagerProduct(GOES2GProduct):
                 f"Unsupported version: {version}. "
                 f"Supported versions: {sorted(self.AVAILABLE_VERSION)}"
             )
+
+        product_id: str = self.AVAILABLE_PRODUCT[0]
+
+        super(GOES2GImagerProduct, self).__init__(product_id, origin_id)
 
         self._scene_id: str = scene_id
         self._version: str = version
