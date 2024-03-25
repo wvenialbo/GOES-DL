@@ -35,7 +35,7 @@ class GOES2GImagerProduct(GOES2GProduct):
         self, scene_id: str = "F", origin_id: str = "G08", version: str = "v01"
     ) -> None:
         if scene_id not in self.AVAILABLE_SCENE:
-            available_scene = sorted(list(self.AVAILABLE_SCENE.keys()))
+            available_scene = sorted(self.AVAILABLE_SCENE.keys())
             raise ValueError(
                 f"Invalid scene_id: {scene_id}. "
                 f"Available scene IDs: {available_scene}"
