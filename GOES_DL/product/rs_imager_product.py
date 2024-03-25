@@ -61,3 +61,40 @@ class GOESRSImagerProduct(GOESRSProduct):
 
         self._scene_id: str = scene_id
         self._scan_mode: str = scan_mode
+
+    def __format__(self, format_spec: str) -> str:
+        if format_spec == "scene":
+            return self._scene_id
+        if format_spec == "scan_mode":
+            return self._scan_mode
+        return super(GOESRSImagerProduct, self).__format__(format_spec)
+
+    @staticmethod
+    def _format_spec() -> list[str]:
+        return super(
+            GOESRSImagerProduct, GOESRSImagerProduct
+        )._format_spec() + [
+            "scene",
+            "scan_mode",
+        ]
+
+    def _repr_stat(self) -> str:
+        return (
+            super(GOESRSImagerProduct, self)._repr_stat()
+            + f",scene_id='{self._scene_id}',scan_mode='{self._scan_mode}'"
+        )
+
+    def _str_stat(self) -> str:
+        return (
+            f"{super(GOESRSImagerProduct, self)._str_stat()}\n"
+            f"  Scene ID   : '{self._scene_id}'\n"
+            f"  Scan Mode  : '{self._scan_mode}'"
+        )
+
+    @property
+    def scene_id(self) -> str:
+        return self._scene_id
+
+    @property
+    def scan_mode(self) -> str:
+        return self._scan_mode

@@ -58,3 +58,41 @@ class GOESRSProduct(GOESProduct):
 
         self._instrument_id: str = instrument_id
         self._level_id: str = level_id
+
+    def __format__(self, format_spec: str) -> str:
+        if format_spec == "instrument":
+            return self._instrument_id
+        if format_spec == "level":
+            return self._level_id
+        return super(GOESRSProduct, self).__format__(format_spec)
+
+    @staticmethod
+    def _format_spec() -> list[str]:
+        return super(GOESRSProduct, GOESRSProduct)._format_spec() + [
+            "instrument",
+            "level",
+        ]
+
+    def _repr_stat(self) -> str:
+        return (
+            f"level_id='{self._level_id}',"
+            f"product_id='{self._product_id}',"
+            f"instrument_id='{self._instrument_id}',"
+            f"origin_id='{self._origin_id}'"
+        )
+
+    def _str_stat(self) -> str:
+        return (
+            f"  Origin ID  : '{self._origin_id}'\n"
+            f"  Instrument : '{self._instrument_id}'\n"
+            f"  Product ID : '{self._product_id}'\n"
+            f"  Level      : '{self._level_id}'"
+        )
+
+    @property
+    def instrument_id(self) -> str:
+        return self._instrument_id
+
+    @property
+    def level_id(self) -> str:
+        return self._level_id

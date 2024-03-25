@@ -29,7 +29,7 @@ class GOESRSSingleBandProduct(GOESRSImagerProduct):
         origin_id: str,
     ) -> None:
         if channel_id not in self.AVAILABLE_CHANNEL:
-            available_channel: list[str] = sorted(list(self.AVAILABLE_CHANNEL))
+            available_channel: list[str] = sorted(self.AVAILABLE_CHANNEL)
             raise ValueError(
                 f"Invalid channel_id: '{channel_id}'. "
                 f"Available channel IDs: {available_channel}"
@@ -53,7 +53,8 @@ class GOESRSSingleBandProduct(GOESRSImagerProduct):
                     f"Available channel IDs: {sorted(channels)}"
                 )
 
-        level_id: str = "L1b" if product_id == "Rad" else "L2"
+        levels: list[str] = sorted(self.AVAILABLE_LEVEL.keys())
+        level_id: str = levels[0] if product_id == "Rad" else levels[1]
 
         super(GOESRSSingleBandProduct, self).__init__(
             scene_id,
@@ -64,3 +65,32 @@ class GOESRSSingleBandProduct(GOESRSImagerProduct):
         )
 
         self._channel_id = channel_id
+
+    def __format__(self, format_spec: str) -> str:
+        if format_spec == "channel":
+            return self._channel_id
+        return super(GOESRSSingleBandProduct, self).__format__(format_spec)
+
+    @staticmethod
+    def _format_spec() -> list[str]:
+        return super(
+            GOESRSSingleBandProduct, GOESRSSingleBandProduct
+        )._format_spec() + [
+            "channel",
+        ]
+
+    def _repr_stat(self) -> str:
+        return (
+            super(GOESRSSingleBandProduct, self)._repr_stat()
+            + f",channel_id='{self._channel_id}'"
+        )
+
+    def _str_stat(self) -> str:
+        return (
+            f"{super(GOESRSSingleBandProduct, self)._str_stat()}\n"
+            f"  Channel ID : '{self._channel_id}'"
+        )
+
+    @property
+    def channel_id(self) -> str:
+        return self._channel_id
