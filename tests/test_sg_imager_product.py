@@ -111,6 +111,41 @@ class TestGOES2GImagerProduct(unittest.TestCase):
                     self.valid_scene_id, self.valid_origin_id, invalid_version
                 )
 
+    def test_format(self) -> None:
+        self.assertEqual(
+            format(self.product, "product"), self.valid_product_id
+        )
+        self.assertEqual(format(self.product, "origin"), self.valid_origin_id)
+        self.assertEqual(format(self.product, ""), str(self.product))
+        with self.assertRaises(ValueError):
+            format(self.product, "invalid")
+
+    def test_repr(self) -> None:
+        MODULE_NAME = GOES2GImagerProduct.__module__
+        EXPECTED_REPR = (
+            f"<{MODULE_NAME}.{self.CLASS_NAME}("
+            f"origin_id='{self.valid_origin_id}',"
+            f"product_id='{self.valid_product_id}',"
+            f"scene_id='{self.valid_scene_id}',"
+            f"version='{self.valid_version}'"
+            ") at 0x"
+        )
+        repr_result = repr(self.product)
+        self.assertTrue(repr_result.startswith(EXPECTED_REPR))
+        self.assertTrue(repr_result.endswith(">"))
+
+    def test_str(self) -> None:
+        EXPECTED_STR = (
+            f"{self.CLASS_NAME}:\n"
+            f"  Origin ID  : '{self.valid_origin_id}'\n"
+            f"  Product ID : '{self.valid_product_id}'\n"
+            f"  Scene ID   : '{self.valid_scene_id}'\n"
+            f"  Version    : '{self.valid_version}'"
+        )
+        str_result = str(self.product)
+        expected_result = EXPECTED_STR
+        self.assertEqual(str_result, expected_result)
+
     def test_get_baseurl(self) -> None:
         TIMESTAMP = "20220101102030"
         EXPECTED_BASEURL = (
@@ -147,41 +182,6 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         )
         actual_file_name = self.product.get_filename(TIMESTAMP)
         self.assertEqual(EXPECTED_FILE_NAME, actual_file_name)
-
-    def test_format(self) -> None:
-        self.assertEqual(
-            format(self.product, "product"), self.valid_product_id
-        )
-        self.assertEqual(format(self.product, "origin"), self.valid_origin_id)
-        self.assertEqual(format(self.product, ""), str(self.product))
-        with self.assertRaises(ValueError):
-            format(self.product, "invalid")
-
-    def test_repr(self) -> None:
-        MODULE_NAME = GOES2GImagerProduct.__module__
-        EXPECTED_REPR = (
-            f"<{MODULE_NAME}.{self.CLASS_NAME}("
-            f"origin_id='{self.valid_origin_id}',"
-            f"product_id='{self.valid_product_id}',"
-            f"scene_id='{self.valid_scene_id}',"
-            f"version='{self.valid_version}'"
-            ") at 0x"
-        )
-        repr_result = repr(self.product)
-        self.assertTrue(repr_result.startswith(EXPECTED_REPR))
-        self.assertTrue(repr_result.endswith(">"))
-
-    def test_str(self) -> None:
-        EXPECTED_STR = (
-            f"{self.CLASS_NAME}:\n"
-            f"  Origin ID  : '{self.valid_origin_id}'\n"
-            f"  Product ID : '{self.valid_product_id}'\n"
-            f"  Scene ID   : '{self.valid_scene_id}'\n"
-            f"  Version    : '{self.valid_version}'"
-        )
-        str_result = str(self.product)
-        expected_result = EXPECTED_STR
-        self.assertEqual(str_result, expected_result)
 
 
 if __name__ == "__main__":

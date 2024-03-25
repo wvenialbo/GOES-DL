@@ -31,22 +31,6 @@ class TestGOESProduct(unittest.TestCase):
     def test_origin_id_property(self) -> None:
         self.assertEqual(self.product.origin_id, self.valid_origin_id)
 
-    def test_get_baseurl(self) -> None:
-        TIMESTAMP = "2024-01-01T00:00:00Z"
-        EXPECTED_BASEURL = f"https://path/to/{TIMESTAMP}"
-        self.assertEqual(self.product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
-
-    def test_get_filename(self) -> None:
-        TIMESTAMP = "2024-01-01T00:00:00Z"
-        EXPECTED_FILENAME = (
-            f"{self.valid_product_id}_"
-            f"{self.valid_origin_id}_"
-            f"{TIMESTAMP}.nc"
-        )
-        self.assertEqual(
-            self.product.get_filename(TIMESTAMP), EXPECTED_FILENAME
-        )
-
     def test_format(self) -> None:
         self.assertEqual(
             format(self.product, "product"), self.valid_product_id
@@ -77,6 +61,22 @@ class TestGOESProduct(unittest.TestCase):
         str_result = str(self.product)
         expected_result = EXPECTED_STR
         self.assertEqual(str_result, expected_result)
+
+    def test_get_baseurl(self) -> None:
+        TIMESTAMP = "2024-01-01T00:00:00Z"
+        EXPECTED_BASEURL = f"https://path/to/{TIMESTAMP}"
+        self.assertEqual(self.product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
+
+    def test_get_filename(self) -> None:
+        TIMESTAMP = "2024-01-01T00:00:00Z"
+        EXPECTED_FILENAME = (
+            f"{self.valid_product_id}_"
+            f"{self.valid_origin_id}_"
+            f"{TIMESTAMP}.nc"
+        )
+        self.assertEqual(
+            self.product.get_filename(TIMESTAMP), EXPECTED_FILENAME
+        )
 
 
 if __name__ == "__main__":
