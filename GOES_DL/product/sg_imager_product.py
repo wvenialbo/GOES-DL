@@ -14,7 +14,7 @@ class GOES2GImagerProduct(GOES2GProduct):
     # Products:
     AVAILABLE_SCENE: dict[str, str] = {
         "F": "Full Disk",
-        "C": "CONUS (Contiguous U.S.)",
+        "C": "CONUS (Contiguous United States)",
     }
 
     # Available versions of the GOES 2nd generation Imager Products:
