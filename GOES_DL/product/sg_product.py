@@ -10,10 +10,10 @@ class GOES2GProduct(GOESProduct):
 
     def __init__(self, product_id: str, origin_id: str) -> None:
         if origin_id not in self.AVAILABLE_ORIGIN:
-            available_origin: list[str] = list(self.AVAILABLE_ORIGIN.keys())
+            available_origin: list[str] = sorted(self.AVAILABLE_ORIGIN.keys())
             raise ValueError(
                 f"Invalid origin_id: '{origin_id}'. "
-                f"Available origin IDs: {sorted(available_origin)}"
+                f"Available origin IDs: {available_origin}"
             )
 
         super(GOES2GProduct, self).__init__(product_id, origin_id)

@@ -37,17 +37,17 @@ class GOESRSImagerProduct(GOESRSProduct):
         origin_id: str,
     ) -> None:
         if scene_id not in self.AVAILABLE_SCENE:
-            available_scene = list(self.AVAILABLE_SCENE.keys())
+            available_scene = sorted(self.AVAILABLE_SCENE.keys())
             raise ValueError(
                 f"Invalid scene_id: {scene_id}. "
-                f"Available scene IDs: {sorted(available_scene)}"
+                f"Available scene IDs: {available_scene}"
             )
 
         if scan_mode not in self.AVAILABLE_SCAN_MODE:
-            available_scan_mode = list(self.AVAILABLE_SCAN_MODE.keys())
+            available_scan_mode = sorted(self.AVAILABLE_SCAN_MODE.keys())
             raise ValueError(
                 f"Invalid scan_mode: {scan_mode}. "
-                f"Available scan modes: {sorted(available_scan_mode)}"
+                f"Available scan modes: {available_scan_mode}"
             )
 
         instrument_id: str = self.SUPPORTED_INSTRUMENT[0]

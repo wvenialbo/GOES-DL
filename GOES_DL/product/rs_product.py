@@ -32,26 +32,26 @@ class GOESRSProduct(GOESProduct):
         origin_id: str,
     ) -> None:
         if level_id not in self.AVAILABLE_LEVEL:
-            available_level: list[str] = list(self.AVAILABLE_LEVEL.keys())
+            available_level: list[str] = sorted(self.AVAILABLE_LEVEL.keys())
             raise ValueError(
                 f"Invalid level_id: '{level_id}'. "
-                f"Available level IDs: {sorted(available_level)}"
+                f"Available level IDs: {available_level}"
             )
 
         if instrument_id not in self.AVAILABLE_INSTRUMENT:
-            available_instrument: list[str] = list(
+            available_instrument: list[str] = sorted(
                 self.AVAILABLE_INSTRUMENT.keys()
             )
             raise ValueError(
                 f"Invalid instrument_id: '{instrument_id}'. "
-                f"Available instrument IDs: {sorted(available_instrument)}"
+                f"Available instrument IDs: {available_instrument}"
             )
 
         if origin_id not in self.AVAILABLE_ORIGIN:
-            available_origin: list[str] = list(self.AVAILABLE_ORIGIN.keys())
+            available_origin: list[str] = sorted(self.AVAILABLE_ORIGIN.keys())
             raise ValueError(
                 f"Invalid origin_id: '{origin_id}'. "
-                f"Available origin IDs: {sorted(available_origin)}"
+                f"Available origin IDs: {available_origin}"
             )
 
         super(GOESRSProduct, self).__init__(product_id, origin_id)

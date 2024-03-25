@@ -79,10 +79,12 @@ class GOESRSMultiBandProduct(GOESRSImagerProduct):
         origin_id: str,
     ) -> None:
         if product_id not in self.AVAILABLE_PRODUCT:
-            available_product: list[str] = list(self.AVAILABLE_PRODUCT.keys())
+            available_product: list[str] = sorted(
+                self.AVAILABLE_PRODUCT.keys()
+            )
             raise ValueError(
                 f"Invalid product_id: '{product_id}'. "
-                f"Available product IDs: {sorted(available_product)}"
+                f"Available product IDs: {available_product}"
             )
 
         for products, scenes in zip(
