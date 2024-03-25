@@ -1,6 +1,6 @@
 import unittest
 
-from ..GOES_DL.product import GOES2GImagerProduct
+from GOES_DL.product import GOES2GImagerProduct
 
 
 class TestGOES2GImagerProduct(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             "G15",
         }
         self.product = GOES2GImagerProduct(
-            self.valid_origin_id, self.valid_scene_id, self.valid_version
+            self.valid_scene_id, self.valid_origin_id, self.valid_version
         )
 
     def test_init_valid_parameters(self) -> None:
@@ -35,21 +35,21 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         invalid_origin_id = "G20"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
-                invalid_origin_id, self.valid_scene_id, self.valid_version
+                self.valid_scene_id, invalid_origin_id, self.valid_version
             )
 
     def test_init_invalid_scene(self) -> None:
         invalid_scene_id = "M1"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
-                self.valid_origin_id, invalid_scene_id, self.valid_version
+                invalid_scene_id, self.valid_origin_id, self.valid_version
             )
 
     def test_init_invalid_version(self) -> None:
         invalid_scene_id = "v02"
         with self.assertRaises(ValueError):
             GOES2GImagerProduct(
-                self.valid_origin_id, self.valid_scene_id, invalid_scene_id
+                self.valid_scene_id, self.valid_origin_id, invalid_scene_id
             )
 
     def test_product_id_property(self) -> None:
@@ -68,19 +68,19 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         for id in range(8, 16):
             valid_origin_id = f"G{id:02d}"
             self.assertIn(valid_origin_id, self.available_origin)
-            GOES2GImagerProduct(valid_origin_id)
+            GOES2GImagerProduct(origin_id=valid_origin_id)
 
     def test_unavailable_origin(self) -> None:
         for id in range(16, 20):
             invalid_origin_id = f"G{id:02d}"
             self.assertNotIn(invalid_origin_id, self.available_origin)
             with self.assertRaises(ValueError):
-                GOES2GImagerProduct(invalid_origin_id)
+                GOES2GImagerProduct(origin_id=invalid_origin_id)
 
     def test_available_scene(self) -> None:
         for valid_scene_id in ["F", "C"]:
             self.assertIn(valid_scene_id, GOES2GImagerProduct.AVAILABLE_SCENE)
-            GOES2GImagerProduct(self.valid_origin_id, valid_scene_id)
+            GOES2GImagerProduct(valid_scene_id, self.valid_origin_id)
 
     def test_unavailable_scene(self) -> None:
         for invalid_scene_id in {"M1", "M2"}:
@@ -88,7 +88,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
                 invalid_scene_id, GOES2GImagerProduct.AVAILABLE_SCENE
             )
             with self.assertRaises(ValueError):
-                GOES2GImagerProduct(self.valid_origin_id, invalid_scene_id)
+                GOES2GImagerProduct(invalid_scene_id, self.valid_origin_id)
 
     def test_available_version(self) -> None:
         for valid_vernum in range(1, 2):
@@ -97,7 +97,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
                 f"{valid_version}", GOES2GImagerProduct.AVAILABLE_VERSION
             )
             GOES2GImagerProduct(
-                self.valid_origin_id, self.valid_scene_id, valid_version
+                self.valid_scene_id, self.valid_origin_id, valid_version
             )
 
     def test_unavailable_version(self) -> None:
@@ -108,7 +108,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             )
             with self.assertRaises(ValueError):
                 GOES2GImagerProduct(
-                    self.valid_origin_id, self.valid_scene_id, invalid_version
+                    self.valid_scene_id, self.valid_origin_id, invalid_version
                 )
 
     def test_get_baseurl(self) -> None:
@@ -131,7 +131,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             "https://www.ncei.noaa.gov/data/gridsat-goes/access/conus/2020/12"
         )
         product = GOES2GImagerProduct(
-            self.valid_origin_id, SCENE_ID, self.valid_version
+            SCENE_ID, self.valid_origin_id, self.valid_version
         )
         self.assertEqual(product.get_baseurl(TIMESTAMP), EXPECTED_BASEURL)
 
@@ -143,7 +143,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         valid_origin_id = "G13"
         valid_scene_id = "C"
         self.product = GOES2GImagerProduct(
-            valid_origin_id, valid_scene_id, self.valid_version
+            valid_scene_id, valid_origin_id, self.valid_version
         )
         actual_file_name = self.product.get_filename(TIMESTAMP)
         self.assertEqual(EXPECTED_FILE_NAME, actual_file_name)
@@ -177,7 +177,7 @@ class TestGOES2GImagerProduct(unittest.TestCase):
             f"  Product ID : '{self.valid_product_id}'\n"
             f"  Origin ID  : '{self.valid_origin_id}'\n"
             f"  Scene ID   : '{self.valid_scene_id}'\n"
-            f"  Version    : 'v{int(self.valid_version):02d}'"
+            f"  Version    : '{self.valid_version}'"
         )
         str_result = str(self.product)
         expected_result = EXPECTED_STR

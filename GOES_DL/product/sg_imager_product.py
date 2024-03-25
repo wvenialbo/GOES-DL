@@ -32,7 +32,7 @@ class GOES2GImagerProduct(GOES2GProduct):
     }
 
     def __init__(
-        self, origin_id: str, scene_id: str = "F", version: str = "v01"
+        self, scene_id: str = "F", origin_id: str = "G08", version: str = "v01"
     ) -> None:
         if scene_id not in self.AVAILABLE_SCENE:
             available_scene = sorted(list(self.AVAILABLE_SCENE.keys()))
