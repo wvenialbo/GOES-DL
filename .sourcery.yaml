@@ -69,6 +69,6 @@ rule_settings:
 #   ssl_certs_file:
 #   no_ssl_verify: false
 
-# coding_assistant:
-#   project_description: ''
-#   enabled:
+coding_assistant:
+  project_description: 'GOES Satellite Imagery Downloader'
+  enabled: true

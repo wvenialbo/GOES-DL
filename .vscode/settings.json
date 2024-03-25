@@ -16,7 +16,8 @@
         "LVTP",
         "MCMI",
         "MCMIP",
-        "RRQPE"
+        "RRQPE",
+        "sourcery"
     ],
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
