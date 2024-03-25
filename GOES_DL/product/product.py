@@ -32,7 +32,7 @@ class GOESProduct(ABC):
         )
 
     def _repr_stat(self) -> str:
-        return f"product_id='{self._product_id}',origin_id='{self._origin_id}'"
+        return f"origin_id='{self._origin_id}',product_id='{self._product_id}'"
 
     def __str__(self) -> str:
         class_name: str = self.__class__.__name__
@@ -41,8 +41,8 @@ class GOESProduct(ABC):
 
     def _str_stat(self) -> str:
         return (
-            f"  Product ID : '{self._product_id}'\n"
-            f"  Origin ID  : '{self._origin_id}'"
+            f"  Origin ID  : '{self._origin_id}'\n"
+            f"  Product ID : '{self._product_id}'"
         )
 
     @abstractmethod

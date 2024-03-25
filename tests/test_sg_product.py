@@ -1,6 +1,6 @@
 import unittest
 
-from GOES_DL.product import GOES2GProduct
+from ..GOES_DL.product import GOES2GProduct
 
 
 class GOES2GProductTest(GOES2GProduct):
@@ -88,8 +88,8 @@ class TestGOES2GProduct(unittest.TestCase):
         MODULE_NAME = GOES2GProductTest.__module__
         EXPECTED_REPR = (
             f"<{MODULE_NAME}.{self.CLASS_NAME}("
-            f"product_id='{self.valid_product_id}',"
-            f"origin_id='{self.valid_origin_id}'"
+            f"origin_id='{self.valid_origin_id}',"
+            f"product_id='{self.valid_product_id}'"
             ") at 0x"
         )
         repr_result = repr(self.product)
@@ -99,8 +99,8 @@ class TestGOES2GProduct(unittest.TestCase):
     def test_str(self) -> None:
         EXPECTED_STR = (
             f"{self.CLASS_NAME}:\n"
-            f"  Product ID : '{self.valid_product_id}'\n"
-            f"  Origin ID  : '{self.valid_origin_id}'"
+            f"  Origin ID  : '{self.valid_origin_id}'\n"
+            f"  Product ID : '{self.valid_product_id}'"
         )
         str_result = str(self.product)
         expected_result = EXPECTED_STR

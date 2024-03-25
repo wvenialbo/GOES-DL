@@ -1,6 +1,6 @@
 import unittest
 
-from GOES_DL.product import GOES2GImagerProduct
+from ..GOES_DL.product import GOES2GImagerProduct
 
 
 class TestGOES2GImagerProduct(unittest.TestCase):
@@ -161,8 +161,8 @@ class TestGOES2GImagerProduct(unittest.TestCase):
         MODULE_NAME = GOES2GImagerProduct.__module__
         EXPECTED_REPR = (
             f"<{MODULE_NAME}.{self.CLASS_NAME}("
-            f"product_id='{self.valid_product_id}',"
             f"origin_id='{self.valid_origin_id}',"
+            f"product_id='{self.valid_product_id}',"
             f"scene_id='{self.valid_scene_id}',"
             f"version='{self.valid_version}'"
             ") at 0x"
@@ -174,8 +174,8 @@ class TestGOES2GImagerProduct(unittest.TestCase):
     def test_str(self) -> None:
         EXPECTED_STR = (
             f"{self.CLASS_NAME}:\n"
-            f"  Product ID : '{self.valid_product_id}'\n"
             f"  Origin ID  : '{self.valid_origin_id}'\n"
+            f"  Product ID : '{self.valid_product_id}'\n"
             f"  Scene ID   : '{self.valid_scene_id}'\n"
             f"  Version    : '{self.valid_version}'"
         )
