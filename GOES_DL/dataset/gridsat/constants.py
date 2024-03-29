@@ -1,0 +1,18 @@
+GRIDSAT_FILE_SUFFIX: str = ".nc"
+GRIDSAT_PREFIX: str = "GridSat"
+
+B1_DATASET_DATE_FORMAT: str = "%Y"
+B1_DATASET_PATH_PREFIX: str = ""
+
+B1_PRODUCT_DATE_FORMAT: str = "%Y.%m.%d.%H"
+B1_PRODUCT_DATE_PATTERN: str = r"\d{4}\.\d{2}\.\d{2}\.\d{2}"
+B1_PRODUCT_LATEST_VERSION: str = "v02r01"
+B1_PRODUCT_NAME: str = "B1"
+B1_PRODUCT_ORIGIN: list[str] = []
+B1_PRODUCT_PREFIX: str = "GRIDSAT"
+
+GOES_DATASET_DATE_FORMAT: str = "%Y/%m"
+
+GOES_PRODUCT_DATE_FORMAT: str = "%Y.%m.%d.%H%M"
+GOES_PRODUCT_DATE_PATTERN: str = r"\d{4}\.\d{2}\.\d{2}\.\d{4}"
+GOES_PRODUCT_LATEST_VERSION: str = "v01"
