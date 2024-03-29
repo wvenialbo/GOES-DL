@@ -2,8 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from ..product import Product
-from .constants import GRIDSAT_FILE_SUFFIX, GRIDSAT_PREFIX
+from GOES_DL.dataset.gridsat.constants import (
+    GRIDSAT_FILE_SUFFIX,
+    GRIDSAT_PREFIX,
+)
+from GOES_DL.dataset.product import Product
 
 
 @dataclass(eq=False, frozen=True)
@@ -125,7 +128,8 @@ class GridSatProduct(Product):
         str
             The generated prefix for the filename.
         """
-        origin: str = f".(?:{'|'.join(self.origin)})" if self.origin else ""
+        sorted_origin: list[str] = sorted(self.origin)
+        origin: str = f".(?:{'|'.join(sorted_origin)})" if self.origin else ""
         return f"{self.file_prefix}-{self.name}{origin}."
 
     def get_suffix(self) -> str:
@@ -140,7 +144,8 @@ class GridSatProduct(Product):
         str
             The generated suffix for the filename.
         """
-        return f".(?:{'|'.join(self.version)}){self.file_suffix}"
+        sorted_version: list[str] = sorted(self.version)
+        return f".(?:{'|'.join(sorted_version)}){self.file_suffix}"
 
     def match(self, filename: str) -> bool:
         """
