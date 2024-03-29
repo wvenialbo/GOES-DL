@@ -5,7 +5,10 @@
         "ACHT",
         "ACTP",
         "AICE",
+        "boto",
+        "botocore",
         "CMIP",
+        "datasources",
         "DMWV",
         "GOESRS",
         "GOESRSCMI",
@@ -16,6 +19,7 @@
         "LVTP",
         "MCMI",
         "MCMIP",
+        "meteosat",
         "RRQPE",
         "sourcery"
     ],
@@ -29,6 +33,18 @@
         {
             "scope": "product"
         },
+        {
+            "scope": "datasource"
+        },
+        {
+            "scope": "dataset"
+        },
+        {
+            "scope": "utils"
+        },
+        {
+            "scope": "downloader"
+        }
     ],
     "python.testing.unittestArgs": [
         "-v",
