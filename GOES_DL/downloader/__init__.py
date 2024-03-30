@@ -1,1 +1,1 @@
-from GOES_DL.downloader.downloader import Downloader as Downloader
+from .downloader import Downloader as Downloader
