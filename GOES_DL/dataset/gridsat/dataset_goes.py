@@ -35,6 +35,8 @@ class GridSatDatasetGOES(GridSatDataset):
     normalise_times(datetime_ini: datetime, datetime_fin: datetime)
         -> tuple[datetime, datetime]
         Normalise the initial and final datetimes.
+    truncate_to_month(time: datetime) -> datetime
+        Truncate the datetime to the current month.
 
     Raises
     ------
@@ -165,10 +167,24 @@ class GridSatDatasetGOES(GridSatDataset):
             A tuple containing the normalised initial and final
             datetimes.
         """
-        start_time = datetime_ini.replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
-        end_time = datetime_fin.replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
+        start_time = self.truncate_to_month(datetime_ini)
+        end_time = self.truncate_to_month(datetime_fin)
         return start_time, end_time
+
+    def truncate_to_month(self, time: datetime) -> datetime:
+        """
+        Truncate the datetime to the current month.
+
+        The datetime is truncated to the start of the month.
+
+        Parameters
+        ----------
+        time : datetime
+            The datetime to round.
+
+        Returns
+        -------
+        datetime
+            The truncated datetime.
+        """
+        return time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
