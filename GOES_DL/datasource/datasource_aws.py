@@ -3,11 +3,11 @@ from typing import Any
 import boto3  # type: ignore
 from botocore.client import UNSIGNED, ClientError, Config  # type: ignore
 
-from GOES_DL.datasource.datasource import Datasource
-from GOES_DL.utils.url import ParseResult, url
+from ..utils.url import ParseResult, url
+from .datasource_cached import DatasourceCached
 
 
-class DatasourceAWS(Datasource):
+class DatasourceAWS(DatasourceCached):
     """
     Abstract a AWS S3 datasource object.
 
@@ -86,8 +86,6 @@ class DatasourceAWS(Datasource):
         self.bucket_name: str = bucket_name
         self.base_path: str = base_path
 
-        self.cached: dict[str, list[str]] = {}
-
     def bucket_exists(self, bucket_name: str) -> bool:
         """
         Check if the bucket exists.
@@ -110,33 +108,6 @@ class DatasourceAWS(Datasource):
             print(exc)
             return False
         return True
-
-    def clear_cache(self, dir_path: str = "") -> None:
-        """
-        Clear the cache.
-
-        Clear the file list cache of the datasource object.
-
-        Parameters
-        ----------
-        dir_path : str
-            The path to the directory. The path is relative to
-            the base URL. If no path is provided, the entire
-            cache should be cleared.
-
-        Raises
-        ------
-        ValueError
-            If the folder is not found in the cache.
-        """
-        if dir_path:
-            folder_path: str = self.get_folder_path(dir_path)
-            if folder_path in self.cached:
-                self.cached.pop(folder_path, None)
-                return
-            raise ValueError(f"Folder '{dir_path}' not found in cache.")
-        else:
-            self.cached.clear()
 
     def get_client(self) -> Any:
         """

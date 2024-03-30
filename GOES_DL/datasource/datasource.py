@@ -21,30 +21,13 @@ class Datasource(ABC):
 
     Methods
     -------
-    clear_cache(dir_path: str = "") -> None
-        Clear the cache.
+    get_file(file_path: str) -> Any
+        Get a file from the datasource.
     listdir(dir_path: str) -> list[str]
         List the contents of a directory.
     """
 
     base_url: str
-
-    @abstractmethod
-    def clear_cache(self, dir_path: str = "") -> None:
-        """
-        Clear the cache.
-
-        Clear the cache of the datasource object. This method should
-        remove all the files in the cache directory.
-
-        Parameters
-        ----------
-        path : str
-            The path to the directory. The path is relative to the base
-            URL. If no path is provided, the entire cache should be
-            cleared.
-        """
-        ...
 
     @abstractmethod
     def get_file(self, file_path: str) -> Any:
