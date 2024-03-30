@@ -2,11 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from GOES_DL.dataset.gridsat.constants import (
-    GRIDSAT_FILE_SUFFIX,
-    GRIDSAT_PREFIX,
-)
-from GOES_DL.dataset.product import Product
+from ..product import Product
+from .constants import GRIDSAT_FILE_SUFFIX, GRIDSAT_PREFIX
 
 
 @dataclass(eq=False, frozen=True)
