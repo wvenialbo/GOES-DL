@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime, timezone
 
+from GOES_DL.dataset import Product
 from GOES_DL.dataset.gridsat import GridSatProductB1
 from GOES_DL.dataset.gridsat.constants import (
     B1_PRODUCT_DATE_FORMAT,
@@ -39,13 +40,16 @@ class TestGridSatProductB1(unittest.TestCase):
     def setUp(self) -> None:
         self.product: GridSatProductB1 = GridSatProductB1()
 
+    def test_init_is_product(self) -> None:
+        self.assertIsInstance(self.product, Product)
+
     def test_init_invalid_version(self) -> None:
         with self.assertRaises(ValueError):
             GridSatProductB1(version="v01r01")
 
     def test_init_available_versions(self) -> None:
         for version in [self.VALID_VERSION]:
-            product = GridSatProductB1(version=version)
+            product: GridSatProductB1 = GridSatProductB1(version=version)
             self.assertEqual(product.version, [version])
 
     def test_name_property(self) -> None:
@@ -70,26 +74,28 @@ class TestGridSatProductB1(unittest.TestCase):
         self.assertEqual(self.product.date_pattern, B1_PRODUCT_DATE_PATTERN)
 
     def test_invalid_version(self) -> None:
-        expected_value = "v01r01"
-        unsupported_version = self.product.invalid_version([expected_value])
+        expected_value: str = "v01r01"
+        unsupported_version: str = self.product.invalid_version(
+            [expected_value]
+        )
         self.assertEqual(unsupported_version, expected_value)
 
     def test_available_versions(self) -> None:
-        valid_version = self.VALID_VERSION
-        expected_value = ""
-        returned_value = self.product.invalid_version([valid_version])
+        valid_version: str = self.VALID_VERSION
+        expected_value: str = ""
+        returned_value: str = self.product.invalid_version([valid_version])
         self.assertEqual(returned_value, expected_value)
 
     def test_get_prefix(self) -> None:
-        expected_prefix = "GRIDSAT-B1."
+        expected_prefix: str = "GRIDSAT-B1."
         self.assertEqual(self.product.get_prefix(), expected_prefix)
 
     def test_get_suffix(self) -> None:
-        expected_suffix = f".(?:{self.VALID_VERSION}).nc"
+        expected_suffix: str = f".(?:{self.VALID_VERSION}).nc"
         self.assertEqual(self.product.get_suffix(), expected_suffix)
 
     def test_get_filename_pattern(self) -> None:
-        expected_pattern = (
+        expected_pattern: str = (
             r"GRIDSAT-B1."
             r"(\d{4}\.\d{2}\.\d{2}\.\d{2})"
             rf".(?:{self.VALID_VERSION}).nc"
@@ -106,8 +112,10 @@ class TestGridSatProductB1(unittest.TestCase):
             self.product.get_datetime(self.FILENAME_3)
 
     def test_timestamp_to_datetime(self) -> None:
-        timestamp = "1980.01.01.00"
-        expected_datetime = datetime(1980, 1, 1, 0, tzinfo=timezone.utc)
+        timestamp: str = "1980.01.01.00"
+        expected_datetime: datetime = datetime(
+            1980, 1, 1, 0, tzinfo=timezone.utc
+        )
         self.assertEqual(
             self.product.timestamp_to_datetime(timestamp), expected_datetime
         )
