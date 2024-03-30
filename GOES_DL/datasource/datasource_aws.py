@@ -3,8 +3,8 @@ from typing import Any
 import boto3  # type: ignore
 from botocore.client import UNSIGNED, ClientError, Config  # type: ignore
 
-from ..utils.url import ParseResult, url
-from .datasource import Datasource
+from GOES_DL.datasource.datasource import Datasource
+from GOES_DL.utils.url import ParseResult, url
 
 
 class DatasourceAWS(Datasource):
@@ -139,6 +139,16 @@ class DatasourceAWS(Datasource):
             self.cached.clear()
 
     def get_client(self) -> Any:
+        """
+        Get the AWS S3 client.
+
+        Returns the AWS S3 client with the UNSIGNED signature version.
+
+        Returns
+        -------
+        Any
+            The AWS S3 client.
+        """
         return boto3.client(  # type: ignore
             "s3",
             # region_name="eu-west-1",
