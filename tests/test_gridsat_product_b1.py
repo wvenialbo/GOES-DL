@@ -43,6 +43,9 @@ class TestGridSatProductB1(unittest.TestCase):
     def test_init_is_product(self) -> None:
         self.assertIsInstance(self.product, Product)
 
+    def test_init_is_product_b1(self) -> None:
+        self.assertIsInstance(self.product, GridSatProductB1)
+
     def test_init_invalid_version(self) -> None:
         with self.assertRaises(ValueError):
             GridSatProductB1(version="v01r01")

@@ -51,6 +51,9 @@ class TestGridSatProductGOES(unittest.TestCase):
     def test_init_is_product(self) -> None:
         self.assertIsInstance(self.product, Product)
 
+    def test_init_is_product_goes(self) -> None:
+        self.assertIsInstance(self.product, GridSatProductGOES)
+
     def test_init_invalid_scene(self) -> None:
         with self.assertRaises(ValueError):
             GridSatProductGOES("Z", self.VALID_ORIGID)
