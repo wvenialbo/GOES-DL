@@ -1,21 +1,20 @@
-import posixpath
-from urllib.parse import ParseResult, urlparse
+from urllib.parse import ParseResult, urljoin, urlparse
 
 
 class url:
     @staticmethod
-    def abspath(base: str, path: str) -> str:
-        return path if path.startswith(base) else url.join(base, path)
+    def abspath(path: str) -> str:
+        parsed_url: ParseResult = urlparse(path)
+        abs_path = urljoin(parsed_url.netloc, parsed_url.path)
+        parsed_url = parsed_url._replace(path=abs_path)
+        return parsed_url.geturl()
 
     @staticmethod
-    def join(base: str, *parts: str) -> str:
-        base_url = urlparse(base)
-        dest_url = base_url
+    def join(base_url: str, *parts: str) -> str:
+        dest_url: str = base_url
         for part in parts:
-            dest_url = dest_url._replace(
-                path=posixpath.join(dest_url.path, part)
-            )
-        return dest_url.geturl()
+            dest_url = urljoin(dest_url, part)
+        return dest_url
 
     @staticmethod
     def parse(path: str) -> ParseResult:
