@@ -2,8 +2,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 
-from ..dataset import Dataset, Datasource, Product
-from .product import GridSatProduct
+from GOES_DL.dataset.dataset import Dataset, Datasource, Product
+from GOES_DL.dataset.gridsat.product import GridSatProduct
 
 
 @dataclass(eq=False, frozen=True)
@@ -18,10 +18,16 @@ class GridSatDataset(Dataset):
     on, between the initial and final datetimes. The final time is
     always included in the list.
 
-    The class also provides access to the product class that is going to
-    be used to extract the datetime from the dataset product filenames and
-    to verify if a given filename matches the expected dataset product
-    filename pattern based on the products requested by the user.
+    The class also provides access to the product class that is going
+    to be used to extract the datetime from the dataset product
+    filenames and to verify if a given filename matches the expected
+    dataset product filename pattern based on the products requested
+    by the user.
+
+    Note: Currently, the GridSat-B1 dataset (Geostationary IR Channel
+    Brightness Temperature - GridSat B1) and the GridSat-GOES dataset
+    (Geostationary Operational Environmental Satellites - GOES/CONUS)
+    are supported by their own classes.
 
     Attributes
     ----------

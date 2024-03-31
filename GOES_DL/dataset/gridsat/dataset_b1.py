@@ -1,10 +1,13 @@
 from datetime import datetime
 from typing import Type
 
-from ...datasource import DatasourceAWS, DatasourceHTTP
-from .constants import B1_DATASET_DATE_FORMAT, B1_DATASET_PATH_PREFIX
-from .dataset import Datasource, GridSatDataset
-from .product_b1 import GridSatProductB1
+from GOES_DL.dataset.gridsat.constants import (
+    B1_DATASET_DATE_FORMAT,
+    B1_DATASET_PATH_PREFIX,
+)
+from GOES_DL.dataset.gridsat.dataset import Datasource, GridSatDataset
+from GOES_DL.dataset.gridsat.product_b1 import GridSatProductB1
+from GOES_DL.datasource import DatasourceAWS, DatasourceHTTP
 
 
 class GridSatDatasetB1(GridSatDataset):
@@ -16,6 +19,44 @@ class GridSatDatasetB1(GridSatDataset):
     initial and final datetimes. The paths are going to be generated for
     each year, between the initial and final datetimes. The final time
     is always included in the list.
+
+    The data in the GridSat-B1 dataset (Geostationary IR Channel
+    Brightness Temperature - GridSat B1) products comes from different
+    sources and only a global view of the Earth is available, so, no
+    domain is implied. Neither of them is reflected in the product's
+    file path. The dataset is available from various services, for
+    Amazon Web Services (AWS) and Google Cloud Platform (GCP), the
+    product's file path pattern is as follows:
+
+    'scheme://net-location/data/yyyy',
+
+    where `scheme` identifies the protocol's scheme (e.g. 's3', 'gs'),
+    `net-location` is the hostname (e.g. 'noaa-cdr-gridsat-b1-pds' for
+    's3', and 'noaa-cdr-gridsat-b1' for 'gs'), and  `yyyy` is the year.
+
+    The files are also hosted on the National Centers for Environmental
+    Information (NCEI) servers, the product's file path pattern is as
+    follows:
+
+    'https://www.ncei.noaa.gov/data/path/access/yyyy';
+
+    where `path` is the project's data files folder name, i.e.
+    'geostationary-ir-channel-brightness-temperature-gridsat-b1',
+    and `yyyy` is the year.
+
+    Note: Currently, only the AWS datasource is supported.
+
+    Input is 3-hourly data from the International Satellite Cloud
+    Climatology Project (ISCCP) with gridded 0.07°x0.07° spatial
+    resolution that spans from 1980 to the present. Three total
+    channels are available:
+
+    - IR: CDR-quality infrared window (IRWIN) channel (near 11 μm);
+    - WV: Infrared water vapor (IRWVP) channel (near 6.7 μm);
+    - VIS: Visible channel (near 0.6 μm).
+
+    For more information visit the following link and links therein:
+    https://www.ncei.noaa.gov/products/gridded-geostationary-brightness-temperature
 
     Parameters
     ----------

@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Type
 
-from ...datasource import DatasourceHTTP
-from .constants import GOES_DATASET_DATE_FORMAT
-from .dataset import Datasource, GridSatDataset
-from .product_goes import GridSatProductGOES
+from GOES_DL.dataset.gridsat.constants import GOES_DATASET_DATE_FORMAT
+from GOES_DL.dataset.gridsat.dataset import Datasource, GridSatDataset
+from GOES_DL.dataset.gridsat.product_goes import GridSatProductGOES
+from GOES_DL.datasource import DatasourceHTTP
 
 
 class GridSatDatasetGOES(GridSatDataset):
@@ -16,6 +16,28 @@ class GridSatDatasetGOES(GridSatDataset):
     the initial and final datetimes. The paths are going to be generated
     for each month, between the initial and final datetimes. The final
     time is always included in the list.
+
+    The data in the GridSat-GOES dataset (Geostationary Operational
+    Environmental Satellites - GOES/CONUS) products comes from GOES
+    Second Generation (GOES-I to GOES-M) series, GOES-8 to GOES-15;
+    they provide data for two separate domains: the entire GOES domain
+    (Full Disk) and the CONUS (Contiguous United States). The domain
+    is reflected in the product's file path. The product's file path
+    pattern is as follows:
+
+    'https://net-location/data/gridsat-goes/access/domain/yyyy/mm/',
+
+    where `net-location` is 'www.ncei.noaa.gov', and `domain` is the
+    scene name in lowercase (e.g. 'conus' or 'goes'). `yyyy` and `mm`
+    are the year and month, respectively, fixed length and padded with
+    zeros.
+
+    Input is half-hourly data from the GOES 2nd generation satellite
+    series with gridded 0.04°x0.04° spatial resolution that spans from
+    1994 to 2017. Six total channels are available
+
+    For more information visit the following link and links therein:
+    https://www.ncei.noaa.gov/products/satellite/gridded-goes-conus
 
     Parameters
     ----------

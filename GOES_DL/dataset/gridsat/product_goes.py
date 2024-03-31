@@ -1,9 +1,9 @@
-from .constants import (
+from GOES_DL.dataset.gridsat.constants import (
     GOES_PRODUCT_DATE_FORMAT,
     GOES_PRODUCT_DATE_PATTERN,
     GOES_PRODUCT_LATEST_VERSION,
 )
-from .product import GridSatProduct
+from GOES_DL.dataset.gridsat.product import GridSatProduct
 
 
 class GridSatProductGOES(GridSatProduct):
@@ -14,6 +14,29 @@ class GridSatProductGOES(GridSatProduct):
     product filename checker. The checker is responsible for extracting
     the datetime from a dataset product filename and verifying if a
     given filename matches the expected pattern.
+
+    The data in the GridSat-GOES dataset (Geostationary Operational
+    Environmental Satellites - GOES/CONUS) products comes from GOES
+    2nd generation (GOES-I to GOES-M) series, GOES-8 to GOES-15; they
+    provide data for two separate domains: the entire GOES domain
+    (Full Disk) and the CONUS (Contiguous United States). The domain
+    and origin names are reflected in the product's filename, as is the
+    product's version. The product's filename pattern is as follows:
+
+    'GridSat-DOMAIN.origin.yyyy.mm.dd.HHMM.version.nc',
+
+    where `DOMAIN` is the scene name in uppercase (e.g. 'CONUS' or
+    'GOES'), `origin` is the satellite identifier in lowercase (e.g.
+    'goes08' to 'goes15'), and `version` is the product's version (e.g.
+    'v01'). `yyyy`, `mm`, `dd`, `HH` and `MM` are the year, month, day,
+    hour, and minute, respectively, fixed length and padded with zeros.
+
+    Input is half-hourly data from the GOES 2nd generation satellite
+    series with gridded 0.04°x0.04° spatial resolution that spans from
+    1994 to 2017. Six total channels are available
+
+    For more information visit the following link and links therein:
+    https://www.ncei.noaa.gov/products/satellite/gridded-goes-conus
 
     Attributes
     ----------

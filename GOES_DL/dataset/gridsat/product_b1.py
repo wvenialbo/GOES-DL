@@ -1,4 +1,4 @@
-from .constants import (
+from GOES_DL.dataset.gridsat.constants import (
     B1_PRODUCT_DATE_FORMAT,
     B1_PRODUCT_DATE_PATTERN,
     B1_PRODUCT_LATEST_VERSION,
@@ -6,7 +6,7 @@ from .constants import (
     B1_PRODUCT_ORIGIN,
     B1_PRODUCT_PREFIX,
 )
-from .product import GridSatProduct
+from GOES_DL.dataset.gridsat.product import GridSatProduct
 
 
 class GridSatProductB1(GridSatProduct):
@@ -17,6 +17,31 @@ class GridSatProductB1(GridSatProduct):
     product filename checker. The checker is responsible for extracting
     the datetime from a dataset product filename and verifying if a
     given filename matches the expected pattern.
+
+    The data in the GridSat-B1 dataset (Geostationary IR Channel
+    Brightness Temperature - GridSat B1) products comes from different
+    sources, so, the origin's name is not reflected in the product's
+    filename but the product's version is. Also, only a global view of
+    the Earth is available, so, no domain is implied. The product's
+    filename pattern is as follows:
+
+    'GRIDSAT-B1.yyyy.mm.dd.HH.version.nc';
+
+    `version` is the product's version (e.g. 'v02r01'). `yyyy`, `mm`,
+    `dd` and `HH` are the year, month, day, hour, respectively, fixed
+    length and padded with zeros.
+
+    Input is 3-hourly data from the International Satellite Cloud
+    Climatology Project (ISCCP) with gridded 0.07°x0.07° spatial
+    resolution that spans from 1980 to the present. Three total
+    channels are available:
+
+    - IR: CDR-quality infrared window (IRWIN) channel (near 11 μm);
+    - WV: Infrared water vapor (IRWVP) channel (near 6.7 μm);
+    - VIS: Visible channel (near 0.6 μm).
+
+    For more information visit the following link and links therein:
+    https://www.ncei.noaa.gov/products/gridded-geostationary-brightness-temperature
 
     Attributes
     ----------

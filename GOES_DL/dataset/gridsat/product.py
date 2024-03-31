@@ -2,8 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from ..product import Product
-from .constants import GRIDSAT_FILE_SUFFIX, GRIDSAT_PREFIX
+from GOES_DL.dataset.gridsat.constants import (
+    GRIDSAT_FILE_SUFFIX,
+    GRIDSAT_PREFIX,
+)
+from GOES_DL.dataset.product import Product
 
 
 @dataclass(eq=False, frozen=True)
@@ -15,6 +18,11 @@ class GridSatProduct(Product):
     product filename checker. The checker is responsible for extracting
     the datetime from a dataset product filename and verifying if a
     given filename matches the expected pattern.
+
+    Note: Currently, the GridSat-B1 dataset (Geostationary IR Channel
+    Brightness Temperature - GridSat B1) and the GridSat-GOES dataset
+    (Geostationary Operational Environmental Satellites - GOES/CONUS)
+    products are supported by their own classes.
 
     Attributes
     ----------
