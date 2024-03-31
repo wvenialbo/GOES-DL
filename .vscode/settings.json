@@ -45,6 +45,9 @@
         },
         {
             "scope": "downloader"
+        },
+        {
+            "scope": "tests"
         }
     ],
     "python.testing.unittestArgs": [
