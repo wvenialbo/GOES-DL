@@ -35,7 +35,7 @@ class GridSatProduct(Product):
         satellite identifier, e.g. "goes08". Multi-origin data may set
         this attribute to an empty list.
     version : list[str]
-        The version or list o versions of the GridSat product; e.g.
+        The version or list of versions of the GridSat product; e.g.
         "v01r01".
     date_format : str
         The specification of the date format used in the GridSat product
