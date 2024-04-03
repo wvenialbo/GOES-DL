@@ -181,6 +181,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
             The next time interval.
         """
         next_year = current_time.year + 1
+
         return current_time.replace(year=next_year)
 
     def normalize_times(
@@ -210,6 +211,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         """
         start_time = self.truncate_to_year(datetime_ini)
         end_time = self.truncate_to_year(datetime_fin)
+
         return start_time, end_time
 
     def truncate_to_year(self, time: datetime) -> datetime:

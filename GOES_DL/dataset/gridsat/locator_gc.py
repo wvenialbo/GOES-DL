@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Type
 
-from GOES_DL.dataset.gridsat.constants import GOES_DATASET_DATE_FORMAT
-from GOES_DL.dataset.gridsat.locator import Datasource, GridSatProductLocator
-from GOES_DL.dataset.gridsat.product_gc import GridSatProductGC
-from GOES_DL.datasource import DatasourceHTTP
+from ...datasource import DatasourceHTTP
+from .constants import GOES_DATASET_DATE_FORMAT
+from .locator import Datasource, GridSatProductLocator
+from .product_gc import GridSatProductGC
 
 
 class GridSatProductLocatorGC(GridSatProductLocator):
@@ -168,6 +168,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         if next_month > 12:
             next_month = 1
             next_year += 1
+
         return current_time.replace(year=next_year, month=next_month)
 
     def normalize_times(
@@ -196,6 +197,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         """
         start_time = self.truncate_to_month(datetime_ini)
         end_time = self.truncate_to_month(datetime_fin)
+
         return start_time, end_time
 
     def truncate_to_month(self, time: datetime) -> datetime:

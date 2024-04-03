@@ -63,10 +63,13 @@ class DatasourceCached(Datasource):
         """
         if dir_path:
             folder_path: str = self.get_folder_path(dir_path)
+
             if folder_path in self.cached:
                 self.cached.pop(folder_path, None)
                 return
+
             raise ValueError(f"Folder '{dir_path}' not found in cache.")
+
         else:
             self.cached.clear()
 

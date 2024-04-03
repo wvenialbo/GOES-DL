@@ -209,6 +209,7 @@ class Downloader:
 
         for file in files:
             ct = product.get_datetime(file)
+
             if datetime_ini <= ct <= datetime_fin:
                 files_in_range.append(file)
 

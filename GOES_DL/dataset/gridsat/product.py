@@ -135,6 +135,7 @@ class GridSatProduct(Product):
         """
         sorted_origin: list[str] = sorted(self.origin)
         origin: str = f".(?:{'|'.join(sorted_origin)})" if self.origin else ""
+
         return f"{self.file_prefix}-{self.name}{origin}."
 
     def get_suffix(self) -> str:
@@ -150,6 +151,7 @@ class GridSatProduct(Product):
             The generated suffix for the filename.
         """
         sorted_version: list[str] = sorted(self.version)
+
         return f".(?:{'|'.join(sorted_version)}){self.file_suffix}"
 
     def match(self, filename: str) -> bool:
@@ -204,6 +206,7 @@ class GridSatProduct(Product):
         file_date: datetime = datetime.strptime(
             file_timestamp, file_date_format
         )
+
         return file_date.astimezone(timezone.utc)
 
 

@@ -104,9 +104,11 @@ class DatasourceAWS(DatasourceCached):
         """
         try:
             self.s3_client.head_bucket(Bucket=bucket_name)
+
         except ClientError as exc:
             print(exc)
             return False
+
         return True
 
     def get_client(self) -> Any:
@@ -157,6 +159,7 @@ class DatasourceAWS(DatasourceCached):
                 Bucket=self.bucket_name, Key=folder_path
             )
             return response["Body"].read()
+
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
             raise RuntimeError(message) from exc
@@ -180,6 +183,7 @@ class DatasourceAWS(DatasourceCached):
         """
         folder_url = url.join(self.base_url, dir_path)
         url_parts: ParseResult = url.parse(folder_url)
+
         return url_parts.path[1:]
 
     def listdir(self, dir_path: str) -> list[str]:
@@ -216,6 +220,7 @@ class DatasourceAWS(DatasourceCached):
         for page in pages:
             if page["KeyCount"] == 0:
                 return file_list
+
             break
 
         ss: int = len(folder_path)
@@ -251,7 +256,10 @@ class DatasourceAWS(DatasourceCached):
         """
         try:
             self.s3_client.head_object(Bucket=bucket_name, Key=object_path)
+
         except ClientError as exc:
             print(exc)
+
             return False
+
         return True
