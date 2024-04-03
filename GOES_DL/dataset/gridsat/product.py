@@ -119,7 +119,7 @@ class GridSatProduct(Product):
         prefix: str = self.get_prefix()
         suffix: str = self.get_suffix()
 
-        return rf"{prefix}({self.date_pattern}){suffix}"
+        return f"{prefix}({self.date_pattern}){suffix}"
 
     def get_prefix(self) -> str:
         """
