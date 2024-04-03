@@ -2,35 +2,40 @@ from datetime import datetime
 from typing import Type
 
 from GOES_DL.dataset.gridsat.constants import GOES_DATASET_DATE_FORMAT
-from GOES_DL.dataset.gridsat.dataset import Datasource, GridSatDataset
-from GOES_DL.dataset.gridsat.product_goes import GridSatProductGOES
+from GOES_DL.dataset.gridsat.locator import Datasource, GridSatProductLocator
+from GOES_DL.dataset.gridsat.product_gc import GridSatProductGC
 from GOES_DL.datasource import DatasourceHTTP
 
 
-class GridSatDatasetGOES(GridSatDataset):
+class GridSatProductLocatorGC(GridSatProductLocator):
     """
-    Represent the GridSat-GOES dataset.
+    Represent the locator for GridSat-GOES/CONUS dataset products.
 
-    This class implements the interface for the GridSat-GOES dataset.
-    The dataset is responsible for generating a list of paths based on
-    the initial and final datetimes. The paths are going to be generated
-    for each month, between the initial and final datetimes. The final
-    time is always included in the list.
+    This class implements the `GridSatProductLocator` abstract class for
+    for the GridSat-GOES/CONUS (Geostationary Operational Environmental
+    Satellites - GOES/CONUS) dataset product locator.
 
-    The data in the GridSat-GOES dataset (Geostationary Operational
-    Environmental Satellites - GOES/CONUS) products comes from GOES
-    Second Generation (GOES-I to GOES-M) series, GOES-8 to GOES-15;
-    they provide data for two separate domains: the entire GOES domain
-    (Full Disk) and the CONUS (Contiguous United States). The domain
-    is reflected in the product's file path. The product's file path
+    Instances of this class are responsible for generating a list of
+    folder paths based on the dataset's directory structure and naming
+    conventions, product details, and a specified date range.
+
+    The generated paths cover each month within the date range. Paths to
+    the folders containing the initial and final dates are included in
+    the list.
+
+    The data in the GridSat-GOES dataset products comes from GOES Second
+    Generation (GOES-I to GOES-M) series, GOES-8 to GOES-15. The dataset
+    provides data for two separate domains: the entire GOES domain (Full
+    Disk) and the CONUS (Contiguous United States). The domain name is
+    reflected in the product's file path. The product's file path
     pattern is as follows:
 
-    'https://net-location/data/gridsat-goes/access/domain/yyyy/mm/',
+    'https://<net-location>/data/gridsat-goes/access/<domain>/<yyyy>/<mm>/',
 
-    where `net-location` is 'www.ncei.noaa.gov', and `domain` is the
-    scene name in lowercase (e.g. 'conus' or 'goes'). `yyyy` and `mm`
-    are the year and month, respectively, fixed length and padded with
-    zeros.
+    where `<net-location>` is 'www.ncei.noaa.gov', and `<domain>` is the
+    domain name in lowercase (e.g. 'conus' or 'goes'). `<yyyy>` and
+    `<mm>` are, respectively, the gregorian year number and the month
+    number using two digits padded with zeros.
 
     Input is half-hourly data from the GOES 2nd generation satellite
     series with gridded 0.04°x0.04° spatial resolution that spans from
@@ -41,7 +46,7 @@ class GridSatDatasetGOES(GridSatDataset):
 
     Parameters
     ----------
-    product : GridSatProductGOES
+    product : GridSatProductGC
         The GridSat-GOES product class.
     datasource : str, optional
         The datasource identifier to use. The only available datasource
@@ -75,7 +80,7 @@ class GridSatDatasetGOES(GridSatDataset):
     }
 
     def __init__(
-        self, product: GridSatProductGOES, datasource: str = "NOAA"
+        self, product: GridSatProductGC, datasource: str = "NOAA"
     ) -> None:
         """
         Initialise the GridSat-GOES dataset.
@@ -110,7 +115,7 @@ class GridSatDatasetGOES(GridSatDataset):
 
         GOES_DATASET_PATH_PREFIX = f"{product.name.lower()}/"
 
-        super(GridSatDatasetGOES, self).__init__(
+        super(GridSatProductLocatorGC, self).__init__(
             product=product,
             datasource=d_source,
             date_format=GOES_DATASET_DATE_FORMAT,

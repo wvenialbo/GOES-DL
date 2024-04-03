@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timezone
 
 from GOES_DL.dataset import Product
-from GOES_DL.dataset.gridsat import GridSatProductGOES
+from GOES_DL.dataset.gridsat import GridSatProductGC
 from GOES_DL.dataset.gridsat.constants import (
     GOES_PRODUCT_DATE_FORMAT,
     GOES_PRODUCT_DATE_PATTERN,
@@ -12,7 +12,7 @@ from GOES_DL.dataset.gridsat.constants import (
 )
 
 
-class TestGridSatProductGOES(unittest.TestCase):
+class TestGridSatProductGC(unittest.TestCase):
     # This set of tests covers the initialization of an object of the
     # GridSatProductGOES class, including the handling of invalid
     # parameters. It also tests the get_prefix, get_suffix,
@@ -44,7 +44,7 @@ class TestGridSatProductGOES(unittest.TestCase):
     MULTI_NAME = ["goes12", "goes13"]
 
     def setUp(self) -> None:
-        self.product: GridSatProductGOES = GridSatProductGOES(
+        self.product: GridSatProductGC = GridSatProductGC(
             self.VALID_SCENE, self.VALID_ORIGID
         )
 
@@ -52,23 +52,23 @@ class TestGridSatProductGOES(unittest.TestCase):
         self.assertIsInstance(self.product, Product)
 
     def test_init_is_product_goes(self) -> None:
-        self.assertIsInstance(self.product, GridSatProductGOES)
+        self.assertIsInstance(self.product, GridSatProductGC)
 
     def test_init_invalid_scene(self) -> None:
         with self.assertRaises(ValueError):
-            GridSatProductGOES("Z", self.VALID_ORIGID)
+            GridSatProductGC("Z", self.VALID_ORIGID)
 
     def test_init_invalid_origin(self) -> None:
         with self.assertRaises(ValueError):
-            GridSatProductGOES(self.VALID_SCENE, "G20")
+            GridSatProductGC(self.VALID_SCENE, "G20")
 
     def test_init_invalid_version(self) -> None:
         with self.assertRaises(ValueError):
-            GridSatProductGOES(self.VALID_SCENE, self.VALID_ORIGID, "v02")
+            GridSatProductGC(self.VALID_SCENE, self.VALID_ORIGID, "v02")
 
     def test_init_available_scenes(self) -> None:
         for name, scene in zip(["CONUS", "GOES"], ["C", "F"]):
-            product: GridSatProductGOES = GridSatProductGOES(
+            product: GridSatProductGC = GridSatProductGC(
                 scene, self.VALID_ORIGID
             )
             self.assertEqual(product.name, name)
@@ -77,14 +77,14 @@ class TestGridSatProductGOES(unittest.TestCase):
         orig_ids: list[str] = [f"G{i:02d}" for i in range(8, 16)]
         orig_names: list[str] = [f"goes{i:02d}" for i in range(8, 16)]
         for name, orig in zip(orig_names, orig_ids):
-            product: GridSatProductGOES = GridSatProductGOES(
+            product: GridSatProductGC = GridSatProductGC(
                 self.VALID_SCENE, orig
             )
             self.assertEqual(product.origin, [name])
 
     def test_init_available_versions(self) -> None:
         for version in [self.VALID_VERSION]:
-            product: GridSatProductGOES = GridSatProductGOES(
+            product: GridSatProductGC = GridSatProductGC(
                 self.VALID_SCENE, self.VALID_ORIGID, version
             )
             self.assertEqual(product.version, [version])
@@ -96,7 +96,7 @@ class TestGridSatProductGOES(unittest.TestCase):
         self.assertEqual(self.product.origin, [self.VALID_ORIGIN])
 
     def test_multiple_origins_property(self) -> None:
-        product: GridSatProductGOES = GridSatProductGOES(
+        product: GridSatProductGC = GridSatProductGC(
             self.VALID_SCENE, self.MULTI_ORIGIN
         )
         self.assertEqual(product.origin, self.MULTI_NAME)
@@ -162,7 +162,7 @@ class TestGridSatProductGOES(unittest.TestCase):
     def test_get_prefix_multiple_origins(self) -> None:
         origins: str = "|".join(self.MULTI_NAME)
         expected_prefix: str = f"GridSat-{self.VALID_NAME}.(?:{origins})."
-        product: GridSatProductGOES = GridSatProductGOES(
+        product: GridSatProductGC = GridSatProductGC(
             self.VALID_SCENE, self.MULTI_ORIGIN
         )
         self.assertEqual(product.get_prefix(), expected_prefix)
@@ -211,7 +211,7 @@ class TestGridSatProductGOES(unittest.TestCase):
         self.assertFalse(self.product.match(self.FILENAME_5))
 
     def test_match_multiple_origins(self) -> None:
-        product: GridSatProductGOES = GridSatProductGOES(
+        product: GridSatProductGC = GridSatProductGC(
             self.VALID_SCENE, self.MULTI_ORIGIN
         )
         self.assertTrue(

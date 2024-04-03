@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from ..dataset import Dataset, Product
+from ..dataset import Product, ProductLocator
 from ..datasource import Datasource
 from .constants import ISO_TIMESTAMP_FORMAT
 
@@ -13,23 +13,24 @@ class Downloader:
     Represent a downloader object.
 
     The downloader object is responsible for downloading files from a
-    datasource. It receives a `Datasource` object, a `Dataset` object,
-    and a date format specification as input and provides methods to
-    download files from the datasource that match the timestamps
-    between a start and end time.
+    datasource. It receives a `Datasource` object, a `ProductLocator`
+    object, and a date format specification string as input, and
+    provides methods to download files from the datasource that match
+    the timestamps between a start and end time.
 
     The downloader object is agnostic to the datasource, dataset, and
     dataset's product implementations. It only requires that the
-    datasource and dataset objects implement the methods specified in
-    the `GOES_DL.datasource.Datasource`, `GOES_DL.dataset.Dataset` and
-    `GOES_DL.dataset.Product` abstract class interfaces.
+    datasource and product locator objects implement the methods
+    specified in the `GOES_DL.datasource.Datasource`,
+    `GOES_DL.dataset.ProductLocator` and `GOES_DL.dataset.Product`
+    interfaces.
 
     Attributes
     ----------
-    data_set : Dataset
-        A reference to the dataset object.
-    data_source : Datasource
+    datasource : Datasource
         A reference to the datasource object.
+    product_locator : ProductLocator
+        A reference to the dataset's product locator object.
     date_format : str
         The date format specification. The default is the ISO timestamp
         format.
@@ -37,22 +38,22 @@ class Downloader:
     Methods
     -------
     get_files(start_time: str, end_time: str = "") -> list[Any]
-        Get the files from the data source.
+        Get the files from the datasource.
     get_file_list(start_time: str, end_time: str = "") -> list[str]
         Get the list of files in the directory.
     retrieve_files(file_paths: list[str]) -> list[Any]
-        Retrieve the files from the data source.
+        Retrieve the files from the datasource.
     """
 
-    data_set: Dataset
-    data_source: Datasource
+    datasource: Datasource
+    product_locator: ProductLocator
     date_format: str = ISO_TIMESTAMP_FORMAT
 
     def get_files(self, start_time: str, end_time: str = "") -> list[Any]:
         """
-        Get the files from the data source.
+        Get the files from the datasource.
 
-        Get the files from the data source that match the timestamps
+        Get the files from the datasource that match the timestamps
         between `start_time` and `end_time`, inclusive. The list is
         filtered by the timestamps of the files; only files in the
         requested range are returned.
@@ -86,7 +87,7 @@ class Downloader:
             is ill-formed (which is, indeed, a bug!).
         RuntimeError
             The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the data source or an
+            e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
         files_in_range: list[str] = self.get_file_list(start_time, end_time)
@@ -135,7 +136,9 @@ class Downloader:
         datetime_fin: datetime
         datetime_ini, datetime_fin = self._get_datetimes(start_time, end_time)
 
-        paths: list[str] = self.data_set.get_paths(datetime_ini, datetime_fin)
+        paths: list[str] = self.product_locator.get_paths(
+            datetime_ini, datetime_fin
+        )
 
         files: list[str] = self._retrieve_directory_content(paths)
 
@@ -145,9 +148,9 @@ class Downloader:
 
     def retrieve_files(self, file_paths: list[str]) -> list[Any]:
         """
-        Retrieve the files from the data source.
+        Retrieve the files from the datasource.
 
-        Retrieve the files from the data source using the file paths
+        Retrieve the files from the datasource using the file paths
         provided in the `file_paths` list.
 
         Parameters
@@ -164,13 +167,13 @@ class Downloader:
         ------
         RuntimeError
             The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the data source or an
+            e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
         file_objects: list[Any] = []
 
         for file in file_paths:
-            file_object = self.data_source.get_file(file)
+            file_object = self.datasource.get_file(file)
             file_objects.append(file_object)
 
         return file_objects
@@ -202,7 +205,7 @@ class Downloader:
         """
         files_in_range: list[str] = []
 
-        product: Product = self.data_set.get_product()
+        product: Product = self.product_locator.get_product()
 
         for file in files:
             ct = product.get_datetime(file)
@@ -270,7 +273,7 @@ class Downloader:
         Retrieve the content of the directories.
 
         Retrieve the content of the directories specified by the `paths`
-        list from the data source.
+        list from the datasource.
 
         Parameters
         ----------
@@ -285,6 +288,6 @@ class Downloader:
         files: list[str] = []
 
         for path in paths:
-            files.extend(self.data_source.listdir(path))
+            files.extend(self.datasource.listdir(path))
 
         return files

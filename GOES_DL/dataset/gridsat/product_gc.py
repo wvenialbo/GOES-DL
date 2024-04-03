@@ -1,35 +1,38 @@
-from GOES_DL.dataset.gridsat.constants import (
+from .constants import (
     GOES_PRODUCT_DATE_FORMAT,
     GOES_PRODUCT_DATE_PATTERN,
     GOES_PRODUCT_LATEST_VERSION,
 )
-from GOES_DL.dataset.gridsat.product import GridSatProduct
+from .product import GridSatProduct
 
 
-class GridSatProductGOES(GridSatProduct):
+class GridSatProductGC(GridSatProduct):
     """
-    Represent the GridSat-GOES dataset product filename checker.
+    Represent the product utility for the GridSat-GOES/CONUS dataset.
 
-    This class implements the interface for the GridSat-GOES dataset
-    product filename checker. The checker is responsible for extracting
-    the datetime from a dataset product filename and verifying if a
-    given filename matches the expected pattern.
+    This class implements the `GridSatProduct` interface for the
+    GridSat-GOES/CONUS dataset (Geostationary Operational Environmental
+    Satellites - GOES/CONUS). Instances of this class are responsible
+    for verifying if a given filename matches the product filename
+    pattern based on the dataset's naming conventions and product
+    specifications, and for extracting the corresponding `datetime`
+    information from the product's filename.
 
-    The data in the GridSat-GOES dataset (Geostationary Operational
-    Environmental Satellites - GOES/CONUS) products comes from GOES
+    The data in the GridSat-GOES/CONUS dataset products comes from GOES
     2nd generation (GOES-I to GOES-M) series, GOES-8 to GOES-15; they
-    provide data for two separate domains: the entire GOES domain
-    (Full Disk) and the CONUS (Contiguous United States). The domain
-    and origin names are reflected in the product's filename, as is the
-    product's version. The product's filename pattern is as follows:
+    provide data for two separate scenes: the entire GOES domain (Full
+    Disk) and CONUS (Contiguous United States). The scene and origin
+    names are reflected in the product's filename, as is the product's
+    version. The product's filename pattern is as follows:
 
-    'GridSat-DOMAIN.origin.yyyy.mm.dd.HHMM.version.nc',
+    'GridSat-<SCENE>.<origin>.<yyyy>.<mm>.<dd>.<HH><MM>.<version>.nc',
 
-    where `DOMAIN` is the scene name in uppercase (e.g. 'CONUS' or
-    'GOES'), `origin` is the satellite identifier in lowercase (e.g.
-    'goes08' to 'goes15'), and `version` is the product's version (e.g.
-    'v01'). `yyyy`, `mm`, `dd`, `HH` and `MM` are the year, month, day,
-    hour, and minute, respectively, fixed length and padded with zeros.
+    where `<SCENE>` is the scene name in uppercase (e.g. 'CONUS' or
+    'GOES'); `<origin>` is the satellite identifier in lowercase (e.g.
+    'goes08' to 'goes15'); `<yyyy>` is the gregorian year number;
+    `<mm>`, `<dd>`, `<HH>` and <MM> are the month, day, hour and minute,
+    respectively, using two digits padded with zeros; and `<version>` is
+    the product's version(e.g. 'v01').
 
     Input is half-hourly data from the GOES 2nd generation satellite
     series with gridded 0.04°x0.04° spatial resolution that spans from
@@ -42,24 +45,24 @@ class GridSatProductGOES(GridSatProduct):
     ----------
     scene : str
         The scene ID for the dataset. Supported scenes are "F" (Full
-        Disk) and "C" (CONUS, Contiguous United States). Due to how
-        the GridSat-GOES dataset is organised, only a single scene
-        may be provided.
+        Disk) and "C" (CONUS, Contiguous United States). Due to how the
+        GridSat-GOES/CONUS dataset directories are organised, only a
+        single scene may be provided.
     origin : str | list[str]
-        The origin of the GridSat-GOES product, namely a satellite
-        identifier, e.g. "goes08". The origin may be a single origin
-        or a list of origins.
+        The origin of the GridSat-GOES/CONUS product, namely a satellite
+        identifier, e.g. "goes08". The origin may be a single origin or
+        a list of origins.
     version : str | list[str], optional
-        The version of the GridSat-GOES product; e.g., "v01". The
-        version may be a single version or a list of versions. Only
-        the latest version is available in the public repository. The
+        The version of the GridSat-GOES/CONUS product; e.g., "v01". The
+        version may be a single version or a list of versions. Only the
+        latest version is available in the public repository. The
         default is the latest version ("v01").
 
     Methods
     -------
     get_datetime(filename: str) -> datetime:
-        Extracts the datetime from a GridSat-GOES product filename.
-        (inherited)
+        Extracts the datetime from a GridSat-GOES/CONUS product
+        filename. (inherited)
     invalid_origin(origin: list[str]) -> str:
         Check for unavailable origins in a list of origins.
     invalid_scene(scene: list[str]) -> str:
@@ -67,8 +70,8 @@ class GridSatProductGOES(GridSatProduct):
     invalid_version(version: list[str]) -> str:
         Check for unsupported versions in a list of versions.
     match(filename: str) -> bool:
-        Checks if a given filename matches the GridSat-GOES product
-        filename pattern. (inherited)
+        Checks if a given filename matches the GridSat-GOES/CONUS
+        product filename pattern. (inherited)
 
     Raises
     ------
@@ -82,7 +85,7 @@ class GridSatProductGOES(GridSatProduct):
         f"G{id:02d}": f"goes{id:02d}" for id in range(8, 16)
     }
 
-    # Available scenes/domains from the GOES 2nd generation Imager
+    # Available scenes from the GOES 2nd generation Imager
     # Products:
     #
     # NOTE: In its strictest sense, “contiguous United States” refers
@@ -110,23 +113,23 @@ class GridSatProductGOES(GridSatProduct):
         version: str | list[str] = GOES_PRODUCT_LATEST_VERSION,
     ) -> None:
         """
-        Initialise a GridSat-GOES dataset product object.
+        Initialise a GridSat-GOES/CONUS dataset product object.
 
-        Constructs a new GridSat-GOES dataset product object.
+        Constructs a new GridSat-GOES/CONUS dataset product object.
 
         Parameters
         ----------
         scene : str
             The scene ID for the dataset. Supported scenes are "F" (Full
             Disk) and "C" (CONUS, Contiguous United States). Due to how
-            the GridSat-GOES dataset is organised, only a single scene
+            the GridSat-GOES/CONUS dataset is organised, only a single scene
             may be provided.
         origin : str | list[str]
-            The origin of the GridSat-GOES product, namely a satellite
+            The origin of the GridSat-GOES/CONUS product, namely a satellite
             identifier, e.g. "goes08". The origin may be a single origin
             or a list of origins.
         version : str | list[str]
-            The version of the GridSat-GOES product; e.g., "v01". The
+            The version of the GridSat-GOES/CONUS product; e.g., "v01". The
             version may be a single version or a list of versions.
 
         Raises
@@ -246,7 +249,7 @@ class GridSatProductGOES(GridSatProduct):
 if __name__ == "__main__":
     FILENAME_1: str = "GridSat-GOES.goes12.1994.09.01.0000.v01.nc"
     FILENAME_2: str = "GridSat-GOES.goes12.2017.12.31.2300.v01.nc"
-    product: GridSatProductGOES = GridSatProductGOES("F", "G12")
+    product: GridSatProductGC = GridSatProductGC("F", "G12")
     print(product)
     print(FILENAME_2.startswith(product.get_prefix()))
     print(FILENAME_2.endswith(product.get_suffix()))

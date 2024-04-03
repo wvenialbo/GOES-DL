@@ -2,27 +2,26 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from GOES_DL.dataset.gridsat.constants import (
-    GRIDSAT_FILE_SUFFIX,
-    GRIDSAT_PREFIX,
-)
-from GOES_DL.dataset.product import Product
+from ..product import Product
+from .constants import GRIDSAT_FILE_SUFFIX, GRIDSAT_PREFIX
 
 
 @dataclass(eq=False, frozen=True)
 class GridSatProduct(Product):
     """
-    Represent a generic GridSat dataset product filename checker.
+    Represent a product utility for GridSat dataset's product consumers.
 
-    This class implements the interface for a generic GridSat dataset
-    product filename checker. The checker is responsible for extracting
-    the datetime from a dataset product filename and verifying if a
-    given filename matches the expected pattern.
+    This class implements the `Product` interface for a generic GridSat
+    dataset product utility. Instances of this class are responsible
+    for verifying if a given filename matches the product filename
+    pattern based on the dataset's naming conventions and product
+    specifications, and for extracting the corresponding `datetime`
+    information from the product's filename.
 
-    Note: Currently, the GridSat-B1 dataset (Geostationary IR Channel
-    Brightness Temperature - GridSat B1) and the GridSat-GOES dataset
-    (Geostationary Operational Environmental Satellites - GOES/CONUS)
-    products are supported by their own classes.
+    Note: Currently, only the 'Geostationary IR Channel Brightness
+    Temperature - GridSat B1' and the 'Geostationary Operational
+    Environmental Satellites - GOES/CONUS' datasets's products are
+    supported.
 
     Attributes
     ----------
@@ -44,25 +43,25 @@ class GridSatProduct(Product):
         The regex pattern of the date format used in the GridSat product
         filename.
     file_prefix : str
-        The prefix for the GridSat product filenames.
+        The prefix for the GridSat product's filenames.
     file_suffix : str
-        The suffix for the GridSat product filenames.
+        The suffix for the GridSat product's filenames.
 
     Methods
     -------
     get_datetime(filename: str) -> datetime:
-        Extracts the datetime from a GridSat product filename.
+        Extracts the datetime from a GridSat product's filename.
     get_filename_pattern() -> str:
-        Returns the regex pattern for the GridSat product filename.
+        Returns the regex pattern for the GridSat product's filename.
     get_prefix():
-        Returns the prefix for the GridSat product filename.
+        Returns the prefix for the GridSat product's filename.
     get_suffix():
-        Returns the suffix for the GridSat product filename.
+        Returns the suffix for the GridSat product's filename.
     match(filename: str) -> bool:
         Checks if a given filename matches the GridSat product
         filename pattern.
     timestamp_to_datetime(timestamp: str) -> datetime:
-        Converts a GridSat product filename timestamp string to a
+        Converts a GridSat product's filename timestamp string to a
         datetime object.
     """
 
@@ -76,20 +75,21 @@ class GridSatProduct(Product):
 
     def get_datetime(self, filename: str) -> datetime:
         """
-        Extract a datetime from the filename.
+        Extract the `datetime` from the product's filename.
 
-        Extracts a datetime object from the given filename string using
-        a specified pattern.
+        This method parses the given filename and extracts the
+        corresponding `datetime` object from the product's filename
+        using the dataset's date/time format conventions.
 
         Parameters
         ----------
         filename : str
-            The filename from which to extract the datetime.
+            The filename from which to extract the `datetime`.
 
         Returns
         -------
-        datetime
-            The extracted datetime from the filename.
+        datetime:
+            The `datetime` extracted from the filename.
 
         Raises
         ------
@@ -106,7 +106,7 @@ class GridSatProduct(Product):
 
     def get_filename_pattern(self) -> str:
         """
-        Generate a regular expression pattern for the product filename.
+        Generate a regular expression pattern for the product's filename.
 
         Generates a filename regex pattern based on the prefix, date
         pattern, and suffix.
@@ -123,9 +123,9 @@ class GridSatProduct(Product):
 
     def get_prefix(self) -> str:
         """
-        Generate the prefix for the product filename.
+        Generate the prefix for the product's filename.
 
-        Generates the prefix for the product filename based on the
+        Generates the prefix for the product's filename based on the
         dataset name and origin.
 
         Returns
@@ -139,9 +139,9 @@ class GridSatProduct(Product):
 
     def get_suffix(self) -> str:
         """
-        Generate the suffix for the product filename.
+        Generate the suffix for the product's filename.
 
-        Generates the suffix for the product filename based on the
+        Generates the suffix for the product's filename based on the
         version and file suffix.
 
         Returns
@@ -156,8 +156,8 @@ class GridSatProduct(Product):
         """
         Verify the format of a provided filename.
 
-        Checks if the provided filename matches the expected pattern for
-        the dataset product.
+        Checks if the provided filename matches the dataset product
+        filename pattern for the dataset product.
 
         Parameters
         ----------

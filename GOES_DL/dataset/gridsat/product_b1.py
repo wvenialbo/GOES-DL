@@ -1,4 +1,4 @@
-from GOES_DL.dataset.gridsat.constants import (
+from .constants import (
     B1_PRODUCT_DATE_FORMAT,
     B1_PRODUCT_DATE_PATTERN,
     B1_PRODUCT_LATEST_VERSION,
@@ -6,30 +6,33 @@ from GOES_DL.dataset.gridsat.constants import (
     B1_PRODUCT_ORIGIN,
     B1_PRODUCT_PREFIX,
 )
-from GOES_DL.dataset.gridsat.product import GridSatProduct
+from .product import GridSatProduct
 
 
 class GridSatProductB1(GridSatProduct):
     """
-    Represent the GridSat-B1 dataset product filename checker.
+    Represent the product utility for the GridSat-B1 dataset.
 
-    This class implements the interface for the GridSat-B1 dataset
-    product filename checker. The checker is responsible for extracting
-    the datetime from a dataset product filename and verifying if a
-    given filename matches the expected pattern.
+    This class implements the `GridSatProduct` interface for the
+    GridSat-B1 dataset (Geostationary IR Channel Brightness Temperature
+    - GridSat B1). Instances of this class are responsible for verifying
+    if a given filename matches the product filename pattern based on
+    the dataset's naming conventions and product specifications, and
+    for extracting the corresponding `datetime` information from the
+    product's filename.
 
-    The data in the GridSat-B1 dataset (Geostationary IR Channel
-    Brightness Temperature - GridSat B1) products comes from different
+    The data in the GridSat-B1 dataset products comes from different
     sources, so, the origin's name is not reflected in the product's
     filename but the product's version is. Also, only a global view of
-    the Earth is available, so, no domain is implied. The product's
+    the Earth is available, thus, no scene is implied. The product's
     filename pattern is as follows:
 
-    'GRIDSAT-B1.yyyy.mm.dd.HH.version.nc';
+    'GRIDSAT-B1.<yyyy>.<mm>.<dd>.<HH>.<version>.nc';
 
-    `version` is the product's version (e.g. 'v02r01'). `yyyy`, `mm`,
-    `dd` and `HH` are the year, month, day, hour, respectively, fixed
-    length and padded with zeros.
+    where `<yyyy>` is the gregorian year number; `<mm>`, `<dd>` and
+    `<HH>` are the month, day and hour, respectively, using two digits
+    padded with zeros; and `<version>` is the product's version (e.g.
+    'v02r01').
 
     Input is 3-hourly data from the International Satellite Cloud
     Climatology Project (ISCCP) with gridded 0.07°x0.07° spatial
@@ -54,7 +57,7 @@ class GridSatProductB1(GridSatProduct):
     Methods
     -------
     get_datetime(filename: str) -> datetime:
-        Extracts the datetime from a GridSat-B1 product filename.
+        Extracts the `datetime` from a GridSat-B1 product's filename.
         (inherited)
     invalid_version(version: list[str]) -> str:
         Check for unsupported versions in a list of versions.

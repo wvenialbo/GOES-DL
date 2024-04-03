@@ -1,48 +1,51 @@
 from datetime import datetime
 from typing import Type
 
-from GOES_DL.dataset.gridsat.constants import (
-    B1_DATASET_DATE_FORMAT,
-    B1_DATASET_PATH_PREFIX,
-)
-from GOES_DL.dataset.gridsat.dataset import Datasource, GridSatDataset
-from GOES_DL.dataset.gridsat.product_b1 import GridSatProductB1
-from GOES_DL.datasource import DatasourceAWS, DatasourceHTTP
+from ...datasource import DatasourceAWS, DatasourceHTTP
+from .constants import B1_DATASET_DATE_FORMAT, B1_DATASET_PATH_PREFIX
+from .locator import Datasource, GridSatProductLocator
+from .product_b1 import GridSatProductB1
 
 
-class GridSatDatasetB1(GridSatDataset):
+class GridSatProductLocatorB1(GridSatProductLocator):
     """
-    Represent the GridSat-B1 dataset.
+    Represent the locator for GridSat-B1 dataset products.
 
-    This class implements the interface for the GridSat-B1 dataset. The
-    dataset is responsible for generating a list of paths based on the
-    initial and final datetimes. The paths are going to be generated for
-    each year, between the initial and final datetimes. The final time
-    is always included in the list.
+    This class implements the `GridSatProductLocator` abstract class for
+    for the GridSat-B1 (Geostationary IR Channel Brightness Temperature
+    - GridSat B1) dataset product locator.
 
-    The data in the GridSat-B1 dataset (Geostationary IR Channel
-    Brightness Temperature - GridSat B1) products comes from different
+    Instances of this class are responsible for generating a list of
+    folder paths based on the dataset's directory structure and naming
+    conventions, product details, and a specified date range.
+
+    The generated paths cover each year within the date range. Paths to
+    the folders containing the initial and final dates are included in
+    the list.
+
+    The data in the GridSat-B1 dataset products comes from different
     sources and only a global view of the Earth is available, so, no
     domain is implied. Neither of them is reflected in the product's
     file path. The dataset is available from various services, for
     Amazon Web Services (AWS) and Google Cloud Platform (GCP), the
     product's file path pattern is as follows:
 
-    'scheme://net-location/data/yyyy',
+    '<scheme>://<net-location>/data/<yyyy>',
 
-    where `scheme` identifies the protocol's scheme (e.g. 's3', 'gs'),
-    `net-location` is the hostname (e.g. 'noaa-cdr-gridsat-b1-pds' for
-    's3', and 'noaa-cdr-gridsat-b1' for 'gs'), and  `yyyy` is the year.
+    where `<scheme>` identifies the protocol's scheme (e.g. 's3', 'gs'),
+    `<net-location>` is the hostname (e.g. 'noaa-cdr-gridsat-b1-pds' for
+    's3', and 'noaa-cdr-gridsat-b1' for 'gs'), and  `<yyyy>` is the
+    gregorian year number.
 
-    The files are also hosted on the National Centers for Environmental
-    Information (NCEI) servers, the product's file path pattern is as
-    follows:
+    The files are also hosted on the servers of the National Centers for
+    Environmental Information (NCEI), the product's file path pattern is
+    as follows:
 
-    'https://www.ncei.noaa.gov/data/path/access/yyyy';
+    'https://www.ncei.noaa.gov/data/<path>/access/<yyyy>';
 
-    where `path` is the project's data files folder name, i.e.
+    where `<path>` is the project's data files folder name, i.e.
     'geostationary-ir-channel-brightness-temperature-gridsat-b1',
-    and `yyyy` is the year.
+    and `<yyyy>` is the gregorian year number.
 
     Note: Currently, only the AWS datasource is supported.
 
@@ -70,11 +73,10 @@ class GridSatDatasetB1(GridSatDataset):
     -------
     invalid_datasource(datasource: list[str]) -> str
         Check for unsupported datasources in a list of datasources.
-    next_time(current_time: datetime) -> datetime
+    next_time(current_time: datetime) -> datetime:
         Get the next time interval. GridSat-B1 dataset organises the
         data by year.
-    normalise_times(datetime_ini: datetime, datetime_fin: datetime)
-        -> tuple[datetime, datetime]
+    normalize_times(datetime_ini: datetime, datetime_fin: datetime) -> tuple[datetime, datetime]:
         Normalise the initial and final datetimes.
     truncate_to_year(time: datetime) -> datetime
         Truncate the datetime to the current year.
@@ -83,7 +85,7 @@ class GridSatDatasetB1(GridSatDataset):
     ------
     ValueError
         If the provided datasource is not supported or unavailable.
-    """
+    """  # noqa: E501
 
     AVAILABLE_DATASOURCE: dict[str, Type[Datasource]] = {
         "AWS": DatasourceAWS,
@@ -130,7 +132,7 @@ class GridSatDatasetB1(GridSatDataset):
         datasource_url: str = self.BASE_URL[datasource]
         d_source: Datasource = DataSource(datasource_url)
 
-        super(GridSatDatasetB1, self).__init__(
+        super(GridSatProductLocatorB1, self).__init__(
             product=product,
             datasource=d_source,
             date_format=B1_DATASET_DATE_FORMAT,

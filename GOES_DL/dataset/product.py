@@ -4,55 +4,63 @@ from datetime import datetime
 
 class Product(ABC):
     """
-    Abstract a generic dataset product filename checker.
+    Abstract a satellite imagery datasets product utility.
 
-    This class defines the interface for a dataset product filename
-    checker. The checker is responsible for extracting the datetime from
-    a dataset product filename and verifying if a given filename matches
-    the expected pattern based on the products requested by the user.
+    This abstract base class defines the interface of a dataset's
+    product utility for consumers of satellite imagery. Subclasses
+    instances are responsible for verifying if a given filename
+    matches the product filename pattern based on the dataset's naming
+    conventions and product specifications, and for extracting the
+    corresponding `datetime` information from the product's filename.
+
+    Subclasses must implement the following methods (refer to their
+    individual documentation for details): `get_datetime(filename)`
+    and `match(filename)`.
 
     Methods
     -------
     get_datetime(filename: str) -> datetime:
-        Extracts the datetime from a dataset product filename timestamp.
+        Extracts the `datetime` from the product's filename.
     match(filename: str) -> bool:
-        Checks if a given filename matches the dataset products
-        filename pattern.
+        Verify if a given filename matches the product's filename
+        pattern.
     """
 
     @abstractmethod
     def get_datetime(self, filename: str) -> datetime:
         """
-        Extract a datetime from the filename.
+        Extract the `datetime` from the product's filename.
 
-        Extracts a datetime object from the given filename string using
-        a specified pattern.
+        This method parses the given filename and extracts the
+        corresponding `datetime` object from the product's filename
+        using the dataset's date/time format conventions.
 
         Parameters
         ----------
         filename : str
-            The filename from which to extract the datetime.
+            The filename from which to extract the `datetime`.
 
         Returns
         -------
         datetime:
-            The datetime extracted from the filename.
+            The `datetime` extracted from the filename.
 
         Raises
         ------
         ValueError:
             If the filename does not match the expected pattern or if
-            the timestamp format specification is ill-formed.
+            the dataset's datetime format specification is ill-formed.
         """
         ...
 
     @abstractmethod
     def match(self, filename: str) -> bool:
         """
-        Verify the format of a provided filename.
+        Verify if a filename matches the product's filename pattern.
 
-        Checks if the provided filename matches the expected based on
-        the dataset products requested by the user.
+        This method checks the given filename against the dataset
+        product filename pattern based on the dataset's naming
+        conventions and product specifications.
 
         Parameters
         ----------
