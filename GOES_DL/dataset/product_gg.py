@@ -5,13 +5,20 @@ from re import Match, findall, fullmatch
 from .product import Product
 
 
-class ProductBase(Product):
+class ProductBaseGG(Product):
     """
-    Abstract a satellite imagery datasets product utility.
+    Abstract a GridSat or GOES-R series dataset product utility.
 
-    This abstract base class implements the `Product` interface and
-    defines a common abstract methods for the GridSat and GOES-R
-    series dataset product utilities.
+    This class implements the `Product` interface and serves as a base
+    class for products of the GridSat and GOES-R series datasets. It
+    also defines common abstract methods that subclasses must implement
+    to provide dataset-specific product utilities.
+
+    Instances of this class are responsible for verifying if a given
+    filename matches the product filename pattern based on the dataset's
+    naming conventions and product specifications, and for extracting
+    the corresponding `datetime` information from the product's
+    filename.
 
     Subclasses must implement the following methods (refer to their
     individual documentation for details): `get_date_format()`,
@@ -49,7 +56,6 @@ class ProductBase(Product):
         str
             The date format specification for the product's filename.
         """
-        ...
 
     def get_datetime(self, filename: str) -> datetime:
         """
@@ -113,7 +119,6 @@ class ProductBase(Product):
         str
             The generated prefix for the filename.
         """
-        ...
 
     @abstractmethod
     def get_suffix(self) -> str:
@@ -128,7 +133,6 @@ class ProductBase(Product):
         str
             The generated suffix for the filename.
         """
-        ...
 
     @abstractmethod
     def get_timestamp_pattern(self) -> str:
@@ -140,7 +144,6 @@ class ProductBase(Product):
         str
             The generated timestamp pattern for the filename.
         """
-        ...
 
     def match(self, filename: str) -> bool:
         """

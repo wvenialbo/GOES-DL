@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Product(ABC):
     """
-    Abstract a satellite imagery datasets product utility.
+    Abstract a satellite imagery dataset's product utility.
 
     This abstract base class defines the interface of a dataset's
     product utility for consumers of satellite imagery. Subclasses
@@ -51,7 +51,6 @@ class Product(ABC):
             If the filename does not match the expected pattern or if
             the dataset's datetime format specification is ill-formed.
         """
-        ...
 
     @abstractmethod
     def match(self, filename: str) -> bool:
@@ -72,4 +71,3 @@ class Product(ABC):
         bool:
             True if the filename matches the pattern, False otherwise.
         """
-        ...

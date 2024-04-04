@@ -1,20 +1,25 @@
 from dataclasses import dataclass
 
-from ..product_base import ProductBase
+from ..product_gg import ProductBaseGG
 from .constants import GOESR_FILE_SUFFIX, GOESR_PRODUCT_DATE_FORMAT
 
 
 @dataclass(eq=False, frozen=True)
-class GOESProduct(ProductBase):
+class GOESProduct(ProductBaseGG):
     """
     Represent a product utility for GOES-R dataset's product consumers.
 
     This class implements the `Product` interface for a generic GOES-R
-    dataset product utility. Instances of this class are responsible
-    for verifying if a given filename matches the product filename
-    pattern based on the dataset's naming conventions and product
-    specifications, and for extracting the corresponding `datetime`
-    information from the product's filename.
+    dataset product utility by inheriting from the `ProductBaseGG`
+    abstract class. The `GOESProduct` class defines the specifications
+    and naming conventions for products in the GOES-R dataset, and
+    serves as a base class for more specialised product utility classes.
+
+    Instances of this class are responsible for verifying if a given
+    filename matches the product filename pattern based on the dataset's
+    naming conventions and product specifications, and for extracting
+    the corresponding `datetime` information from the product's
+    filename.
 
     Attributes
     ----------

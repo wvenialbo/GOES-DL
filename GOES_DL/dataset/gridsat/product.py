@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from ..product_base import ProductBase
+from ..product_gg import ProductBaseGG
 from .constants import GRIDSAT_FILE_SUFFIX
 
 
 @dataclass(eq=False, frozen=True)
-class GridSatProduct(ProductBase):
+class GridSatProduct(ProductBaseGG):
     """
     Represent a product utility for GridSat dataset's product consumers.
 
