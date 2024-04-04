@@ -6,6 +6,56 @@ from .constants import GOESR_FILE_SUFFIX, GOESR_PRODUCT_DATE_FORMAT
 
 @dataclass(eq=False, frozen=True)
 class GOESProduct(ProductBase):
+    """
+    Represent a product utility for GOES-R dataset's product consumers.
+
+    This class implements the `Product` interface for a generic GOES-R
+    dataset product utility. Instances of this class are responsible
+    for verifying if a given filename matches the product filename
+    pattern based on the dataset's naming conventions and product
+    specifications, and for extracting the corresponding `datetime`
+    information from the product's filename.
+
+    Attributes
+    ----------
+    name : str
+        The name of the GOES-R dataset product. Due to how the GOES-R
+        dataset is structured, the name is always a single string.
+    level : str
+        The level of the GOES-R product, e.g. "L1b" or "L2".
+    scene : str
+        The scene of the GOES-R product, e.g. "F" or "C".
+    instrument : str
+        The instrument of the GOES-R product, e.g. "ABI" or "GLM".
+    mode : list[str]
+        The list of modes of the GOES-R product, e.g. "M3" or "M6".
+    channel : list[str]
+        The list of channels of the GOES-R product, e.g. "C08" or "C13".
+    origin : list[str]
+        The list of origins of the GOES-R product, namely one or more
+        satellite identifier, e.g. "goes08". Multi-origin data may set
+        this attribute to an empty list.
+    date_pattern : str
+        The regex pattern of the date format used in the GOES-R product
+        filename.
+
+    Methods
+    -------
+    get_date_format() -> str:
+        Return the date format specification for the GOES-R product's
+        filename.
+    get_prefix() -> str:
+        Generate the prefix for the GOES-R product's filename.
+    get_product_prefix() -> str:
+        Generate the product prefix for the GOES-R product's filename.
+    get_scan_band() -> str:
+        Generate the scan mode and channel number identifier part of the
+        GOES-R product's filename.
+    get_suffix() -> str:
+        Generate the suffix for the GOES-R product's filename.
+    get_timestamp_pattern() -> str:
+        Return the timestamp pattern for the GOES-R product's filename.
+    """
 
     name: str
     level: str

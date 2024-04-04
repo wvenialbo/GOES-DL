@@ -42,8 +42,6 @@ class GridSatProduct(ProductBase):
         filename.
     file_prefix : str
         The prefix for the GridSat product's filenames.
-    file_suffix : str
-        The suffix for the GridSat product's filenames.
 
     Methods
     -------

@@ -14,8 +14,8 @@ class ProductBase(Product):
     series dataset product utilities.
 
     Subclasses must implement the following methods (refer to their
-    individual documentation for details): `get_datetime(filename)`
-    and `match(filename)`.
+    individual documentation for details): `get_date_format()`,
+    `get_prefix()`, `get_suffix()`, and `get_timestamp_pattern()`.
 
     Methods
     -------
