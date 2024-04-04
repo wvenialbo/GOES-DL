@@ -10,6 +10,7 @@
         "CMIP",
         "datasources",
         "DMWV",
+        "GOESR",
         "GOESRS",
         "GOESRSCMI",
         "GOESRSMCMI",
@@ -30,7 +31,7 @@
     ],
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
-            "scope": "goes"
+            "scope": "goes-dl"
         },
         {
             "scope": "ide-env"
