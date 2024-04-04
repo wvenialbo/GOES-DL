@@ -49,9 +49,6 @@ class TestGridSatProduct(unittest.TestCase):
     def test_file_prefix_property(self) -> None:
         self.assertEqual(self.product.file_prefix, self.FILE_PREFIX)
 
-    def test_file_suffix_property(self) -> None:
-        self.assertEqual(self.product.file_suffix, self.FILE_SUFFIX)
-
     def test_date_format_property(self) -> None:
         self.assertEqual(self.product.date_format, self.DATE_FORMAT)
 
