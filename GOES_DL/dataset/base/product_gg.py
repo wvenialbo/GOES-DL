@@ -16,40 +16,55 @@ class ProductBaseGG(Product):
 
     Instances of this class are responsible for verifying if a given
     filename matches the product filename pattern based on the dataset's
-    naming conventions and product specifications, and for extracting
-    the corresponding `datetime` information from the product's
-    filename.
+    naming conventions and product specifications, by means of method
+    `match(filename)`, and for extracting the corresponding `datetime`
+    information from the product's filename through the use of the
+    method `get_datetime(filename)`.
 
+    Notes
+    -----
     Subclasses must implement the following methods (refer to their
     individual documentation for details): `get_date_format()`,
     `get_prefix()`, `get_suffix()`, and `get_timestamp_pattern()`.
 
+    Caution
+    -------
+    Members of this class not defined by the `Product` interface are
+    helper methods and can be considered as implementation details,
+    even though they are defined as part of the public API. In future
+    releases, these methods may be moved to a private scope, suffer
+    name changes, or be removed altogether.
+
     Methods
     -------
     get_date_format() -> str:
-        Generate the date format for the product's filename.
+        Return the date format specification for the product's filename.
     get_datetime(filename: str) -> datetime:
-        Extracts the `datetime` from the product's filename.
+        Extract the `datetime` from the product's filename.
     get_filename_pattern() -> str:
-        Returns the regex pattern for the product's filename.
+        Return a regular expression pattern for the product's filename.
     get_prefix():
-        Returns the prefix for the product's filename.
+        Return the prefix for the product's filename.
     get_suffix():
-        Returns the suffix for the product's filename.
+        Return the suffix for the product's filename.
     get_timestamp_pattern() -> str:
-        Returns the timestamp pattern for the product's filename.
+        Return the timestamp regex pattern for the product's filename.
     match(filename: str) -> bool:
-        Verify if a given filename matches the product's filename
-        pattern.
+        Verify if a provided filename matches the required format.
     timestamp_to_datetime(timestamp: str) -> datetime:
-        Converts the product's filename timestamp string to a
-        `datetime` object.
+        Convert a timestamp string to a UTC `datetime` object.
     """
 
     @abstractmethod
     def get_date_format(self) -> str:
         """
         Return the date format specification for the product's filename.
+
+        Generates and returns the date format specification for the
+        product's filename based on the dataset product filename's date
+        and time format conventions. The date format specification
+        string is used to parse the product's filename and extract the
+        `datetime` information.
 
         Returns
         -------
@@ -61,9 +76,9 @@ class ProductBaseGG(Product):
         """
         Extract the `datetime` from the product's filename.
 
-        This method parses the given filename and extracts the
+        This method parses the given filename and convert it to the
         corresponding `datetime` object from the product's filename
-        using the dataset's date/time format conventions.
+        using the dataset's date and time format conventions.
 
         Parameters
         ----------
@@ -90,15 +105,16 @@ class ProductBaseGG(Product):
 
     def get_filename_pattern(self) -> str:
         """
-        Generate a regular expression pattern for the product's filename.
+        Return a regular expression pattern for the product's filename.
 
-        Generates a filename regex pattern based on the prefix, date
-        pattern, and suffix.
+        Generates and returns a regular expression pattern for the
+        product's filename based on the prefix, date pattern, and
+        suffix created with dataset-specific product information.
 
         Returns
         -------
         str
-            The generated filename pattern.
+            The regular expression pattern for the product's filename
         """
         prefix: str = self.get_prefix()
         suffix: str = self.get_suffix()
@@ -109,48 +125,57 @@ class ProductBaseGG(Product):
     @abstractmethod
     def get_prefix(self) -> str:
         """
-        Generate the prefix for the product's filename.
+        Return the prefix for the product's filename.
 
-        Generates the prefix for the product's filename based on the
-        dataset name and origin.
+        Generates and returns the prefix for the product's filename
+        based on product-specific information like dataset and product's
+        name, instrument and origin's identifier, etc.
 
         Returns
         -------
         str
-            The generated prefix for the filename.
+            The prefix for the product's filename.
         """
 
     @abstractmethod
     def get_suffix(self) -> str:
         """
-        Generate the suffix for the product's filename.
+        Return the suffix for the product's filename.
 
-        Generates the suffix for the product's filename based on the
-        version and file suffix.
+        Generates and returns the suffix for the product's filename
+        based on product-specific information like product's version
+        origin's identifier, and file suffix (extension).
 
         Returns
         -------
         str
-            The generated suffix for the filename.
+            The suffix for the product's filename.
         """
 
     @abstractmethod
     def get_timestamp_pattern(self) -> str:
         """
-        Generate the timestamp pattern for the product's filename.
+        Return the timestamp regex pattern for the product's filename.
+
+        Generates and returns the timestamp regular expression
+        pattern for the product's filename based on the dataset
+        product filename's date and time format conventions. The
+        timestamp regex pattern is used to extract the substring
+        containing the timestamp from the product's filename
+        before extracting the `datetime` information.
 
         Returns
         -------
         str
-            The generated timestamp pattern for the filename.
+            The timestamp regex pattern for the product's filename.
         """
 
     def match(self, filename: str) -> bool:
         """
-        Verify the format of a provided filename.
+        Verify if a provided filename matches the required format.
 
-        Checks if the provided filename matches the dataset product
-        filename pattern for the dataset product.
+        Checks if the provided filename matches the product's filename
+        pattern for the dataset product.
 
         Parameters
         ----------
@@ -169,20 +194,28 @@ class ProductBaseGG(Product):
 
     def timestamp_to_datetime(self, timestamp: str) -> datetime:
         """
-        Convert a timestamp to a datetime object.
+        Convert a timestamp string to a UTC `datetime` object.
 
-        Converts the provided timestamp string to a datetime object in
-        UTC timezone.
+        Parses and converts the provided timestamp string to a
+        `datetime` object.
+
+        Notes
+        -----
+        The timestamp string extracted from the product's filename
+        are (or assumed to be) always in UTC timezone. Consumer of
+        product utilities should be aware of this assumption. The
+        user could convert the `datetime` object to the desired
+        timezone if needed.
 
         Parameters
         ----------
         timestamp : str
-            The timestamp string to convert to a datetime object.
+            The timestamp string to convert to a `datetime` object.
 
         Returns
         -------
         datetime
-            The converted datetime object in UTC timezone.
+            The converted `datetime` object in UTC timezone.
 
         Raises
         ------

@@ -15,11 +15,17 @@ class GOESProduct(ProductBaseGG):
     and naming conventions for products in the GOES-R dataset, and
     serves as a base class for more specialised product utility classes.
 
-    Instances of this class are responsible for verifying if a given
+    Also, the class provides the implementation of the abstract
+    helper methods defined in the `ProductBaseGG` abstract class.
+    The `GOESProduct` class is the workhorse for all GOES-R dataset
+    products.
+
+    `GOESProduct` objects are responsible for verifying if a given
     filename matches the product filename pattern based on the dataset's
-    naming conventions and product specifications, and for extracting
-    the corresponding `datetime` information from the product's
-    filename.
+    naming conventions and product specifications, using the method
+    `match(filename)`, and for extracting the corresponding `datetime`
+    information from the product's filename by dint of the method
+    `get_datetime(filename)`.
 
     Attributes
     ----------
@@ -51,9 +57,9 @@ class GOESProduct(ProductBaseGG):
         filename.
     get_prefix() -> str:
         Generate the prefix for the GOES-R product's filename.
-    get_product_prefix() -> str:
+    get_product_tag() -> str:
         Generate the product prefix for the GOES-R product's filename.
-    get_scan_band() -> str:
+    get_mode_tag() -> str:
         Generate the scan mode and channel number identifier part of the
         GOES-R product's filename.
     get_suffix() -> str:
@@ -75,6 +81,12 @@ class GOESProduct(ProductBaseGG):
         """
         Return the date format specification for the product's filename.
 
+        Generates and returns the date format specification for
+        the product's filename based on the GOES-R dataset product
+        filename's date and time format conventions. The date format
+        specification string is used to parse the product's filename
+        and extract the `datetime` information.
+
         Returns
         -------
         str
@@ -85,48 +97,62 @@ class GOESProduct(ProductBaseGG):
 
     def get_prefix(self) -> str:
         """
-        Generate the prefix for the GOES-R product's filename.
+        Return the prefix for the product's filename.
 
-        Generates the prefix for the product's filename based on the
-        dataset name and origin.
+        Generates and returns the prefix for the GOES-R product's
+        filename based on product-specific information like dataset
+        and product's name, instrument and origin's identifier, etc.
 
         Returns
         -------
         str
-            The generated prefix for the filename.
+            The prefix for the GOES-R product's filename.
         """
-        product_prefix: str = self.get_product_prefix()
-        scan_band: str = self.get_scan_band()
+        product_prefix: str = self.get_product_tag()
+        scan_band: str = self.get_mode_tag()
+
         if scan_band:
             scan_band = f"_{scan_band}"
         origin: str = f"_{self.origin}"
 
         return f"{product_prefix}{scan_band}{origin}"
 
-    def get_product_prefix(self) -> str:
+    def get_product_tag(self) -> str:
         """
-        Generate the product prefix for the GOES-R product's filename.
+        Return a product identifier for the product's filename.
+
+        Generates and returns the product identifier to be used as
+        part of the prefix for the GOES-R product's filename based
+        on information like product's name, instrument and origin's
+        identifier, etc.
 
         Returns
         -------
         str
-            The generated product prefix for the filename.
+            The product identifier for the GOES-R product's filename.
         """
         product_id: str = f"_{self.level}_{self.name}{self.scene}"
 
         return f"{self.instrument}{product_id}"
 
-    def get_scan_band(self) -> str:
+    def get_mode_tag(self) -> str:
         """
-        Generate the scan band for the GOES-R product's filename.
+        Return the scan mode and band names for the product's filename.
+
+        Generates and returns a regex pattern for the requested scan
+        modes and channels that appear as tags in the product's filename
+        based on product-specific scan modes and band channel
+        identifiers.
 
         Returns
         -------
         str
-            The generated scan band for the filename.
+            The scan mode and band names for the GOES-R product's
+            filename.
         """
         sorted_modes: list[str] = sorted(self.mode)
         mode: str = f"(?:{'|'.join(sorted_modes)})" if self.mode else ""
+
         sorted_channels: list[str] = sorted(self.channel)
         channel: str = (
             f"(?:{'|'.join(sorted_channels)})" if self.channel else ""
@@ -136,29 +162,35 @@ class GOESProduct(ProductBaseGG):
 
     def get_suffix(self) -> str:
         """
-        Generate the suffix for the GOES-R product's filename.
+        Return the suffix for the product's filename.
 
-        Generates the suffix for the product's filename based on the
-        version and file suffix.
+        Generates and returns the suffix for the product's filename
+        based on product-specific information like product's version
+        origin's identifier, and file suffix (extension).
 
         Returns
         -------
         str
-            The generated suffix for the filename.
+            The suffix for the GOES-R product's filename.
         """
         return GOESR_FILE_SUFFIX
 
     def get_timestamp_pattern(self) -> str:
         """
-        Return the timestamp pattern for the GOES-R product's filename.
+        Return the timestamp regex pattern for the product's filename.
 
-        Note: The scan start time that appear in the filename is
-        considered as a the date and time of the product.
+        Generates and returns the timestamp regular expression
+        pattern for the product's filename based on the dataset
+        product filename's date and time format conventions. The
+        timestamp regex pattern is used to extract the substring
+        containing the timestamp from the product's filename
+        before extracting the `datetime` information.
 
         Returns
         -------
         str
-            The generated timestamp pattern for the filename.
+            The timestamp regex pattern for the GOES-R product's
+            filename.
         """
         start_date: str = f"_s({self.date_pattern})"
         end_date: str = f"_e{self.date_pattern}"

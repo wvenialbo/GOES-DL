@@ -13,9 +13,18 @@ class Product(ABC):
     conventions and product specifications, and for extracting the
     corresponding `datetime` information from the product's filename.
 
+    Notes
+    -----
     Subclasses must implement the following methods (refer to their
     individual documentation for details): `get_datetime(filename)`
     and `match(filename)`.
+
+    Important
+    ---------
+    The `Product` interface assumes that the timestamp extracted from
+    the product's filename is always in UTC timezone. Consumers of the
+    product utilities should be aware of this assumption. Users could
+    convert the `datetime` object to the desired timezone if needed.
 
     Methods
     -------
@@ -31,9 +40,9 @@ class Product(ABC):
         """
         Extract the `datetime` from the product's filename.
 
-        This method parses the given filename and extracts the
+        This method parses the given filename and convert it to the
         corresponding `datetime` object from the product's filename
-        using the dataset's date/time format conventions.
+        using the dataset's date and time format conventions.
 
         Parameters
         ----------
