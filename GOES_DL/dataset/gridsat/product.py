@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..product_gg import ProductBaseGG
+from ..base import ProductBaseGG
 from .constants import GRIDSAT_FILE_SUFFIX
 
 

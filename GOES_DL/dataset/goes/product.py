@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..product_gg import ProductBaseGG
+from ..base import ProductBaseGG
 from .constants import GOESR_FILE_SUFFIX, GOESR_PRODUCT_DATE_FORMAT
 
 

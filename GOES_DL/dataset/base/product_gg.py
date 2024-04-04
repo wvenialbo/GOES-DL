@@ -2,7 +2,7 @@ from abc import abstractmethod
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from .product import Product
+from ..product import Product
 
 
 class ProductBaseGG(Product):
