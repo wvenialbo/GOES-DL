@@ -1,0 +1,11 @@
+[run]
+omit=
+    '.venv/*'
+    '.vscode/*'
+    '.ipynb_checkpoints/*'
+    'htmlcov/*'
+    'var/*'
+source='.'
+
+[report]
+show_missing = true
