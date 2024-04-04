@@ -1,10 +1,10 @@
 from .constants import (
+    B1_GRIDSAT_PREFIX,
     B1_PRODUCT_DATE_FORMAT,
     B1_PRODUCT_DATE_PATTERN,
     B1_PRODUCT_LATEST_VERSION,
     B1_PRODUCT_NAME,
     B1_PRODUCT_ORIGIN,
-    B1_PRODUCT_PREFIX,
 )
 from .product import GridSatProduct
 
@@ -109,7 +109,7 @@ class GridSatProductB1(GridSatProduct):
             version=version,
             date_format=B1_PRODUCT_DATE_FORMAT,
             date_pattern=B1_PRODUCT_DATE_PATTERN,
-            file_prefix=B1_PRODUCT_PREFIX,
+            file_prefix=B1_GRIDSAT_PREFIX,
         )
 
     def invalid_version(self, version: list[str]) -> str:

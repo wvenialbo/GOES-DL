@@ -1,4 +1,5 @@
 from .constants import (
+    GOES_GRIDSAT_PREFIX,
     GOES_PRODUCT_DATE_FORMAT,
     GOES_PRODUCT_DATE_PATTERN,
     GOES_PRODUCT_LATEST_VERSION,
@@ -174,6 +175,7 @@ class GridSatProductGC(GridSatProduct):
             version=version,
             date_format=GOES_PRODUCT_DATE_FORMAT,
             date_pattern=GOES_PRODUCT_DATE_PATTERN,
+            file_prefix=GOES_GRIDSAT_PREFIX,
         )
 
     def invalid_origin(self, origin: list[str]) -> str:

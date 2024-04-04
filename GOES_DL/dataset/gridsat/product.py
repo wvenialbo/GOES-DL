@@ -1,13 +1,11 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from re import Match, findall, fullmatch
 
-from ..product import Product
-from .constants import GRIDSAT_FILE_SUFFIX, GRIDSAT_PREFIX
+from ..product_base import ProductBase
+from .constants import GRIDSAT_FILE_SUFFIX
 
 
 @dataclass(eq=False, frozen=True)
-class GridSatProduct(Product):
+class GridSatProduct(ProductBase):
     """
     Represent a product utility for GridSat dataset's product consumers.
 
@@ -49,20 +47,20 @@ class GridSatProduct(Product):
 
     Methods
     -------
+    get_date_format() -> str:
+        Generate the date format for the GridSat product's filename.
     get_datetime(filename: str) -> datetime:
         Extracts the datetime from a GridSat product's filename.
-    get_filename_pattern() -> str:
-        Returns the regex pattern for the GridSat product's filename.
+        (inherited)
     get_prefix():
         Returns the prefix for the GridSat product's filename.
     get_suffix():
         Returns the suffix for the GridSat product's filename.
+    get_timestamp_pattern() -> str:
+        Returns the timestamp pattern for the product's filename.
     match(filename: str) -> bool:
         Checks if a given filename matches the GridSat product
-        filename pattern.
-    timestamp_to_datetime(timestamp: str) -> datetime:
-        Converts a GridSat product's filename timestamp string to a
-        datetime object.
+        filename pattern. (inherited)
     """
 
     name: str
@@ -70,60 +68,23 @@ class GridSatProduct(Product):
     version: list[str]
     date_format: str
     date_pattern: str
-    file_prefix: str = GRIDSAT_PREFIX
-    file_suffix: str = GRIDSAT_FILE_SUFFIX
+    file_prefix: str
 
-    def get_datetime(self, filename: str) -> datetime:
+    def get_date_format(self) -> str:
         """
-        Extract the `datetime` from the product's filename.
-
-        This method parses the given filename and extracts the
-        corresponding `datetime` object from the product's filename
-        using the dataset's date/time format conventions.
-
-        Parameters
-        ----------
-        filename : str
-            The filename from which to extract the `datetime`.
-
-        Returns
-        -------
-        datetime:
-            The `datetime` extracted from the filename.
-
-        Raises
-        ------
-        ValueError
-            If the filename does not match the expected pattern.
-        """
-        pattern: str = self.get_filename_pattern()
-        matches: list[str] = findall(pattern, filename)
-
-        if len(matches) != 1:
-            raise ValueError(f"Incompatible product filename: '{filename}'")
-
-        return self.timestamp_to_datetime(matches[0])
-
-    def get_filename_pattern(self) -> str:
-        """
-        Generate a regular expression pattern for the product's filename.
-
-        Generates a filename regex pattern based on the prefix, date
-        pattern, and suffix.
+        Return the date format specification for the product's filename.
 
         Returns
         -------
         str
-            The generated filename pattern.
+            The date format specification for the GridSat product's
+            filename.
         """
-        prefix: str = self.get_prefix()
-        suffix: str = self.get_suffix()
-
-        return f"{prefix}({self.date_pattern}){suffix}"
+        return self.date_format
 
     def get_prefix(self) -> str:
         """
-        Generate the prefix for the product's filename.
+        Generate the prefix for the GridSat dataset product's filename.
 
         Generates the prefix for the product's filename based on the
         dataset name and origin.
@@ -140,7 +101,7 @@ class GridSatProduct(Product):
 
     def get_suffix(self) -> str:
         """
-        Generate the suffix for the product's filename.
+        Generate the suffix for the GridSat dataset product's filename.
 
         Generates the suffix for the product's filename based on the
         version and file suffix.
@@ -152,62 +113,18 @@ class GridSatProduct(Product):
         """
         sorted_version: list[str] = sorted(self.version)
 
-        return f".(?:{'|'.join(sorted_version)}){self.file_suffix}"
+        return f".(?:{'|'.join(sorted_version)}){GRIDSAT_FILE_SUFFIX}"
 
-    def match(self, filename: str) -> bool:
+    def get_timestamp_pattern(self) -> str:
         """
-        Verify the format of a provided filename.
-
-        Checks if the provided filename matches the dataset product
-        filename pattern for the dataset product.
-
-        Parameters
-        ----------
-        filename : str
-            The filename to match against the pattern.
+        Return the timestamp pattern for the GridSat product's filename.
 
         Returns
         -------
-        bool
-            True if the filename matches the pattern, False otherwise.
+        str
+            The generated timestamp pattern for the filename.
         """
-        pattern: str = self.get_filename_pattern()
-        match: Match[str] | None = fullmatch(pattern, filename)
-
-        return match is not None
-
-    def timestamp_to_datetime(self, timestamp: str) -> datetime:
-        """
-        Convert a timestamp to a datetime object.
-
-        Converts the provided timestamp string to a datetime object in
-        UTC timezone.
-
-        Parameters
-        ----------
-        timestamp : str
-            The timestamp string to convert to a datetime object.
-
-        Returns
-        -------
-        datetime
-            The converted datetime object in UTC timezone.
-
-        Raises
-        ------
-        ValueError
-            The framework raises an exception if the timestamp does not
-            match the expected format or if the format specification is
-            ill-formed (which is, indeed, a bug!).
-        """
-        # File dates are always in UTC.
-        file_timestamp: str = f"{timestamp}+0000"
-        file_date_format: str = f"{self.date_format}%z"
-        file_date: datetime = datetime.strptime(
-            file_timestamp, file_date_format
-        )
-
-        return file_date.astimezone(timezone.utc)
+        return f"({self.date_pattern})"
 
 
 if __name__ == "__main__":
