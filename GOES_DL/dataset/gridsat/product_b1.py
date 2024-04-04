@@ -141,8 +141,7 @@ if __name__ == "__main__":
     FILENAME_2: str = "GRIDSAT-B1.2023.09.30.21.v02r01.nc"
     product: GridSatProductB1 = GridSatProductB1(version="v02r01")
     print(product)
-    print(FILENAME_2.startswith(product.get_prefix()))
-    print(FILENAME_2.endswith(product.get_suffix()))
     print(product.match(FILENAME_1))
     print(product.get_datetime(FILENAME_1))
+    print(product.match(FILENAME_2))
     print(product.get_datetime(FILENAME_2).astimezone())

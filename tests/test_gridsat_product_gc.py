@@ -1,14 +1,13 @@
 import unittest
 from datetime import datetime, timezone
 
-from ..GOES_DL.dataset import ProductBase
-from ..GOES_DL.dataset.gridsat import GridSatProductGC
-from ..GOES_DL.dataset.gridsat.constants import (
+from GOES_DL.dataset import Product
+from GOES_DL.dataset.gridsat import GridSatProductGC
+from GOES_DL.dataset.gridsat.constants import (
     GOES_GRIDSAT_PREFIX,
     GOES_PRODUCT_DATE_FORMAT,
     GOES_PRODUCT_DATE_PATTERN,
     GOES_PRODUCT_LATEST_VERSION,
-    GRIDSAT_FILE_SUFFIX,
 )
 
 
@@ -49,7 +48,7 @@ class TestGridSatProductGC(unittest.TestCase):
         )
 
     def test_init_is_product(self) -> None:
-        self.assertIsInstance(self.product, ProductBase)
+        self.assertIsInstance(self.product, Product)
 
     def test_init_is_product_goes(self) -> None:
         self.assertIsInstance(self.product, GridSatProductGC)
@@ -106,9 +105,6 @@ class TestGridSatProductGC(unittest.TestCase):
 
     def test_file_prefix_property(self) -> None:
         self.assertEqual(self.product.file_prefix, GOES_GRIDSAT_PREFIX)
-
-    def test_file_suffix_property(self) -> None:
-        self.assertEqual(self.product.file_suffix, GRIDSAT_FILE_SUFFIX)
 
     def test_date_format_property(self) -> None:
         self.assertEqual(self.product.date_format, GOES_PRODUCT_DATE_FORMAT)

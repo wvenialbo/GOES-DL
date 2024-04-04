@@ -139,8 +139,7 @@ if __name__ == "__main__":
         date_pattern=r"\d{4}\.\d{2}\.\d{2}\.\d{2}",
     )
     print(product)
-    print(FILENAME_2.startswith(product.get_prefix()))
-    print(FILENAME_2.endswith(product.get_suffix()))
     print(product.match(FILENAME_1))
     print(product.get_datetime(FILENAME_1))
+    print(product.match(FILENAME_2))
     print(product.get_datetime(FILENAME_2).astimezone())

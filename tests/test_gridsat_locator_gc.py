@@ -1,9 +1,9 @@
 import unittest
 from datetime import datetime
 
-from ..GOES_DL.dataset import ProductBase, ProductLocator
-from ..GOES_DL.dataset.gridsat import GridSatProductGC, GridSatProductLocatorGC
-from ..GOES_DL.datasource import Datasource, DatasourceHTTP
+from GOES_DL.dataset import Product, ProductLocator
+from GOES_DL.dataset.gridsat import GridSatProductGC, GridSatProductLocatorGC
+from GOES_DL.datasource import Datasource, DatasourceHTTP
 
 
 class TestGridSatProductLocatorGC(unittest.TestCase):
@@ -35,7 +35,7 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
         self.assertIsInstance(self.locator, GridSatProductLocatorGC)
 
     def test_init_is_product(self) -> None:
-        self.assertIsInstance(self.product, ProductBase)
+        self.assertIsInstance(self.product, Product)
 
     def test_init_is_product_goes(self) -> None:
         self.assertIsInstance(self.product, GridSatProductGC)
@@ -89,7 +89,7 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
         self.assertIsInstance(self.locator.product, GridSatProductGC)
 
     def test_product_property_is_product(self) -> None:
-        self.assertIsInstance(self.locator.product, ProductBase)
+        self.assertIsInstance(self.locator.product, Product)
 
     def test_date_format_property(self) -> None:
         self.assertEqual(self.locator.date_format, self.DATE_FORMAT)

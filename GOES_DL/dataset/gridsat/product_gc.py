@@ -253,8 +253,7 @@ if __name__ == "__main__":
     FILENAME_2: str = "GridSat-GOES.goes12.2017.12.31.2300.v01.nc"
     product: GridSatProductGC = GridSatProductGC("F", "G12")
     print(product)
-    print(FILENAME_2.startswith(product.get_prefix()))
-    print(FILENAME_2.endswith(product.get_suffix()))
     print(product.match(FILENAME_1))
     print(product.get_datetime(FILENAME_1))
+    print(product.match(FILENAME_2))
     print(product.get_datetime(FILENAME_2).astimezone())
