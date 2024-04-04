@@ -130,7 +130,3 @@ class TestGridSatProductB1(unittest.TestCase):
 
     def test_match_invalid_version_filename(self) -> None:
         self.assertFalse(self.product.match(self.FILENAME_4))
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -213,7 +213,3 @@ class TestGridSatProductGC(unittest.TestCase):
         self.assertTrue(
             product.match(self.FILENAME_1) and product.match(self.FILENAME_2)
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

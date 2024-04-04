@@ -118,7 +118,3 @@ class TestUrlMethods(unittest.TestCase):
     ) -> None:
         joined_url = url.join(base_url, part_url)
         self.assertEqual(joined_url, expected_url)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -154,7 +154,3 @@ class TestGridSatProductLocatorB1(unittest.TestCase):
             current_time
         )
         self.assertEqual(returned_truncated_time, expected_truncated_time)
-
-
-if __name__ == "__main__":
-    unittest.main()

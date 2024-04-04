@@ -65,9 +65,13 @@
     "python.testing.unittestEnabled": true,
     "testing.showCoverageInExplorer": true,
     "coverage-gutters.showLineCoverage": true,
-    "coverage-gutters.showRulerCoverage": false,
+    "coverage-gutters.showRulerCoverage": true,
     "coverage-gutters.showGutterCoverage": false,
     "coverage-gutters.coverageReportFileName": "./htmlcov/index.html",
     "coverage-gutters.coverageBaseDir": "./",
     "sourcery.codeLens": false,
+    "github.copilot.enable": {
+        "*": "false",
+        "python": "true"
+    },
 }
