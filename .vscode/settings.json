@@ -14,6 +14,8 @@
         "GOESRS",
         "GOESRSCMI",
         "GOESRSMCMI",
+        "GOEZ",
+        "GRIDCAT",
         "gridsat",
         "hhmm",
         "IRWVP",
@@ -24,6 +26,7 @@
         "MCMI",
         "MCMIP",
         "meteosat",
+        "modis",
         "ncei",
         "ORIGID",
         "RRQPE",
@@ -74,4 +77,5 @@
         "*": "false",
         "python": "true"
     },
+    "python.analysis.importFormat": "absolute",
 }

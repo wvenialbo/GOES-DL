@@ -1,34 +1,56 @@
 from datetime import datetime
-from typing import Type
 
-from ...datasource import DatasourceAWS, DatasourceHTTP
-from .constants import B1_DATASET_DATE_FORMAT, B1_DATASET_PATH_PREFIX
-from .locator import Datasource, GridSatProductLocator
-from .product_b1 import GridSatProductB1
+from .constants import (
+    B1_DATASET_DATE_FORMAT,
+    B1_DATASET_PATH_PREFIX,
+    B1_GRIDSAT_PREFIX,
+    B1_PRODUCT_DATE_FORMAT,
+    B1_PRODUCT_DATE_PATTERN,
+    B1_PRODUCT_LATEST_VERSION,
+    B1_PRODUCT_NAME,
+    B1_PRODUCT_ORIGIN,
+)
+from .locator import GridSatProductLocator
 
 
 class GridSatProductLocatorB1(GridSatProductLocator):
     """
-    Represent the locator for GridSat-B1 dataset products.
+    Represent the GridSat-B1 imagery dataset product locator.
 
     This class implements the `GridSatProductLocator` abstract class for
     for the GridSat-B1 (Geostationary IR Channel Brightness Temperature
-    - GridSat B1) dataset product locator.
+    - GridSat B1) imagery dataset product locator.
 
     Instances of this class are responsible for generating a list of
     folder paths based on the dataset's directory structure and naming
-    conventions, product details, and a specified date range.
+    conventions, product details, and a specified date range. The
+    generated paths cover each year within the date range. Paths to the
+    folders containing the initial and final dates are included in the
+    list.
 
-    The generated paths cover each year within the date range. Paths to
-    the folders containing the initial and final dates are included in
-    the list.
+    Instances of this class are also responsible for verifying if a
+    given filename matches the product filename pattern based on the
+    dataset's naming conventions and product specifications, and for
+    extracting the corresponding `datetime` information from the
+    product's filename.
 
     The data in the GridSat-B1 dataset products comes from different
-    sources and only a global view of the Earth is available, so, no
-    domain is implied. Neither of them is reflected in the product's
-    file path. The dataset is available from various services, for
-    Amazon Web Services (AWS) and Google Cloud Platform (GCP), the
-    product's file path pattern is as follows:
+    sources and only a global view of the Earth is available, thus,
+    the origin's name and scene identifier are not reflected in the
+    product's path or filename, but the product's version is. The
+    product's filename pattern is as follows:
+
+    'GRIDSAT-B1.<yyyy>.<mm>.<dd>.<HH>.<version>.nc';
+
+    where `<yyyy>` is the gregorian year number; `<mm>`, `<dd>` and
+    `<HH>` are the month, day and hour, respectively, using two digits
+    padded with zeros; and `<version>` is the product's version (e.g.
+    'v02r01').
+
+    The dataset is available from various services; see the Notes below
+    for a list of supported sources. For Amazon Web Services (AWS) and
+    Google Cloud Platform (GCP), the product's file path pattern is as
+    follows:
 
     '<scheme>://<net-location>/data/<yyyy>',
 
@@ -47,8 +69,6 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     'geostationary-ir-channel-brightness-temperature-gridsat-b1',
     and `<yyyy>` is the gregorian year number.
 
-    Note: Currently, only the AWS datasource is supported.
-
     Input is 3-hourly data from the International Satellite Cloud
     Climatology Project (ISCCP) with gridded 0.07°x0.07° spatial
     resolution that spans from 1980 to the present. Three total
@@ -61,18 +81,18 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     For more information visit the following link and links therein:
     https://www.ncei.noaa.gov/products/gridded-geostationary-brightness-temperature
 
-    Parameters
-    ----------
-    product : GridSatProductB1
-        The GridSat-B1 product class.
-    datasource : str, optional
-        The datasource identifier to use. The available datasources are
-        "AWS" and "NOAA". The default is "AWS".
+    Notes
+    -----
+    Only the AWS datasource is supported currently.
 
     Methods
     -------
+    get_base_url(datasource: str) -> str:
+        Get the base URL for the GridSat-B1 imagery dataset's products.
     invalid_datasource(datasource: list[str]) -> str
         Check for unsupported datasources in a list of datasources.
+    invalid_version(version: list[str]) -> str:
+        Check for unsupported versions in a list of versions.
     next_time(current_time: datetime) -> datetime:
         Get the next time interval. GridSat-B1 dataset organises the
         data by year.
@@ -81,63 +101,110 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     truncate_to_year(time: datetime) -> datetime
         Truncate the datetime to the current year.
 
-    Raises
-    ------
-    ValueError
-        If the provided datasource is not supported or unavailable.
+    Caution
+    -------
+    Members of this class not defined by the `ProductLocator` interface
+    are helper methods and can be considered as implementation details,
+    even though they are defined as part of the public API. In future
+    releases, these methods may be moved to a private scope, suffer
+    name changes, or be removed altogether.
     """  # noqa: E501
 
-    AVAILABLE_DATASOURCE: dict[str, Type[Datasource]] = {
-        "AWS": DatasourceAWS,
-        "NOAA": DatasourceHTTP,
-    }
-
-    BASE_URL: dict[str, str] = {
+    # Base URLs for the available datasources of the GridSat-B1 dataset
+    # Products:
+    AVAILABLE_DATASOURCES: dict[str, str] = {
         "AWS": "s3://noaa-cdr-gridsat-b1-pds/data/",
+        "GCP": "gs://noaa-cdr-gridsat-b1/data/",
         "NOAA": "https://www.ncei.noaa.gov/data/geostationary-ir-"
         "channel-brightness-temperature-gridsat-b1/access/",
     }
 
+    # Supported datasources of the GridSat-B1 dataset Products:
+    SUPPORTED_DATASOURCES: set[str] = {"AWS"}
+
+    # Supported versions of the GridSat-B1 dataset Products:
+    SUPPORTED_VERSIONS: set[str] = {"v02r01"}
+
     def __init__(
-        self, product: GridSatProductB1, datasource: str = "AWS"
+        self, version: str | list[str] = B1_PRODUCT_LATEST_VERSION
     ) -> None:
         """
-        Initialise the GridSat-B1 dataset.
+        Initialise a GridSat-B1 imagery dataset product locator.
 
-        Constructs a new GridSat-B1 dataset object.
+        Constructs a new GridSat-B1 imagery dataset product locator
+        object.
 
         Parameters
         ----------
-        product : GridSatProductB1
-            The GridSat-B1 product class.
-        datasource : str, optional
-            The datasource identifier to use. The available datasources
-            are "AWS" and "NOAA". The default is "AWS".
+        version : str | list[str], optional
+            The version of the GridSat-B1 product; e.g., "v02r01". The
+            version may be a single version or a list of versions. Only
+            the latest version is available in the public repository.
+            The default is the latest version ("v02r01").
 
         Raises
         ------
         ValueError
-            If the provided datasource is not supported or unavailable.
+            If the provided version is not supported or unavailable.
+        """
+        if isinstance(version, str):
+            version = [version]
+
+        if unsupported_version := self.invalid_version(version):
+            supported_versions: list[str] = sorted(self.SUPPORTED_VERSIONS)
+            raise ValueError(
+                f"Unsupported version: '{unsupported_version}'. "
+                f"Supported versions: {supported_versions}"
+            )
+
+        super(GridSatProductLocatorB1, self).__init__(
+            name=B1_PRODUCT_NAME,
+            origin=B1_PRODUCT_ORIGIN,
+            version=version,
+            file_date_format=B1_PRODUCT_DATE_FORMAT,
+            file_date_pattern=B1_PRODUCT_DATE_PATTERN,
+            file_prefix=B1_GRIDSAT_PREFIX,
+            path_date_format=B1_DATASET_DATE_FORMAT,
+            path_prefix=B1_DATASET_PATH_PREFIX,
+        )
+
+    def get_base_url(self, datasource: str) -> str:
+        """
+        Get the base URL for the GridSat-B1 imagery dataset's products.
+
+        This method returns the base URL for the GridSat-B1 imagery
+        dataset's products. The base URL is used to construct the full
+        URL to the dataset's product files.
+
+        Parameters
+        ----------
+        datasource : str
+            The datasource identifier. This parameter is used to
+            determine the base URL for the dataset's products. The
+            available datasources are 'AWS', 'GCP', and 'NOAA'. Only
+            the AWS datasource is supported so far.
+
+        Returns
+        -------
+        str:
+            The base URL for the GridSat-B1 imagery dataset's products
+            based on the requested datasource identifier.
+
+        Raises
+        ------
+        ValueError
+            If the requested datasource is not supported or unavailable.
         """
         if unsupported_datasource := self.invalid_datasource([datasource]):
             available_datasource: list[str] = sorted(
-                self.AVAILABLE_DATASOURCE.keys()
+                self.SUPPORTED_DATASOURCES
             )
             raise ValueError(
                 f"Unsupported datasource: {unsupported_datasource}. "
                 f"Available datasources: {available_datasource}"
             )
 
-        DataSource: Type[Datasource] = self.AVAILABLE_DATASOURCE[datasource]
-        datasource_url: str = self.BASE_URL[datasource]
-        d_source: Datasource = DataSource(datasource_url)
-
-        super(GridSatProductLocatorB1, self).__init__(
-            product=product,
-            datasource=d_source,
-            date_format=B1_DATASET_DATE_FORMAT,
-            path_prefix=B1_DATASET_PATH_PREFIX,
-        )
+        return self.AVAILABLE_DATASOURCES[datasource]
 
     def invalid_datasource(self, datasource: list[str]) -> str:
         """
@@ -160,7 +227,30 @@ class GridSatProductLocatorB1(GridSatProductLocator):
             are supported.
         """
         return next(
-            (ds for ds in datasource if ds not in self.AVAILABLE_DATASOURCE),
+            (ds for ds in datasource if ds not in self.SUPPORTED_DATASOURCES),
+            "",
+        )
+
+    def invalid_version(self, version: list[str]) -> str:
+        """
+        Check for unsupported or invalid versions.
+
+        Verifies and returns the first unsupported version from a list
+        of versions.
+
+        Parameters
+        ----------
+        version : list[str]
+            The list of versions to check for unsupported versions.
+
+        Returns
+        -------
+        str
+            The first unsupported version found in the list of versions.
+            An empty string is returned if all versions are supported.
+        """
+        return next(
+            (ver for ver in version if ver not in self.SUPPORTED_VERSIONS),
             "",
         )
 
@@ -180,7 +270,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         datetime
             The next time interval.
         """
-        next_year = current_time.year + 1
+        next_year: int = current_time.year + 1
 
         return current_time.replace(year=next_year)
 
@@ -209,8 +299,8 @@ class GridSatProductLocatorB1(GridSatProductLocator):
             A tuple containing the normalised initial and final
             datetimes.
         """
-        start_time = self.truncate_to_year(datetime_ini)
-        end_time = self.truncate_to_year(datetime_fin)
+        start_time: datetime = self.truncate_to_year(datetime_ini)
+        end_time: datetime = self.truncate_to_year(datetime_fin)
 
         return start_time, end_time
 

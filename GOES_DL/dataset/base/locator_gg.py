@@ -2,38 +2,33 @@ from abc import abstractmethod
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from ..product import Product
+from ..locator import ProductLocator
 
 
-class ProductBaseGG(Product):
+class ProductLocatorGG(ProductLocator):
     """
-    Abstract a GridSat or GOES-R series dataset product utility.
+    Abstract a GridSat or GOES-R series dataset product locator.
 
-    This class implements the `Product` interface and serves as a base
-    class for products of the GridSat and GOES-R series datasets. It
-    also defines common abstract methods that subclasses must implement
-    to provide dataset-specific product utilities.
+    This class implements the `ProductLocator` interface and serves as
+    a base class for product locators of the GridSat and GOES-R series
+    datasets. It also defines common abstract methods that subclasses
+    must implement to provide dataset-specific product utilities.
 
     Instances of this class are responsible for verifying if a given
     filename matches the product filename pattern based on the dataset's
-    naming conventions and product specifications, by means of method
-    `match(filename)`, and for extracting the corresponding `datetime`
+    naming conventions and product specifications by means of its method
+    `match()`, and for extracting the corresponding `datetime`
     information from the product's filename through the use of the
-    method `get_datetime(filename)`.
+    `get_datetime()` method.
 
     Notes
     -----
-    Subclasses must implement the following methods (refer to their
-    individual documentation for details): `get_date_format()`,
-    `get_prefix()`, `get_suffix()`, and `get_timestamp_pattern()`.
-
-    Caution
-    -------
-    Members of this class not defined by the `Product` interface are
-    helper methods and can be considered as implementation details,
-    even though they are defined as part of the public API. In future
-    releases, these methods may be moved to a private scope, suffer
-    name changes, or be removed altogether.
+    Subclasses must implement the following methods: `get_base_url()`
+    and `get_paths()` declared by the `ProductLocator` interface.
+    Implementations for abstract methods declared by this class:
+    `get_date_format()`, `get_prefix()`, `get_suffix()`, and
+    `get_timestamp_pattern()` should also be provided. Refer to their
+    individual documentation for details.
 
     Methods
     -------
@@ -53,6 +48,14 @@ class ProductBaseGG(Product):
         Verify if a provided filename matches the required format.
     timestamp_to_datetime(timestamp: str) -> datetime:
         Convert a timestamp string to a UTC `datetime` object.
+
+    Caution
+    -------
+    Members of this class not defined by the `ProductLocator` interface
+    are helper methods and can be considered as implementation details,
+    even though they are defined as part of the public API. In future
+    releases, these methods may be moved to a private scope, suffer name
+    changes, or be removed altogether.
     """
 
     @abstractmethod
@@ -99,7 +102,9 @@ class ProductBaseGG(Product):
         matches: list[str] = findall(pattern, filename)
 
         if len(matches) != 1:
-            raise ValueError(f"Incompatible product filename: '{filename}'")
+            raise ValueError(
+                f"Expected 1 timestamp field, found {len(matches)} fields"
+            )
 
         return self.timestamp_to_datetime(matches[0])
 

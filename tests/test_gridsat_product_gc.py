@@ -1,215 +1,468 @@
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from GOES_DL.dataset import Product
-from GOES_DL.dataset.gridsat import GridSatProductGC
-from GOES_DL.dataset.gridsat.constants import (
-    GOES_GRIDSAT_PREFIX,
-    GOES_PRODUCT_DATE_FORMAT,
-    GOES_PRODUCT_DATE_PATTERN,
-    GOES_PRODUCT_LATEST_VERSION,
-)
+from GOES_DL.dataset.gridsat import GridSatProductLocatorGC
 
 
-class TestGridSatProductGC(unittest.TestCase):
-    # This set of tests covers the initialization of an object of the
-    # GridSatProductGOES class, including the handling of invalid
-    # parameters. It also tests the get_prefix, get_suffix,
-    # get_filename_pattern, get_datetime, timestamp_to_datetime and
-    # match methods.
+class TestPassed(Exception):
+    """
+    Exception raised when a test has passed.
+    """
 
-    # Valid filenames
-    FILENAME_1 = "GridSat-GOES.goes12.1994.08.23.1213.v01.nc"
-    FILENAME_2 = "GridSat-GOES.goes13.1994.08.23.1213.v01.nc"
 
-    # Filename with invalid product name
-    FILENAME_3 = "GridSat-CONUS.goes12.1994.08.23.1213.v01.nc"
-
-    # Filename with invalid timestamp format
-    FILENAME_4 = "GridSat-GOES.goes12.1994.08.23.12.v01.nc"
-
-    # Filename with unsupported version
-    FILENAME_5 = "GridSat-GOES.goes12.1994.08.23.1213.v02.nc"
-
-    DATETIME_1: datetime = datetime(1994, 8, 23, 12, 13, tzinfo=timezone.utc)
-
-    VALID_SCENE = "F"
-    VALID_NAME = "GOES"
-    VALID_ORIGID = "G12"
-    VALID_ORIGIN = "goes12"
-    VALID_VERSION = "v01"
-
-    MULTI_ORIGIN = ["G12", "G13"]
-    MULTI_NAME = ["goes12", "goes13"]
+class TestGridSatProductLocatorGC(unittest.TestCase):
+    # This set of tests covers the initialisation of an object of
+    # the `GridSatProductLocatorGC` class, including the handling of
+    # invalid parameters. It also tests the `ProductLocator` interface
+    # implemented by the `GridSatProductLocatorGC` and parent classes.
 
     def setUp(self) -> None:
-        self.product: GridSatProductGC = GridSatProductGC(
-            self.VALID_SCENE, self.VALID_ORIGID
+        # Initialise the locator with a valid scene, and all supported
+        # origins and versions.
+        self.locator: GridSatProductLocatorGC = GridSatProductLocatorGC(
+            scene=self._supported_scenes()[0],
+            origin=self._supported_origins(),
+            version=self._supported_versions(),
+        )
+        self.longMessage = True
+
+    def setUpLocator(
+        self, scene: str = "", origin: str = "", version: str = ""
+    ) -> None:
+        self.locator: GridSatProductLocatorGC = GridSatProductLocatorGC(
+            scene=scene or self._supported_scenes()[0],
+            origin=origin or self._supported_origins(),
+            version=version or self._supported_versions(),
         )
 
-    def test_init_is_product(self) -> None:
-        self.assertIsInstance(self.product, Product)
+    # ------------------------------------------------------------------
+    # A minimal subset of tests are designed to reach 100% code coverage
+    # of the `GridSatProductLocatorGC` class hierarchy. The remaining
+    # complementary tests help to reach 100% test coverage.
+    #
+    # Note: For completeness, `match()` is tested against valid filename
+    # format with an unknown version, and against a valid filename with
+    # an invalid date.
+    #
+    # Although date conversion is performed under the hood by the
+    # framework and `get_datetime()` does not perform any checking for
+    # invalid dates, it is tested here against a valid filename with an
+    # invalid date to ensure that the method is consistent. It is also
+    # tested against a `datetime` object set in a non-UTC timezone.
 
-    def test_init_is_product_goes(self) -> None:
-        self.assertIsInstance(self.product, GridSatProductGC)
+    def test_init_supported_scenes(self) -> None:
+        for scene in self._supported_scenes():
+            with self.subTest(scene=scene):
+                with self.assertRaises(TestPassed):
+                    GridSatProductLocatorGC(
+                        scene=scene,
+                        origin=self._supported_origins(),
+                        version=self._supported_versions(),
+                    )
+                    raise TestPassed()
 
-    def test_init_invalid_scene(self) -> None:
-        with self.assertRaises(ValueError):
-            GridSatProductGC("Z", self.VALID_ORIGID)
+    def test_init_unsupported_scenes(self) -> None:
+        for scene in self._unsupported_scenes():
+            with self.subTest(scene=scene):
+                with self.assertRaises(ValueError):
+                    GridSatProductLocatorGC(
+                        scene=scene,
+                        origin=self._supported_origins(),
+                        version=self._supported_versions(),
+                    )
 
-    def test_init_invalid_origin(self) -> None:
-        with self.assertRaises(ValueError):
-            GridSatProductGC(self.VALID_SCENE, "G20")
+    def test_init_supported_origins(self) -> None:
+        for origin in self._supported_origins():
+            with self.subTest(origin=origin):
+                with self.assertRaises(TestPassed):
+                    GridSatProductLocatorGC(
+                        scene=self._supported_scenes()[0],
+                        origin=origin,
+                        version=self._supported_versions(),
+                    )
+                    raise TestPassed()
 
-    def test_init_invalid_version(self) -> None:
-        with self.assertRaises(ValueError):
-            GridSatProductGC(self.VALID_SCENE, self.VALID_ORIGID, "v02")
+    def test_init_unsupported_origins(self) -> None:
+        for origin in self._unsupported_origins():
+            with self.subTest(origin=origin):
+                with self.assertRaises(ValueError):
+                    GridSatProductLocatorGC(
+                        scene=self._supported_scenes()[0],
+                        origin=origin,
+                        version=self._supported_versions(),
+                    )
 
-    def test_init_available_scenes(self) -> None:
-        for name, scene in zip(["CONUS", "GOES"], ["C", "F"]):
-            product: GridSatProductGC = GridSatProductGC(
-                scene, self.VALID_ORIGID
+    def test_init_default_version(self) -> None:
+        # Initialise the locator with the default version.
+        with self.assertRaises(TestPassed):
+            GridSatProductLocatorGC(
+                scene=self._supported_scenes()[0],
+                origin=self._supported_origins()[0],
             )
-            self.assertEqual(product.name, name)
+            raise TestPassed()
 
-    def test_init_available_origins(self) -> None:
-        orig_ids: list[str] = [f"G{i:02d}" for i in range(8, 16)]
-        orig_names: list[str] = [f"goes{i:02d}" for i in range(8, 16)]
-        for name, orig in zip(orig_names, orig_ids):
-            product: GridSatProductGC = GridSatProductGC(
-                self.VALID_SCENE, orig
+    def test_init_supported_versions(self) -> None:
+        for version in self._supported_versions():
+            with self.subTest(version=version):
+                with self.assertRaises(TestPassed):
+                    GridSatProductLocatorGC(
+                        scene=self._supported_scenes()[0],
+                        origin=self._supported_origins()[0],
+                        version=version,
+                    )
+                    raise TestPassed()
+
+    def test_init_unsupported_versions(self) -> None:
+        for version in self._unsupported_versions():
+            with self.subTest(version=version):
+                with self.assertRaises(ValueError):
+                    GridSatProductLocatorGC(
+                        scene=self._supported_scenes()[0],
+                        origin=self._supported_origins()[0],
+                        version=version,
+                    )
+
+    def test_get_base_url_supported_datasources(self) -> None:
+        SUPPORTED_URLS: dict[str, str] = self._supported_urls()
+        for datasource_id, expected_url in SUPPORTED_URLS.items():
+            returned_url: str = self.locator.get_base_url(
+                datasource=datasource_id
             )
-            self.assertEqual(product.origin, [name])
+            with self.subTest(datasource=datasource_id):
+                self.assertEqual(returned_url, expected_url)
 
-    def test_init_available_versions(self) -> None:
-        for version in [self.VALID_VERSION]:
-            product: GridSatProductGC = GridSatProductGC(
-                self.VALID_SCENE, self.VALID_ORIGID, version
-            )
-            self.assertEqual(product.version, [version])
+    def test_get_base_url_unsupported_datasources(self) -> None:
+        for datasource_id in self._unsupported_datasources():
+            with self.subTest(datasource=datasource_id):
+                with self.assertRaises(ValueError):
+                    self.locator.get_base_url(datasource=datasource_id)
 
-    def test_name_property(self) -> None:
-        self.assertEqual(self.product.name, self.VALID_NAME)
+    def test_get_datetime_valid_date_utc(self) -> None:
+        # Expected `datetime` object set in UTC timezone.
+        TZ_UTC: timezone = timezone.utc
+        self._test_get_datetime_valid_date(12, TZ_UTC)
 
-    def test_origin_property(self) -> None:
-        self.assertEqual(self.product.origin, [self.VALID_ORIGIN])
+    def test_get_datetime_valid_date_non_utc(self) -> None:
+        # Expected `datetime` object set in different non-UTC timezone.
+        TZ_PYT: timezone = timezone(timedelta(hours=-4.0))
+        self._test_get_datetime_valid_date(8, TZ_PYT)
 
-    def test_multiple_origins_property(self) -> None:
-        product: GridSatProductGC = GridSatProductGC(
-            self.VALID_SCENE, self.MULTI_ORIGIN
-        )
-        self.assertEqual(product.origin, self.MULTI_NAME)
+    def test_get_datetime_bad_date_format(self) -> None:
+        for invalid_filename in self._incomplete_dates():
+            with self.subTest(filename=invalid_filename):
+                with self.assertRaises(ValueError):
+                    self.locator.get_datetime(invalid_filename)
 
-    def test_version_property(self) -> None:
-        self.assertEqual(self.product.version, [GOES_PRODUCT_LATEST_VERSION])
+    def test_get_datetime_incomplete_date(self) -> None:
+        for invalid_filename in self._incomplete_dates():
+            with self.subTest(filename=invalid_filename):
+                with self.assertRaises(ValueError):
+                    self.locator.get_datetime(invalid_filename)
 
-    def test_file_prefix_property(self) -> None:
-        self.assertEqual(self.product.file_prefix, GOES_GRIDSAT_PREFIX)
-
-    def test_date_format_property(self) -> None:
-        self.assertEqual(self.product.date_format, GOES_PRODUCT_DATE_FORMAT)
-
-    def test_date_pattern_property(self) -> None:
-        self.assertEqual(self.product.date_pattern, GOES_PRODUCT_DATE_PATTERN)
-
-    def test_invalid_scene(self) -> None:
-        expected_value: str = "Z"
-        unavailable_scene: str = self.product.invalid_scene([expected_value])
-        self.assertEqual(unavailable_scene, expected_value)
-
-    def test_invalid_origin(self) -> None:
-        expected_value: str = "G20"
-        unavailable_product: str = self.product.invalid_origin(
-            [expected_value]
-        )
-        self.assertEqual(unavailable_product, expected_value)
-
-    def test_invalid_version(self) -> None:
-        expected_value: str = "v02"
-        unsupported_version: str = self.product.invalid_version(
-            [expected_value]
-        )
-        self.assertEqual(unsupported_version, expected_value)
-
-    def test_available_scenes(self) -> None:
-        available_scenes: list[str] = ["C", "F"]
-        expected_value: str = ""
-        returned_value: str = self.product.invalid_scene(available_scenes)
-        self.assertEqual(returned_value, expected_value)
-
-    def test_available_origins(self) -> None:
-        available_origins: list[str] = [f"G{i:02d}" for i in range(8, 16)]
-        expected_value: str = ""
-        returned_value: str = self.product.invalid_origin(available_origins)
-        self.assertEqual(returned_value, expected_value)
-
-    def test_available_versions(self) -> None:
-        available_versions: list[str] = ["v01"]
-        expected_value: str = ""
-        returned_value: str = self.product.invalid_version(available_versions)
-        self.assertEqual(returned_value, expected_value)
-
-    def test_get_prefix(self) -> None:
-        expected_prefix: str = (
-            f"GridSat-{self.VALID_NAME}.(?:{self.VALID_ORIGIN})."
-        )
-        self.assertEqual(self.product.get_prefix(), expected_prefix)
-
-    def test_get_prefix_multiple_origins(self) -> None:
-        origins: str = "|".join(self.MULTI_NAME)
-        expected_prefix: str = f"GridSat-{self.VALID_NAME}.(?:{origins})."
-        product: GridSatProductGC = GridSatProductGC(
-            self.VALID_SCENE, self.MULTI_ORIGIN
-        )
-        self.assertEqual(product.get_prefix(), expected_prefix)
-
-    def test_get_suffix(self) -> None:
-        expected_suffix: str = f".(?:{self.VALID_VERSION}).nc"
-        self.assertEqual(self.product.get_suffix(), expected_suffix)
-
-    def test_get_filename_pattern(self) -> None:
-        expected_pattern: str = (
-            rf"GridSat-{self.VALID_NAME}."
-            rf"(?:{self.VALID_ORIGIN})."
-            r"(\d{4}\.\d{2}\.\d{2}\.\d{4})"
-            rf".(?:{self.VALID_VERSION}).nc"
-        )
-        self.assertEqual(self.product.get_filename_pattern(), expected_pattern)
-
-    def test_get_datetime(self) -> None:
-        self.assertEqual(
-            self.product.get_datetime(self.FILENAME_1), self.DATETIME_1
-        )
-
-    def test_get_datetime_invalid_filename(self) -> None:
+    def test_get_datetime_invalid_date(self) -> None:
+        # Valid filename with invalid date, e.g. September 31.
+        VALID_FILENAME_INVALID_DATE: str = self._filename(month=9, day=31)
         with self.assertRaises(ValueError):
-            self.product.get_datetime(self.FILENAME_4)
+            self.locator.get_datetime(VALID_FILENAME_INVALID_DATE)
 
-    def test_timestamp_to_datetime(self) -> None:
-        timestamp: str = "1980.01.01.00"
+    def test_match_valid_filename(self) -> None:
+        VALID_FILENAME: str = self._filename()
+        self.assertTrue(self.locator.match(VALID_FILENAME))
+
+    def test_match_misspelled_prefix(self) -> None:
+        INVALID_FILENAME: str = self._filename(prefix="GridCat")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_supported_scenes(self) -> None:
+        for scene in self._supported_scenes():
+            self.setUpLocator(scene=scene)
+            filename: str = self._filename(scene=scene)
+            with self.subTest(scene=scene):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_scenes(self) -> None:
+        self.setUpLocator(scene=self._supported_scenes()[0])
+        for scene in self._unsupported_scenes():
+            filename: str = self._filename(scene=scene)
+            with self.subTest(scene=scene):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_supported_origins(self) -> None:
+        for origin in self._supported_origins():
+            self.setUpLocator(origin=origin)
+            filename: str = self._filename(origin=origin)
+            with self.subTest(origin=origin):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_origins(self) -> None:
+        self.setUpLocator(origin=self._supported_origins()[0])
+        for origin in self._unsupported_origins():
+            filename: str = self._filename(origin=origin)
+            with self.subTest(origin=origin):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_supported_multi_origins(self) -> None:
+        for origin in self._supported_origins():
+            filename: str = self._filename(origin=origin)
+            with self.subTest(origin=origin):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_multi_origins(self) -> None:
+        for origin in self._unsupported_origins():
+            filename: str = self._filename(origin=origin)
+            with self.subTest(origin=origin):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_bad_date_format(self) -> None:
+        for invalid_filename in self._bad_date_format():
+            with self.subTest(filename=invalid_filename):
+                self.assertFalse(self.locator.match(invalid_filename))
+
+    def test_match_incomplete_date(self) -> None:
+        for invalid_filename in self._incomplete_dates():
+            with self.subTest(filename=invalid_filename):
+                self.assertFalse(self.locator.match(invalid_filename))
+
+    def test_match_invalid_date(self) -> None:
+        # Valid filename format with invalid dates are not caught
+        # by `match()` because the date format is correct and do not
+        # violates the filename pattern, although it should be caught
+        # by the `get_datetime()` method.
+        #
+        # See `test_get_datetime_invalid_date()`.
+        VALID_FILENAME_INVALID_DATE: str = self._filename(month=9, day=31)
+        self.assertTrue(self.locator.match(VALID_FILENAME_INVALID_DATE))
+
+    def test_match_supported_versions(self) -> None:
+        for version in self._supported_versions():
+            self.setUpLocator(version=version)
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_versions(self) -> None:
+        self.setUpLocator(version=self._supported_versions()[0])
+        for version in self._unsupported_versions():
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_supported_multi_versions(self) -> None:
+        for version in self._supported_versions():
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_multi_versions(self) -> None:
+        for version in self._unsupported_versions():
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_wrong_suffix(self) -> None:
+        INVALID_FILENAME: str = self._filename(suffix=".txt")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_scene_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename().replace("-GOES", "_GOES")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_origin_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename().replace(".goes12", "_goes12")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_date_separator(self) -> None:
+        FILENAME: str = self._filename(year=1999, month=12, day=31, hour=23)
+        invalid_filename: str = FILENAME.replace(".1999", "_1999")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Year separator"
+        )
+        invalid_filename = FILENAME.replace(".12", "_12")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Month separator"
+        )
+        invalid_filename = FILENAME.replace(".31", "_31")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Day separator"
+        )
+        invalid_filename = FILENAME.replace(".23", "_23")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Hour separator"
+        )
+
+    def test_match_bad_version_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename().replace(".v01", "_v01")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_suffix_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename(suffix="_nc")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_version_prefix(self) -> None:
+        INVALID_FILENAME: str = self._filename().replace(".v01", ".b01")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_get_paths(self) -> None:
+        TIME_1: datetime = datetime(1982, 1, 10, 11)
+        TIME_2: datetime = datetime(1985, 12, 13, 14)
+        for scene in self._supported_scenes():
+            self.setUpLocator(scene=scene)
+            returned_paths: list[str] = self.locator.get_paths(TIME_1, TIME_2)
+            expected_paths: list[str] = [
+                self._path(scene, year, month)
+                for year in range(1982, 1986)
+                for month in range(1, 13)
+            ]
+            with self.subTest(scene=scene):
+                self.assertEqual(returned_paths, expected_paths)
+
+    # ------------------------------------------------------------------
+
+    def _test_get_datetime_valid_date(self, hour: int, tz: timezone) -> None:
+        VALID_FILENAME: str = self._filename()
         expected_datetime: datetime = datetime(
-            1980, 1, 1, 0, tzinfo=timezone.utc
+            1994, 8, 23, hour, 13, tzinfo=tz
         )
-        self.assertEqual(
-            self.product.timestamp_to_datetime(timestamp), expected_datetime
+        returned_datetime: datetime = self.locator.get_datetime(VALID_FILENAME)
+        self.assertEqual(returned_datetime, expected_datetime)
+
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _filename(
+        prefix: str = "GridSat",
+        scene: str = "GOES",
+        origin: str = "goes12",
+        year: int = 1994,
+        month: int = 8,
+        day: int = 23,
+        hour: int = 12,
+        minute: int = 13,
+        version: str = "v01",
+        suffix: str = ".nc",
+    ) -> str:
+        # By default returns a valid filename for the GridSat-GOES/CONUS
+        # imagery dataset products.
+        SCENE_MAPPING: dict[str, str] = {
+            "F": "GOES",
+            "C": "CONUS",
+            "M1": "MESOSCALE1",
+            "M2": "MESOSCALE2",
+        }
+        if scene in SCENE_MAPPING:
+            scene = SCENE_MAPPING[scene]
+        ORIGIN_MAPPING: dict[str, str] = {
+            f"G{id:02d}": f"goes{id:02d}" for id in range(8, 16)
+        }
+        if origin in ORIGIN_MAPPING:
+            origin = ORIGIN_MAPPING[origin]
+        return (
+            f"{prefix}-{scene}.{origin}."
+            f"{year:04d}.{month:02d}.{day:02d}.{hour:02d}{minute:02d}."
+            f"{version}{suffix}"
         )
 
-    def test_match(self) -> None:
-        self.assertTrue(self.product.match(self.FILENAME_1))
+    @classmethod
+    def _bad_date_format(cls) -> list[str]:
+        BAD_YEAR: str = cls._filename(year=99999)
+        BAD_MONTH: str = cls._filename(month=999)
+        BAD_DAY: str = cls._filename(day=999)
+        BAD_HOUR: str = cls._filename(hour=999)
+        BAD_MINUTE: str = cls._filename(minute=999)
+        return [BAD_YEAR, BAD_MONTH, BAD_DAY, BAD_HOUR, BAD_MINUTE]
 
-    def test_match_invalid_name_filename(self) -> None:
-        self.assertFalse(self.product.match(self.FILENAME_3))
+    @classmethod
+    def _incomplete_dates(cls) -> list[str]:
+        NO_YEAR: str = cls._filename(year=9999).replace(".9999", "")
+        NO_MONTH: str = cls._filename(month=99).replace(".99", "")
+        NO_DAY: str = cls._filename(day=99).replace(".99", "")
+        NO_HOUR: str = cls._filename(hour=99).replace(".99", "")
+        NO_MINUTE: str = cls._filename(minute=99).replace("99", "")
+        return [NO_YEAR, NO_MONTH, NO_DAY, NO_HOUR, NO_MINUTE]
 
-    def test_match_invalid_timestamp_filename(self) -> None:
-        self.assertFalse(self.product.match(self.FILENAME_4))
+    @staticmethod
+    def _path(scene: str, year: int, month: int) -> str:
+        SCENE_MAPPING: dict[str, str] = {"F": "goes", "C": "conus"}
+        return f"{SCENE_MAPPING[scene]}/{year:04d}/{month:02d}/"
 
-    def test_match_invalid_version_filename(self) -> None:
-        self.assertFalse(self.product.match(self.FILENAME_5))
+    # ------------------------------------------------------------------
 
-    def test_match_multiple_origins(self) -> None:
-        product: GridSatProductGC = GridSatProductGC(
-            self.VALID_SCENE, self.MULTI_ORIGIN
-        )
-        self.assertTrue(
-            product.match(self.FILENAME_1) and product.match(self.FILENAME_2)
-        )
+    @staticmethod
+    def _available_datasources() -> dict[str, str]:
+        return {
+            "AWS": "s3://noaa-cdr-gridsat-goes-pds/data/",
+            "Azure": "https://noaa-cdr-gridsat-goes.blob.core.windows.net/"
+            "data/",
+            "GCP": "gs://noaa-cdr-gridsat-goes/data/",
+            "NOAA": "https://www.ncei.noaa.gov/data/gridsat-goes/access/",
+        }
+
+    @classmethod
+    def _supported_urls(cls) -> dict[str, str]:
+        AVAILABLE_DATASOURCES: dict[str, str] = cls._available_datasources()
+        SUPPORTED_DATASOURCES: list[str] = cls._supported_datasources()
+        return {
+            datasource_id: url
+            for datasource_id, url in AVAILABLE_DATASOURCES.items()
+            if datasource_id in SUPPORTED_DATASOURCES
+        }
+
+    @staticmethod
+    def _supported_datasources() -> list[str]:
+        return ["NOAA"]
+
+    @classmethod
+    def _unsupported_datasources(cls) -> list[str]:
+        AVAILABLE_DATASOURCES: dict[str, str] = cls._available_datasources()
+        SUPPORTED_DATASOURCES: list[str] = cls._supported_datasources()
+        return [
+            datasource_id
+            for datasource_id in AVAILABLE_DATASOURCES.keys()
+            if datasource_id not in SUPPORTED_DATASOURCES
+        ]
+
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _supported_scenes() -> list[str]:
+        return ["F", "C"]
+
+    @staticmethod
+    def _unsupported_scenes() -> list[str]:
+        return ["M1", "M2"]
+
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _get_origins(a: int, b: int) -> list[str]:
+        return [f"G{n:02d}" for n in range(a, b + 1)]
+
+    @classmethod
+    def _supported_origins(cls) -> list[str]:
+        return cls._get_origins(8, 15)
+
+    @classmethod
+    def _unsupported_origins(cls) -> list[str]:
+        AVAILABLE_ORIGINS: list[str] = cls._get_origins(1, 18)
+        SUPPORTED_ORIGINS: list[str] = cls._supported_origins()
+        return [
+            origin
+            for origin in AVAILABLE_ORIGINS
+            if origin not in SUPPORTED_ORIGINS
+        ]
+
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _supported_versions() -> list[str]:
+        return ["v01"]
+
+    @classmethod
+    def _unsupported_versions(cls) -> list[str]:
+        AVAILABLE_VERSIONS: set[str] = {f"v{v:02}" for v in range(1, 10)}
+        SUPPORTED_VERSIONS: list[str] = cls._supported_versions()
+        return [
+            version
+            for version in AVAILABLE_VERSIONS
+            if version not in SUPPORTED_VERSIONS
+        ]

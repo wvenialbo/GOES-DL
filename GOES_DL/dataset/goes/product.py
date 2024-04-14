@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from ..base import ProductBaseGG
+from ..base import ProductLocatorGG
 from .constants import GOESR_FILE_SUFFIX, GOESR_PRODUCT_DATE_FORMAT
 
 
 @dataclass(eq=False, frozen=True)
-class GOESProduct(ProductBaseGG):
+class GOESProduct(ProductLocatorGG):
     """
     Represent a product utility for GOES-R dataset's product consumers.
 

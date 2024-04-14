@@ -1,1 +1,1 @@
-from .product_gg import ProductBaseGG as ProductBaseGG
+from .locator_gg import ProductLocatorGG as ProductLocatorGG

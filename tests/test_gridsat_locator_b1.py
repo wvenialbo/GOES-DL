@@ -1,156 +1,319 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from GOES_DL.dataset import Product, ProductLocator
-from GOES_DL.dataset.gridsat import GridSatProductB1, GridSatProductLocatorB1
-from GOES_DL.datasource import Datasource, DatasourceAWS, DatasourceHTTP
+from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
+
+
+class TestPassed(Exception):
+    """
+    Exception raised when a test has passed.
+    """
 
 
 class TestGridSatProductLocatorB1(unittest.TestCase):
-    AVAILABLE_DATASOURCE: list[str] = ["AWS", "NOAA"]
-    UNSUPPORTED_DATASOURCE: list[str] = ["Google", "Azure"]
-    DATASOURCE_CLASS: list[type[Datasource]] = [DatasourceAWS, DatasourceHTTP]
-    DATASOURCE_URL: list[str] = [
-        "s3://noaa-cdr-gridsat-b1-pds/data/",
-        "https://www.ncei.noaa.gov/data/geostationary-ir-"
-        "channel-brightness-temperature-gridsat-b1/access/",
-    ]
-
-    PATH_PREFIX: str = ""
-    DATE_FORMAT: str = "%Y"
+    # This set of tests covers the initialisation of an object of
+    # the `GridSatProductLocatorB1` class, including the handling of
+    # invalid parameters. It also tests the `ProductLocator` interface
+    # implemented by the `GridSatProductLocatorB1` and parent classes.
 
     def setUp(self) -> None:
-        self.product: GridSatProductB1 = GridSatProductB1()
+        # Initialise the locator with all supported versions.
         self.locator: GridSatProductLocatorB1 = GridSatProductLocatorB1(
-            self.product
+            version=self._supported_versions()
         )
-        self.datasource: Datasource = self.locator.datasource
+        self.longMessage = True
 
-    def test_init_is_locator(self) -> None:
-        self.assertIsInstance(self.locator, ProductLocator)
+    def setUpLocator(self, version: str = "") -> None:
+        version = version or self._supported_versions()[0]
+        self.locator: GridSatProductLocatorB1 = GridSatProductLocatorB1(
+            version=version
+        )
 
-    def test_init_is_locator_b1(self) -> None:
-        self.assertIsInstance(self.locator, GridSatProductLocatorB1)
+    # ------------------------------------------------------------------
+    # A minimal subset of tests are designed to reach 100% code coverage
+    # of the `GridSatProductLocatorB1` class hierarchy. The remaining
+    # complementary tests help to reach 100% test coverage.
+    #
+    # Note: For completeness, `match()` is tested against valid filename
+    # format with an unknown version, and against a valid filename with
+    # an invalid date.
+    #
+    # Although date conversion is performed under the hood by the
+    # framework and `get_datetime()` does not perform any checking for
+    # invalid dates, it is tested here against a valid filename with an
+    # invalid date to ensure that the method is consistent. It is also
+    # tested against a `datetime` object set in a non-UTC timezone.
 
-    def test_init_is_product(self) -> None:
-        self.assertIsInstance(self.product, Product)
+    def test_init_default_version(self) -> None:
+        # Initialise the locator with the default version.
+        with self.assertRaises(TestPassed):
+            GridSatProductLocatorB1()
+            raise TestPassed()
 
-    def test_init_is_product_b1(self) -> None:
-        self.assertIsInstance(self.product, GridSatProductB1)
+    def test_init_supported_versions(self) -> None:
+        for version in self._supported_versions():
+            with self.subTest(version=version):
+                with self.assertRaises(TestPassed):
+                    GridSatProductLocatorB1(version=version)
+                    raise TestPassed()
 
-    def test_init_is_datasource(self) -> None:
-        self.assertIsInstance(self.datasource, Datasource)
+    def test_init_unsupported_versions(self) -> None:
+        for version in self._unsupported_versions():
+            with self.subTest(version=version):
+                with self.assertRaises(ValueError):
+                    GridSatProductLocatorB1(version=version)
 
-    def test_init_is_datasource_aws(self) -> None:
-        self.assertIsInstance(self.datasource, DatasourceAWS)
-
-    def test_init_invalid_datasource(self) -> None:
-        for datasource in self.UNSUPPORTED_DATASOURCE:
-            with self.assertRaises(ValueError):
-                GridSatProductLocatorB1(self.product, datasource=datasource)
-
-    def test_init_supported_datasources(self) -> None:
-        available_ds: list[str] = self.AVAILABLE_DATASOURCE
-        class_ds: list[type[Datasource]] = self.DATASOURCE_CLASS
-        for datasource, expected_class in zip(available_ds, class_ds):
-            locator: GridSatProductLocatorB1 = GridSatProductLocatorB1(
-                self.product, datasource=datasource
+    def test_get_base_url_supported_datasources(self) -> None:
+        SUPPORTED_URLS: dict[str, str] = self._supported_urls()
+        for datasource_id, expected_url in SUPPORTED_URLS.items():
+            returned_url: str = self.locator.get_base_url(
+                datasource=datasource_id
             )
-            self.assertIsInstance(locator.datasource, expected_class)
+            with self.subTest(datasource=datasource_id):
+                self.assertEqual(returned_url, expected_url)
 
-    def test_init_supported_datasource_urls(self) -> None:
-        available_ds: list[str] = self.AVAILABLE_DATASOURCE
-        url_ds: list[str] = self.DATASOURCE_URL
-        for datasource, expected_url in zip(available_ds, url_ds):
-            locator: GridSatProductLocatorB1 = GridSatProductLocatorB1(
-                self.product, datasource=datasource
-            )
-            self.assertEqual(locator.datasource.base_url, expected_url)
+    def test_get_base_url_unsupported_datasources(self) -> None:
+        for datasource_id in self._unsupported_datasources():
+            with self.subTest(datasource=datasource_id):
+                with self.assertRaises(ValueError):
+                    self.locator.get_base_url(datasource=datasource_id)
 
-    def test_datasource_property(self) -> None:
-        self.assertIsInstance(self.locator.datasource, DatasourceAWS)
+    def test_get_datetime_valid_date_utc(self) -> None:
+        # Expected `datetime` object set in UTC timezone.
+        TZ_UTC: timezone = timezone.utc
+        self._test_get_datetime_valid_date(14, TZ_UTC)
 
-    def test_datasource_property_is_datasource(self) -> None:
-        self.assertIsInstance(self.locator.datasource, Datasource)
+    def test_get_datetime_valid_date_non_utc(self) -> None:
+        # Expected `datetime` object set in different non-UTC timezone.
+        TZ_PYT: timezone = timezone(timedelta(hours=-4.0))
+        self._test_get_datetime_valid_date(10, TZ_PYT)
 
-    def test_product_property(self) -> None:
-        self.assertIsInstance(self.locator.product, GridSatProductB1)
+    def test_get_datetime_bad_date_format(self) -> None:
+        for invalid_filename in self._incomplete_dates():
+            with self.subTest(filename=invalid_filename):
+                with self.assertRaises(ValueError):
+                    self.locator.get_datetime(invalid_filename)
 
-    def test_product_property_is_product(self) -> None:
-        self.assertIsInstance(self.locator.product, Product)
+    def test_get_datetime_incomplete_date(self) -> None:
+        for invalid_filename in self._incomplete_dates():
+            with self.subTest(filename=invalid_filename):
+                with self.assertRaises(ValueError):
+                    self.locator.get_datetime(invalid_filename)
 
-    def test_date_format_property(self) -> None:
-        self.assertEqual(self.locator.date_format, self.DATE_FORMAT)
+    def test_get_datetime_invalid_date(self) -> None:
+        # Valid filename with invalid date, e.g. April 31.
+        VALID_FILENAME_INVALID_DATE: str = self._filename(month=4, day=31)
+        with self.assertRaises(ValueError):
+            self.locator.get_datetime(VALID_FILENAME_INVALID_DATE)
 
-    def test_path_prefix_property(self) -> None:
-        self.assertEqual(self.locator.path_prefix, self.PATH_PREFIX)
+    def test_match_valid_filename(self) -> None:
+        VALID_FILENAME: str = self._filename()
+        self.assertTrue(self.locator.match(VALID_FILENAME))
 
-    def test_get_datasource(self) -> None:
-        self.assertEqual(self.locator.get_datasource(), self.datasource)
+    def test_match_misspelled_prefix(self) -> None:
+        INVALID_FILENAME: str = self._filename(prefix="GRIDCAT")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
 
-    def test_get_product(self) -> None:
-        self.assertEqual(self.locator.get_product(), self.product)
+    def test_match_misspelled_name(self) -> None:
+        INVALID_FILENAME: str = self._filename(name="B2")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_date_format(self) -> None:
+        for invalid_filename in self._bad_date_format():
+            with self.subTest(filename=invalid_filename):
+                self.assertFalse(self.locator.match(invalid_filename))
+
+    def test_match_incomplete_date(self) -> None:
+        for invalid_filename in self._incomplete_dates():
+            with self.subTest(filename=invalid_filename):
+                self.assertFalse(self.locator.match(invalid_filename))
+
+    def test_match_invalid_date(self) -> None:
+        # Valid filename format with invalid dates are not caught
+        # by `match()` because the date format is correct and do not
+        # violates the filename pattern, although it should be caught
+        # by the `get_datetime()` method.
+        #
+        # See `test_get_datetime_invalid_date()`.
+        VALID_FILENAME_INVALID_DATE: str = self._filename(month=4, day=31)
+        self.assertTrue(self.locator.match(VALID_FILENAME_INVALID_DATE))
+
+    def test_match_supported_versions(self) -> None:
+        for version in self._supported_versions():
+            self.setUpLocator(version=version)
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_versions(self) -> None:
+        self.setUpLocator(version=self._supported_versions()[0])
+        for version in self._unsupported_versions():
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_supported_multi_versions(self) -> None:
+        for version in self._supported_versions():
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertTrue(self.locator.match(filename))
+
+    def test_match_unsupported_multi_versions(self) -> None:
+        for version in self._unsupported_versions():
+            filename: str = self._filename(version=version)
+            with self.subTest(version=version):
+                self.assertFalse(self.locator.match(filename))
+
+    def test_match_wrong_suffix(self) -> None:
+        INVALID_FILENAME: str = self._filename(suffix=".txt")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_name_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename().replace("-B1", "_B1")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_date_separator(self) -> None:
+        FILENAME: str = self._filename(year=1999, month=12, day=31, hour=23)
+        invalid_filename: str = FILENAME.replace(".1999", "_1999")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Year separator"
+        )
+        invalid_filename = FILENAME.replace(".12", "_12")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Month separator"
+        )
+        invalid_filename = FILENAME.replace(".31", "_31")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Day separator"
+        )
+        invalid_filename = FILENAME.replace(".23", "_23")
+        self.assertFalse(
+            self.locator.match(invalid_filename), msg="Hour separator"
+        )
+
+    def test_match_bad_version_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename().replace(".v02r01", "_v02r01")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_suffix_separator(self) -> None:
+        INVALID_FILENAME: str = self._filename(suffix="_nc")
+        self.assertFalse(self.locator.match(INVALID_FILENAME))
+
+    def test_match_bad_version_prefix(self) -> None:
+        FILENAME: str = self._filename()
+        invalid_filename: str = FILENAME.replace(".v02r01", ".b02r01")
+        self.assertFalse(self.locator.match(invalid_filename))
+        invalid_filename: str = FILENAME.replace(".v02r01", ".v02s01")
+        self.assertFalse(self.locator.match(invalid_filename))
 
     def test_get_paths(self) -> None:
-        time_1: datetime = datetime(1970, 8, 23, 0)
-        time_2: datetime = datetime(2020, 8, 23, 14)
-        expected_paths: list[str] = [
-            f"{year:04d}/" for year in range(1970, 2021)
+        TIME_1: datetime = datetime(1970, 8, 23, 0)
+        TIME_2: datetime = datetime(2020, 8, 23, 14)
+        RETURNED_PATHS: list[str] = self.locator.get_paths(TIME_1, TIME_2)
+        EXPECTED_PATHS: list[str] = [
+            self._path(year) for year in range(1970, 2021)
         ]
-        returned_paths: list[str] = self.locator.get_paths(time_1, time_2)
-        self.assertEqual(returned_paths, expected_paths)
+        self.assertEqual(RETURNED_PATHS, EXPECTED_PATHS)
 
-    def test_invalid_datasource(self) -> None:
-        invalid_ds: list[str] = self.UNSUPPORTED_DATASOURCE
-        for expected_ds in invalid_ds:
-            unsupported_ds: str = self.locator.invalid_datasource(
-                [expected_ds]
-            )
-            self.assertEqual(unsupported_ds, expected_ds)
+    # ------------------------------------------------------------------
 
-    def test_invalid_datasource_array(self) -> None:
-        invalid_ds: list[str] = self.UNSUPPORTED_DATASOURCE
-        expected_ds: str = invalid_ds[0]
-        unsupported_ds: str = self.locator.invalid_datasource(invalid_ds)
-        self.assertEqual(unsupported_ds, expected_ds)
+    def _test_get_datetime_valid_date(self, hour: int, tz: timezone) -> None:
+        VALID_FILENAME: str = self._filename()
+        EXPECTED_DATETIME: datetime = datetime(2020, 8, 23, hour, tzinfo=tz)
+        RETURNED_DATETIME: datetime = self.locator.get_datetime(VALID_FILENAME)
+        self.assertEqual(RETURNED_DATETIME, EXPECTED_DATETIME)
 
-    def test_available_datasource(self) -> None:
-        available_ds: list[str] = self.AVAILABLE_DATASOURCE
-        for datasource in available_ds:
-            supported_ds: str = self.locator.invalid_datasource([datasource])
-            self.assertEqual(supported_ds, "")
+    # ------------------------------------------------------------------
 
-    def test_available_datasource_array(self) -> None:
-        available_ds: list[str] = self.AVAILABLE_DATASOURCE
-        supported_ds: str = self.locator.invalid_datasource(available_ds)
-        self.assertEqual(supported_ds, "")
-
-    def test_next_time(self) -> None:
-        current_time: datetime = datetime(2022, 1, 1)
-        expected_next_time: datetime = datetime(2023, 1, 1)
-        returned_next_time: datetime = self.locator.next_time(current_time)
-        self.assertEqual(returned_next_time, expected_next_time)
-
-    def test_normalize_time_1(self) -> None:
-        time_1: datetime = datetime(1970, 8, 23, 12)
-        time_2: datetime = datetime(2020, 8, 23, 13)
-        expected_time_1: datetime = datetime(1970, 1, 1, 0)
-        returned_time_1: datetime
-        returned_time_1, _ = self.locator.normalize_times(time_1, time_2)
-        self.assertEqual(returned_time_1, expected_time_1)
-
-    def test_normalize_time_2(self) -> None:
-        time_1: datetime = datetime(1970, 8, 23, 14)
-        time_2: datetime = datetime(2020, 8, 23, 15)
-        expected_time_2: datetime = datetime(2020, 1, 1, 0)
-        returned_time_2: datetime
-        _, returned_time_2 = self.locator.normalize_times(time_1, time_2)
-        self.assertEqual(returned_time_2, expected_time_2)
-
-    def test_truncate_to_year(self) -> None:
-        current_time: datetime = datetime(2020, 8, 23, 16)
-        expected_truncated_time: datetime = datetime(2020, 1, 1, 0)
-        returned_truncated_time: datetime = self.locator.truncate_to_year(
-            current_time
+    @staticmethod
+    def _filename(
+        prefix: str = "GRIDSAT",
+        name: str = "B1",
+        year: int = 2020,
+        month: int = 8,
+        day: int = 23,
+        hour: int = 14,
+        version: str = "v02r01",
+        suffix: str = ".nc",
+    ) -> str:
+        # By default returns a valid filename for the GridSat-B1 imagery
+        # dataset products.
+        return (
+            f"{prefix}-{name}."
+            f"{year:04d}.{month:02d}.{day:02d}.{hour:02d}."
+            f"{version}{suffix}"
         )
-        self.assertEqual(returned_truncated_time, expected_truncated_time)
+
+    @classmethod
+    def _bad_date_format(cls) -> list[str]:
+        BAD_YEAR: str = cls._filename(year=99999)
+        BAD_MONTH: str = cls._filename(month=999)
+        BAD_DAY: str = cls._filename(day=999)
+        BAD_HOUR: str = cls._filename(hour=999)
+        return [BAD_YEAR, BAD_MONTH, BAD_DAY, BAD_HOUR]
+
+    @classmethod
+    def _incomplete_dates(cls) -> list[str]:
+        NO_YEAR: str = cls._filename(year=9999).replace(".9999", "")
+        NO_MONTH: str = cls._filename(month=99).replace(".99", "")
+        NO_DAY: str = cls._filename(day=99).replace(".99", "")
+        NO_HOUR: str = cls._filename(hour=99).replace(".99", "")
+        return [NO_YEAR, NO_MONTH, NO_DAY, NO_HOUR]
+
+    @staticmethod
+    def _path(year: int) -> str:
+        return f"{year:04d}/"
+
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _available_datasources() -> dict[str, str]:
+        return {
+            "AWS": "s3://noaa-cdr-gridsat-b1-pds/data/",
+            "Azure": "https://noaa-cdr-gridsat-b1.blob.core.windows.net/data/",
+            "GCP": "gs://noaa-cdr-gridsat-b1/data/",
+            "NOAA": "https://www.ncei.noaa.gov/data/geostationary-ir-"
+            "channel-brightness-temperature-gridsat-b1/access/",
+        }
+
+    @staticmethod
+    def _supported_datasources() -> list[str]:
+        return ["AWS"]
+
+    @classmethod
+    def _supported_urls(cls) -> dict[str, str]:
+        AVAILABLE_DATASOURCES: dict[str, str] = cls._available_datasources()
+        SUPPORTED_DATASOURCES: list[str] = cls._supported_datasources()
+        return {
+            datasource_id: url
+            for datasource_id, url in AVAILABLE_DATASOURCES.items()
+            if datasource_id in SUPPORTED_DATASOURCES
+        }
+
+    @classmethod
+    def _unsupported_datasources(cls) -> list[str]:
+        AVAILABLE_DATASOURCES: dict[str, str] = cls._available_datasources()
+        SUPPORTED_DATASOURCES: list[str] = cls._supported_datasources()
+        return [
+            datasource_id
+            for datasource_id in AVAILABLE_DATASOURCES.keys()
+            if datasource_id not in SUPPORTED_DATASOURCES
+        ]
+
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _supported_versions() -> list[str]:
+        return ["v02r01"]
+
+    @classmethod
+    def _unsupported_versions(cls) -> list[str]:
+        AVAILABLE_VERSIONS: set[str] = {
+            f"v{v:02}r{r:02}" for v in range(1, 10) for r in range(1, 6)
+        }
+        SUPPORTED_VERSIONS: list[str] = cls._supported_versions()
+        return [
+            version
+            for version in AVAILABLE_VERSIONS
+            if version not in SUPPORTED_VERSIONS
+        ]

@@ -1,68 +1,107 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from ..datasource import Datasource
-from .product import Product
-
 
 class ProductLocator(ABC):
     """
     Abstract a product locator for satellite imagery dataset consumers.
 
-    This abstract base class defines the interface for consumers of
-    satellite imagery datasets. Subclasses instances are responsible for
-    generating a list of folder paths based on the dataset's directory
-    structure and naming conventions, product details, and a specified
-    date range.
+    This abstract base class defines the product locator interface for
+    consumers of satellite imagery datasets. Subclasses instances are
+    responsible for:
 
-    The generated paths must cover the time interval defined by the
-    dataset's directory temporal granularity within the date range.
-    Paths to the folders containing the initial and final dates must
-    be included in the list.
+    1) Generating a list of folder paths based on the dataset's
+       directory structure and naming conventions, product details,
+       and a specified date range. The generated paths must cover
+       the time interval defined by the dataset's directory temporal
+       granularity within the required period; paths to the folders
+       containing the initial and final dates must be included in
+       the list.
 
-    Additionally, this interface provides methods to get references to
-    objects implementing the `Datasource` and `Product` interfaces. The
-    `Datasource` class is used to list the contents of a dataset's
-    repository and retrieve files from it. The `Product` class is used
-    to verify if a given filename matches the dataset product filename
-    pattern and to extract the `datetime` from the product's filename.
+    2) Verifying if a given filename matches the product filename
+       pattern based on the dataset file's naming conventions and
+       product specifications.
 
-    Subclasses must implement the following methods (refer to their
-    individual documentation for details): `get_datasource()`,
-    `get_paths(datetime_ini, datetime_fin)`, and `get_product()`.
+    3) Extracting the corresponding UTC `datetime` information from a
+       valid product's filename.
+
+    Notes
+    -----
+    Subclasses must implement the following methods: `get_base_url()`,
+    `get_datetime()`, `get_paths()`, and `match()`; refer to their
+    individual documentation for details.
+
+    Important
+    ---------
+    It is assumed that the timestamp extracted from the product's
+    filename is always in UTC timezone. Consumers of the product
+    utilities should be aware of this assumption. Users can convert the
+    `datetime` object to the desired timezone if needed. Implementors
+    of the `ProductLocator` interface should ensure that the extracted
+    `datetime` object is in UTC timezone in the case that the filename's
+    timestamp is in a different timezone.
 
     Methods
     -------
-    get_datasource() -> Datasource:
-        Get a reference to an object implementing the `Datasource`
-        interface.
+    get_base_url(datasource: str) -> str:
+        Get the base URL for the dataset's products.
+    get_datetime(filename: str) -> datetime:
+        Extracts the `datetime` from the product's filename.
     get_paths(datetime_ini: datetime, datetime_fin: datetime) -> list[str]:
         Generate a list of paths containing the product files for the
         specified date range.
-    get_product() -> Product:
-        Get a reference to an object implementing the `Product`
-        interface.
+    match(filename: str) -> bool:
+        Verify if a given filename matches the product's filename
+        pattern.
     """
 
     @abstractmethod
-    def get_datasource(self) -> Datasource:
+    def get_base_url(self, datasource: str) -> str:
         """
-        Get a reference to a `Datasource` object.
+        Get the base URL for the dataset's products.
 
-        The returned instance provides methods to list the contents of a
-        local or remote dataset's directory and retrieve files from that
-        location. A dataset may be available from different sources, the
-        `ProductLocator` subclass should provide a way to configure the
-        appropriate source location if the dataset can be accessed from
-        multiple locations.
+        This method returns the base URL for the dataset's products.
+        The base URL is used to construct the full URL to the dataset's
+        product files.
+
+        Parameters
+        ----------
+        datasource : str
+            The datasource identifier. This parameter is used to
+            determine the base URL for the dataset's products.
+            E.g. 'AWS', 'GCP', 'NOAA'.
 
         Returns
         -------
-        Datasource
-            An instance of a class implementing the `Datasource`
-            interface.
+        str:
+            The base URL for the dataset's products.
         """
-        ...
+
+    @abstractmethod
+    def get_datetime(self, filename: str) -> datetime:
+        """
+        Extract the `datetime` from the product's filename.
+
+        This method parses the given filename and convert it to the
+        corresponding `datetime` object from the product's filename
+        using the dataset's date and time format conventions.
+
+        Parameters
+        ----------
+        filename : str
+            The filename from which to extract the `datetime`.
+
+        Returns
+        -------
+        datetime:
+            The `datetime` extracted from the filename.
+
+        Raises
+        ------
+        ValueError:
+            If the filename does not match the expected pattern or if
+            the dataset's datetime format specification is ill-formed.
+        """
 
     @abstractmethod
     def get_paths(
@@ -91,22 +130,23 @@ class ProductLocator(ABC):
             directories containing the product files for the
             specified date range.
         """
-        ...
 
     @abstractmethod
-    def get_product(self) -> Product:
+    def match(self, filename: str) -> bool:
         """
-        Get a reference to a `Product` object.
+        Verify if a filename matches the product's filename pattern.
 
-        The returned instance provides methods for verifying filenames
-        against the dataset product filename pattern based on the
-        dataset's naming conventions and user specifications, and
-        extracting the corresponding `datetime` information from the
-        product's filename.
+        This method checks the given filename against the dataset
+        product filename pattern based on the dataset's naming
+        conventions and product specifications.
+
+        Parameters
+        ----------
+        filename : str
+            The filename to match against the pattern.
 
         Returns
         -------
-        Product
-            An instance of a class implementing the `Product` interface.
+        bool:
+            True if the filename matches the pattern, False otherwise.
         """
-        ...
