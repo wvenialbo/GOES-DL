@@ -171,7 +171,7 @@ class GridSatProductLocator(ProductLocatorGG):
         folder_paths: list[str] = []
 
         while current_time <= end_time:
-            folder_path = current_time.strftime(self.path_date_format)
+            folder_path: str = current_time.strftime(self.path_date_format)
             folder_paths.append(f"{self.path_prefix}{folder_path}/")
 
             current_time = self.next_time(current_time)
