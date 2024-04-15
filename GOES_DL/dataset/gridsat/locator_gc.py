@@ -127,13 +127,13 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
     # Base URLs for the available datasources of the GridSat-GOES/CONUS
     # imagery dataset products:
-    BASE_URL: dict[str, str] = {
+    AVAILABLE_DATASOURCES: dict[str, str] = {
         "NOAA": "https://www.ncei.noaa.gov/data/gridsat-goes/access/",
     }
 
     # Supported datasources of the GridSat-GOES/CONUS imagery dataset
     # products:
-    SUPPORTED_DATASOURCES: set[str] = set(BASE_URL.keys())
+    SUPPORTED_DATASOURCES: set[str] = set(AVAILABLE_DATASOURCES.keys())
 
     # Available versions of the GridSat-GOES/CONUS imagery dataset
     # products:
@@ -261,7 +261,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
                 f"Available datasources: {available_datasource}"
             )
 
-        return self.BASE_URL[datasource]
+        return self.AVAILABLE_DATASOURCES[datasource]
 
     def invalid_datasource(self, datasource: list[str]) -> str:
         """
