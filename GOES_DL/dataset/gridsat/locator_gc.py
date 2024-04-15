@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from .constants import (
-    GOES_DATASET_DATE_FORMAT,
-    GOES_GRIDSAT_PREFIX,
-    GOES_PRODUCT_DATE_FORMAT,
-    GOES_PRODUCT_DATE_PATTERN,
+from GOES_DL.dataset.gridsat.constants import (
+    GOES_FILE_DATE_FORMAT,
+    GOES_FILE_DATE_PATTERN,
+    GOES_FILE_PREFIX,
+    GOES_PATH_DATE_FORMAT,
     GOES_PRODUCT_LATEST_VERSION,
 )
-from .locator import GridSatProductLocator
+from GOES_DL.dataset.gridsat.locator import GridSatProductLocator
 
 
 class GridSatProductLocatorGC(GridSatProductLocator):
@@ -212,17 +212,17 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             self.AVAILABLE_ORIGINS[orig] for orig in origin
         ]
 
-        GOES_DATASET_PATH_PREFIX = f"{product_name.lower()}/"
+        GOES_PATH_PREFIX: str = f"{product_name.lower()}/"
 
         super(GridSatProductLocatorGC, self).__init__(
             name=product_name,
             origin=data_origin,
             version=version,
-            file_date_format=GOES_PRODUCT_DATE_FORMAT,
-            file_date_pattern=GOES_PRODUCT_DATE_PATTERN,
-            file_prefix=GOES_GRIDSAT_PREFIX,
-            path_date_format=GOES_DATASET_DATE_FORMAT,
-            path_prefix=GOES_DATASET_PATH_PREFIX,
+            file_date_format=GOES_FILE_DATE_FORMAT,
+            file_date_pattern=GOES_FILE_DATE_PATTERN,
+            file_prefix=GOES_FILE_PREFIX,
+            path_date_format=GOES_PATH_DATE_FORMAT,
+            path_prefix=GOES_PATH_PREFIX,
         )
 
     def get_base_url(self, datasource: str) -> str:
