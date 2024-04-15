@@ -1,3 +1,5 @@
-GOESR_DATASET_DATE_FORMAT: str = "%Y/%j/%H"
 GOESR_FILE_SUFFIX: str = ".nc"
-GOESR_PRODUCT_DATE_FORMAT: str = "%Y%j%H%M%S%f"
+
+GOESR_FILE_DATE_FORMAT: str = "%Y%j%H%M%S%f"
+GOESR_FILE_DATE_PATTERN: str = r"\d{14}"
+GOESR_PATH_DATE_FORMAT: str = "%Y/%j/%H"
