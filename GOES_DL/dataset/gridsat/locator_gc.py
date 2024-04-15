@@ -84,8 +84,8 @@ class GridSatProductLocatorGC(GridSatProductLocator):
     invalid_version(version: list[str]) -> str:
         Check for unsupported versions in a list of versions.
     next_time(current_time: datetime) -> datetime
-        Get the next time interval. GridSat-GOES dataset organises the
-        data by year.
+        Get the next time interval. GridSat-GOES/CONUS dataset organises
+        the data by month.
     normalise_times(datetime_ini: datetime, datetime_fin: datetime)
         -> tuple[datetime, datetime]
         Normalise the initial and final datetimes.
