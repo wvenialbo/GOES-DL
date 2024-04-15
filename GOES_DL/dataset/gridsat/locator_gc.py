@@ -160,7 +160,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             only a single scene may be provided.
         origin : str | list[str]
             The origin of the GridSat-GOES/CONUS imagery dataset
-            product, namely a satellite identifier, e.g. "goes08".
+            product, namely a satellite identifier, e.g. "G08".
             The origin may be a single origin or a list of origins.
         version : str | list[str]
             The version of the GridSat-GOES/CONUS imagery dataset
