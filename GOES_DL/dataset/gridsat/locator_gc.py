@@ -373,8 +373,8 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         datetime
             The next time interval.
         """
-        next_month = current_time.month + 1
-        next_year = current_time.year
+        next_month: int = current_time.month + 1
+        next_year: int = current_time.year
         if next_month > 12:
             next_month = 1
             next_year += 1
@@ -405,8 +405,8 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             A tuple containing the normalised initial and final
             datetimes.
         """
-        start_time = self.truncate_to_month(datetime_ini)
-        end_time = self.truncate_to_month(datetime_fin)
+        start_time: datetime = self.truncate_to_month(datetime_ini)
+        end_time: datetime = self.truncate_to_month(datetime_fin)
 
         return start_time, end_time
 
