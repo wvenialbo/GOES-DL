@@ -194,41 +194,16 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         ValueError
             If the requested datasource is not supported or unavailable.
         """
-        if unsupported_datasource := self.invalid_datasource([datasource]):
+        if datasource not in self.SUPPORTED_DATASOURCES:
             available_datasource: list[str] = sorted(
                 self.SUPPORTED_DATASOURCES
             )
             raise ValueError(
-                f"Unsupported datasource: {unsupported_datasource}. "
+                f"Unsupported datasource: {datasource}. "
                 f"Available datasources: {available_datasource}"
             )
 
         return self.AVAILABLE_DATASOURCES[datasource]
-
-    def invalid_datasource(self, datasource: list[str]) -> str:
-        """
-        Check for unsupported or invalid datasources.
-
-        Verifies and returns the first unsupported datasource from a
-        list of datasources.
-
-        Parameters
-        ----------
-        datasource : list[str]
-            The list of datasources to check for unsupported
-            datasources.
-
-        Returns
-        -------
-        str
-            The first unsupported datasource found in the list of
-            datasources. An empty string is returned if all datasources
-            are supported.
-        """
-        return next(
-            (ds for ds in datasource if ds not in self.SUPPORTED_DATASOURCES),
-            "",
-        )
 
     def invalid_version(self, version: list[str]) -> str:
         """

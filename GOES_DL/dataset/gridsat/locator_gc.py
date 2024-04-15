@@ -107,11 +107,11 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         f"G{id:02d}": f"goes{id:02d}" for id in range(8, 16)
     }
 
-    # Available scenes from the GridSat-GOES/CONUS imagery dataset
+    # Available scenes for the GridSat-GOES/CONUS imagery dataset
     # products:
     #
     # NOTE: In its strictest sense, “Contiguous United States” refers
-    # to the lower 48 states in North America (including the District of
+    # to the lower 48 states in North America (including the District
     # of Columbia), and “Continental United States” refers to 49 states
     # (including Alaska and the District of Columbia).
     AVAILABLE_SCENES: dict[str, str] = {
@@ -173,15 +173,11 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         ------
         ValueError
             If the provided origin, scene, or version is invalid.
-        Parameters
-        ----------
-        datasource : str, optional
-
         """
-        if unavailable_scene := self.invalid_scene([scene]):
+        if scene not in self.AVAILABLE_SCENES:
             available_scenes: list[str] = sorted(self.AVAILABLE_SCENES.keys())
             raise ValueError(
-                f"Invalid scene: '{unavailable_scene}'. "
+                f"Invalid scene ID: '{scene}'. "
                 f"Available scene IDs: {available_scenes}"
             )
 
@@ -193,7 +189,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
                 self.AVAILABLE_ORIGINS.keys()
             )
             raise ValueError(
-                f"Invalid origin: '{unavailable_origin}'. "
+                f"Invalid origin ID: '{unavailable_origin}'. "
                 f"Available origin IDs: {available_origins}"
             )
 
@@ -252,41 +248,16 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         ValueError
             If the provided datasource is not supported or unavailable.
         """
-        if unsupported_datasource := self.invalid_datasource([datasource]):
+        if datasource not in self.SUPPORTED_DATASOURCES:
             available_datasource: list[str] = sorted(
                 self.SUPPORTED_DATASOURCES
             )
             raise ValueError(
-                f"Unsupported datasource: {unsupported_datasource}. "
+                f"Unsupported datasource: {datasource}. "
                 f"Available datasources: {available_datasource}"
             )
 
         return self.AVAILABLE_DATASOURCES[datasource]
-
-    def invalid_datasource(self, datasource: list[str]) -> str:
-        """
-        Check for unsupported or invalid datasources.
-
-        Verifies and returns the first unsupported datasource from a
-        list of datasources.
-
-        Parameters
-        ----------
-        datasource : list[str]
-            The list of datasources to check for unsupported
-            datasources.
-
-        Returns
-        -------
-        str
-            The first unsupported datasource found in the list of
-            datasources. An empty string is returned if all datasources
-            are supported.
-        """
-        return next(
-            (ds for ds in datasource if ds not in self.SUPPORTED_DATASOURCES),
-            "",
-        )
 
     def invalid_origin(self, origin: list[str]) -> str:
         """
@@ -308,29 +279,6 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         """
         return next(
             (orig for orig in origin if orig not in self.AVAILABLE_ORIGINS),
-            "",
-        )
-
-    def invalid_scene(self, scene: list[str]) -> str:
-        """
-        Check for unavailable or invalid scenes.
-
-        Verifies and returns the first unavailable scene from a list of
-        scenes.
-
-        Parameters
-        ----------
-        scene : list[str]
-            The list of scenes to check for unavailable scenes.
-
-        Returns
-        -------
-        str
-            The first unavailable scene found in the list of scenes.
-            An empty string is returned if all scenes are available.
-        """
-        return next(
-            (sce for sce in scene if sce not in self.AVAILABLE_SCENES),
             "",
         )
 
