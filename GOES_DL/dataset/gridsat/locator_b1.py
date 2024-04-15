@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from GOES_DL.dataset.gridsat.constants import (
+from .constants import (
     B1_FILE_DATE_FORMAT,
     B1_FILE_DATE_PATTERN,
     B1_FILE_PREFIX,
@@ -9,7 +9,7 @@ from GOES_DL.dataset.gridsat.constants import (
     B1_PRODUCT_LATEST_VERSION,
     B1_PRODUCT_NAME,
 )
-from GOES_DL.dataset.gridsat.locator import GridSatProductLocator
+from .locator import GridSatProductLocator
 
 
 class GridSatProductLocatorB1(GridSatProductLocator):
