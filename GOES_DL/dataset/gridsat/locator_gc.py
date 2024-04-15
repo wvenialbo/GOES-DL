@@ -90,7 +90,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         -> tuple[datetime, datetime]
         Normalise the initial and final datetimes.
     truncate_to_month(time: datetime) -> datetime
-        Truncate the datetime to the current month.
+        Truncate the `datetime` to the current month.
 
     Caution
     -------
@@ -412,18 +412,19 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
     def truncate_to_month(self, time: datetime) -> datetime:
         """
-        Truncate the datetime to the current month.
+        Truncate the `datetime` to the current month.
 
-        The datetime is truncated to the start of the month.
+        The `datetime` is truncated to the beginning of the current
+        month.
 
         Parameters
         ----------
         time : datetime
-            The datetime to round.
+            The `datetime` to be truncated to the current month.
 
         Returns
         -------
         datetime
-            The truncated datetime.
+            The `datetime` truncated to the current month.
         """
         return time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)

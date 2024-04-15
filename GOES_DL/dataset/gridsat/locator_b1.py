@@ -98,7 +98,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     normalize_times(datetime_ini: datetime, datetime_fin: datetime) -> tuple[datetime, datetime]:
         Normalise the initial and final datetimes.
     truncate_to_year(time: datetime) -> datetime
-        Truncate the datetime to the current year.
+        Truncate the `datetime` to the current year.
 
     Caution
     -------
@@ -305,19 +305,20 @@ class GridSatProductLocatorB1(GridSatProductLocator):
 
     def truncate_to_year(self, time: datetime) -> datetime:
         """
-        Truncate the datetime to the current year.
+        Truncate the `datetime` to the current year.
 
-        The datetime is truncated to the start of the year.
+        The `datetime` is truncated to the beginning of the current
+        year.
 
         Parameters
         ----------
         time : datetime
-            The datetime to round.
+            The `datetime` to be truncated to the current year.
 
         Returns
         -------
         datetime
-            The truncated datetime.
+            The `datetime` truncated to the current year.
         """
         return time.replace(
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0
