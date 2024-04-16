@@ -38,11 +38,9 @@ class GOESProductLocatorGLM(GOESProductLocator):
             If the provided product name is invalid.
         """
         if name not in self.AVAILABLE_PRODUCTS:
-            available_products: list[str] = sorted(
-                self.AVAILABLE_PRODUCTS.keys()
-            )
+            available_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
             raise ValueError(
-                f"Invalid product ID: '{origin}'. "
+                f"Invalid product ID: '{name}'. "
                 f"Available product IDs: {available_products}"
             )
 
@@ -175,6 +173,6 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
 
         assert (
             self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.level}', expected '{PRODUCT_NAME}'"
+        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
 
         super(GOESProductLocatorLCFA, self).validate_settings()

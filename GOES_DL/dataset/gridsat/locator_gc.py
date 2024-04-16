@@ -75,14 +75,6 @@ class GridSatProductLocatorGC(GridSatProductLocator):
     get_base_url(datasource: str) -> str:
         Get the base URL for the GridSat-GOES/CONUS imagery dataset's
         products.
-    invalid_datasource(datasource: list[str]) -> str
-        Check for unsupported datasources in a list of datasources.
-    invalid_origin(origin: list[str]) -> str:
-        Check for unavailable origins in a list of origins.
-    invalid_scene(scene: list[str]) -> str:
-        Check for unavailable scenes in a list of scenes.
-    invalid_version(version: list[str]) -> str:
-        Check for unsupported versions in a list of versions.
     next_time(current_time: datetime) -> datetime
         Get the next time interval. GridSat-GOES/CONUS dataset organises
         the data by month.
@@ -133,7 +125,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
     # Supported datasources of the GridSat-GOES/CONUS imagery dataset
     # products:
-    SUPPORTED_DATASOURCES: set[str] = set(AVAILABLE_DATASOURCES.keys())
+    SUPPORTED_DATASOURCES: set[str] = set(AVAILABLE_DATASOURCES)
 
     # Available versions of the GridSat-GOES/CONUS imagery dataset
     # products:
@@ -175,7 +167,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             If the provided origin, scene, or version is invalid.
         """
         if scene not in self.AVAILABLE_SCENES:
-            available_scenes: list[str] = sorted(self.AVAILABLE_SCENES.keys())
+            available_scenes: list[str] = sorted(self.AVAILABLE_SCENES)
             raise ValueError(
                 f"Invalid scene ID: '{scene}'. "
                 f"Available scene IDs: {available_scenes}"
@@ -184,35 +176,33 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         if isinstance(origin, str):
             origin = [origin]
 
-        if unavailable_origin := self.invalid_origin(origin):
-            available_origins: list[str] = sorted(
-                self.AVAILABLE_ORIGINS.keys()
-            )
+        if unavailable_origin := set(origin) - set(self.AVAILABLE_ORIGINS):
+            available_origins: list[str] = sorted(self.AVAILABLE_ORIGINS)
             raise ValueError(
-                f"Invalid origin ID: '{unavailable_origin}'. "
+                f"Invalid origin IDs: {sorted(unavailable_origin)}. "
                 f"Available origin IDs: {available_origins}"
             )
 
         if isinstance(version, str):
             version = [version]
 
-        if unsupported_version := self.invalid_version(version):
+        if unsupported_version := set(version) - set(self.SUPPORTED_VERSIONS):
             supported_versions: list[str] = sorted(self.SUPPORTED_VERSIONS)
             raise ValueError(
-                f"Unsupported version: '{unsupported_version}'. "
+                f"Unsupported versions: {sorted(unsupported_version)}. "
                 f"Supported versions: {supported_versions}"
             )
 
-        product_name: str = self.SCENE_TO_NAME[scene]
-        data_origin: list[str] = [
+        PRODUCT_NAME: str = self.SCENE_TO_NAME[scene]
+        DATA_ORIGIN: list[str] = [
             self.AVAILABLE_ORIGINS[orig] for orig in origin
         ]
 
-        GOES_PATH_PREFIX: str = f"{product_name.lower()}/"
+        GOES_PATH_PREFIX: str = f"{PRODUCT_NAME.lower()}/"
 
         super(GridSatProductLocatorGC, self).__init__(
-            name=product_name,
-            origin=data_origin,
+            name=PRODUCT_NAME,
+            origin=DATA_ORIGIN,
             version=version,
             file_date_format=GOES_FILE_DATE_FORMAT,
             file_date_pattern=GOES_FILE_DATE_PATTERN,
@@ -249,61 +239,15 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             If the provided datasource is not supported or unavailable.
         """
         if datasource not in self.SUPPORTED_DATASOURCES:
-            available_datasource: list[str] = sorted(
+            supported_datasources: list[str] = sorted(
                 self.SUPPORTED_DATASOURCES
             )
             raise ValueError(
-                f"Unsupported datasource: {datasource}. "
-                f"Available datasources: {available_datasource}"
+                f"Unsupported datasource: '{datasource}'. "
+                f"Supported datasources: {supported_datasources}"
             )
 
         return self.AVAILABLE_DATASOURCES[datasource]
-
-    def invalid_origin(self, origin: list[str]) -> str:
-        """
-        Check for unavailable or invalid origins.
-
-        Verifies and returns the first unavailable origin from a list of
-        origins.
-
-        Parameters
-        ----------
-        origin : list[str]
-            The list of origins to check for unavailable origins.
-
-        Returns
-        -------
-        str
-            The first unavailable origin found in the list of origins.
-            An empty string is returned if all origins are available.
-        """
-        return next(
-            (orig for orig in origin if orig not in self.AVAILABLE_ORIGINS),
-            "",
-        )
-
-    def invalid_version(self, version: list[str]) -> str:
-        """
-        Check for unsupported or invalid versions.
-
-        Verifies and returns the first unsupported version from a list
-        of versions.
-
-        Parameters
-        ----------
-        version : list[str]
-            The list of versions to check for unsupported versions.
-
-        Returns
-        -------
-        str
-            The first unsupported version found in the list of versions.
-            An empty string is returned if all versions are supported.
-        """
-        return next(
-            (ver for ver in version if ver not in self.SUPPORTED_VERSIONS),
-            "",
-        )
 
     def next_time(self, current_time: datetime) -> datetime:
         """

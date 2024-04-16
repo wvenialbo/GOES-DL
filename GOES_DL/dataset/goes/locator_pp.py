@@ -66,7 +66,7 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
 
         assert (
             self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.level}', expected '{PRODUCT_NAME}'"
+        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
 
         assert self.level == PRODUCT_LEVEL, (
             f"Invalid level '{self.level}' "
@@ -142,7 +142,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
 
         assert (
             self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.level}', expected '{PRODUCT_NAME}'"
+        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
 
         assert self.level == PRODUCT_LEVEL, (
             f"Invalid level '{self.level}' "
@@ -218,7 +218,7 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
 
         assert (
             self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.level}', expected '{PRODUCT_NAME}'"
+        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
 
         assert self.level == PRODUCT_LEVEL, (
             f"Invalid level '{self.level}' "
@@ -231,9 +231,10 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
 
         M_CHANNELS: set[str] = {"C02"} | {f"C{id:02d}" for id in range(7, 11)}
         CF_CHANNELS: set[str] = {"C14"} | M_CHANNELS
+        CF_SCENES: set[str] = {"C", "F"}
 
         supported_channels: set[str] = (
-            CF_CHANNELS if self.scene in {"C", "F"} else M_CHANNELS
+            CF_CHANNELS if self.scene in CF_SCENES else M_CHANNELS
         )
 
         if not set(self.channel).issubset(supported_channels):
@@ -317,7 +318,7 @@ class GOESProductLocatorDMWV(GOESProductLocatorPrimary):
 
         assert (
             self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.level}', expected '{PRODUCT_NAME}'"
+        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
 
         assert self.level == PRODUCT_LEVEL, (
             f"Invalid level '{self.level}' "

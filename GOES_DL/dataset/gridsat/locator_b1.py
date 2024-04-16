@@ -88,10 +88,6 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     -------
     get_base_url(datasource: str) -> str:
         Get the base URL for the GridSat-B1 imagery dataset's products.
-    invalid_datasource(datasource: list[str]) -> str
-        Check for unsupported datasources in a list of datasources.
-    invalid_version(version: list[str]) -> str:
-        Check for unsupported versions in a list of versions.
     next_time(current_time: datetime) -> datetime:
         Get the next time interval. GridSat-B1 dataset organises the
         data by year.
@@ -149,10 +145,10 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         if isinstance(version, str):
             version = [version]
 
-        if unsupported_version := self.invalid_version(version):
+        if unsupported_version := set(version) - set(self.SUPPORTED_VERSIONS):
             supported_versions: list[str] = sorted(self.SUPPORTED_VERSIONS)
             raise ValueError(
-                f"Unsupported version: '{unsupported_version}'. "
+                f"Unsupported version: {sorted(unsupported_version)}. "
                 f"Supported versions: {supported_versions}"
             )
 
@@ -166,6 +162,8 @@ class GridSatProductLocatorB1(GridSatProductLocator):
             path_date_format=B1_PATH_DATE_FORMAT,
             path_prefix=B1_PATH_PREFIX,
         )
+
+        self.validate_settings()
 
     def get_base_url(self, datasource: str) -> str:
         """
@@ -195,38 +193,15 @@ class GridSatProductLocatorB1(GridSatProductLocator):
             If the requested datasource is not supported or unavailable.
         """
         if datasource not in self.SUPPORTED_DATASOURCES:
-            available_datasource: list[str] = sorted(
+            supported_datasources: list[str] = sorted(
                 self.SUPPORTED_DATASOURCES
             )
             raise ValueError(
-                f"Unsupported datasource: {datasource}. "
-                f"Available datasources: {available_datasource}"
+                f"Unsupported datasource: '{datasource}'. "
+                f"Supported datasources: {supported_datasources}"
             )
 
         return self.AVAILABLE_DATASOURCES[datasource]
-
-    def invalid_version(self, version: list[str]) -> str:
-        """
-        Check for unsupported or invalid versions.
-
-        Verifies and returns the first unsupported version from a list
-        of versions.
-
-        Parameters
-        ----------
-        version : list[str]
-            The list of versions to check for unsupported versions.
-
-        Returns
-        -------
-        str
-            The first unsupported version found in the list of versions.
-            An empty string is returned if all versions are supported.
-        """
-        return next(
-            (ver for ver in version if ver not in self.SUPPORTED_VERSIONS),
-            "",
-        )
 
     def next_time(self, current_time: datetime) -> datetime:
         """
@@ -297,4 +272,44 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         """
         return time.replace(
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0
+        )
+
+    def validate_settings(self) -> None:
+        """
+        Validate the product locator settings after initialization.
+
+        Validate the product locator settings after initialization to
+        ensure that the settings are consistent with the product
+        locator's requirements and specifications.
+
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
+        """
+        # The following checks are assertions that should never fail
+        # since they are values internally set by the constructor and
+        # they do not represent user input. (I do not use global
+        # constants for the assertions here, otherwise these checks
+        # might always pass regardless of the actual values.)
+
+        PRODUCT_NAME: str = "B1"
+
+        assert self.name == PRODUCT_NAME, (
+            f"Invalid product name '{self.name}' for 'GridSat' dataset, "
+            f"expected '{PRODUCT_NAME}'"
+        )
+
+        # Indeed, GridSat-B1 data comes from different sources but the
+        # origin's ID is not used in the directory structure nor in the
+        # file names.
+        assert not self.origin, (
+            f"Invalid origin IDs {self.origin}. "
+            f"'GridSat-{PRODUCT_NAME}' products do not support origins."
         )

@@ -190,9 +190,7 @@ class GOESProductLocator(ProductLocatorGG):
             instrument that does not support it.
         """
         if origin not in self.AVAILABLE_ORIGINS:
-            available_origins: list[str] = sorted(
-                self.AVAILABLE_ORIGINS.keys()
-            )
+            available_origins: list[str] = sorted(self.AVAILABLE_ORIGINS)
             raise ValueError(
                 f"Invalid origin ID: '{origin}'. "
                 f"Available origin IDs: {available_origins}"
@@ -200,7 +198,7 @@ class GOESProductLocator(ProductLocatorGG):
 
         if instrument not in self.AVAILABLE_INSTRUMENTS:
             available_instruments: list[str] = sorted(
-                self.AVAILABLE_INSTRUMENTS.keys()
+                self.AVAILABLE_INSTRUMENTS
             )
             raise ValueError(
                 f"Invalid instrument ID: '{instrument}'. "
@@ -250,12 +248,12 @@ class GOESProductLocator(ProductLocatorGG):
             If the provided datasource is not supported or unavailable.
         """
         if datasource not in self.SUPPORTED_DATASOURCES:
-            available_datasource: list[str] = sorted(
+            supported_datasources: list[str] = sorted(
                 self.SUPPORTED_DATASOURCES
             )
             raise ValueError(
-                f"Unsupported datasource: {datasource}. "
-                f"Available datasources: {available_datasource}"
+                f"Unsupported datasource: '{datasource}'. "
+                f"Supported datasources: {supported_datasources}"
             )
 
         AVAILABLE_SCENES: dict[str, str] = {

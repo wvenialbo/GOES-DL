@@ -63,10 +63,10 @@ class GOESProductLocatorABI(GOESProductLocator):
             If the provided origin, level or scene is invalid.
         """
         if scene not in self.AVAILABLE_SCENES:
-            available_levels: list[str] = sorted(self.AVAILABLE_SCENES.keys())
+            available_scenes: list[str] = sorted(self.AVAILABLE_SCENES)
             raise ValueError(
                 f"Invalid scene ID: '{scene}'. "
-                f"Available scene IDs: {available_levels}"
+                f"Available scene IDs: {available_scenes}"
             )
 
         # Instrument: Advanced Baseline Imager (ABI).

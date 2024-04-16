@@ -58,11 +58,9 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
             )
 
         if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(
-                self.AVAILABLE_PRODUCTS.keys()
-            )
+            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
             raise ValueError(
-                f"Invalid product ID: '{origin}'. "
+                f"Invalid product ID: '{name}'. "
                 f"Available product IDs: {supported_products}"
             )
 
