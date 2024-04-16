@@ -6,7 +6,7 @@ class GOESProductLocatorABI(GOESProductLocator):
     Product locator for GOES-R Series imagery dataset's ABI products.
 
     Instrument: Advanced Baseline Imager (ABI).
-    Product: All ABI products.
+    Product: All primary and derived ABI products.
     """
 
     # Available scenes for the GOES-R Series imagery dataset products:
@@ -69,37 +69,63 @@ class GOESProductLocatorABI(GOESProductLocator):
                 f"Available scene IDs: {available_levels}"
             )
 
-        if instrument_error := (self._verify_settings(name, level, channel)):
-            raise ValueError(instrument_error)
+        # Instrument: Advanced Baseline Imager (ABI).
+        INSTRUMENT_NAME: str = "ABI"
 
-        mode: list[str] = ["M3", "M4", "M6"] if scene == "F" else ["M3", "M6"]
+        # Available scan modes for the GOES-R Series imagery dataset ABI
+        # products, regarding the requested scene for the product:
+        F_MODES: list[str] = ["M3", "M4", "M6"]
+        CM_MODES: list[str] = ["M3", "M6"]
+        SCAN_MODE: list[str] = F_MODES if scene == "F" else CM_MODES
 
         super(GOESProductLocatorABI, self).__init__(
             name=name,
             level=level,
             scene=scene,
-            instrument="ABI",
-            mode=mode,
+            instrument=INSTRUMENT_NAME,
+            mode=SCAN_MODE,
             channel=channel,
             origin=origin,
         )
 
-    def _verify_settings(
-        self,
-        name: str,
-        level: str,
-        channel: list[str],
-    ) -> str:
-        if name not in ["Rad", "CMIP", "DMW"] and channel:
-            return f"Invalid channel {channel} for the requested ABI product."
+    def validate_settings(self) -> None:
+        """
+        Validate the product locator settings after initialization.
 
-        bad_level: str = ""
-        if name == "Rad":
-            bad_level = level if level != "L1b" else ""
-        else:
-            bad_level = level if level != "L2" else ""
+        Validate the ABI product locator settings after initialization
+        to ensure that the settings are consistent with the product
+        locator's requirements and specifications.
 
-        if bad_level:
-            return f"Invalid level '{bad_level}' for requested ABI product."
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
+        """
+        # The following checks are assertions that should never fail
+        # since they are values internally set by the constructor and
+        # they do not represent user input. (I do not use global
+        # constants for the assertions here, otherwise these checks
+        # might always pass regardless of the actual values.)
 
-        return ""
+        INSTRUMENT_NAME: str = "ABI"
+        NOT_F_MODES: set[str] = {"M3", "M6"}
+        F_MODES: set[str] = {"M4"} | NOT_F_MODES
+
+        assert (
+            self.instrument == INSTRUMENT_NAME
+        ), f"Invalid instrument name '{self.instrument}' for ABI product"
+
+        assert (
+            self.scene == "F"
+            and set(self.mode).issubset(F_MODES)
+            or self.scene != "F"
+            and set(self.mode).issubset(NOT_F_MODES)
+        ), f"Invalid scan modes {self.mode} for current scene '{self.scene}'"
+
+        super(GOESProductLocatorABI, self).validate_settings()

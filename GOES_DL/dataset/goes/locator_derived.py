@@ -1,7 +1,7 @@
 from .locator_abi import GOESProductLocatorABI
 
 
-class GOESProductLocatorABIDerived(GOESProductLocatorABI):
+class GOESProductLocatorDerived(GOESProductLocatorABI):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
@@ -18,10 +18,15 @@ class GOESProductLocatorABIDerived(GOESProductLocatorABI):
         "AOD": "Aerosol Optical Depth",  # !M
         "COD": "Cloud Optical Depth",  # !M
         "CPS": "Cloud Particle Size",
-
+        "CTP": "Cloud Top Pressure",  # !M
+        "DSR": "Downward Shortwave Radiation",
+        "FDC": "Fire (Hot Spot Characterization)",  # !M
+        "LST": "Land Surface Temperature",
+        "LVMP": "Legacy Vertical Moisture Profile",
+        "LVTP": "Legacy Vertical Temperature Profile",
+        "MCMIP": "Multi-band Cloud and Moisture Imagery",
         "ACM": "Clear Sky Mask",
-        "ACHA": "Cloud Top Height",
-        "ACHT": "Cloud Top Temperature",
+        "ACM": "Clear Sky Mask",
         "ACM": "Clear Sky Mask",
     }
 
@@ -56,6 +61,37 @@ class GOESProductLocatorABIDerived(GOESProductLocatorABI):
                 f"Available product IDs: {available_products}"
             )
 
-        super(GOESProductLocatorABIDerived, self).__init__(
+        super(GOESProductLocatorDerived, self).__init__(
             name=name, level="L2", scene=scene, channel=[], origin=origin
         )
+
+    def validate_settings(self) -> None:
+        """
+        Validate the product locator settings after initialization.
+
+        Validate the ABI primary product locator settings after
+        initialization to ensure that the settings are consistent with
+        the product locator's requirements and specifications.
+
+        Returns
+        -------
+        str
+            An error message if the instrument of product settings are
+            invalid; otherwise, an empty string.
+        """
+        # The following checks are assertions that should never fail
+        # since they are values internally set by the constructor and
+        # they do not represent user input. (I do not use global
+        # constants for the assertions here, otherwise these checks
+        # might always pass regardless of the actual values.)
+
+        assert self.level == "L2", (
+            f"Invalid level '{self.level}' "
+            f"for derived ABI product '{self.name}'."
+        )
+
+        assert not self.channel, (
+            f"Derived ABI product '{self.name}' " "does not support channels."
+        )
+
+        super(GOESProductLocatorDerived, self).validate_settings()

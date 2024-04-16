@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from datetime import datetime, timedelta
 from typing import ClassVar
 
@@ -46,7 +47,9 @@ class GOESProductLocator(ProductLocatorGG):
     Notes
     -----
     Subclasses are responsible for initialising the attributes with the
-    appropriate values for the dataset and product details.
+    appropriate values for the dataset and product details. Definition
+    for the abstract method `validate_settings()` declared by this class
+    should also be provided; refer to its documentation for details.
 
     Attributes
     ----------
@@ -100,15 +103,15 @@ class GOESProductLocator(ProductLocatorGG):
     get_timestamp_pattern() -> str:
         Return the timestamp pattern for the GOES-R Series imagery
         dataset product's filename.
-    invalid_datasource(datasource: list[str]) -> str
-        Check for unsupported datasources in a list of datasources.
     next_time(current_time: datetime) -> datetime:
         Get the next time interval. GOES-R Series dataset organises the
         data by hour.
     normalize_times(datetime_ini: datetime, datetime_fin: datetime) -> tuple[datetime, datetime]:
         Normalise the initial and final datetimes.
-    truncate_to_hour(time: datetime) -> datetime
+    truncate_to_hour(time: datetime) -> datetime:
         Truncate the `datetime` to the current hour.
+    validate_settings() -> str:
+        Validate the product locator settings after initialization.
 
     Caution
     -------
@@ -211,14 +214,6 @@ class GOESProductLocator(ProductLocatorGG):
                 f"Available level IDs: {available_levels}"
             )
 
-        if instrument_error := (
-            self._verify_instrument_glm(
-                level, scene, instrument, mode, channel
-            )
-            or self._verify_instrument_abi(scene, instrument, mode)
-        ):
-            raise ValueError(instrument_error)
-
         self.name: str = name
         self.level: str = level
         self.scene: str = scene
@@ -226,6 +221,8 @@ class GOESProductLocator(ProductLocatorGG):
         self.mode: list[str] = mode
         self.channel: list[str] = channel
         self.origin: str = origin
+
+        self.validate_settings()
 
     def get_base_url(self, datasource: str) -> str:
         """
@@ -360,7 +357,7 @@ class GOESProductLocator(ProductLocatorGG):
             scan_band = f"-{scan_band}"
         origin: str = f"_{self.origin}"
 
-        return f"OR_    {product_prefix}{scan_band}{origin}"
+        return f"OR_{product_prefix}{scan_band}{origin}"
 
     def get_product_tag(self) -> str:
         """
@@ -511,61 +508,23 @@ class GOESProductLocator(ProductLocatorGG):
         """
         return time.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    def _verify_instrument_abi(
-        self,
-        scene: str,
-        instrument: str,
-        mode: list[str],
-    ) -> str:
-        if instrument != "ABI":
-            return ""
+    @abstractmethod
+    def validate_settings(self) -> None:
+        """
+        Validate the product locator settings after initialization.
 
-        bad_mode: str = ""
-        if scene == "F":
-            bad_mode = next(
-                (mod for mod in mode if mod not in ["M3", "M4", "M6"]),
-                "",
-            )
-        else:
-            bad_mode = next(
-                (mod for mod in mode if mod not in ["M3", "M6"]),
-                "",
-            )
+        Validate the product locator settings after initialization to
+        ensure that the settings are consistent with the product
+        locator's requirements and specifications.
 
-        if bad_mode:
-            return f"Invalid scan mode '{bad_mode}' for requested ABI product."
-
-        return ""
-
-    def _verify_instrument_glm(
-        self,
-        level: str,
-        scene: str,
-        instrument: str,
-        mode: list[str],
-        channel: list[str],
-    ) -> str:
-        if instrument != "GLM":
-            return ""
-
-        if level != "L2":
-            raise ValueError(
-                f"Invalid level ID: '{level}'. GLM products are level 'L2'."
-            )
-
-        if scene:
-            return "Invalid scene ID. GLM instrument does not support scenes."
-
-        if mode:
-            return (
-                "Invalid scan mode. "
-                "GLM instrument does not support scanning modes."
-            )
-
-        if channel:
-            return (
-                "Invalid channel ID. "
-                "GLM instrument does not support channels."
-            )
-
-        return ""
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
+        """

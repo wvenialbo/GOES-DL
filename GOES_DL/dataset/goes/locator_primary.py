@@ -1,12 +1,12 @@
 from .locator_abi import GOESProductLocatorABI
 
 
-class GOESProductLocatorABIPrimary(GOESProductLocatorABI):
+class GOESProductLocatorPrimary(GOESProductLocatorABI):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
     Instrument: Advanced Baseline Imager (ABI)
-    Product: Primary ABI products.
+    Product: All primary ABI products.
     """
 
     AVAILABLE_CHANNELS: set[str] = {f"C{id:02d}" for id in range(1, 17)}
@@ -14,6 +14,7 @@ class GOESProductLocatorABIPrimary(GOESProductLocatorABI):
     AVAILABLE_PRODUCTS: dict[str, str] = {
         "CMIP": "Cloud and Moisture Imagery Product",
         "DMW": "Derived Motion Winds",
+        "DMWV": "Derived Motion WV Winds",
         "Rad": "Radiances",
     }
 
@@ -49,149 +50,74 @@ class GOESProductLocatorABIPrimary(GOESProductLocatorABI):
         ValueError
             If the provided product name is invalid.
         """
-        if unsupported_channel := self.invalid_channel(channel):
-            supported_versions: list[str] = sorted(self.AVAILABLE_CHANNELS)
+        if unsupported_channel := set(channel) - set(self.AVAILABLE_CHANNELS):
+            supported_channels: list[str] = sorted(self.AVAILABLE_CHANNELS)
             raise ValueError(
-                f"Unsupported version: '{unsupported_channel}'. "
-                f"Supported versions: {supported_versions}"
+                f"Unsupported channel: '{sorted(unsupported_channel)}'. "
+                f"Supported channels: {supported_channels}"
             )
 
         if name not in self.AVAILABLE_PRODUCTS:
-            available_products: list[str] = sorted(
+            supported_products: list[str] = sorted(
                 self.AVAILABLE_PRODUCTS.keys()
             )
             raise ValueError(
                 f"Invalid product ID: '{origin}'. "
-                f"Available product IDs: {available_products}"
+                f"Available product IDs: {supported_products}"
             )
 
         level: str = "L1b" if name == "Rad" else "L2"
 
-        super(GOESProductLocatorABIPrimary, self).__init__(
+        super(GOESProductLocatorPrimary, self).__init__(
             name=name, level=level, scene=scene, channel=channel, origin=origin
         )
 
-    def invalid_channel(self, channel: list[str]) -> str:
+    def validate_settings(self) -> None:
         """
-        Check for unsupported or invalid versions.
+        Validate the product locator settings after initialization.
 
-        Verifies and returns the first unsupported version from a list
-        of versions.
+        Validate the ABI primary product locator settings after
+        initialization to ensure that the settings are consistent with
+        the product locator's requirements and specifications.
 
-        Parameters
-        ----------
-        version : list[str]
-            The list of versions to check for unsupported versions.
-
-        Returns
-        -------
-        str
-            The first unsupported version found in the list of versions.
-            An empty string is returned if all versions are supported.
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
         """
-        return next(
-            (chn for chn in channel if chn not in self.AVAILABLE_CHANNELS),
-            "",
+        # The following checks are assertions that should never fail
+        # since they are values internally set by the constructor and
+        # they do not represent user input. (I do not use global
+        # constants for the assertions here, otherwise these checks
+        # might always pass regardless of the actual values.)
+
+        PRODUCT_RAD: str = "Rad"
+        LEVEL_RAD: str = "L1b"
+        LEVEL_NOT_RAD: str = "L2"
+
+        assert (
+            self.name == PRODUCT_RAD
+            and self.level == LEVEL_RAD
+            or self.scene != PRODUCT_RAD
+            and self.level == LEVEL_NOT_RAD
+        ), (
+            f"Invalid level '{self.level}' "
+            f"for primary ABI product '{self.name}'"
         )
 
+        # The following checks depend on user input and an exception
+        # should be raised if the user provides invalid values.
 
-class GOESProductLocatorCMIP(GOESProductLocatorABIPrimary):
-    """
-    Product locator for GOES-R Series imagery dataset's ABI products.
+        if not self.channel:
+            raise ValueError(
+                f"Primary ABI product '{self.name}' "
+                "does require channel specification"
+            )
 
-    Instrument: Advanced Baseline Imager (ABI)
-    Product: Cloud and Moisture Imagery Product (CMIP).
-    """
-
-    def __init__(self, scene: str, channel: list[str], origin: str) -> None:
-        """
-        Initialise a GOES-R Series imagery dataset ABI product locator.
-
-        Constructs a GOES-R Series imagery dataset ABI primary product
-        locator object.
-
-        Parameters
-        ----------
-        scene : str
-            The scene of the GOES-R Series imagery dataset product, e.g.
-            "F" or "C".
-        channel : list[str]
-            The list of channels of the GOES-R Series imagery dataset
-            ABI product, e.g. "C08" or "C13".
-        origin : str
-            The origin of the GOES-R Series imagery dataset ABI product,
-            namely a satellite identifier, e.g. "G16". Due to how the
-            dataset directories are organised, only a single origin may
-            be provided.
-        """
-        super(GOESProductLocatorCMIP, self).__init__(
-            name="CMIP", scene=scene, channel=channel, origin=origin
-        )
-
-
-class GOESProductLocatorDMW(GOESProductLocatorABIPrimary):
-    """
-    Product locator for GOES-R Series imagery dataset's ABI products.
-
-    Instrument: Advanced Baseline Imager (ABI)
-    Product: Derived Motion Winds (DMW).
-    """
-
-    def __init__(self, scene: str, channel: list[str], origin: str) -> None:
-        """
-        Initialise a GOES-R Series imagery dataset ABI product locator.
-
-        Constructs a GOES-R Series imagery dataset ABI primary product
-        locator object.
-
-        Parameters
-        ----------
-        scene : str
-            The scene of the GOES-R Series imagery dataset product, e.g.
-            "F" or "C".
-        channel : list[str]
-            The list of channels of the GOES-R Series imagery dataset
-            ABI product, e.g. "C08" or "C13".
-        origin : str
-            The origin of the GOES-R Series imagery dataset ABI product,
-            namely a satellite identifier, e.g. "G16". Due to how the
-            dataset directories are organised, only a single origin may
-            be provided.
-        """
-        super(GOESProductLocatorDMW, self).__init__(
-            name="DMW", scene=scene, channel=channel, origin=origin
-        )
-
-
-class GOESProductLocatorRad(GOESProductLocatorABIPrimary):
-    """
-    Product locator for GOES-R Series imagery dataset's ABI products.
-
-    Instrument: Advanced Baseline Imager (ABI)
-    Product: Radiances (Rad).
-    """
-
-    def __init__(self, scene: str, channel: list[str], origin: str) -> None:
-        """
-        Initialise a GOES-R Series imagery dataset ABI product locator.
-
-        Constructs a GOES-R Series imagery dataset ABI primary product
-        locator object.
-
-        Parameters
-        ----------
-        scene : str
-            The scene of the GOES-R Series imagery dataset product, e.g.
-            "F" or "C".
-        channel : list[str]
-            The list of channels of the GOES-R Series imagery dataset
-            ABI product, e.g. "C08" or "C13".
-        origin : str
-            The origin of the GOES-R Series imagery dataset ABI product,
-            namely a satellite identifier, e.g. "G16". Due to how the
-            dataset directories are organised, only a single origin may
-            be provided.
-        """
-        super(GOESProductLocatorRad, self).__init__(
-            name="Rad", scene=scene, channel=channel, origin=origin
-        )
+        super(GOESProductLocatorPrimary, self).validate_settings()

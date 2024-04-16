@@ -46,15 +46,75 @@ class GOESProductLocatorGLM(GOESProductLocator):
                 f"Available product IDs: {available_products}"
             )
 
+        INSTRUMENT_NAME: str = "GLM"
+        PRODUCT_LEVEL: str = "L2"
+
         super(GOESProductLocatorGLM, self).__init__(
             name=name,
-            level="L2",
+            level=PRODUCT_LEVEL,
             scene="",
-            instrument="GLM",
+            instrument=INSTRUMENT_NAME,
             mode=[],
             channel=[],
             origin=origin,
         )
+
+    def validate_settings(self) -> None:
+        """
+        Validate the product locator settings after initialization.
+
+        Validate the ABI product locator settings after initialization
+        to ensure that the settings are consistent with the product
+        locator's requirements and specifications.
+
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
+        """
+        # The following checks are assertions that should never fail
+        # since they are values internally set by the constructor and
+        # they do not represent user input. (I do not use global
+        # constants for the assertions here, otherwise these checks
+        # might always pass regardless of the actual values.)
+
+        INSTRUMENT_NAME: str = "GLM"
+        PRODUCT_LEVEL: str = "L2"
+
+        assert (
+            self.instrument == INSTRUMENT_NAME
+        ), f"Invalid instrument name '{self.instrument}' for GLM product"
+
+        assert self.level == PRODUCT_LEVEL, (
+            f"Invalid level '{self.level}' "
+            f"for GLM product '{self.name}', "
+            f"expected '{PRODUCT_LEVEL}'"
+        )
+
+        # In fact, GLM products are Full Disk products but the scene ID
+        # is not used in the directory structure nor in the file names.
+        assert not self.scene, (
+            f"Invalid scene ID '{self.scene}'. "
+            "GLM products do not support scenes."
+        )
+
+        assert not self.mode, (
+            f"Invalid scan modes {self.mode}. "
+            "GLM instrument does not support scanning modes."
+        )
+
+        assert not self.channel, (
+            f"Invalid channels {self.channel}. "
+            "GLM instrument does not support channels."
+        )
+
+        super(GOESProductLocatorGLM, self).validate_settings()
 
 
 class GOESProductLocatorLCFA(GOESProductLocatorGLM):
@@ -80,7 +140,41 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
             directories are organised, only a single origin may be
             provided.
         """
+        PRODUCT_NAME: str = "LCFA"
+
         super(GOESProductLocatorLCFA, self).__init__(
-            name="LCFA",
-            origin=origin,
+            name=PRODUCT_NAME, origin=origin
         )
+
+    def validate_settings(self) -> None:
+        """
+        Validate the product locator settings after initialization.
+
+        Validate the ABI primary product locator settings after
+        initialization to ensure that the settings are consistent with
+        the product locator's requirements and specifications.
+
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
+        """
+        # The following checks are assertions that should never fail
+        # since they are values internally set by the constructor and
+        # they do not represent user input. (I do not use global
+        # constants for the assertions here, otherwise these checks
+        # might always pass regardless of the actual values.)
+
+        PRODUCT_NAME: str = "LCFA"
+
+        assert (
+            self.name == PRODUCT_NAME
+        ), f"Invalid product name '{self.level}', expected '{PRODUCT_NAME}'"
+
+        super(GOESProductLocatorLCFA, self).validate_settings()
