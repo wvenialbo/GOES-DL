@@ -9,7 +9,9 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
     Product: Radiances (Rad).
     """
 
-    def __init__(self, scene: str, channel: list[str], origin: str) -> None:
+    def __init__(
+        self, scene: str, channel: str | list[str], origin: str
+    ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
 
@@ -85,7 +87,9 @@ class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
     Product: Cloud and Moisture Imagery Product (CMIP).
     """
 
-    def __init__(self, scene: str, channel: list[str], origin: str) -> None:
+    def __init__(
+        self, scene: str, channel: str | list[str], origin: str
+    ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
 
@@ -161,7 +165,9 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
     Product: Derived Motion Winds (DMW).
     """
 
-    def __init__(self, scene: str, channel: list[str], origin: str) -> None:
+    def __init__(
+        self, scene: str, channel: str | list[str], origin: str
+    ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
 
@@ -268,9 +274,6 @@ class GOESProductLocatorDMWV(GOESProductLocatorPrimary):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channel : list[str]
-            The list of channels of the GOES-R Series imagery dataset
-            ABI product, e.g. "C08" or "C13".
         origin : str
             The origin of the GOES-R Series imagery dataset ABI product,
             namely a satellite identifier, e.g. "G16". Due to how the

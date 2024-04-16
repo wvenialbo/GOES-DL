@@ -19,7 +19,7 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
     }
 
     def __init__(
-        self, name: str, scene: str, channel: list[str], origin: str
+        self, name: str, scene: str, channel: str | list[str], origin: str
     ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -50,6 +50,9 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         ValueError
             If the provided product name is invalid.
         """
+        if isinstance(channel, str):
+            channel = [channel]
+
         if unsupported_channel := set(channel) - set(self.AVAILABLE_CHANNELS):
             supported_channels: list[str] = sorted(self.AVAILABLE_CHANNELS)
             raise ValueError(
