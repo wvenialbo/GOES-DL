@@ -74,6 +74,8 @@ class GOESProductLocatorABI(GOESProductLocator):
 
         # Available scan modes for the GOES-R Series imagery dataset ABI
         # products, regarding the requested scene for the product:
+        # - Mode 3 (Previous Flex Mode)
+        # - Mode 6 (Current Flex Mode)
         F_MODES: list[str] = ["M3", "M4", "M6"]
         CM_MODES: list[str] = ["M3", "M6"]
         SCAN_MODES: list[str] = F_MODES if scene == "F" else CM_MODES

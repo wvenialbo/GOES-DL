@@ -132,11 +132,17 @@ class GOESProductLocator(ProductLocatorGG):
         f"G{id:02d}": f"goes{id:02d}" for id in range(16, 19)
     }
 
+    # Supported instruments from the GOES-R series:
     AVAILABLE_INSTRUMENTS: dict[str, str] = {
         "ABI": "Advanced Baseline Imager",
         "GLM": "Geostationary Lightning Mapper",
     }
 
+    # Supported product levels from the GOES-R series:
+    # - Level 1b (calibrated and geographically corrected, radiance
+    #             units)
+    # - Level 2  (calibrated and geographically corrected,
+    #             reflectance/brightness [Kelvin] units)
     AVAILABLE_LEVELS: set[str] = {"L1b", "L2"}
 
     def __init__(

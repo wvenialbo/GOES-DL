@@ -15,7 +15,7 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         "CMIP": "Cloud and Moisture Imagery Product",
         "DMW": "Derived Motion Winds",
         "DMWV": "Derived Motion WV Winds",
-        "Rad": "Radiances",
+        "Rad": "Radiance",
     }
 
     def __init__(

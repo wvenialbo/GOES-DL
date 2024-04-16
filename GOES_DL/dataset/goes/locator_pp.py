@@ -6,7 +6,7 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
     Product locator for GOES-R Series imagery dataset's ABI products.
 
     Instrument: Advanced Baseline Imager (ABI)
-    Product: Radiances (Rad).
+    Product: Radiance (Rad).
     """
 
     def __init__(
