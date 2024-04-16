@@ -6,29 +6,83 @@ class GOESProductLocatorDerived(GOESProductLocatorABI):
     Product locator for GOES-R Series imagery dataset's ABI products.
 
     Instrument: Advanced Baseline Imager (ABI)
-    Product: Derived ABI products.
+    Product: All derived ABI products.
     """
 
+    # Available single-band products from the GOES-R Series's ABI
+    # instrument:
     AVAILABLE_PRODUCTS: dict[str, str] = {
-        "ACHA": "Cloud Top Height",
-        "ACHT": "Cloud Top Temperature",  # !C
+        "ACHA": "Cloud Top Height (10km for 'F' and 'C', 4km for 'M')",
+        "ACHA2KM": "Cloud Top Height (2km since 24 March 2023)",
+        "ACHP2KM": "Cloud Top Pressure (2km spatial resolution)",
+        "ACHT": "Cloud Top Temperature",
         "ACM": "Clear Sky Mask",
         "ACTP": "Cloud Top Phase",
         "ADP": "Aerosol Detection Product",
-        "AOD": "Aerosol Optical Depth",  # !M
-        "COD": "Cloud Optical Depth",  # !M
+        "AICE": "Ice Concentration and Extent",
+        "AITA": "Ice Age and Thickness",
+        "AOD": "Aerosol Optical Depth",
+        "BRF": "Bidirectional Reflectance Factor (Land Surface)",
+        "CCL": "Cloud Cover Layers",
+        "COD": "Cloud Optical Depth (4km for 'F' and 2km for 'C')",
+        "COD2KM": "Cloud Optical Depth (2km since 22 March 2023)",
         "CPS": "Cloud Particle Size",
-        "CTP": "Cloud Top Pressure",  # !M
+        "CTP": "Cloud Top Pressure",
+        "DSI": "Derived Stability Indices",
         "DSR": "Downward Shortwave Radiation",
-        "FDC": "Fire (Hot Spot Characterization)",  # !M
-        "LST": "Land Surface Temperature",
+        "FDC": "Fire (Hot Spot Characterization)",
+        "FSC": "Fractional Snow Cover",
+        "LSA": "Land Surface Albedo",
+        "LST": "Land Surface Temperature (10km for 'F', 2km for 'C' and 'M')",
+        "LST2KM": "Land Surface Temperature (2km since 10 September 2021)",
         "LVMP": "Legacy Vertical Moisture Profile",
         "LVTP": "Legacy Vertical Temperature Profile",
-        "MCMIP": "Multi-band Cloud and Moisture Imagery",
-        "ACM": "Clear Sky Mask",
-        "ACM": "Clear Sky Mask",
-        "ACM": "Clear Sky Mask",
+        "RRQPE": "Rainfall Rate (Quantitative Precipitation Estimate)",
+        "RSR": "Reflected Shortwave Radiation (Top-Of-Atmosphere)",
+        "SST": "Sea Surface Temperature",
+        "TPW": "Total Precipitable Water",
+        "VAA": "Volcanic Ash (Detection and Height)",
     }
+
+    ONLY_CF_SCENE: set[str] = {
+        "AOD",
+        "COD",
+        "CTP",
+        "RSR",
+    }
+
+    ONLY_F_SCENE: set[str] = {
+        "AICE",
+        "AITA",
+        "COD2KM",
+        "LST2KM",
+        "RRQPE",
+        "SST",
+        "VAA",
+    }
+
+    ONLY_FM_SCENE: set[str] = {
+        "ACHT",
+    }
+
+    ONLY_G16_G17: set[str] = {
+        "VAA",
+    }
+
+    ONLY_G16_G18: set[str] = {
+        "ACHA2KM",
+        "ACHP2KM",
+        "CCL",
+        "FSC",
+        "COD2KM",
+    }
+
+    CF_SCENE: set[str] = {"C", "F"}
+    F_SCENE: set[str] = {"F"}
+    FM_SCENE: set[str] = {"F", "M1", "M2"}
+
+    G16_G17_ORIGIN: set[str] = {"G16", "G17"}
+    G16_G18_ORIGIN: set[str] = {"G16", "G18"}
 
     def __init__(self, name: str, scene: str, origin: str) -> None:
         """
@@ -53,14 +107,56 @@ class GOESProductLocatorDerived(GOESProductLocatorABI):
             be provided.
         """
         if name not in self.AVAILABLE_PRODUCTS:
-            available_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
+            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
             raise ValueError(
                 f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {available_products}"
+                f"Available product IDs: {supported_products}"
             )
 
+        only_in_segment: list[set[str]] = [
+            self.ONLY_CF_SCENE,
+            self.ONLY_F_SCENE,
+            self.ONLY_FM_SCENE,
+        ]
+        scene_segment: list[set[str]] = [
+            self.CF_SCENE,
+            self.F_SCENE,
+            self.FM_SCENE,
+        ]
+
+        for only, segment in zip(only_in_segment, scene_segment):
+            if name in only and scene not in segment:
+                raise ValueError(
+                    f"Invalid scene '{scene}' "
+                    f"for derived ABI product '{name}', "
+                    f"supported scenes {sorted(segment)}"
+                )
+
+        only_in_segment: list[set[str]] = [
+            self.ONLY_G16_G17,
+            self.ONLY_G16_G18,
+        ]
+        origin_segment: list[set[str]] = [
+            self.G16_G17_ORIGIN,
+            self.G16_G18_ORIGIN,
+        ]
+
+        for only, segment in zip(only_in_segment, origin_segment):
+            if name in only and origin not in segment:
+                raise ValueError(
+                    f"Invalid origin '{origin}' "
+                    f"for derived ABI product '{name}', "
+                    f"supported origins {sorted(segment)}"
+                )
+
+        PRODUCT_LEVEL: str = "L2"
+
         super(GOESProductLocatorDerived, self).__init__(
-            name=name, level="L2", scene=scene, channels=[], origin=origin
+            name=name,
+            level=PRODUCT_LEVEL,
+            scene=scene,
+            channels=[],
+            origin=origin,
         )
 
     def validate_settings(self) -> None:
@@ -71,11 +167,16 @@ class GOESProductLocatorDerived(GOESProductLocatorABI):
         initialization to ensure that the settings are consistent with
         the product locator's requirements and specifications.
 
-        Returns
-        -------
-        str
-            An error message if the instrument of product settings are
-            invalid; otherwise, an empty string.
+        Raises
+        ------
+        AssertionError
+            If the instrument or product internal settings are invalid.
+            I.e. when the settings do not represent user input and were
+            internally set by the class's or a subclass's constructor.
+        ValueError
+            If an unexpected or unsupported setting is required for an
+            instrument that does not support it. I.e. when the setting
+            depends on user input and the user provides invalid values.
         """
         # The following checks are assertions that should never fail
         # since they are values internally set by the constructor and
@@ -83,13 +184,16 @@ class GOESProductLocatorDerived(GOESProductLocatorABI):
         # constants for the assertions here, otherwise these checks
         # might always pass regardless of the actual values.)
 
-        assert self.level == "L2", (
+        PRODUCT_LEVEL: str = "L2"
+
+        assert self.level == PRODUCT_LEVEL, (
             f"Invalid level '{self.level}' "
-            f"for derived ABI product '{self.name}'."
+            f"for derived ABI product '{self.name}', "
+            f"expected '{PRODUCT_LEVEL}'"
         )
 
-        assert not self.channels, (
-            f"Derived ABI product '{self.name}' " "does not support channels."
-        )
+        assert (
+            not self.channels
+        ), f"Derived ABI product '{self.name}' does not support channels."
 
         super(GOESProductLocatorDerived, self).validate_settings()
