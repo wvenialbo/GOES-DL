@@ -19,7 +19,7 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
     }
 
     def __init__(
-        self, name: str, scene: str, channel: str | list[str], origin: str
+        self, name: str, scene: str, channels: str | list[str], origin: str
     ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -36,7 +36,7 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channel : list[str]
+        channels : list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -50,10 +50,10 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         ValueError
             If the provided product name is invalid.
         """
-        if isinstance(channel, str):
-            channel = [channel]
+        if isinstance(channels, str):
+            channels = [channels]
 
-        if unsupported_channel := set(channel) - set(self.AVAILABLE_CHANNELS):
+        if unsupported_channel := set(channels) - set(self.AVAILABLE_CHANNELS):
             supported_channels: list[str] = sorted(self.AVAILABLE_CHANNELS)
             raise ValueError(
                 f"Unsupported channel: '{sorted(unsupported_channel)}'. "
@@ -70,7 +70,11 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         level: str = "L1b" if name == "Rad" else "L2"
 
         super(GOESProductLocatorPrimary, self).__init__(
-            name=name, level=level, scene=scene, channel=channel, origin=origin
+            name=name,
+            level=level,
+            scene=scene,
+            channels=channels,
+            origin=origin,
         )
 
     def validate_settings(self) -> None:
@@ -115,7 +119,7 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         # The following checks depend on user input and an exception
         # should be raised if the user provides invalid values.
 
-        if not self.channel:
+        if not self.channels:
             raise ValueError(
                 f"Primary ABI product '{self.name}' "
                 "does require channel specification"

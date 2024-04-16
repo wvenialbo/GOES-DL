@@ -66,10 +66,10 @@ class GOESProductLocator(ProductLocatorGG):
     instrument : str
         The instrument of the GOES-R Series imagery dataset product,
         e.g. "ABI" or "GLM".
-    mode : list[str]
+    modes : list[str]
         The list of modes of the GOES-R Series imagery dataset product,
         e.g. "M3" or "M6".
-    channel : list[str]
+    channels : list[str]
         The list of channels of the GOES-R Series imagery dataset
         product, e.g. "C08" or "C13".
     origin : str
@@ -145,8 +145,8 @@ class GOESProductLocator(ProductLocatorGG):
         level: str,
         scene: str,
         instrument: str,
-        mode: list[str],
-        channel: list[str],
+        modes: list[str],
+        channels: list[str],
         origin: str,
     ) -> None:
         """
@@ -170,10 +170,10 @@ class GOESProductLocator(ProductLocatorGG):
         instrument : str
             The instrument of the GOES-R Series imagery dataset product,
             e.g. "ABI" or "GLM".
-        mode : list[str]
+        modes : list[str]
             The list of modes of the GOES-R Series imagery dataset
             product, e.g. "M3" or "M6".
-        channel : list[str]
+        channels : list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -216,8 +216,8 @@ class GOESProductLocator(ProductLocatorGG):
         self.level: str = level
         self.scene: str = scene
         self.instrument: str = instrument
-        self.mode: list[str] = mode
-        self.channel: list[str] = channel
+        self.modes: list[str] = modes
+        self.channels: list[str] = channels
         self.origin: str = origin
 
         self.validate_settings()
@@ -391,12 +391,12 @@ class GOESProductLocator(ProductLocatorGG):
             The scan mode and band names for the GOES-R Series imagery
             dataset product's filename.
         """
-        sorted_modes: list[str] = sorted(self.mode)
-        mode: str = f"(?:{'|'.join(sorted_modes)})" if self.mode else ""
+        sorted_modes: list[str] = sorted(self.modes)
+        mode: str = f"(?:{'|'.join(sorted_modes)})" if self.modes else ""
 
-        sorted_channels: list[str] = sorted(self.channel)
+        sorted_channels: list[str] = sorted(self.channels)
         channel: str = (
-            f"(?:{'|'.join(sorted_channels)})" if self.channel else ""
+            f"(?:{'|'.join(sorted_channels)})" if self.channels else ""
         )
 
         return f"{mode}{channel}"

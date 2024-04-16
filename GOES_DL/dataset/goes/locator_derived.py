@@ -60,7 +60,7 @@ class GOESProductLocatorDerived(GOESProductLocatorABI):
             )
 
         super(GOESProductLocatorDerived, self).__init__(
-            name=name, level="L2", scene=scene, channel=[], origin=origin
+            name=name, level="L2", scene=scene, channels=[], origin=origin
         )
 
     def validate_settings(self) -> None:
@@ -88,7 +88,7 @@ class GOESProductLocatorDerived(GOESProductLocatorABI):
             f"for derived ABI product '{self.name}'."
         )
 
-        assert not self.channel, (
+        assert not self.channels, (
             f"Derived ABI product '{self.name}' " "does not support channels."
         )
 

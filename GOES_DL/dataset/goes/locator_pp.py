@@ -10,7 +10,7 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
     """
 
     def __init__(
-        self, scene: str, channel: str | list[str], origin: str
+        self, scene: str, channels: str | list[str], origin: str
     ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -23,7 +23,7 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channel : list[str]
+        channels : list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -35,7 +35,7 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
         PRODUCT_NAME: str = "Rad"
 
         super(GOESProductLocatorRad, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channel=channel, origin=origin
+            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
     def validate_settings(self) -> None:
@@ -88,7 +88,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
     """
 
     def __init__(
-        self, scene: str, channel: str | list[str], origin: str
+        self, scene: str, channels: str | list[str], origin: str
     ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -101,7 +101,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channel : list[str]
+        channels : list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -113,7 +113,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
         PRODUCT_NAME: str = "CMIP"
 
         super(GOESProductLocatorCMIP, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channel=channel, origin=origin
+            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
     def validate_settings(self) -> None:
@@ -166,7 +166,7 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
     """
 
     def __init__(
-        self, scene: str, channel: str | list[str], origin: str
+        self, scene: str, channels: str | list[str], origin: str
     ) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -179,7 +179,7 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channel : list[str]
+        channels : list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C14".
         origin : str
@@ -191,7 +191,7 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
         PRODUCT_NAME: str = "DMW"
 
         super(GOESProductLocatorDMW, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channel=channel, origin=origin
+            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
     def validate_settings(self) -> None:
@@ -243,9 +243,9 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
             CF_CHANNELS if self.scene in CF_SCENES else M_CHANNELS
         )
 
-        if not set(self.channel).issubset(supported_channels):
+        if not set(self.channels).issubset(supported_channels):
             raise ValueError(
-                f"Unsupported channels {self.channel} "
+                f"Unsupported channels {self.channels} "
                 f"for current scene '{self.scene}' of "
                 f"primary ABI product '{PRODUCT_NAME}'. "
                 f"Supported channels: {sorted(supported_channels)}"
@@ -286,7 +286,7 @@ class GOESProductLocatorDMWV(GOESProductLocatorPrimary):
         super(GOESProductLocatorDMWV, self).__init__(
             name=PRODUCT_NAME,
             scene=scene,
-            channel=PRODUCT_CHANNELS,
+            channels=PRODUCT_CHANNELS,
             origin=origin,
         )
 
@@ -329,8 +329,8 @@ class GOESProductLocatorDMWV(GOESProductLocatorPrimary):
             f"expected '{PRODUCT_LEVEL}'"
         )
 
-        assert set(self.channel).issubset(PRODUCT_CHANNELS), (
-            f"Unsupported channels {self.channel} "
+        assert set(self.channels).issubset(PRODUCT_CHANNELS), (
+            f"Unsupported channels {self.channels} "
             f"for current scene '{self.scene}' of "
             f"primary ABI product '{PRODUCT_NAME}'. "
             f"Supported channels: {sorted(PRODUCT_CHANNELS)}"

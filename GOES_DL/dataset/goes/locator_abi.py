@@ -27,7 +27,7 @@ class GOESProductLocatorABI(GOESProductLocator):
         name: str,
         level: str,
         scene: str,
-        channel: list[str],
+        channels: list[str],
         origin: str,
     ) -> None:
         """
@@ -48,7 +48,7 @@ class GOESProductLocatorABI(GOESProductLocator):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channel : list[str]
+        channels : list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -76,15 +76,15 @@ class GOESProductLocatorABI(GOESProductLocator):
         # products, regarding the requested scene for the product:
         F_MODES: list[str] = ["M3", "M4", "M6"]
         CM_MODES: list[str] = ["M3", "M6"]
-        SCAN_MODE: list[str] = F_MODES if scene == "F" else CM_MODES
+        SCAN_MODES: list[str] = F_MODES if scene == "F" else CM_MODES
 
         super(GOESProductLocatorABI, self).__init__(
             name=name,
             level=level,
             scene=scene,
             instrument=INSTRUMENT_NAME,
-            mode=SCAN_MODE,
-            channel=channel,
+            modes=SCAN_MODES,
+            channels=channels,
             origin=origin,
         )
 
@@ -123,9 +123,9 @@ class GOESProductLocatorABI(GOESProductLocator):
 
         assert (
             self.scene == "F"
-            and set(self.mode).issubset(F_MODES)
+            and set(self.modes).issubset(F_MODES)
             or self.scene != "F"
-            and set(self.mode).issubset(NOT_F_MODES)
-        ), f"Invalid scan modes {self.mode} for current scene '{self.scene}'"
+            and set(self.modes).issubset(NOT_F_MODES)
+        ), f"Invalid scan modes {self.modes} for current scene '{self.scene}'"
 
         super(GOESProductLocatorABI, self).validate_settings()

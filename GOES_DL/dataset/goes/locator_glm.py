@@ -52,8 +52,8 @@ class GOESProductLocatorGLM(GOESProductLocator):
             level=PRODUCT_LEVEL,
             scene="",
             instrument=INSTRUMENT_NAME,
-            mode=[],
-            channel=[],
+            modes=[],
+            channels=[],
             origin=origin,
         )
 
@@ -102,13 +102,13 @@ class GOESProductLocatorGLM(GOESProductLocator):
             "GLM products do not support scenes."
         )
 
-        assert not self.mode, (
-            f"Invalid scan modes {self.mode}. "
+        assert not self.modes, (
+            f"Invalid scan modes {self.modes}. "
             "GLM instrument does not support scanning modes."
         )
 
-        assert not self.channel, (
-            f"Invalid channels {self.channel}. "
+        assert not self.channels, (
+            f"Invalid channels {self.channels}. "
             "GLM instrument does not support channels."
         )
 
