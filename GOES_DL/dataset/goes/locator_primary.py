@@ -53,6 +53,12 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
         if isinstance(channels, str):
             channels = [channels]
 
+        if not channels:
+            raise ValueError(
+                f"Primary ABI product '{name}' "
+                "does require channel specification"
+            )
+
         if unsupported_channel := set(channels) - set(self.AVAILABLE_CHANNELS):
             supported_channels: list[str] = sorted(self.AVAILABLE_CHANNELS)
             raise ValueError(
@@ -67,7 +73,11 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
                 f"Available product IDs: {supported_products}"
             )
 
-        level: str = "L1b" if name == "Rad" else "L2"
+        PRODUCT_RAD: str = "Rad"
+        LEVEL_RAD: str = "L1b"
+        LEVEL_NOT_RAD: str = "L2"
+
+        level: str = LEVEL_RAD if name == PRODUCT_RAD else LEVEL_NOT_RAD
 
         super(GOESProductLocatorPrimary, self).__init__(
             name=name,
@@ -76,53 +86,3 @@ class GOESProductLocatorPrimary(GOESProductLocatorABI):
             channels=channels,
             origin=origin,
         )
-
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the ABI primary product locator settings after
-        initialization to ensure that the settings are consistent with
-        the product locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_RAD: str = "Rad"
-        LEVEL_RAD: str = "L1b"
-        LEVEL_NOT_RAD: str = "L2"
-
-        assert (
-            self.name == PRODUCT_RAD
-            and self.level == LEVEL_RAD
-            or self.scene != PRODUCT_RAD
-            and self.level == LEVEL_NOT_RAD
-        ), (
-            f"Invalid level '{self.level}' "
-            f"for primary ABI product '{self.name}'"
-        )
-
-        # The following checks depend on user input and an exception
-        # should be raised if the user provides invalid values.
-
-        if not self.channels:
-            raise ValueError(
-                f"Primary ABI product '{self.name}' "
-                "does require channel specification"
-            )
-
-        super(GOESProductLocatorPrimary, self).validate_settings()

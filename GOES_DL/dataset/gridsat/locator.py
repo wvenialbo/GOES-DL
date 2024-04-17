@@ -68,7 +68,7 @@ class GridSatProductLocator(ProductLocatorGG):
         The name of the GridSat dataset product. A dataset can have
         multiple products. E.g. "B1", "GOES". Due to how the GridSat
         dataset is structured, the name is always a single string.
-    origin : list[str]
+    origins : list[str]
         The list of origins of the GridSat product, namely one or more
         satellite identifier, e.g. "goes08". Multi-origin datasets, like
         GridSat-B1, set this attribute to an empty list.
@@ -77,7 +77,7 @@ class GridSatProductLocator(ProductLocatorGG):
         the dataset.
     path_prefix : str
         The path prefix to the dataset directories.
-    version : list[str]
+    versions : list[str]
         The version or list of versions of the GridSat product; e.g.
         "v01r01".
 
@@ -110,8 +110,8 @@ class GridSatProductLocator(ProductLocatorGG):
     """  # noqa: E501
 
     name: str
-    origin: list[str]
-    version: list[str]
+    origins: list[str]
+    versions: list[str]
     file_date_format: str
     file_date_pattern: str
     file_prefix: str
@@ -191,12 +191,12 @@ class GridSatProductLocator(ProductLocatorGG):
         str
             The prefix for the GridSat product's filename.
         """
-        sorted_origin: list[str] = sorted(self.origin)
-        origin: str = (
-            rf"\.(?:{'|'.join(sorted_origin)})" if self.origin else ""
+        sorted_origins: list[str] = sorted(self.origins)
+        origins: str = (
+            rf"\.(?:{'|'.join(sorted_origins)})" if self.origins else ""
         )
 
-        return rf"{self.file_prefix}-{self.name}{origin}\."
+        return rf"{self.file_prefix}-{self.name}{origins}\."
 
     def get_suffix(self) -> str:
         """
@@ -211,9 +211,9 @@ class GridSatProductLocator(ProductLocatorGG):
         str
             The suffix for the GridSat product's filename.
         """
-        sorted_version: list[str] = sorted(self.version)
+        sorted_versions: list[str] = sorted(self.versions)
 
-        return rf"\.(?:{'|'.join(sorted_version)})\{GRIDSAT_FILE_SUFFIX}"
+        return rf"\.(?:{'|'.join(sorted_versions)})\{GRIDSAT_FILE_SUFFIX}"
 
     def get_timestamp_pattern(self) -> str:
         """

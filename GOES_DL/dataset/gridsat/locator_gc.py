@@ -134,8 +134,8 @@ class GridSatProductLocatorGC(GridSatProductLocator):
     def __init__(
         self,
         scene: str,
-        origin: str | list[str],
-        version: str | list[str] = GOES_PRODUCT_LATEST_VERSION,
+        origins: str | list[str],
+        versions: str | list[str] = GOES_PRODUCT_LATEST_VERSION,
     ) -> None:
         """
         Initialise a GridSat-GOES/CONUS imagery dataset product locator.
@@ -150,11 +150,11 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             Disk) and "C" (CONUS, Contiguous United States). Due to how
             the GridSat-GOES/CONUS dataset directories are organised,
             only a single scene may be provided.
-        origin : str | list[str]
+        origins : str | list[str]
             The origin of the GridSat-GOES/CONUS imagery dataset
             product, namely a satellite identifier, e.g. "G08".
             The origin may be a single origin or a list of origins.
-        version : str | list[str]
+        versions : str | list[str]
             The version of the GridSat-GOES/CONUS imagery dataset
             product; e.g., "v01". The version may be a single version
             or a list of versions. Only the latest version is available
@@ -173,20 +173,20 @@ class GridSatProductLocatorGC(GridSatProductLocator):
                 f"Available scene IDs: {available_scenes}"
             )
 
-        if isinstance(origin, str):
-            origin = [origin]
+        if isinstance(origins, str):
+            origins = [origins]
 
-        if unavailable_origin := set(origin) - set(self.AVAILABLE_ORIGINS):
+        if unavailable_origin := set(origins) - set(self.AVAILABLE_ORIGINS):
             available_origins: list[str] = sorted(self.AVAILABLE_ORIGINS)
             raise ValueError(
                 f"Invalid origin IDs: {sorted(unavailable_origin)}. "
                 f"Available origin IDs: {available_origins}"
             )
 
-        if isinstance(version, str):
-            version = [version]
+        if isinstance(versions, str):
+            versions = [versions]
 
-        if unsupported_version := set(version) - set(self.SUPPORTED_VERSIONS):
+        if unsupported_version := set(versions) - set(self.SUPPORTED_VERSIONS):
             supported_versions: list[str] = sorted(self.SUPPORTED_VERSIONS)
             raise ValueError(
                 f"Unsupported versions: {sorted(unsupported_version)}. "
@@ -195,15 +195,15 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
         PRODUCT_NAME: str = self.SCENE_TO_NAME[scene]
         DATA_ORIGIN: list[str] = [
-            self.AVAILABLE_ORIGINS[orig] for orig in origin
+            self.AVAILABLE_ORIGINS[orig] for orig in origins
         ]
 
         GOES_PATH_PREFIX: str = f"{PRODUCT_NAME.lower()}/"
 
         super(GridSatProductLocatorGC, self).__init__(
             name=PRODUCT_NAME,
-            origin=DATA_ORIGIN,
-            version=version,
+            origins=DATA_ORIGIN,
+            versions=versions,
             file_date_format=GOES_FILE_DATE_FORMAT,
             file_date_pattern=GOES_FILE_DATE_PATTERN,
             file_prefix=GOES_FILE_PREFIX,

@@ -29,36 +29,3 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
         super(GOESProductLocatorLCFA, self).__init__(
             name=PRODUCT_NAME, origin=origin
         )
-
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the ABI primary product locator settings after
-        initialization to ensure that the settings are consistent with
-        the product locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_NAME: str = "LCFA"
-
-        assert (
-            self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
-
-        super(GOESProductLocatorLCFA, self).validate_settings()

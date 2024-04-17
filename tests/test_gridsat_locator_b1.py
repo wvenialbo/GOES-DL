@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
+from ..GOES_DL.dataset.gridsat import GridSatProductLocatorB1
 
 
 class TestPassed(Exception):
@@ -19,14 +19,14 @@ class TestGridSatProductLocatorB1(unittest.TestCase):
     def setUp(self) -> None:
         # Initialise the locator with all supported versions.
         self.locator: GridSatProductLocatorB1 = GridSatProductLocatorB1(
-            version=self._supported_versions()
+            versions=self._supported_versions()
         )
         self.longMessage = True
 
     def setUpLocator(self, version: str = "") -> None:
         version = version or self._supported_versions()[0]
         self.locator: GridSatProductLocatorB1 = GridSatProductLocatorB1(
-            version=version
+            versions=version
         )
 
     # ------------------------------------------------------------------
@@ -54,14 +54,14 @@ class TestGridSatProductLocatorB1(unittest.TestCase):
         for version in self._supported_versions():
             with self.subTest(version=version):
                 with self.assertRaises(TestPassed):
-                    GridSatProductLocatorB1(version=version)
+                    GridSatProductLocatorB1(versions=version)
                     raise TestPassed()
 
     def test_init_unsupported_versions(self) -> None:
         for version in self._unsupported_versions():
             with self.subTest(version=version):
                 with self.assertRaises(ValueError):
-                    GridSatProductLocatorB1(version=version)
+                    GridSatProductLocatorB1(versions=version)
 
     def test_get_base_url_supported_datasources(self) -> None:
         SUPPORTED_URLS: dict[str, str] = self._supported_urls()

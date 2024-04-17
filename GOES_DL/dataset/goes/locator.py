@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from datetime import datetime, timedelta
 from typing import ClassVar
 
@@ -47,9 +46,7 @@ class GOESProductLocator(ProductLocatorGG):
     Notes
     -----
     Subclasses are responsible for initialising the attributes with the
-    appropriate values for the dataset and product details. Definition
-    for the abstract method `validate_settings()` declared by this class
-    should also be provided; refer to its documentation for details.
+    appropriate values for the dataset and product details.
 
     Attributes
     ----------
@@ -110,8 +107,6 @@ class GOESProductLocator(ProductLocatorGG):
         Normalise the initial and final datetimes.
     truncate_to_hour(time: datetime) -> datetime:
         Truncate the `datetime` to the current hour.
-    validate_settings() -> str:
-        Validate the product locator settings after initialization.
 
     Caution
     -------
@@ -225,8 +220,6 @@ class GOESProductLocator(ProductLocatorGG):
         self.modes: list[str] = modes
         self.channels: list[str] = channels
         self.origin: str = origin
-
-        self.validate_settings()
 
     def get_base_url(self, datasource: str) -> str:
         """
@@ -398,14 +391,14 @@ class GOESProductLocator(ProductLocatorGG):
             dataset product's filename.
         """
         sorted_modes: list[str] = sorted(self.modes)
-        mode: str = f"(?:{'|'.join(sorted_modes)})" if self.modes else ""
+        modes: str = f"(?:{'|'.join(sorted_modes)})" if self.modes else ""
 
         sorted_channels: list[str] = sorted(self.channels)
-        channel: str = (
+        channels: str = (
             f"(?:{'|'.join(sorted_channels)})" if self.channels else ""
         )
 
-        return f"{mode}{channel}"
+        return f"{modes}{channels}"
 
     def get_suffix(self) -> str:
         """
@@ -511,24 +504,3 @@ class GOESProductLocator(ProductLocatorGG):
             The `datetime` truncated to the current hour.
         """
         return time.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    @abstractmethod
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the product locator settings after initialization to
-        ensure that the settings are consistent with the product
-        locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """

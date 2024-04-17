@@ -121,7 +121,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     SUPPORTED_VERSIONS: set[str] = {"v02r01"}
 
     def __init__(
-        self, version: str | list[str] = B1_PRODUCT_LATEST_VERSION
+        self, versions: str | list[str] = B1_PRODUCT_LATEST_VERSION
     ) -> None:
         """
         Initialise a GridSat-B1 imagery dataset product locator.
@@ -131,7 +131,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
 
         Parameters
         ----------
-        version : str | list[str], optional
+        versions : str | list[str], optional
             The version of the GridSat-B1 product; e.g., "v02r01". The
             version may be a single version or a list of versions. Only
             the latest version is available in the public repository.
@@ -142,10 +142,10 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         ValueError
             If the provided version is not supported or unavailable.
         """
-        if isinstance(version, str):
-            version = [version]
+        if isinstance(versions, str):
+            versions = [versions]
 
-        if unsupported_version := set(version) - set(self.SUPPORTED_VERSIONS):
+        if unsupported_version := set(versions) - set(self.SUPPORTED_VERSIONS):
             supported_versions: list[str] = sorted(self.SUPPORTED_VERSIONS)
             raise ValueError(
                 f"Unsupported version: {sorted(unsupported_version)}. "
@@ -154,16 +154,14 @@ class GridSatProductLocatorB1(GridSatProductLocator):
 
         super(GridSatProductLocatorB1, self).__init__(
             name=B1_PRODUCT_NAME,
-            origin=[],
-            version=version,
+            origins=[],
+            versions=versions,
             file_date_format=B1_FILE_DATE_FORMAT,
             file_date_pattern=B1_FILE_DATE_PATTERN,
             file_prefix=B1_FILE_PREFIX,
             path_date_format=B1_PATH_DATE_FORMAT,
             path_prefix=B1_PATH_PREFIX,
         )
-
-        self.validate_settings()
 
     def get_base_url(self, datasource: str) -> str:
         """
@@ -272,44 +270,4 @@ class GridSatProductLocatorB1(GridSatProductLocator):
         """
         return time.replace(
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0
-        )
-
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the product locator settings after initialization to
-        ensure that the settings are consistent with the product
-        locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_NAME: str = "B1"
-
-        assert self.name == PRODUCT_NAME, (
-            f"Invalid product name '{self.name}' for 'GridSat' dataset, "
-            f"expected '{PRODUCT_NAME}'"
-        )
-
-        # Indeed, GridSat-B1 data comes from different sources but the
-        # origin's ID is not used in the directory structure nor in the
-        # file names.
-        assert not self.origin, (
-            f"Invalid origin IDs {self.origin}. "
-            f"'GridSat-{PRODUCT_NAME}' products do not support origins."
         )

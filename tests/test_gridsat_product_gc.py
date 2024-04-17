@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from GOES_DL.dataset.gridsat import GridSatProductLocatorGC
+from ..GOES_DL.dataset.gridsat import GridSatProductLocatorGC
 
 
 class TestPassed(Exception):
@@ -21,8 +21,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
         # origins and versions.
         self.locator: GridSatProductLocatorGC = GridSatProductLocatorGC(
             scene=self._supported_scenes()[0],
-            origin=self._supported_origins(),
-            version=self._supported_versions(),
+            origins=self._supported_origins(),
+            versions=self._supported_versions(),
         )
         self.longMessage = True
 
@@ -31,8 +31,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
     ) -> None:
         self.locator: GridSatProductLocatorGC = GridSatProductLocatorGC(
             scene=scene or self._supported_scenes()[0],
-            origin=origin or self._supported_origins(),
-            version=version or self._supported_versions(),
+            origins=origin or self._supported_origins(),
+            versions=version or self._supported_versions(),
         )
 
     # ------------------------------------------------------------------
@@ -56,8 +56,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
                 with self.assertRaises(TestPassed):
                     GridSatProductLocatorGC(
                         scene=scene,
-                        origin=self._supported_origins(),
-                        version=self._supported_versions(),
+                        origins=self._supported_origins(),
+                        versions=self._supported_versions(),
                     )
                     raise TestPassed()
 
@@ -67,8 +67,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     GridSatProductLocatorGC(
                         scene=scene,
-                        origin=self._supported_origins(),
-                        version=self._supported_versions(),
+                        origins=self._supported_origins(),
+                        versions=self._supported_versions(),
                     )
 
     def test_init_supported_origins(self) -> None:
@@ -77,8 +77,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
                 with self.assertRaises(TestPassed):
                     GridSatProductLocatorGC(
                         scene=self._supported_scenes()[0],
-                        origin=origin,
-                        version=self._supported_versions(),
+                        origins=origin,
+                        versions=self._supported_versions(),
                     )
                     raise TestPassed()
 
@@ -88,8 +88,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     GridSatProductLocatorGC(
                         scene=self._supported_scenes()[0],
-                        origin=origin,
-                        version=self._supported_versions(),
+                        origins=origin,
+                        versions=self._supported_versions(),
                     )
 
     def test_init_default_version(self) -> None:
@@ -97,7 +97,7 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
         with self.assertRaises(TestPassed):
             GridSatProductLocatorGC(
                 scene=self._supported_scenes()[0],
-                origin=self._supported_origins()[0],
+                origins=self._supported_origins()[0],
             )
             raise TestPassed()
 
@@ -107,8 +107,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
                 with self.assertRaises(TestPassed):
                     GridSatProductLocatorGC(
                         scene=self._supported_scenes()[0],
-                        origin=self._supported_origins()[0],
-                        version=version,
+                        origins=self._supported_origins()[0],
+                        versions=version,
                     )
                     raise TestPassed()
 
@@ -118,8 +118,8 @@ class TestGridSatProductLocatorGC(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     GridSatProductLocatorGC(
                         scene=self._supported_scenes()[0],
-                        origin=self._supported_origins()[0],
-                        version=version,
+                        origins=self._supported_origins()[0],
+                        versions=version,
                     )
 
     def test_get_base_url_supported_datasources(self) -> None:

@@ -38,46 +38,6 @@ class GOESProductLocatorRad(GOESProductLocatorPrimary):
             name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the ABI primary product locator settings after
-        initialization to ensure that the settings are consistent with
-        the product locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_NAME: str = "Rad"
-        PRODUCT_LEVEL: str = "L1b"
-
-        assert (
-            self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
-
-        assert self.level == PRODUCT_LEVEL, (
-            f"Invalid level '{self.level}' "
-            f"for primary ABI product '{PRODUCT_NAME}', "
-            f"expected '{PRODUCT_LEVEL}'"
-        )
-
-        super(GOESProductLocatorRad, self).validate_settings()
-
 
 class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
     """
@@ -116,46 +76,6 @@ class GOESProductLocatorCMIP(GOESProductLocatorPrimary):
             name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the ABI primary product locator settings after
-        initialization to ensure that the settings are consistent with
-        the product locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_NAME: str = "CMIP"
-        PRODUCT_LEVEL: str = "L2"
-
-        assert (
-            self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
-
-        assert self.level == PRODUCT_LEVEL, (
-            f"Invalid level '{self.level}' "
-            f"for primary ABI product '{PRODUCT_NAME}', "
-            f"expected '{PRODUCT_LEVEL}'"
-        )
-
-        super(GOESProductLocatorCMIP, self).validate_settings()
-
 
 class GOESProductLocatorDMW(GOESProductLocatorPrimary):
     """
@@ -190,51 +110,6 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
         """
         PRODUCT_NAME: str = "DMW"
 
-        super(GOESProductLocatorDMW, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
-        )
-
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the ABI primary product locator settings after
-        initialization to ensure that the settings are consistent with
-        the product locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_NAME: str = "DMW"
-        PRODUCT_LEVEL: str = "L2"
-
-        assert (
-            self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
-
-        assert self.level == PRODUCT_LEVEL, (
-            f"Invalid level '{self.level}' "
-            f"for primary ABI product '{PRODUCT_NAME}', "
-            f"expected '{PRODUCT_LEVEL}'"
-        )
-
-        # The following checks depend on user input and an exception
-        # should be raised if the user provides invalid values.
-
         M_CHANNELS: set[str] = {"C02"} | {f"C{id:02d}" for id in range(7, 11)}
         CF_CHANNELS: set[str] = {"C14"} | M_CHANNELS
         CF_SCENES: set[str] = {"C", "F"}
@@ -251,7 +126,9 @@ class GOESProductLocatorDMW(GOESProductLocatorPrimary):
                 f"Supported channels: {sorted(supported_channels)}"
             )
 
-        super(GOESProductLocatorDMW, self).validate_settings()
+        super(GOESProductLocatorDMW, self).__init__(
+            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
+        )
 
 
 class GOESProductLocatorDMWV(GOESProductLocatorPrimary):
@@ -289,51 +166,3 @@ class GOESProductLocatorDMWV(GOESProductLocatorPrimary):
             channels=PRODUCT_CHANNELS,
             origin=origin,
         )
-
-    def validate_settings(self) -> None:
-        """
-        Validate the product locator settings after initialization.
-
-        Validate the ABI primary product locator settings after
-        initialization to ensure that the settings are consistent with
-        the product locator's requirements and specifications.
-
-        Raises
-        ------
-        AssertionError
-            If the instrument or product internal settings are invalid.
-            I.e. when the settings do not represent user input and were
-            internally set by the class's or a subclass's constructor.
-        ValueError
-            If an unexpected or unsupported setting is required for an
-            instrument that does not support it. I.e. when the setting
-            depends on user input and the user provides invalid values.
-        """
-        # The following checks are assertions that should never fail
-        # since they are values internally set by the constructor and
-        # they do not represent user input. (I do not use global
-        # constants for the assertions here, otherwise these checks
-        # might always pass regardless of the actual values.)
-
-        PRODUCT_NAME: str = "DMWV"
-        PRODUCT_LEVEL: str = "L2"
-        PRODUCT_CHANNELS: set[str] = {"C08"}
-
-        assert (
-            self.name == PRODUCT_NAME
-        ), f"Invalid product name '{self.name}', expected '{PRODUCT_NAME}'"
-
-        assert self.level == PRODUCT_LEVEL, (
-            f"Invalid level '{self.level}' "
-            f"for primary ABI product '{PRODUCT_NAME}', "
-            f"expected '{PRODUCT_LEVEL}'"
-        )
-
-        assert set(self.channels).issubset(PRODUCT_CHANNELS), (
-            f"Unsupported channels {self.channels} "
-            f"for current scene '{self.scene}' of "
-            f"primary ABI product '{PRODUCT_NAME}'. "
-            f"Supported channels: {sorted(PRODUCT_CHANNELS)}"
-        )
-
-        super(GOESProductLocatorDMWV, self).validate_settings()
