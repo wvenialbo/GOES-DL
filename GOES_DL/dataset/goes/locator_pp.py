@@ -1,7 +1,7 @@
 from .locator_abi import GOESProductLocatorABI
 
 
-class GOESProductLocatorABIP(GOESProductLocatorABI):
+class GOESProductLocatorABIPP(GOESProductLocatorABI):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
@@ -77,7 +77,7 @@ class GOESProductLocatorABIP(GOESProductLocatorABI):
 
         level: str = LEVEL_RAD if name == PRODUCT_RAD else LEVEL_NOT_RAD
 
-        super(GOESProductLocatorABIP, self).__init__(
+        super(GOESProductLocatorABIPP, self).__init__(
             name=name,
             level=level,
             scene=scene,
@@ -86,7 +86,7 @@ class GOESProductLocatorABIP(GOESProductLocatorABI):
         )
 
 
-class GOESProductLocatorRad(GOESProductLocatorABIP):
+class GOESProductLocatorRad(GOESProductLocatorABIPP):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
@@ -124,7 +124,7 @@ class GOESProductLocatorRad(GOESProductLocatorABIP):
         )
 
 
-class GOESProductLocatorCMIP(GOESProductLocatorABIP):
+class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 

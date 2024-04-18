@@ -1,7 +1,7 @@
 from .locator_abi import GOESProductLocatorABI
 
 
-class GOESProductLocatorABID(GOESProductLocatorABI):
+class GOESProductLocatorABIDP(GOESProductLocatorABI):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
@@ -151,7 +151,7 @@ class GOESProductLocatorABID(GOESProductLocatorABI):
 
         PRODUCT_LEVEL: str = "L2"
 
-        super(GOESProductLocatorABID, self).__init__(
+        super(GOESProductLocatorABIDP, self).__init__(
             name=name,
             level=PRODUCT_LEVEL,
             scene=scene,
