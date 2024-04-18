@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from ..dataset import Product, ProductLocator
+from ..dataset import ProductLocator
 from ..datasource import Datasource
 from .constants import ISO_TIMESTAMP_FORMAT
 
@@ -173,7 +173,7 @@ class Downloader:
         file_objects: list[Any] = []
 
         for file in file_paths:
-            file_object = self.datasource.get_file(file)
+            file_object: Any = self.datasource.get_file(file)
             file_objects.append(file_object)
 
         return file_objects
@@ -205,10 +205,11 @@ class Downloader:
         """
         files_in_range: list[str] = []
 
-        product: Product = self.product_locator.get_product()
-
         for file in files:
-            ct = product.get_datetime(file)
+            if not self.product_locator.match(file):
+                continue
+
+            ct: datetime = self.product_locator.get_datetime(file)
 
             if datetime_ini <= ct <= datetime_fin:
                 files_in_range.append(file)
@@ -253,10 +254,14 @@ class Downloader:
         if not start_time:
             raise ValueError("start_time must be provided")
 
-        datetime_ini = datetime.strptime(start_time, self.date_format)
+        datetime_ini: datetime = datetime.strptime(
+            start_time, self.date_format
+        )
 
         if end_time:
-            datetime_fin = datetime.strptime(end_time, self.date_format)
+            datetime_fin: datetime = datetime.strptime(
+                end_time, self.date_format
+            )
         else:
             datetime_fin = datetime_ini
 
