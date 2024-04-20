@@ -155,7 +155,7 @@ class DatasourceAWS(DatasourceCached):
         folder_path: str = self.get_folder_path(file_path)
 
         try:
-            response = self.s3_client.get_object(
+            response: Any = self.s3_client.get_object(
                 Bucket=self.bucket_name, Key=folder_path
             )
             return response["Body"].read()
@@ -181,7 +181,7 @@ class DatasourceAWS(DatasourceCached):
         str
             The folder path.
         """
-        folder_url = url.join(self.base_url, dir_path)
+        folder_url: str = url.join(self.base_url, dir_path)
         url_parts: ParseResult = url.parse(folder_url)
 
         return url_parts.path[1:]
