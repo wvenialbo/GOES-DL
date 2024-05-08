@@ -34,6 +34,8 @@ class Downloader:
     date_format : str
         The date format specification. The default is the ISO timestamp
         format.
+    time_tolerance : int
+        The time tolerance in seconds. The default is 60 seconds.
 
     Methods
     -------
@@ -48,6 +50,13 @@ class Downloader:
     datasource: Datasource
     product_locator: ProductLocator
     date_format: str = ISO_TIMESTAMP_FORMAT
+    time_tolerance: int = 60
+
+    def __post_init__(self) -> None:
+        """
+        Validate the downloader object.
+        """
+        assert self.time_tolerance >= 0
 
     def get_files(self, start_time: str, end_time: str = "") -> list[Any]:
         """
@@ -269,8 +278,8 @@ class Downloader:
         # sooner or later to the user required times. To overcome this
         # issue, we subtract and add 60 seconds to the initial and final
         # datetimes, respectively.
-        datetime_ini -= timedelta(seconds=60)
-        datetime_fin += timedelta(seconds=60)
+        datetime_ini -= timedelta(seconds=self.time_tolerance)
+        datetime_fin += timedelta(seconds=self.time_tolerance)
 
         return datetime_ini, datetime_fin
 
