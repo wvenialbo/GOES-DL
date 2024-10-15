@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
@@ -215,7 +216,8 @@ class Downloader:
         files_in_range: list[str] = []
 
         for file in files:
-            if not self.product_locator.match(file):
+            basename: str = os.path.basename(file)
+            if not self.product_locator.match(basename):
                 continue
 
             ct: datetime = self.product_locator.get_datetime(file)
