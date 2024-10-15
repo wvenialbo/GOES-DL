@@ -503,4 +503,4 @@ class GOESProductLocator(ProductLocatorGG):
         datetime
             The `datetime` truncated to the current hour.
         """
-        return time.replace(hour=0, minute=0, second=0, microsecond=0)
+        return time.replace(minute=0, second=0, microsecond=0)
