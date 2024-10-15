@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from ..GOES_DL.dataset.gridsat import GridSatProductLocatorGC
+from GOES_DL.dataset.gridsat import GridSatProductLocatorGC
 
 
 class TestPassed(Exception):
