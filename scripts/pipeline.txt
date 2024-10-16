@@ -1,0 +1,153 @@
+Installation pipeline
+=====================
+make.ps1
+install.ps1
+
+
+Package requirements
+--------------------
+- Python 3.12.6
+- boto3==1.35.41                      # The AWS SDK for Python
+    botocore==1.35.41
+    jmespath==1.0.1
+    python-dateutil==2.9.0.post0
+    s3transfer==0.10.3
+    six==1.16.0
+    urllib3==2.2.3
+
+Dev packages
+------------
+setuptools==75.2.0
+build==1.2.2.post1
+  colorama==0.4.6
+  packaging==24.1
+  pyproject_hooks==1.2.0
+wheel==0.44.0
+pip-tools==7.4.1
+  click==8.1.7
+flake8==7.1.1                         # Source code checker
+  mccabe==0.7.0                       # Code complexity checker
+  pycodestyle==2.12.1                 # Style guide checker (~PEP 8)
+  pyflakes==3.2.0                     # Passive code checker
+black==24.10.0                        # Code formatter (WARN)
+  mypy-extensions==1.0.0              # Type system extensions for mypy
+  pathspec==0.12.1
+  platformdirs==4.3.6
+flake8-black==0.3.6                   # Call black as a code style validator
+pylint==3.3.1                         # Static code analysis
+  astroid==3.3.5
+  dill==0.3.9
+  isort==5.13.2                       # Sort Python imports (WARN)
+  tomlkit==0.13.2
+flake8-pylint==0.2.1                  # Run pylint
+flake8-isort==6.1.1                   # Integrate isort to Flake8
+mypy==1.12.0                          # Optional static typing
+  typing_extensions==4.12.2           # Backported and experimental type hints
+#flake8-mypy==17.8.0                   # Integrate mypy to Flake8 (ERROR)
+#  attrs==24.2.0
+bandit==1.7.10                        # Security oriented static code analyser
+  markdown-it-py==3.0.0
+  mdurl==0.1.2
+  pbr==6.1.0
+  Pygments==2.18.0
+  PyYAML==6.0.2
+  rich==13.9.2
+  stevedore==5.3.0
+flake8-bandit==4.1.1                  # Integrate bandit to Flake8
+eradicate==2.3.0                      # Removes commented-out code
+flake8-eradicate==1.5.0               # Integrate eradicate to Flake8
+  attrs==24.2.0
+flake8-bugbear==24.8.19               # Find likely bugs and design problems
+flake8-builtins==2.5.0                # Check for builtins being used as names
+#flake8-confusables==0.1.0             # Integrate confusables to Flake8 (ERROR)
+#  confusables==1.2.0                  # Check for ambiguous identifiers
+#  Cython==3.0.11
+flake8-comprehensions==3.15.0         # Help you write better comprehensions
+pep8-naming==0.14.1                   # Check PEP 8 naming conventions
+pydocstyle==6.3.0                     # Docstring style checker
+  snowballstemmer==2.2.0
+flake8-docstrings==1.7.0              # Integrate pydocstyle to Flake8
+flake8-docstrings-complete==1.3.0     # Checks docstrings are complete
+ruff==0.6.9                           # Fast linter and code formatter
+flake8-ruff==0.3.0                    # Integrate ruff to Flake8
+darglint2==1.8.2                      # Ensuring docstrings stay up to date
+jupyterlab==4.2.5
+  anyio==4.6.2.post1
+  argon2-cffi==23.1.0
+  argon2-cffi-bindings==21.2.0
+  arrow==1.3.0
+  asttokens==2.4.1
+  async-lru==2.0.4
+  babel==2.16.0
+  beautifulsoup4==4.12.3
+  bleach==6.1.0
+  certifi==2024.8.30
+  cffi==1.17.1
+  charset-normalizer==3.4.0
+  comm==0.2.2
+  debugpy==1.8.7
+  decorator==5.1.1
+  defusedxml==0.7.1
+  executing==2.1.0
+  fastjsonschema==2.20.0
+  fqdn==1.5.1
+  h11==0.14.0
+  httpcore==1.0.6
+  httpx==0.27.2
+  idna==3.10
+  ipykernel==6.29.5
+  ipython==8.28.0
+  isoduration==20.11.0
+  jedi==0.19.1
+  Jinja2==3.1.4
+  json5==0.9.25
+  jsonpointer==3.0.0
+  jsonschema==4.23.0
+  jsonschema-specifications==2024.10.1
+  jupyter-events==0.10.0
+  jupyter-lsp==2.2.5
+  jupyter_client==8.6.3
+  jupyter_core==5.7.2
+  jupyter_server==2.14.2
+  jupyter_server_terminals==0.5.3
+  jupyterlab_pygments==0.3.0
+  jupyterlab_server==2.27.3
+  MarkupSafe==3.0.1
+  matplotlib-inline==0.1.7
+  mistune==3.0.2
+  nbclient==0.10.0
+  nbconvert==7.16.4
+  nbformat==5.10.4
+  nest-asyncio==1.6.0
+  notebook_shim==0.2.4
+  overrides==7.7.0
+  pandocfilters==1.5.1
+  parso==0.8.4
+  prometheus_client==0.21.0
+  prompt_toolkit==3.0.48
+  psutil==6.0.0
+  pure_eval==0.2.3
+  pycparser==2.22
+  python-json-logger==2.0.7
+  pywin32==308
+  pywinpty==2.0.13
+  pyzmq==26.2.0
+  referencing==0.35.1
+  requests==2.32.3
+  rfc3339-validator==0.1.4
+  rfc3986-validator==0.1.1
+  rpds-py==0.20.0
+  Send2Trash==1.8.3
+  sniffio==1.3.1
+  soupsieve==2.6
+  stack-data==0.6.3
+  terminado==0.18.1
+  tinycss2==1.3.0
+  tornado==6.4.1
+  traitlets==5.14.3
+  types-python-dateutil==2.9.0.20241003
+  uri-template==1.3.0
+  wcwidth==0.2.13
+  webcolors==24.8.0
+  webencodings==0.5.1
+  websocket-client==1.8.0

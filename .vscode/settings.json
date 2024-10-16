@@ -9,7 +9,7 @@
             "source.fixall.pylance": "explicit",
             "source.organizeImports": "explicit",
             "source.organizeImports.ruff": "never",
-            "source.unusedImports": "explicit"
+            "source.unusedImports": "explicit",
         },
         "editor.colorDecorators": true,
         "editor.defaultFormatter": "ms-python.black-formatter",
@@ -74,17 +74,17 @@
         ]
     },
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 10000,
+    "files.autoSaveDelay": 5000,
     "files.eol": "\n",
     "window.zoomLevel": -1,
     // Python linting tools settings
+    "flake8.importStrategy": "fromEnvironment",
     "flake8.interpreter": [
         "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     ],
     "flake8.args": [
         // "--per-file-ignores=__init__.py:F401",
-        // "--extend-ignore=D101,D102,,D104,D105,D107,E203,N802,N803,N806,S101,S301,S311,S403",
-        "--extend-ignore=D100,D103",
+        // "--extend-ignore=D100,D101,D102,D103,D104,D105,D107,E203,N802,N803,N806,S101,S301,S311,S403",
     ],
     "mypy-type-checker.args": [
         "--follow-imports=silent",
@@ -94,7 +94,7 @@
         "--check-untyped-defs",
     ],
     "pylint.args": [
-        "--disabe=C0116",
+        // "--disabe=C0116",
     ],
     // Python formatting tools settings
     "autopep8.args": [
@@ -140,8 +140,8 @@
     "python.analysis.completeFunctionParens": true,
     "python.analysis.enableSyncServer": false,
     "python.analysis.fixAll": [
-        "source.convertImportFormat",
-        "source.unusedImports"
+        // "source.convertImportFormat",
+        "source.unusedImports",
     ],
     "python.analysis.importFormat": "relative",
     "python.analysis.indexing": true,
@@ -160,7 +160,7 @@
         "-s",
         "./tests",
         "-p",
-        "test_*.py"
+        "test_*.py",
     ],
     "python.testing.unittestEnabled": true,
     "testing.showCoverageInExplorer": true,
@@ -182,7 +182,7 @@
         "Command Prompt": {
             "path": [
                 "${env:windir}\\Sysnative\\cmd.exe",
-                "${env:windir}\\System32\\cmd.exe"
+                "${env:windir}\\System32\\cmd.exe",
             ],
             "args": [],
             "icon": "terminal-cmd"
@@ -445,6 +445,7 @@
     ],
     // VSCode specifics settings
     "json.schemaDownload.enable": true,
-    "eslint.format.enable": true
+    "eslint.format.enable": true,
+    "black-formatter.importStrategy": "fromEnvironment",
     // End of settings.json
 }
