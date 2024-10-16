@@ -56,10 +56,30 @@ class DatasourceAWS(DatasourceCached):
     """
 
     @overload
-    def __init__(self, locator: ProductLocator) -> None: ...
+    def __init__(self, locator: ProductLocator) -> None:
+        """
+        Initialize the AWS S3 datasource with a ProductLocator.
+
+        Parameters
+        ----------
+        locator : ProductLocator
+            A `ProductLocator` object containing the base URL and an
+            optional region where the S3 bucket is located.
+        """
+        ...
 
     @overload
-    def __init__(self, locator: tuple[str, ...]) -> None: ...
+    def __init__(self, locator: tuple[str, ...]) -> None:
+        """
+        Initialize the AWS S3 datasource with a tuple of strings.
+
+        Parameters
+        ----------
+        locator : tuple[str, ...]
+            A tuple of strings containing the base URL and an optional
+            region where the S3 bucket is located.
+        """
+        ...
 
     def __init__(self, locator: ProductLocator | tuple[str, ...]) -> None:
         """
