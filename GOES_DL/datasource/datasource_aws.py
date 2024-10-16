@@ -54,7 +54,7 @@ class DatasourceAWS(DatasourceCached):
         If the bucket does not exist or the user has no access.
     """
 
-    def __init__(self, base_url: str) -> None:
+    def __init__(self, base_url: str, region: str | None = None) -> None:
         """
         Initialize the AWS S3 datasource.
 
@@ -62,6 +62,10 @@ class DatasourceAWS(DatasourceCached):
         ----------
         base_url : str
             The base URL of the AWS S3 bucket.
+        region : str, optional
+            The region where the S3 bucket is located. E.g. "us-west-1",
+            "us-east-1", "eu-west-1", etc. If None, the default region
+            is used.
 
         Raises
         ------
@@ -73,7 +77,7 @@ class DatasourceAWS(DatasourceCached):
         bucket_name: str = url_parts.netloc
         base_path: str = url_parts.path
 
-        self.s3_client: Any = self.get_client()
+        self.s3_client: Any = self.get_client(region)
 
         if not self.bucket_exists(bucket_name):
             raise ValueError(
@@ -111,22 +115,33 @@ class DatasourceAWS(DatasourceCached):
 
         return True
 
-    def get_client(self) -> Any:
+    def get_client(self, region: str | None) -> Any:
         """
         Get the AWS S3 client.
 
         Returns the AWS S3 client with the UNSIGNED signature version.
+
+        Parameters
+        ----------
+        region : str
+            The region where the S3 bucket is located. E.g. "us-west-1",
+            "us-east-1", "eu-west-1", etc. If None, the default region
+            is used.
 
         Returns
         -------
         Any
             The AWS S3 client.
         """
+        AWS_CLIENT: str = "s3"
+        if region:
+            return boto3.client(  # type: ignore
+                AWS_CLIENT,
+                region_name=region,
+                config=Config(signature_version=UNSIGNED),
+            )
         return boto3.client(  # type: ignore
-            "s3",
-            # region_name="eu-west-1",
-            # region_name="us-west-1",
-            # region_name="us-east-1",
+            AWS_CLIENT,
             config=Config(signature_version=UNSIGNED),
         )
 
@@ -181,7 +196,9 @@ class DatasourceAWS(DatasourceCached):
         str
             The folder path.
         """
-        folder_url: str = url.join(self.base_url, dir_path)
+        # url.join() fails with "s3://" URLs.
+        # folder_url: str = url.join(self.base_url, dir_path)
+        folder_url: str = self.base_url + dir_path
         url_parts: ParseResult = url.parse(folder_url)
 
         return url_parts.path[1:]
