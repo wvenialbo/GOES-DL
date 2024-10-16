@@ -11,7 +11,8 @@
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "${workspaceFolderBasename}.cbrpy",
+            "module": "${workspaceFolderBasename}.test",
+            "module": "test",
             "request": "launch",
             "type": "debugpy",
             "env": {
