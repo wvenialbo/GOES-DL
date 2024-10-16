@@ -59,26 +59,26 @@ class Downloader:
         """
         assert self.time_tolerance >= 0
 
-    def get_files(self, start_time: str, end_time: str = "") -> list[Any]:
+    def get_files(self, *, start: str, end: str = "") -> list[Any]:
         """
         Get the files from the datasource.
 
         Get the files from the datasource that match the timestamps
-        between `start_time` and `end_time`, inclusive. The list is
-        filtered by the timestamps of the files; only files in the
-        requested range are returned.
+        between `start` and `end` times, inclusive. The list is filtered
+        by the timestamps of the files; only files in the requested
+        range are returned.
 
-        Note that `start_time` must be always provided. An offset of 60
+        Note that `start` must be always provided. An offset of 60
         seconds is added to the initial datetime and subtracted from the
         final datetime to account for possible differences in the files'
         timestamps.
 
         Parameters
         ----------
-        start_time : str
+        start : str
             The start time in the format specified by the date_format
             attribute.
-        end_time : str, optional
+        end : str, optional
             The end time in the format specified by the date_format
             attribute. The default is "", in which case `end_time` is
             set equal to `start_time`.
@@ -91,16 +91,16 @@ class Downloader:
         Raises
         ------
         ValueError
-            If the start_time is not provided. The framework raises
-            an exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification
-            is ill-formed (which is, indeed, a bug!).
+            If the start_time is not provided. The framework raises an
+            exception if the provided timestamps do not match the
+            expected format or if the timestamp format specification is
+            ill-formed (which is, indeed, a bug!).
         RuntimeError
             The framework may raise if the file cannot be retrieved,
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        files_in_range: list[str] = self.get_file_list(start_time, end_time)
+        files_in_range: list[str] = self.get_file_list(start, end)
 
         return self.retrieve_files(files_in_range)
 
