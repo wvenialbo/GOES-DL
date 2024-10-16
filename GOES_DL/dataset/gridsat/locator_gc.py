@@ -211,7 +211,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
             path_prefix=GOES_PATH_PREFIX,
         )
 
-    def get_base_url(self, datasource: str) -> str:
+    def get_base_url(self, datasource: str) -> tuple[str, ...]:
         """
         Get the base URL for the GridSat-GOES/CONUS dataset's products.
 
@@ -221,7 +221,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
         Parameters
         ----------
-        datasource : str
+        datasource : tuple[str, ...]
             The datasource identifier. This parameter is used to
             determine the base URL for the dataset's products. The only
             available datasource is 'NOAA'. No datasource is supported
@@ -247,7 +247,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
                 f"Supported datasources: {supported_datasources}"
             )
 
-        return self.AVAILABLE_DATASOURCES[datasource]
+        return (self.AVAILABLE_DATASOURCES[datasource],)
 
     def next_time(self, current_time: datetime) -> datetime:
         """
