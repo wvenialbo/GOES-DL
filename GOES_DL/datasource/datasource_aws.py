@@ -1,8 +1,9 @@
-from typing import Any
+from typing import Any, overload
 
 import boto3  # type: ignore
 from botocore.client import UNSIGNED, ClientError, Config  # type: ignore
 
+from ..dataset import ProductLocator
 from ..utils.url import ParseResult, url
 from .datasource_cached import DatasourceCached
 
@@ -54,24 +55,36 @@ class DatasourceAWS(DatasourceCached):
         If the bucket does not exist or the user has no access.
     """
 
-    def __init__(self, base_url: str, region: str | None = None) -> None:
+    @overload
+    def __init__(self, locator: ProductLocator) -> None: ...
+
+    @overload
+    def __init__(self, locator: tuple[str, ...]) -> None: ...
+
+    def __init__(self, locator: ProductLocator | tuple[str, ...]) -> None:
         """
         Initialize the AWS S3 datasource.
 
         Parameters
         ----------
-        base_url : str
-            The base URL of the AWS S3 bucket.
-        region : str, optional
-            The region where the S3 bucket is located. E.g. "us-west-1",
-            "us-east-1", "eu-west-1", etc. If None, the default region
-            is used.
+        locator : ProductLocator | tuple[str, ...]
+            A `ProductLocator` object or a tuple of strings containing
+            the base URL and an optional region where the S3 bucket is
+            located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
+            None, the default region is used.
 
         Raises
         ------
         ValueError
             If the bucket does not exist or the user has no access.
         """
+        base_url: str
+        region: str | None
+        if isinstance(locator, ProductLocator):
+            (base_url, region) = locator.get_base_url("AWS")
+        else:
+            (base_url, region) = locator
+
         url_parts: ParseResult = url.parse(base_url)
 
         bucket_name: str = url_parts.netloc

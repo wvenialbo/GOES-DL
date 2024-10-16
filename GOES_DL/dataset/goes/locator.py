@@ -221,7 +221,7 @@ class GOESProductLocator(ProductLocatorGG):
         self.channels: list[str] = channels
         self.origin: str = origin
 
-    def get_base_url(self, datasource: str) -> str:
+    def get_base_url(self, datasource: str) -> tuple[str, ...]:
         """
         Get the base URL for the GOES-R Series dataset's products.
 
@@ -270,7 +270,7 @@ class GOESProductLocator(ProductLocatorGG):
             "AWS": f"s3://noaa-{satellite}/{product}/"
         }
 
-        return AVAILABLE_DATASOURCES[datasource]
+        return (AVAILABLE_DATASOURCES[datasource], "")
 
     def get_date_format(self) -> str:
         """

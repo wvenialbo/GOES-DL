@@ -56,25 +56,28 @@ class ProductLocator(ABC):
     """
 
     @abstractmethod
-    def get_base_url(self, datasource: str) -> str:
+    def get_base_url(self, datasource: str) -> tuple[str, ...]:
         """
         Get the base URL for the dataset's products.
 
-        This method returns the base URL for the dataset's products.
-        The base URL is used to construct the full URL to the dataset's
+        This method returns the base URL for the dataset's products. The
+        base URL is used to construct the full URL to the dataset's
         product files.
 
         Parameters
         ----------
         datasource : str
             The datasource identifier. This parameter is used to
-            determine the base URL for the dataset's products.
-            E.g. 'AWS', 'GCP', 'NOAA'.
+            determine the base URL for the dataset's products. E.g.
+            'AWS', 'GCP', 'NOAA'.
 
         Returns
         -------
-        str:
-            The base URL for the dataset's products.
+        tuple[str, ...]:
+            A tuple where the first element is the base URL for the
+            dataset's products. Additional elements may be included if
+            the dataset is distributed across multiple sources or the
+            datasource requires additional information.
         """
 
     @abstractmethod

@@ -8,21 +8,21 @@ from GOES_DL.downloader import Downloader
 DATE_FORMAT = "%Y-%m-%dT%H:%M%z"
 
 
-def test(dl: Downloader, start_time: str, end_time: str = "") -> list[Any]:
-    if end_time:
-        print(f"Downloading data from {start_time} to {end_time}")
+def test(dl: Downloader, start: str, end: str = "") -> list[Any]:
+    if end:
+        print(f"Downloading data from {start} to {end}")
     else:
-        print(f"Downloading data from {start_time}")
+        print(f"Downloading data from {start}")
 
-    files: list[Any] = dl.get_files(start_time, end_time)
+    files: list[Any] = dl.get_files(start=start, end=end)
 
     return files
 
 
 def test_gridsat() -> None:
     pd = ProductLocatorB1()
-    ds = Datasource(pd.get_base_url("AWS"))
-    dl = Downloader(datasource=ds, product_locator=pd, date_format=DATE_FORMAT)
+    ds = Datasource(pd)
+    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
 
     test(dl, "1980-01-01T00:00+0000")
     test(dl, "1980-01-01T00:00+0000", "1980-01-01T06:00+0000")
@@ -35,7 +35,7 @@ def test_gridsat() -> None:
 def test_goes() -> None:
     pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
     ds = Datasource(pd.get_base_url("AWS"))
-    dl = Downloader(datasource=ds, product_locator=pd, date_format=DATE_FORMAT)
+    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
 
     test(dl, "2024-08-23T00:00+0000")
 

@@ -163,7 +163,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
             path_prefix=B1_PATH_PREFIX,
         )
 
-    def get_base_url(self, datasource: str) -> str:
+    def get_base_url(self, datasource: str) -> tuple[str, ...]:
         """
         Get the base URL for the GridSat-B1 imagery dataset's products.
 
@@ -199,7 +199,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
                 f"Supported datasources: {supported_datasources}"
             )
 
-        return self.AVAILABLE_DATASOURCES[datasource]
+        return (self.AVAILABLE_DATASOURCES[datasource], "")
 
     def next_time(self, current_time: datetime) -> datetime:
         """
