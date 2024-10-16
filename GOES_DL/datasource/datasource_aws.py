@@ -229,8 +229,8 @@ class DatasourceAWS(DatasourceCached):
         str
             The folder path.
         """
-        # url.join() fails with "s3://" URLs.
-        # folder_url: str = url.join(self.base_url, dir_path)
+        # BUG: url.join() fails with "s3://" URLs.
+        # > folder_url: str = url.join(self.base_url, dir_path)
         folder_url: str = self.base_url + dir_path
         url_parts: ParseResult = url.parse(folder_url)
 
