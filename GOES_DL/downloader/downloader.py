@@ -49,7 +49,7 @@ class Downloader:
     """
 
     datasource: Datasource
-    product_locator: ProductLocator
+    locator: ProductLocator
     date_format: str = ISO_TIMESTAMP_FORMAT
     time_tolerance: int = 60
 
@@ -146,9 +146,7 @@ class Downloader:
         datetime_fin: datetime
         datetime_ini, datetime_fin = self._get_datetimes(start_time, end_time)
 
-        paths: list[str] = self.product_locator.get_paths(
-            datetime_ini, datetime_fin
-        )
+        paths: list[str] = self.locator.get_paths(datetime_ini, datetime_fin)
 
         files: list[str] = self._retrieve_directory_content(paths)
 
@@ -217,10 +215,10 @@ class Downloader:
 
         for file in files:
             basename: str = os.path.basename(file)
-            if not self.product_locator.match(basename):
+            if not self.locator.match(basename):
                 continue
 
-            ct: datetime = self.product_locator.get_datetime(file)
+            ct: datetime = self.locator.get_datetime(file)
 
             if datetime_ini <= ct <= datetime_fin:
                 files_in_range.append(file)
