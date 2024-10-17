@@ -110,12 +110,12 @@ class GridSatProductLocatorB1(GridSatProductLocator):
     AVAILABLE_DATASOURCES: dict[str, str] = {
         "AWS": "s3://noaa-cdr-gridsat-b1-pds/data/",
         "GCP": "gs://noaa-cdr-gridsat-b1/data/",
-        "NOAA": "https://www.ncei.noaa.gov/data/geostationary-ir-"
+        "HTTP": "https://www.ncei.noaa.gov/data/geostationary-ir-"
         "channel-brightness-temperature-gridsat-b1/access/",
     }
 
     # Supported datasources of the GridSat-B1 dataset Products:
-    SUPPORTED_DATASOURCES: set[str] = {"AWS"}
+    SUPPORTED_DATASOURCES: set[str] = {"AWS", "HTTP"}
 
     # Supported versions of the GridSat-B1 dataset Products:
     SUPPORTED_VERSIONS: set[str] = {"v02r01"}

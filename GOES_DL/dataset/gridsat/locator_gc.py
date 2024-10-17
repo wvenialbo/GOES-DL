@@ -120,7 +120,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
     # Base URLs for the available datasources of the GridSat-GOES/CONUS
     # imagery dataset products:
     AVAILABLE_DATASOURCES: dict[str, str] = {
-        "NOAA": "https://www.ncei.noaa.gov/data/gridsat-goes/access/",
+        "HTTP": "https://www.ncei.noaa.gov/data/gridsat-goes/access/",
     }
 
     # Supported datasources of the GridSat-GOES/CONUS imagery dataset
