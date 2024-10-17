@@ -8,10 +8,11 @@ $devs = 'flake8', 'black', 'pylint', 'mypy', 'bandit', 'ruff', 'eradicate', `
         'pydocstyle', 'flake8-black', 'flake8-pylint', 'flake8-isort', `
         'flake8-bandit', 'flake8-eradicate', 'flake8-bugbear', 'darglint2', `
         'flake8-builtins', 'flake8-comprehensions', 'flake8-docstrings', `
-        'pep8-naming', 'flake8-docstrings-complete', 'flake8-ruff', 'jupyterlab'
+        'pep8-naming', 'flake8-docstrings-complete', 'flake8-ruff', `
+        'flake8-pyproject', 'flake8-annotations', 'jupyterlab'
         # 'flake8-mypy', 'flake8-confusables'
 
-$tool = 'pip', 'setuptools', 'build', 'wheel', 'pip-tools'
+$tool = 'pip', 'setuptools', 'build', 'wheel', 'pip-tools', 'findpydeps'
 
 python --version
 python -m pip --version

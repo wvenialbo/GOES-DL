@@ -14,20 +14,20 @@ pip install findpydeps --upgrade
 
 # Get the list of installed packages >> 'installed.txt'
 
-$installed_pkgs = 'installed.txt'
+$installed_txt = 'installed.txt'
 
-pip freeze > $installed_pkgs
+pip freeze > $installed_txt
 
 # Extract required packages from source code >> 'required.txt'
 
-$required_pkgs = 'required.txt'
+$required_txt = 'required.txt'
 
-findpydeps -l -i $project > $required_pkgs
+findpydeps -l -i $project > $required_txt
 
 # Read the content of 'required.txt' and 'installed.txt' into arrays
 
-$required = Get-Content -Path $required_pkgs
-$installed = Get-Content -Path $installed_pkgs
+$required = Get-Content -Path $required_txt
+$installed = Get-Content -Path $installed_txt
 
 # Replace underscores with dashes in 'required.txt'
 
@@ -42,7 +42,7 @@ $required = $required -replace 'sklearn', 'scikit-learn'
 
 # Create two empty arrays for 'requirements.txt' and 'requirements-dev.txt'
 
-$required_prod = @()
+$required_prj = @()
 
 $required_dev = @()
 
@@ -60,7 +60,7 @@ foreach ($line in $installed) {
 
         # Add to 'requirements.txt'
 
-        $required_prod += $line + "`n"
+        $required_prj += $line + "`n"
 
     }
     else {
@@ -77,15 +77,16 @@ foreach ($line in $installed) {
 # Replace '==' with '~=' for backward-compatibility in 'requirements.txt'
 #           or with '>=' for forward compatibility in 'requirements-dev.txt'
 
-$requirements = 'requirements.prj'
+# Just pin the current version of the package in 'requirements.txt'
+$requirements_prj = 'requirements.prj'
 $requirements_dev = 'requirements.dev'
 
-$required_prod.Replace('==', '~=') | Set-Content -NoNewline -Path $requirements
+$required_prj.Replace('==', '~=') | Set-Content -NoNewline -Path $requirements_prj
 $required_dev.Replace('==', '>=') | Set-Content -NoNewline -Path $requirements_dev
 
 # Clean up auxiliary files
 
-$files = $required_pkgs, $installed_pkgs
+$files = $required_txt, $installed_txt
 
 Foreach ($file in $files) {
     If (Test-Path $file) {
