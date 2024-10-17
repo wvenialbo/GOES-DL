@@ -1,3 +1,12 @@
+"""
+This module provides an abstract class for a cached datasource.
+
+The DatasourceCached class is an abstract class for a datasource that
+caches the file list of the directory. The cache is used to avoid
+unnecessary requests to the server and should be cleared when the
+directory is modified.
+"""
+
 from abc import abstractmethod
 
 from .datasource import Datasource
@@ -38,7 +47,6 @@ class DatasourceCached(Datasource):
             datasource is located. The base URL is used to build the
             full URL to the files and directories.
         """
-
         super().__init__(base_url)
 
         self.cached: dict[str, list[str]] = {}
@@ -70,8 +78,7 @@ class DatasourceCached(Datasource):
 
             raise ValueError(f"Folder '{dir_path}' not found in cache.")
 
-        else:
-            self.cached.clear()
+        self.cached.clear()
 
     @abstractmethod
     def get_folder_path(self, dir_path: str) -> str:
@@ -91,4 +98,3 @@ class DatasourceCached(Datasource):
         str
             The folder path.
         """
-        ...

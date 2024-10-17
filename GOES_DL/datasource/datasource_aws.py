@@ -1,3 +1,11 @@
+"""
+This module provides the DatasourceAWS class for interacting with AWS S3.
+
+The DatasourceAWS class abstracts an AWS S3 datasource object, allowing
+for listing the contents of a directory in a remote location and for
+downloading files from that location.
+"""
+
 from typing import Any, overload
 
 import boto3  # type: ignore
@@ -6,6 +14,8 @@ from botocore.client import UNSIGNED, ClientError, Config  # type: ignore
 from ..dataset import ProductLocator
 from ..utils.url import ParseResult, url
 from .datasource_cached import DatasourceCached
+
+AWS_CLIENT: str = "s3"
 
 
 class DatasourceAWS(DatasourceCached):
@@ -66,7 +76,6 @@ class DatasourceAWS(DatasourceCached):
             A `ProductLocator` object containing the base URL and an
             optional region where the S3 bucket is located.
         """
-        ...
 
     @overload
     def __init__(self, locator: tuple[str, ...]) -> None:
@@ -79,7 +88,6 @@ class DatasourceAWS(DatasourceCached):
             A tuple of strings containing the base URL and an optional
             region where the S3 bucket is located.
         """
-        ...
 
     def __init__(self, locator: ProductLocator | tuple[str, ...]) -> None:
         """
@@ -108,22 +116,19 @@ class DatasourceAWS(DatasourceCached):
         url_parts: ParseResult = url.parse(base_url)
 
         bucket_name: str = url_parts.netloc
-        base_path: str = url_parts.path
 
-        self.s3_client: Any = self.get_client(region)
+        self.s3_client: Any = self._get_client(region)
 
-        if not self.bucket_exists(bucket_name):
+        if not self._bucket_exists(bucket_name):
             raise ValueError(
-                f"Bucket '{bucket_name}' does not exist "
-                "or you have no access."
+                f"Bucket '{bucket_name}' does not exist or you have no access."
             )
 
         super().__init__(base_url)
 
         self.bucket_name: str = bucket_name
-        self.base_path: str = base_path
 
-    def bucket_exists(self, bucket_name: str) -> bool:
+    def _bucket_exists(self, bucket_name: str) -> bool:
         """
         Check if the bucket exists.
 
@@ -148,7 +153,7 @@ class DatasourceAWS(DatasourceCached):
 
         return True
 
-    def get_client(self, region: str | None) -> Any:
+    def _get_client(self, region: str | None) -> Any:
         """
         Get the AWS S3 client.
 
@@ -166,7 +171,6 @@ class DatasourceAWS(DatasourceCached):
         Any
             The AWS S3 client.
         """
-        AWS_CLIENT: str = "s3"
         if region:
             return boto3.client(  # type: ignore
                 AWS_CLIENT,
@@ -212,6 +216,14 @@ class DatasourceAWS(DatasourceCached):
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
             raise RuntimeError(message) from exc
 
+    @staticmethod
+    def _url_join(head: str, tail: str) -> str:
+        if head.endswith("/") and tail.startswith("/"):
+            head = head[:-1]
+        if not head.endswith("/") and not tail.startswith("/"):
+            return head + "/" + tail
+        return head + tail
+
     def get_folder_path(self, dir_path: str) -> str:
         """
         Get the folder path.
@@ -231,7 +243,7 @@ class DatasourceAWS(DatasourceCached):
         """
         # BUG: url.join() fails with "s3://" URLs.
         # > folder_url: str = url.join(self.base_url, dir_path)
-        folder_url: str = self.base_url + dir_path
+        folder_url: str = self._url_join(self.base_url, dir_path)
         url_parts: ParseResult = url.parse(folder_url)
 
         return url_parts.path[1:]
@@ -256,6 +268,7 @@ class DatasourceAWS(DatasourceCached):
         """
         folder_path: str = self.get_folder_path(dir_path)
 
+        # TODO: Implement caching or repository in a separate module.
         if folder_path in self.cached:
             return self.cached[folder_path]
 
@@ -286,7 +299,7 @@ class DatasourceAWS(DatasourceCached):
 
         return file_list
 
-    def object_exists(self, bucket_name: str, object_path: str) -> bool:
+    def _object_exists(self, bucket_name: str, object_path: str) -> bool:
         """
         Check if the object exists.
 
