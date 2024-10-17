@@ -204,7 +204,7 @@ class DatasourceAWS(DatasourceCached):
         RuntimeError
             If the file cannot be retrieved.
         """
-        folder_path: str = self.get_folder_path(file_path)
+        folder_path: str = self.get_item_path(file_path)
 
         try:
             response: Any = self.s3_client.get_object(
@@ -224,7 +224,7 @@ class DatasourceAWS(DatasourceCached):
             return head + "/" + tail
         return head + tail
 
-    def get_folder_path(self, dir_path: str) -> str:
+    def get_item_path(self, dir_path: str) -> str:
         """
         Get the folder path.
 
@@ -270,7 +270,7 @@ class DatasourceAWS(DatasourceCached):
         if dir_path in self.cached:
             return self.cached[dir_path]
 
-        folder_path: str = self.get_folder_path(dir_path)
+        folder_path: str = self.get_item_path(dir_path)
 
         paginator: Any = self.s3_client.get_paginator("list_objects_v2")
         pages: Any = paginator.paginate(
