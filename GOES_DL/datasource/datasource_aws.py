@@ -266,11 +266,11 @@ class DatasourceAWS(DatasourceCached):
         list[str]
             A list of file names in the directory.
         """
-        folder_path: str = self.get_folder_path(dir_path)
-
         # TODO: Implement caching or repository in a separate module.
-        if folder_path in self.cached:
-            return self.cached[folder_path]
+        if dir_path in self.cached:
+            return self.cached[dir_path]
+
+        folder_path: str = self.get_folder_path(dir_path)
 
         paginator: Any = self.s3_client.get_paginator("list_objects_v2")
         pages: Any = paginator.paginate(
@@ -295,7 +295,7 @@ class DatasourceAWS(DatasourceCached):
             if obj["Size"] > 0
         )
 
-        self.cached[folder_path] = file_list
+        self.cached[dir_path] = file_list
 
         return file_list
 

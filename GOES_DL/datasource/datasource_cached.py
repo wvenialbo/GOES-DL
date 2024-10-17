@@ -7,8 +7,6 @@ unnecessary requests to the server and should be cleared when the
 directory is modified.
 """
 
-from abc import abstractmethod
-
 from .datasource import Datasource
 
 
@@ -69,32 +67,11 @@ class DatasourceCached(Datasource):
         ValueError
             If the folder is not found in the cache.
         """
-        if dir_path:
-            folder_path: str = self.get_folder_path(dir_path)
-
-            if folder_path in self.cached:
-                self.cached.pop(folder_path, None)
-                return
-
+        if not dir_path:
             raise ValueError(f"Folder '{dir_path}' not found in cache.")
 
+        if dir_path in self.cached:
+            self.cached.pop(dir_path, None)
+            return
+
         self.cached.clear()
-
-    @abstractmethod
-    def get_folder_path(self, dir_path: str) -> str:
-        """
-        Get the folder path.
-
-        Get the folder path from the base URL and the directory path.
-
-        Parameters
-        ----------
-        dir_path : str
-            The path to the directory. The path is relative to the base
-            URL.
-
-        Returns
-        -------
-        str
-            The folder path.
-        """
