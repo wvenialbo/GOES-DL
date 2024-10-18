@@ -1,16 +1,27 @@
 ##
-## Update the dependency lists
+## Find the project dependencies and create/update requirements.txt
 ##
 
-param ($project = '.')
+$venv = '.venv'
 
-# Activate the environment
+$project = $args[0]
 
-& ./.venv/Scripts/Activate.ps1
+if (-not $project) {
+    Write-Host "Usage: find-deps.ps1 <project>"
+    Write-Host ""
+    Write-Host "  project: the path to the project"
+    Write-Host ""
+    exit
+}
 
-# Install/Update the `findpydeps` tool package
+# Activate the environment if it is not active
 
-pip install findpydeps --upgrade
+$isVirtualEnvActive = $true
+
+if (-not $env:VIRTUAL_ENV) {
+    $isVirtualEnvActive = $false
+    & $venv/Scripts/Activate.ps1
+}
 
 # Get the list of installed packages >> 'installed.txt'
 
@@ -36,20 +47,19 @@ $required = $required -replace '_', '-'
 # Treat known special cases in 'required.txt':
 #   - replace `cv2` with `opencv-python-*`
 #   - replace `sklearn` with `scikit-learn`
+#   - remove `botocore` wich comes with `boto3`
 
 $required = $required -replace 'cv2', 'opencv-python-headless'
 $required = $required -replace 'sklearn', 'scikit-learn'
+$required = $required -replace "botocore", ""
 
-# Create two empty arrays for 'requirements.txt' and 'requirements-dev.txt'
+# Create two empty arrays for 'requirements.prj' and 'requirements.dev'
 
 $required_prj = @()
-
-$required_dev = @()
 
 # Loop through each line in 'installed.txt'
 
 foreach ($line in $installed) {
-
     # Split the package name from the version string
 
     $packageName = $line.Split('==')[0]
@@ -63,26 +73,16 @@ foreach ($line in $installed) {
         $required_prj += $line + "`n"
 
     }
-    else {
-
-        # Add to 'requirements-dev.txt'
-
-        $required_dev += $line + "`n"
-
-    }
 }
 
-# Write the results to separate text files:
-#
-# Replace '==' with '~=' for backward-compatibility in 'requirements.txt'
-#           or with '>=' for forward compatibility in 'requirements-dev.txt'
+$requirements_txt = 'requirements.txt'
 
-# Just pin the current version of the package in 'requirements.txt'
-$requirements_prj = 'requirements.prj'
-$requirements_dev = 'requirements.dev'
+# Pin the current version of the packages...
+# $required_prj | Set-Content -NoNewline -Path $requirements_txt
 
-$required_prj.Replace('==', '~=') | Set-Content -NoNewline -Path $requirements_prj
-$required_dev.Replace('==', '>=') | Set-Content -NoNewline -Path $requirements_dev
+# ... or replace '==' with '~=' for backward-compatibility
+#                  or with '>=' for forward compatibility
+$required_prj.Replace('==', '~=') | Set-Content -NoNewline -Path $requirements_txt
 
 # Clean up auxiliary files
 
@@ -92,4 +92,10 @@ Foreach ($file in $files) {
     If (Test-Path $file) {
         Remove-Item $file
     }
+}
+
+# Deactivate the environment if it was not active
+
+if (-not $isVirtualEnvActive) {
+    deactivate
 }

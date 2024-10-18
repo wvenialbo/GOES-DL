@@ -1,10 +1,8 @@
 ##
-## Start Jupyter Lab
+## Run unit tests with coverage
 ##
 
 $venv = '.venv'
-
-$nobrowser = $args[0]
 
 $isVirtualEnvActive = $true
 
@@ -13,12 +11,7 @@ if (-not $env:VIRTUAL_ENV) {
     & $venv/Scripts/Activate.ps1
 }
 
-if ($nobrowser) {
-    jupyter-lab --no-browser
-}
-else {
-    jupyter-lab
-}
+coverage run -m unittest discover .\tests
 
 if (-not $isVirtualEnvActive) {
     deactivate

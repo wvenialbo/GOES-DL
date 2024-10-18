@@ -1,29 +1,43 @@
+##
+## Install the project development requirements.dev
+##
+
 $venv = '.venv'
-$vers = 'version.txt'
-$reqs = 'installed.txt'
 
-Param($requirements='requirements.txt')
+$requirements_txt = $args[0]
 
-$tool = 'pip', 'pip-tools', 'setuptools', 'build'
+if (-not $requirements_txt) {
+    $requirements_txt = 'requirements.txt'
+}
+
+# Activate the environment if it is not active
+
+$isVirtualEnvActive = $true
+
+if (-not $env:VIRTUAL_ENV) {
+    $isVirtualEnvActive = $false
+    & $venv/Scripts/Activate.ps1
+}
+
+# Display the version of python and pip
 
 python --version
 python -m pip --version
 
-if (Test-Path -Path $venv) {
-    python -m venv --upgrade $venv
-    python -m venv --upgrade-deps $venv
+# Install the project development requirements.dev
+
+$requirements_dev = 'requirements.dev'
+
+python -m pip install --upgrade -r $requirements_dev
+
+# Install the project requirements.txt, if it exists
+
+if (Test-Path -Path $requirements_txt) {
+    python -m pip install --upgrade -r $requirements_txt
 }
-else {
-    python -m venv --copies $venv
+
+# Deactivate the environment if it was not active
+
+if (-not $isVirtualEnvActive) {
+    deactivate
 }
-
-& $venv/Scripts/Activate.ps1
-python -m pip install --upgrade $tool
-
-python -m pip install --upgrade -r $requirements
-
-python --version > $vers
-python -m pip --version >> $vers
-python -m pip freeze > $reqs
-
-deactivate

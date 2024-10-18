@@ -1,41 +1,44 @@
 ##
-## Build the package for deployment
+## Build a release package for deployment
 ##
 
-# To build a wheel:
-# .\pack.ps1 -Wheel
-#
-# To build a .tar.gz:
-# .\build.ps1
+$venv = '.venv'
 
-param (
-    [switch]$Wheel
-)
+$tool = $args[0]
 
-# Activate the environment
+if (-not $tool -or -not (($tool -eq 'build') -or ($tool -eq 'poetry') -or ($tool -eq 'wheel'))) {
+    Write-Host "Usage: build.ps1 [build|poetry|wheel]"
+    Write-Host ""
+    exit
+}
 
-& ./.venv/Scripts/Activate.ps1
+# Activate the environment if it is not active
+
+$isVirtualEnvActive = $true
+
+if (-not $env:VIRTUAL_ENV) {
+    $isVirtualEnvActive = $false
+    & $venv/Scripts/Activate.ps1
+}
 
 # Build the package based on user choice
 
-if ($Wheel) {
-
-    # Install/Update the `build` and `wheel` tools packages
-
-    pip install build wheel --upgrade
-
+if ($tool -eq 'wheel') {
     # Build the package as a wheel
 
     python -m build -n --wheel
-
-} else {
-
-    # Install/Update the `build` tool package
-
-    pip install build --upgrade
-
+}
+elseif ($tool -eq 'wheel') {
     # Build the package as a .tar.gz
 
     python -m build -n
+}
+elseif ($tool -eq 'poetry') {
+    poetry build -f sdist
+}
 
+# Deactivate the environment if it was not active
+
+if (-not $isVirtualEnvActive) {
+    deactivate
 }

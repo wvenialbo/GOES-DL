@@ -1,7 +1,18 @@
 Installation pipeline
 =====================
-make.ps1
-install.ps1
+init.ps1        # Initialize/update the project environment
+make.ps1        # Make the project development requirements.dev
+install.ps1     # Install the project development requirements.dev
+find-deps.ps1   # Find the project dependencies and create requirements.txt
+
+
+Environment management and maintenance
+======================================
+activate.ps1    # Activate the project environment
+deactivate      # Deactivate the project environment
+build.ps1       # Build a release package for deployment
+compile.ps1     # Build a release executable for deployment
+cleanup.ps1     # Clean the project environment (remove all installed packages)
 
 
 Package requirements
@@ -14,6 +25,7 @@ Package requirements
     s3transfer==0.10.3
     six==1.16.0
     urllib3==2.2.3
+
 
 Dev packages
 ------------
@@ -33,14 +45,14 @@ black==24.10.0                        # Code formatter (WARN)
   mypy-extensions==1.0.0              # Type system extensions for mypy
   pathspec==0.12.1
   platformdirs==4.3.6
-flake8-black==0.3.6                   # Call black as a code style validator
+-flake8-black==0.3.6                   # Call black as a code style validator
 pylint==3.3.1                         # Static code analysis
   astroid==3.3.5
   dill==0.3.9
   isort==5.13.2                       # Sort Python imports (WARN)
   tomlkit==0.13.2
-flake8-pylint==0.2.1                  # Run pylint
-flake8-isort==6.1.1                   # Integrate isort to Flake8
+-flake8-pylint==0.2.1                  # Run pylint
+-flake8-isort==6.1.1                   # Integrate isort to Flake8
 mypy==1.12.0                          # Optional static typing
   typing_extensions==4.12.2           # Backported and experimental type hints
 #flake8-mypy==17.8.0                   # Integrate mypy to Flake8 (ERROR)
@@ -53,7 +65,7 @@ bandit==1.7.10                        # Security oriented static code analyser
   PyYAML==6.0.2
   rich==13.9.2
   stevedore==5.3.0
-flake8-bandit==4.1.1                  # Integrate bandit to Flake8
+-flake8-bandit==4.1.1                  # Integrate bandit to Flake8
 eradicate==2.3.0                      # Removes commented-out code
 flake8-eradicate==1.5.0               # Integrate eradicate to Flake8
   attrs==24.2.0
@@ -67,9 +79,9 @@ pep8-naming==0.14.1                   # Check PEP 8 naming conventions
 pydocstyle==6.3.0                     # Docstring style checker
   snowballstemmer==2.2.0
 flake8-docstrings==1.7.0              # Integrate pydocstyle to Flake8
-flake8-docstrings-complete==1.3.0     # Checks docstrings are complete
+-flake8-docstrings-complete==1.3.0     # Checks docstrings are complete
 ruff==0.6.9                           # Fast linter and code formatter
-flake8-ruff==0.3.0                    # Integrate ruff to Flake8
+-flake8-ruff==0.3.0                    # Integrate ruff to Flake8
 darglint2==1.8.2                      # Ensuring docstrings stay up to date
 jupyterlab==4.2.5
   anyio==4.6.2.post1

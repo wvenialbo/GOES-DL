@@ -2,22 +2,42 @@
 ## Clean up the Python environment
 ##
 
-# Remove all packages installed with `pip`
+$venv = '.venv'
 
-# Activate the environment
+# Check if the environment exists, ensure we do not modify the system Python
 
-& ./.venv/Scripts/Activate.ps1
+if (Test-Path -Path $venv) {
+    # Activate the environment if it is not active
 
-# Get the list of installed packages >> 'uninstall.txt'
+    $isVirtualEnvActive = $true
 
-$uninstall = 'uninstall.txt'
+    if (-not $env:VIRTUAL_ENV) {
+        $isVirtualEnvActive = $false
+        & $venv/Scripts/Activate.ps1
+    }
+    
+    # Get the list of installed packages >> 'uninstall.txt'
+    
+    $uninstall = 'uninstall.txt'
+    
+    pip freeze > $uninstall
 
-pip freeze > $uninstall
+    # Remove all packages installed with `pip`
 
-# Uninstall packages by the `pip` tool
-
-pip uninstall -y -r $uninstall
-
-# Clean up auxiliary files
-
-Remove-Item $uninstall
+    if (Get-Content $uninstall) {
+        pip uninstall -y -r $uninstall
+    }
+    else {
+        Write-Warning "No packages to uninstall"
+    }
+    
+    # Clean up auxiliary files
+    
+    Remove-Item $uninstall
+    
+    # Deactivate the environment if it was not active
+    
+    if (-not $isVirtualEnvActive) {
+        deactivate
+    }
+}

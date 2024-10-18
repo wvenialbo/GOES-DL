@@ -1,20 +1,22 @@
 [build-system]
-requires = ["setuptools>=75.2.0", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+# requires = ["setuptools>=75.2.0", "setuptools-scm"]
+# build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "goes_dl"
 dynamic = ["version"]
 description = "Satellite data downloader for GOES and GridSat Datasets"
-readme = "README.md"
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.8"
-license = "MIT"
+license = { file = "LICENSE" }
 authors = [
     { name = "Waldemar Villamayor-Venialbo", email = "wvenialbo@fpuna.edu.py" },
 ]
 keywords = [
     "atmospheric science",
-    "enviromental data",
+    "environmental data",
     "meteorology",
     "multi-source",
     "satellite imagery",
@@ -51,10 +53,13 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Utilities",
 ]
-urls = [{ name = "Source", url = "https://github.com/wvenialbo/GOES-DL" }]
 dependencies = ["boto3~=1.35.42", "requests~=2.32.3"]
-entry-points = { "console_scripts" = ["goes-dl=goes-dl.__main__:main"] }
 
+[project.urls]
+Repository = "https://github.com/wvenialbo/GOES-DL"
+Issues = "https://github.com/wvenialbo/GOES-DL/issues"
+
+[tool]
 [tool.setuptools]
 include-package-data = true
 
@@ -721,3 +726,52 @@ redefining-builtins-modules = [
     "builtins",
     "io",
 ]
+[tool.mypy]
+
+# Introduce stricter options
+strict = true
+
+# Start off with these
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+# Getting these passing should be easy
+strict_concatenate = true
+strict_equality = true
+
+# Strongly recommend enabling this one as soon as you can
+check_untyped_defs = true
+
+# These shouldn't be too much additional work, but may be tricky to
+# get passing if you use a lot of untyped libraries
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_decorators = true
+
+# These next few are various gradations of forcing use of type annotations
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+
+# This one isn't too hard to get passing, but return on investment is lower
+no_implicit_reexport = true
+
+# This one can be tricky to get passing if you use a lot of untyped libraries
+warn_return_any = true
+[tool.poetry]
+name = "goes-dl"
+version = "0.1.0"
+description = "Satellite data downloader for GOES and GridSat Datasets"
+authors = ["Waldemar Villamayor-Venialbo"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+requests = "~=2.32.3"
+boto3 = "~=1.35.42"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.1"
+black = "^24.10.0"
