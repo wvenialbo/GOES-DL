@@ -64,7 +64,7 @@ Issues = "https://github.com/wvenialbo/GOES-DL/issues"
 include-package-data = true
 
 [tool.setuptools.dynamic]
-version = { attr = "goes_dl.__version__" }
+version = { attr = "GOES_DL.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["GOES_DL"]
