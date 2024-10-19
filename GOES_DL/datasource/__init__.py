@@ -1,5 +1,5 @@
 """
-This module contains the classes for the datasource objects.
+Contain the classes for the datasource objects.
 
 The datasource objects are responsible for listing the contents of a
 directory in a remote location and for downloading files from that
