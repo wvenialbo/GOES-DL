@@ -1,0 +1,210 @@
+{
+    "product": "retspy-radar",
+    "version": "1.0",
+    "client": {
+        "chunk_size": 1024,
+        "repository_path": "./"
+    },
+    "services": [
+        "sinarame",
+        "simepar"
+    ],
+    "timing": {
+        "wait_for_next_request": "PT1S",
+        "wait_for_next_authorization": "PT2S",
+        "scan_interval": "PT1M"
+    },
+    "sinarame": {
+        "metadata": {
+            "name": "SINARAME",
+            "description": "Sistema Nacional de Radares Meteorológicos",
+            "organization": "Servicio Meteorológico Nacional (SMN)",
+            "country": "Argentina",
+            "product": "Colmax"
+        },
+        "server": {
+            "base_url": "https://www.smn.gob.ar/",
+            "bypassed_url": "https://www.smn.gob.ar/radar/",
+            "radar_url": "http://200.16.116.35/radar/",
+            "inventory_url": "https://ws1.smn.gob.ar/v1/images/radar/",
+            "repository_url": "https://estaticos.smn.gob.ar/vmsr/radar/"
+        },
+        "station_groups": {
+            "mosaicos": [
+                "COMP_ARG",
+                "COMP_CEN",
+                "COMP_NOR"
+            ],
+            "norte": [
+                "PAR_240",
+                "PER_240",
+                "RMA1_240",
+                "RMA2_240",
+                "RMA3_240",
+                "RMA4_240",
+                "RMA5_240",
+                "RMA8_240",
+                "RMA11_240",
+                "RMA15_240"
+            ],
+            "centro": [
+                "PAR_240",
+                "PER_240",
+                "RMA1_240",
+                "RMA2_240",
+                "RMA6_240",
+                "RMA7_240",
+                "RMA8_240",
+                "RMA10_240",
+                "RMA12_240",
+                "RMA15_240"
+            ],
+            "sur": [
+                "ANG_240",
+                "RMA9_240"
+            ],
+            "retspy": [
+                "RMA3_240",
+                "RMA4_240",
+                "RMA5_240",
+                "RMA8_240"
+            ]
+        },
+        "stations": {
+            "ANG_240": {
+                "name": "Anguil (La Pampa)",
+                "lat": -36.53954849540453,
+                "lon": -63.98987921347703
+            },
+            "PAR_240": {
+                "name": "Paraná (Entre Ríos)",
+                "lat": -31.84847115491203,
+                "lon": -60.537147529755124
+            },
+            "PER_240": {
+                "name": "Pergamino (Buenos Aires)",
+                "lat": -33.94611598846878,
+                "lon": -60.56251857010105
+            },
+            "RMA1_240": {
+                "name": "Córdoba (Córdoba)",
+                "lat": -31.441121074640172,
+                "lon": -64.1919271572934
+            },
+            "RMA2_240": {
+                "name": "Ezeiza (Buenos Aires)",
+                "lat": -34.800741497568275,
+                "lon": -58.51565663293616
+            },
+            "RMA3_240": {
+                "name": "Las Lomitas (Formosa)",
+                "lat": -24.73003376914212,
+                "lon": -60.551664791087006
+            },
+            "RMA4_240": {
+                "name": "Resistencia (Chaco)",
+                "lat": -27.451625844454597,
+                "lon": -59.05100121260466
+            },
+            "RMA5_240": {
+                "name": "Bernardo de Irigoyen (Misiones)",
+                "lat": -26.27795763696331,
+                "lon": -53.67085936308859
+            },
+            "RMA6_240": {
+                "name": "Mar del Plata (Buenos Aires)",
+                "lat": -37.91282331797286,
+                "lon": -57.52770279009119
+            },
+            "RMA7_240": {
+                "name": "Neuquén (Neuquén)",
+                "lat": -38.803032436548925,
+                "lon": -68.14982233334665
+            },
+            "RMA8_240": {
+                "name": "Mercedes (Corrientes)",
+                "lat": -29.195821469913184,
+                "lon": -58.04468223243145
+            },
+            "RMA9_240": {
+                "name": "Río Grande (Tierra del Fuego)",
+                "lat": -53.78392224756485,
+                "lon": -67.74426844891154
+            },
+            "RMA10_240": {
+                "name": "Bahía Blanca (Buenos Aires)",
+                "lat": -38.73412020114079,
+                "lon": -62.16542600320446
+            },
+            "RMA11_240": {
+                "name": "Termas de Río Hondo (Santiago del Estero)",
+                "lat": -27.50258155975688,
+                "lon": -64.90591760478367
+            },
+            "RMA12_240": {
+                "name": "Las Grutas (Río Negro)",
+                "lat": -40.7719994150929,
+                "lon": -65.0760002500423
+            },
+            "RMA15_240": {
+                "name": "Patquía (La Rioja)",
+                "lat": -30.030959269847997,
+                "lon": -66.87629521523205
+            },
+            "COMP_ARG": {
+                "name": "Mosaico general (Argentina)",
+                "lat": 0.0,
+                "lon": 0.0
+            },
+            "COMP_CEN": {
+                "name": "Mosaico - región central (Argentina)",
+                "lat": 0.0,
+                "lon": 0.0
+            },
+            "COMP_NOR": {
+                "name": "Mosaico - región norte (Argentina)",
+                "lat": 0.0,
+                "lon": 0.0
+            }
+        }
+    },
+    "simepar": {
+        "metadata": {
+            "name": "SIMEPAR",
+            "description": "Sistema de Tecnologia e Monitoramento Ambiental do Paraná",
+            "organization": "Secretaria de Estado do Desenvolvimento Sustentável (SEDEST)",
+            "country": "Brasil",
+            "product": "mosaic"
+        },
+        "server": {
+            "base_url": "http://www.simepar.br/",
+            "radar_url": "http://www.simepar.br/prognozweb/simepar/radar_msc",
+            "inventory_url": "http://www.simepar.br/prognozweb/simepar/radar_msc",
+            "repository_url": "https://lb01.simepar.br/riak/pgw-radar/"
+        },
+        "station_groups": {
+            "mosaico": [
+                "TEIXEIRA_SOARES",
+                "CASCAVEL",
+                "CURITIBA"
+            ]
+        },
+        "stations": {
+            "TEIXEIRA_SOARES": {
+                "name": "Teixeira Soares (Paraná)",
+                "lat": -25.5057004985389,
+                "lon": -50.36165253934563
+            },
+            "CASCAVEL": {
+                "name": "Aroeira, Cascavel (Paraná)",
+                "lat": -24.876029271456197,
+                "lon": -53.52582104447966
+            },
+            "CURITIBA": {
+                "name": "Curitiba (Paraná)",
+                "lat": -25.451865206991965,
+                "lon": -49.237138924947544
+            }
+        }
+    }
+}
