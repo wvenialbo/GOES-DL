@@ -1,6 +1,6 @@
 import os
 import platform
-from ..__init__ import __package_id__, __version__
+from .. import __package_id__, __version__
 
 IMAGE_JPEG: str = "image/jpeg"
 IMAGE_PNG: str = "image/png"
@@ -12,7 +12,7 @@ APPLICATION_NETCDF3: str = "application/x-netcdf"
 APPLICATION_NETCDF4: str = "application/x-netcdf4"
 
 
-class Headers:
+class RequestHeaders:
     """
     A class to represent HTTP headers for requests.
 
@@ -22,7 +22,7 @@ class Headers:
         The value of the "accept" header.
     """
 
-    def __init__(self, accept: str = TEXT_HTML) -> None:
+    def __init__(self, *, accept: str = TEXT_HTML) -> None:
         """Inicializa una nueva instancia de la clase Headers.
 
         Parameters
