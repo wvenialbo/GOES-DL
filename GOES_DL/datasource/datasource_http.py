@@ -1,69 +1,60 @@
 """
 Provide the DatasourceHTTP class for handling HTTP-based data sources.
 
-The DatasourceHTTP class extends DatasourceCached and provides methods
-to interact with HTTP folders and files, either through a base URL or a
-ProductLocator object.
+Classes:
+    DatasourceHTTP: Handle HTTP-based data sources.
 """
 
+import re
 import socket
 from typing import Any, overload
-import re
+from urllib.parse import ParseResult
+
 import requests
 
 from ..dataset import ProductLocator
-from ..utils.url import ParseResult, url
-from .datasource_cached import DatasourceCached
-from .headers import Headers, TEXT_HTML, APPLICATION_NETCDF4
+from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
+from ..utils.url import url
+from .datasource import Datasource
+from .datasource_cache import DatasourceCache
 
 HTTP_STATUS_OK = 200
 
 
-class DatasourceHTTP(DatasourceCached):
+class DatasourceHTTP(Datasource):
     """
-    DatasourceHTTP is a class for handling HTTP-based data sources.
+    Handle HTTP-based data sources.
 
-    This class extends `DatasourceCached` and provides methods to
-    interact with HTTP folders and files, either through a base URL or a
-    `ProductLocator` object.
+    Provide methods to interact with HTTP folders and files, either
+    through a base URL or a `ProductLocator` object.
+
+    Parameters
+    ----------
+    locator : str | ProductLocator
+        The base URL of a HTTP-based data sources or a `ProductLocator`
+        object.
+
+    Raises
+    ------
+    ValueError
+        If the resource does not exist or the user has no access.
     """
 
     @overload
-    def __init__(self, locator: ProductLocator) -> None:
-        """
-        Initialize the HTTP datasource with a ProductLocator.
-
-        Parameters
-        ----------
-        locator : ProductLocator
-            A `ProductLocator` object.
-        """
+    def __init__(
+        self, locator: str, cache: DatasourceCache | None = None
+    ) -> None: ...
 
     @overload
-    def __init__(self, locator: str) -> None:
-        """
-        Initialize the HTTP datasource with a base URL.
+    def __init__(
+        self, locator: ProductLocator, cache: DatasourceCache | None = None
+    ) -> None: ...
 
-        Parameters
-        ----------
-        locator : str
-            The base URL of a HTTP folder.
-        """
-
-    def __init__(self, locator: str | ProductLocator) -> None:
-        """
-        Initialize the HTTP datasource.
-
-        Parameters
-        ----------
-        locator : str
-            The base URL of a HTTP folder or a `ProductLocator` object.
-
-        Raises
-        ------
-        ValueError
-            If the resource does not exist or the user has no access.
-        """
+    def __init__(
+        self,
+        locator: str | ProductLocator,
+        cache: DatasourceCache | None = None,
+    ) -> None:
         if isinstance(locator, ProductLocator):
             base_url: str = locator.get_base_url("HTTP")[0]
         else:
@@ -86,8 +77,50 @@ class DatasourceHTTP(DatasourceCached):
 
         super().__init__(base_url)
 
-        self.host_name: str = host_name
-        self.base_path: str = base_path
+        self.cache: DatasourceCache = cache or DatasourceCache()
+
+    @overload
+    @staticmethod
+    def create(
+        locator: ProductLocator, life_time: float | None = None
+    ) -> "DatasourceHTTP": ...
+
+    @overload
+    @staticmethod
+    def create(
+        locator: str, life_time: float | None = None
+    ) -> "DatasourceHTTP": ...
+
+    @staticmethod
+    def create(
+        locator: str | ProductLocator,
+        life_time: float | None = None,
+    ) -> "DatasourceHTTP":
+        """
+        Create a new HTTP datasource.
+
+        Create a new HTTP datasource with a base URL or a ProductLocator
+        object.
+
+        Parameters
+        ----------
+        locator : str
+            The base URL of a HTTP folder or a `ProductLocator` object.
+        life_time : float, optional
+            The cache life time in seconds, by default None.
+
+        Returns
+        -------
+        DatasourceHTTP
+            A new `DatasourceHTTP` object.
+
+        Raises
+        ------
+        ValueError
+            If the resource does not exist or the user has no access.
+        """
+        cache = DatasourceCache(life_time)
+        return DatasourceHTTP(locator, cache)
 
     def get_file(self, file_path: str) -> Any:
         """
@@ -108,6 +141,8 @@ class DatasourceHTTP(DatasourceCached):
 
         Raises
         ------
+        HTTPError
+            If the request fails.
         RuntimeError
             If the file cannot be retrieved.
         """
@@ -115,12 +150,12 @@ class DatasourceHTTP(DatasourceCached):
 
             file_url: str = url.join(self.base_url, file_path)
 
-            headers = Headers(APPLICATION_NETCDF4).headers
+            headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
             response = requests.get(file_url, headers=headers, timeout=15)
 
             response.raise_for_status()
 
-            if response.status_code is HTTP_STATUS_OK:
+            if response.status_code == HTTP_STATUS_OK:
                 return response.content
 
             raise requests.HTTPError("Request failure", response=response)
@@ -129,7 +164,8 @@ class DatasourceHTTP(DatasourceCached):
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
             raise RuntimeError(message) from exc
 
-    def _host_exists(self, host_name: str) -> bool:
+    @staticmethod
+    def _host_exists(host_name: str) -> bool:
         """Check if a host server exists or is not out of service.
 
         This function takes the hostname part of a URL as input and
@@ -174,9 +210,10 @@ class DatasourceHTTP(DatasourceCached):
         list[str]
             A list of file names in the directory.
         """
-        # TODO: Implement caching or repository in a separate module.
-        if dir_path in self.cached:
-            return self.cached[dir_path]
+        cached_links = self.cache.get_item(dir_path)
+
+        if cached_links is not None:
+            return cached_links
 
         folder_url: str = url.join(self.base_url, dir_path)
         index_html: str = self._get_content(folder_url)
@@ -184,11 +221,11 @@ class DatasourceHTTP(DatasourceCached):
         if not index_html:
             return []
 
-        href_links: list[str] = re.findall(r'<a\s+href="([^"]+)"', index_html)
+        href_links = re.findall(r'<a\s+href="([^"]+)"', index_html)
         href_links = [url.join(folder_url, href) for href in href_links]
         href_links = [href.replace(self.base_url, "") for href in href_links]
 
-        self.cached[dir_path] = href_links
+        self.cache.add_item(dir_path, href_links)
 
         return href_links
 
@@ -206,12 +243,12 @@ class DatasourceHTTP(DatasourceCached):
             True if the folder exists, False otherwise.
         """
         response = requests.head(folder_url, timeout=10)
-        return response.status_code is HTTP_STATUS_OK
+        return response.status_code == HTTP_STATUS_OK
 
     def _get_content(self, folder_url: str) -> str:
-        headers = Headers(TEXT_HTML).headers
+        headers = RequestHeaders(accept=TEXT_HTML).headers
         response = requests.get(folder_url, headers=headers, timeout=15)
-        if response.status_code is HTTP_STATUS_OK:
+        if response.status_code == HTTP_STATUS_OK:
             response.encoding = response.apparent_encoding
             return response.text
         return ""

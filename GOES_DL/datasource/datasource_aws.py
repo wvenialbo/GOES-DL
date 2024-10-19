@@ -7,18 +7,21 @@ downloading files from that location.
 """
 
 from typing import Any, overload
+from urllib.parse import ParseResult
 
-import boto3  # type: ignore
-from botocore.client import UNSIGNED, ClientError, Config  # type: ignore
+import boto3
+from botocore import UNSIGNED
+from botocore.client import ClientError, Config
 
 from ..dataset import ProductLocator
-from ..utils.url import ParseResult, url
-from .datasource_cached import DatasourceCached
+from ..utils.url import url
+from .datasource import Datasource
+from .datasource_cache import DatasourceCache
 
 AWS_CLIENT: str = "s3"
 
 
-class DatasourceAWS(DatasourceCached):
+class DatasourceAWS(Datasource):
     """
     Abstract a AWS S3 datasource object.
 
@@ -26,6 +29,14 @@ class DatasourceAWS(DatasourceCached):
     directory in a remote location and for downloading files from that
     location. The base URL of the datasource is the URL of the AWS S3
     bucket.
+
+    Parameters
+    ----------
+    locator : tuple[str, ...] | ProductLocator
+        A `ProductLocator` object or a tuple of strings containing
+        the base URL and an optional region where the S3 bucket is
+        located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
+        None, the default region is used.
 
     Attributes
     ----------
@@ -66,46 +77,20 @@ class DatasourceAWS(DatasourceCached):
     """
 
     @overload
-    def __init__(self, locator: ProductLocator) -> None:
-        """
-        Initialize the AWS S3 datasource with a ProductLocator.
-
-        Parameters
-        ----------
-        locator : ProductLocator
-            A `ProductLocator` object containing the base URL and an
-            optional region where the S3 bucket is located.
-        """
+    def __init__(
+        self, locator: tuple[str, ...], cache: DatasourceCache | None = None
+    ) -> None: ...
 
     @overload
-    def __init__(self, locator: tuple[str, ...]) -> None:
-        """
-        Initialize the AWS S3 datasource with a tuple of strings.
+    def __init__(
+        self, locator: ProductLocator, cache: DatasourceCache | None = None
+    ) -> None: ...
 
-        Parameters
-        ----------
-        locator : tuple[str, ...]
-            A tuple of strings containing the base URL and an optional
-            region where the S3 bucket is located.
-        """
-
-    def __init__(self, locator: ProductLocator | tuple[str, ...]) -> None:
-        """
-        Initialize the AWS S3 datasource.
-
-        Parameters
-        ----------
-        locator : ProductLocator | tuple[str, ...]
-            A `ProductLocator` object or a tuple of strings containing
-            the base URL and an optional region where the S3 bucket is
-            located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
-            None, the default region is used.
-
-        Raises
-        ------
-        ValueError
-            If the bucket does not exist or the user has no access.
-        """
+    def __init__(
+        self,
+        locator: ProductLocator | tuple[str, ...],
+        cache: DatasourceCache | None = None,
+    ) -> None:
         base_url: str
         region: str | None
         if isinstance(locator, ProductLocator):
@@ -127,6 +112,8 @@ class DatasourceAWS(DatasourceCached):
         super().__init__(base_url)
 
         self.bucket_name: str = bucket_name
+
+        self.cache: DatasourceCache = cache or DatasourceCache()
 
     def _bucket_exists(self, bucket_name: str) -> bool:
         """
@@ -172,12 +159,12 @@ class DatasourceAWS(DatasourceCached):
             The AWS S3 client.
         """
         if region:
-            return boto3.client(  # type: ignore
+            return boto3.client(
                 AWS_CLIENT,
                 region_name=region,
                 config=Config(signature_version=UNSIGNED),
             )
-        return boto3.client(  # type: ignore
+        return boto3.client(
             AWS_CLIENT,
             config=Config(signature_version=UNSIGNED),
         )
@@ -266,9 +253,10 @@ class DatasourceAWS(DatasourceCached):
         list[str]
             A list of file names in the directory.
         """
-        # TODO: Implement caching or repository in a separate module.
-        if dir_path in self.cached:
-            return self.cached[dir_path]
+        cached_list = self.cache.get_item(dir_path)
+
+        if cached_list is not None:
+            return cached_list
 
         folder_path: str = self.get_item_path(dir_path)
 
@@ -277,16 +265,16 @@ class DatasourceAWS(DatasourceCached):
             Bucket=self.bucket_name, Prefix=folder_path
         )
 
-        file_list: list[str] = []
-
         # Workaround for non-existing folders.
         for page in pages:
             if page["KeyCount"] == 0:
-                return file_list
+                return []
 
             break
 
         ss: int = len(folder_path)
+
+        file_list: list[str] = []
 
         file_list.extend(
             f"{dir_path}{obj['Key'][ss:]}"
@@ -295,7 +283,7 @@ class DatasourceAWS(DatasourceCached):
             if obj["Size"] > 0
         )
 
-        self.cached[dir_path] = file_list
+        self.cache.add_item(dir_path, file_list)
 
         return file_list
 
