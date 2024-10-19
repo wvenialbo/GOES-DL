@@ -1,9 +1,8 @@
 """
-This module provides the DatasourceAWS class for interacting with AWS S3.
+Provide the DatasourceAWS class for handling AWS-based data sources.
 
-The DatasourceAWS class abstracts an AWS S3 datasource object, allowing
-for listing the contents of a directory in a remote location and for
-downloading files from that location.
+Classes:
+    DatasourceAWS: Handle AWS-based data sources.
 """
 
 from typing import Any, overload
@@ -23,7 +22,7 @@ AWS_CLIENT: str = "s3"
 
 class DatasourceAWS(Datasource):
     """
-    Abstract a AWS S3 datasource object.
+    Handle AWS-based data sources.
 
     The AWS S3 datasource is responsible for listing the contents of a
     directory in a remote location and for downloading files from that

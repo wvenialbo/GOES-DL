@@ -1,3 +1,10 @@
+"""
+Provide the Datasource abstract interface for handling datasources.
+
+Classes:
+    Datasource: Abstract a datasource object.
+"""
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
@@ -39,7 +46,7 @@ class Datasource(ABC):
 
         Parameters
         ----------
-        path : str
+        file_path : str
             The path to the file. The path is relative to the base URL.
 
         Returns
@@ -47,7 +54,6 @@ class Datasource(ABC):
         Any
             The file object.
         """
-        ...
 
     @abstractmethod
     def listdir(self, dir_path: str) -> list[str]:
@@ -59,7 +65,7 @@ class Datasource(ABC):
 
         Parameters
         ----------
-        path : str
+        dir_path : str
             The path to the directory. The path is relative to the base
             URL.
 
@@ -68,4 +74,3 @@ class Datasource(ABC):
         list[str]
             A list of file names in the directory.
         """
-        ...
