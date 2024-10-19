@@ -79,39 +79,43 @@ of the supported sources.
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
-from GOES_DL.datasource import DatasourceNCEI as Datasource
+from GOES_DL.dataset.gridsat import GridSatProductLocatorGC
+from GOES_DL.datasource import DatasourceHTTP
 from GOES_DL.downloader import Downloader
 
 # Initialize the downloader for GridSat-GOES (GOES-12, Full Disk)
-locator = ProductLocatorGC("F", "G12")
+locator = GridSatProductLocatorGC("F", "G12")
 
-datasource = Datasource(locator)
+datasource = DatasourceHTTP(locator)
 
 downloader = Downloader(
     datasource=datasource,
     product_locator=locator,
+    date_format="%Y-%m-%dT%H:%M%z",  # use a custom short date format
 )
 
 # Set your desired date...
 files1 = downloader.get_files("2012-08-23T00:00Z")
 
 # ...or your desired date range
-files2 = downloader.get_files("2012-08-23T00:00-0004", "2012-08-24T00:00-0004")
+files2 = downloader.get_files(
+   "2012-08-23T00:00-0004",
+   "2012-08-24T00:00-0004",
+)
 ```
 
 ### 2. Download GOES 3rd Generation Data
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
-from GOES_DL.datasource import DatasourceAWS as Datasource
+from GOES_DL.dataset.goes import GOESProductLocatorABIPP
+from GOES_DL.datasource import DatasourceAWS
 from GOES_DL.downloader import Downloader
 
 # Initialize the downloader for GOES-R Series (set your desired product)
-locator = ProductLocatorGOES("CMIP", "F", ["C02", "C13-C15"], "G16")
+locator = GOESProductLocatorABIPP("CMIP", "F", ["C02", "C13-C15"], "G16")
 
-datasource = Datasource(locator)
+datasource = DatasourceAWS(locator)
 
 downloader = Downloader(
     datasource=datasource,
@@ -119,24 +123,27 @@ downloader = Downloader(
 )
 
 # Set your desired date...
-files1 = downloader.get_files("2024-08-23T00:00Z")
+files1 = downloader.get_files("2024-08-23T00:00:00Z")
 
 # ...or your desired date range
-files2 = downloader.get_files("2024-08-23T00:00-0004", "2024-08-24T00:00-0004")
+files2 = downloader.get_files(
+   "2024-08-23T00:00:00-0004",  # use the default date format
+   "2024-08-24T00:00:00-0004",
+)
 ```
 
 ### 3. Download GridSat-B1 Data
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
-from GOES_DL.datasource import DatasourceAWS as Datasource
+from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
+from GOES_DL.datasource import DatasourceAWS
 from GOES_DL.downloader import Downloader
 
 # Initialize the downloader for GridSat-B1
-locator = ProductLocatorB1()
+locator = GridSatProductLocatorB1()
 
-datasource = Datasource(locator)
+datasource = DatasourceAWS(locator)  # also available in HTTP from NCEI
 
 downloader = Downloader(
     datasource=datasource,
@@ -148,7 +155,10 @@ downloader = Downloader(
 files1 = downloader.get_files("1984-08-23T00:00Z")
 
 # ...or your desired date range
-files2 = downloader.get_files("1984-08-23T00:00-0004", "1984-08-24T00:00-0004")
+files2 = downloader.get_files(
+   "1984-08-23T00:00-0004",
+   "1984-08-24T00:00-0004",
+)
 ```
 
 ## Pipeline and parameters
