@@ -87,7 +87,6 @@ profile = "black"
 
 [tool.flake8]
 max-line-length = 79
-extend-ignore = ["BLK100", "PLW511", "ANN101", "PLR903"]
 docstring_style = "numpy"
 per-file-ignores = ["__init__.py:F401"]
 strictness = "full"
@@ -775,3 +774,8 @@ boto3 = "~=1.35.42"
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.1.1"
 black = "^24.10.0"
+[tool.pydoclint]
+style = 'numpy'
+
+[tool.pydocstyle]
+convention = 'numpy'
