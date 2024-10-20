@@ -9,6 +9,9 @@ from .constants import (
 )
 from .locator import GridSatProductLocator
 
+# Define a constant for the number of months in a year
+MONTHS_IN_YEAR = 12
+
 
 class GridSatProductLocatorGC(GridSatProductLocator):
     """
@@ -267,7 +270,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         """
         next_month: int = current_time.month + 1
         next_year: int = current_time.year
-        if next_month > 12:
+        if next_month > MONTHS_IN_YEAR:
             next_month = 1
             next_year += 1
 
