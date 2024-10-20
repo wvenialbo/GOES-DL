@@ -1,3 +1,12 @@
+"""
+Provide a locator for the GridSat-B1 imagery dataset products.
+
+Classes
+-------
+GridSatProductLocatorB1
+    Represent the GridSat-B1 imagery dataset product locator.
+"""
+
 from datetime import datetime
 
 from .constants import (
@@ -86,14 +95,14 @@ class GridSatProductLocatorB1(GridSatProductLocator):
 
     Methods
     -------
-    get_base_url(datasource: str) -> str:
+    get_base_url(datasource: str)
         Get the base URL for the GridSat-B1 imagery dataset's products.
-    next_time(current_time: datetime) -> datetime:
+    next_time(current_time: datetime)
         Get the next time interval. GridSat-B1 dataset organises the
         data by year.
-    normalize_times(datetime_ini: datetime, datetime_fin: datetime) -> tuple[datetime, datetime]:
+    normalize_times(datetime_ini: datetime, datetime_fin: datetime)
         Normalise the initial and final datetimes.
-    truncate_to_year(time: datetime) -> datetime
+    truncate_to_year(time: datetime)
         Truncate the `datetime` to the current year.
 
     Caution
@@ -152,7 +161,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
                 f"Supported versions: {supported_versions}"
             )
 
-        super(GridSatProductLocatorB1, self).__init__(
+        super().__init__(
             name=B1_PRODUCT_NAME,
             origins=[],
             versions=versions,
@@ -181,7 +190,7 @@ class GridSatProductLocatorB1(GridSatProductLocator):
 
         Returns
         -------
-        str:
+        tuple[str, ...]
             The base URL for the GridSat-B1 imagery dataset's products
             based on the requested datasource identifier.
 
@@ -251,7 +260,8 @@ class GridSatProductLocatorB1(GridSatProductLocator):
 
         return start_time, end_time
 
-    def truncate_to_year(self, time: datetime) -> datetime:
+    @staticmethod
+    def truncate_to_year(time: datetime) -> datetime:
         """
         Truncate the `datetime` to the current year.
 
