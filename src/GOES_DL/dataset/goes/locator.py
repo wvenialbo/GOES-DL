@@ -487,7 +487,8 @@ class GOESProductLocator(ProductLocatorGG):
 
         return start_time, end_time
 
-    def truncate_to_hour(self, time: datetime) -> datetime:
+    @staticmethod
+    def truncate_to_hour(time: datetime) -> datetime:
         """
         Truncate the `datetime` to the current hour.
 
