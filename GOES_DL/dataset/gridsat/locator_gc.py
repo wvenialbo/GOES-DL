@@ -302,7 +302,8 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
         return start_time, end_time
 
-    def truncate_to_month(self, time: datetime) -> datetime:
+    @staticmethod
+    def truncate_to_month(time: datetime) -> datetime:
         """
         Truncate the `datetime` to the current month.
 
