@@ -109,6 +109,7 @@
     "pylint.args": [
         // "--disabe=C0116",
     ],
+    "pydoctest.workingDirectory": "src",
     // Python formatting tools settings
     "autopep8.args": [
         "--max-line-length=79",
