@@ -1,3 +1,17 @@
+"""
+Provide a locator for the GridSat-GOES/CONUS imagery dataset products.
+
+Attributes
+----------
+MONTHS_IN_YEAR : int
+    The number of months in a year, used for date calculations.
+
+Classes
+-------
+GridSatProductLocatorGC
+    Represent the GridSat-GOES/CONUS imagery dataset product locator.
+"""
+
 from datetime import datetime
 
 from .constants import (
@@ -17,7 +31,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
     """
     Represent the GridSat-GOES/CONUS imagery dataset product locator.
 
-    This class implements the `GridSatProductLocator` abstract class for
+    This class implements the `GridSatProductLocator` abstract class
     for the GridSat-GOES/CONUS (Geostationary Operational Environmental
     Satellites - GOES/CONUS) dataset product locator.
 
