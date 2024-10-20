@@ -1,3 +1,15 @@
+"""
+Define the class for the downloader object.
+
+The downloader object is responsible for downloading files from a
+specified location using a datasource and product locator.
+
+Classes
+-------
+Downloader
+    Represent a downloader object.
+"""
+
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
