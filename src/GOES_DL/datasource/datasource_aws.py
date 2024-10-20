@@ -114,6 +114,49 @@ class DatasourceAWS(Datasource):
 
         self.cache: DatasourceCache = cache or DatasourceCache()
 
+    @overload
+    @staticmethod
+    def create(
+        locator: ProductLocator, life_time: float | None = None
+    ) -> "DatasourceAWS": ...
+
+    @overload
+    @staticmethod
+    def create(
+        locator: tuple[str, ...], life_time: float | None = None
+    ) -> "DatasourceAWS": ...
+
+    @staticmethod
+    def create(
+        locator: tuple[str, ...] | ProductLocator,
+        life_time: float | None = None,
+    ) -> "DatasourceAWS":
+        """
+        Create a new AWS-based datasource.
+
+        Create a new AWS-based datasource with a base URL or a
+        ProductLocator object.
+
+        Parameters
+        ----------
+        locator : str
+            The base URL of a HTTP folder or a `ProductLocator` object.
+        life_time : float, optional
+            The cache life time in seconds, by default None.
+
+        Returns
+        -------
+        DatasourceHTTP
+            A new `DatasourceHTTP` object.
+
+        Raises
+        ------
+        ValueError
+            If the resource does not exist or the user has no access.
+        """
+        cache = DatasourceCache(life_time)
+        return DatasourceAWS(locator, cache)
+
     def _bucket_exists(self, bucket_name: str) -> bool:
         """
         Check if the bucket exists.
