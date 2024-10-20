@@ -193,22 +193,22 @@ class GridSatProductLocatorGC(GridSatProductLocator):
                 f"Supported versions: {supported_versions}"
             )
 
-        PRODUCT_NAME: str = self.SCENE_TO_NAME[scene]
-        DATA_ORIGIN: list[str] = [
+        product_name: str = self.SCENE_TO_NAME[scene]
+        data_origin: list[str] = [
             self.AVAILABLE_ORIGINS[orig] for orig in origins
         ]
 
-        GOES_PATH_PREFIX: str = f"{PRODUCT_NAME.lower()}/"
+        goes_path_prefix: str = f"{product_name.lower()}/"
 
         super(GridSatProductLocatorGC, self).__init__(
-            name=PRODUCT_NAME,
-            origins=DATA_ORIGIN,
+            name=product_name,
+            origins=data_origin,
             versions=versions,
             file_date_format=GOES_FILE_DATE_FORMAT,
             file_date_pattern=GOES_FILE_DATE_PATTERN,
             file_prefix=GOES_FILE_PREFIX,
             path_date_format=GOES_PATH_DATE_FORMAT,
-            path_prefix=GOES_PATH_PREFIX,
+            path_prefix=goes_path_prefix,
         )
 
     def get_base_url(self, datasource: str) -> tuple[str, ...]:
