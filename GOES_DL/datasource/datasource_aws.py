@@ -182,7 +182,8 @@ class DatasourceAWS(Datasource):
 
         return True
 
-    def _get_client(self, region: str | None) -> Any:
+    @staticmethod
+    def _get_client(region: str | None) -> Any:
         """
         Get the AWS S3 client.
 
@@ -250,7 +251,7 @@ class DatasourceAWS(Datasource):
         if head.endswith("/") and tail.startswith("/"):
             head = head[:-1]
         if not head.endswith("/") and not tail.startswith("/"):
-            return head + "/" + tail
+            return f"{head}/{tail}"
         return head + tail
 
     def get_item_path(self, dir_path: str) -> str:
