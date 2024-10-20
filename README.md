@@ -90,17 +90,17 @@ datasource = DatasourceHTTP(locator)
 
 downloader = Downloader(
     datasource=datasource,
-    product_locator=locator,
+    locator=locator,
     date_format="%Y-%m-%dT%H:%M%z",  # use a custom short date format
 )
 
 # Set your desired date...
-files1 = downloader.get_files("2012-08-23T00:00Z")
+files1 = downloader.get_files(start="2012-08-23T00:00Z")
 
 # ...or your desired date range
 files2 = downloader.get_files(
-   "2012-08-23T00:00-0004",
-   "2012-08-24T00:00-0004",
+   start="2012-08-23T00:00-0004",
+   end="2012-08-24T00:00-0004",
 )
 ```
 
@@ -113,22 +113,22 @@ from GOES_DL.datasource import DatasourceAWS
 from GOES_DL.downloader import Downloader
 
 # Initialize the downloader for GOES-R Series (set your desired product)
-locator = GOESProductLocatorABIPP("CMIP", "F", ["C02", "C13-C15"], "G16")
+locator = GOESProductLocatorABIPP("CMIP", "F", ["C02", "C08", "C13"], "G16")
 
 datasource = DatasourceAWS(locator)
 
 downloader = Downloader(
     datasource=datasource,
-    product_locator=locator,
+    locator=locator,
 )
 
 # Set your desired date...
-files1 = downloader.get_files("2024-08-23T00:00:00Z")
+files1 = downloader.get_files(start="2024-08-23T00:00:00Z")
 
 # ...or your desired date range
 files2 = downloader.get_files(
-   "2024-08-23T00:00:00-0004",  # use the default date format
-   "2024-08-24T00:00:00-0004",
+   start="2024-08-23T00:00:00-0004",  # use the default date format
+   end="2024-08-24T00:00:00-0004",
 )
 ```
 
@@ -147,17 +147,17 @@ datasource = DatasourceAWS(locator)  # also available in HTTP from NCEI
 
 downloader = Downloader(
     datasource=datasource,
-    product_locator=locator,
+    locator=locator,
     date_format="%Y-%m-%dT%H:%M%z",
 )
 
 # Set your desired date...
-files1 = downloader.get_files("1984-08-23T00:00Z")
+files1 = downloader.get_files(start="1984-08-23T00:00Z")
 
 # ...or your desired date range
 files2 = downloader.get_files(
-   "1984-08-23T00:00-0004",
-   "1984-08-24T00:00-0004",
+   start="1984-08-23T00:00-0004",
+   end="1984-08-24T00:00-0004",
 )
 ```
 
@@ -166,10 +166,10 @@ files2 = downloader.get_files(
 The general workflow for downloading data using **GOES-DL** is as follows:
 
 1. **Initialize the locator**: Import the appropriate locator class for the
-   desired product and satellite and initialize a locator object. The locator
-   provides the necessary information to locate the data files in the dataset
-   repository. This is the only step that is specific to the dataset being
-   downloaded.
+   desired product and satellite and initialize a locator object. The product
+   locator provides the necessary information to find the data files in the
+   dataset repository. This is the only step that is specific to the dataset
+   being downloaded.
 2. **Initialize the datasource**: Import the appropriate datasource class for
    the desired dataset and instantiate a datasource object. The datasource
    provides the necessary functionality to access the data files from the
@@ -194,8 +194,9 @@ format to the downloader object during initialization.
 
 ## Data Sources
 
-1. **NOAA NCEI Archive**: GOES-8 to GOES-15 data is available through NOAA’s
-   National Centers for Environmental Information.
+1. **NOAA NCEI Archive**: GridSat-B1 Climate Data Record and GOES-8 to GOES-15
+   data is available through NOAA’s National Centers for Environmental
+   Information.
 2. **NOAA AWS Cloud Archive**: GOES-16 to GOES-18 data and GridSat-B1 Climate
    Data Record are accessible via the NOAA archive hosted on AWS.
 
