@@ -91,36 +91,36 @@ class GOESProductLocator(ProductLocatorGG):
 
     Methods
     -------
-    get_base_url(datasource: str) -> str:
+    get_base_url(datasource: str)
         Get the base URL for the GOES-R Series imagery dataset's
         products.
-    get_date_format() -> str:
+    get_date_format()
         Return the date format specification for the GOES-R Series
         imagery dataset product's filename.
     get_paths(datetime_ini: datetime, datetime_fin: datetime) -> list[str]:
         Generate a list of paths containing the product files for the
         specified date range.
-    get_prefix() -> str:
+    get_prefix()
         Generate the prefix for the GOES-R Series imagery dataset
         product's filename.
-    get_product_tag() -> str:
+    get_product_tag()
         Generate the product prefix for the GOES-R Series imagery
         dataset product's filename.
-    get_mode_tag() -> str:
+    get_mode_tag()
         Generate the scan mode and channel number identifier part of the
         GOES-R Series imagery dataset product's filename.
-    get_suffix() -> str:
+    get_suffix()
         Generate the suffix for the GOES-R Series imagery dataset
         product's filename.
-    get_timestamp_pattern() -> str:
+    get_timestamp_pattern()
         Return the timestamp pattern for the GOES-R Series imagery
         dataset product's filename.
-    next_time(current_time: datetime) -> datetime:
+    next_time(current_time: datetime)
         Get the next time interval. GOES-R Series dataset organises the
         data by hour.
-    normalize_times(datetime_ini: datetime, datetime_fin: datetime):
+    normalize_times(datetime_ini: datetime, datetime_fin: datetime)
         Normalise the initial and final datetimes.
-    truncate_to_hour(time: datetime) -> datetime:
+    truncate_to_hour(time: datetime)
         Truncate the `datetime` to the current hour.
 
     Caution
