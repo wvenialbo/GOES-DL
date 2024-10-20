@@ -439,7 +439,8 @@ class GOESProductLocator(ProductLocatorGG):
 
         return f"{start_date}{end_date}{creation_date}"
 
-    def next_time(self, current_time: datetime) -> datetime:
+    @staticmethod
+    def next_time(current_time: datetime) -> datetime:
         """
         Get the next time interval.
 
