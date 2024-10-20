@@ -237,9 +237,11 @@ class GOESProductLocator(ProductLocatorGG):
 
         Returns
         -------
-        str:
-            The base URL for the GOES-R Series imagery dataset's
-            products based on the requested datasource identifier.
+        tuple[str, ...]:
+            A tuple whose first element is the base URL for the GOES-R
+            Series imagery dataset's products based on the requested
+            datasource identifier. The second element is an empty
+            string.
 
         Raises
         ------
