@@ -200,7 +200,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
         goes_path_prefix: str = f"{product_name.lower()}/"
 
-        super(GridSatProductLocatorGC, self).__init__(
+        super().__init__(
             name=product_name,
             origins=data_origin,
             versions=versions,
@@ -221,7 +221,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
         Parameters
         ----------
-        datasource : tuple[str, ...]
+        datasource : str
             The datasource identifier. This parameter is used to
             determine the base URL for the dataset's products. The only
             available datasource is 'NOAA'. No datasource is supported
@@ -229,7 +229,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
 
         Returns
         -------
-        str:
+        tuple[str, ...]
             The base URL for the GridSat-GOES/CONUS imagery dataset's
             products based on the requested datasource identifier.
 
