@@ -1,3 +1,18 @@
+"""
+Provide the GOESProductLocator class for locating GOES-R data files.
+
+Module for .
+
+The `GOESProductLocator` class implements the `ProductLocator` interface
+for locating GOES-R Series imagery dataset products. It includes methods
+for generating dataset directory paths, verifying product filenames, and
+extracting datetime information from filenames.
+
+Classes:
+    GOESProductLocator: Abstract a product locator for GOES-R Series
+    imagery dataset.
+"""
+
 from datetime import datetime, timedelta
 from typing import ClassVar
 
@@ -103,7 +118,7 @@ class GOESProductLocator(ProductLocatorGG):
     next_time(current_time: datetime) -> datetime:
         Get the next time interval. GOES-R Series dataset organises the
         data by hour.
-    normalize_times(datetime_ini: datetime, datetime_fin: datetime) -> tuple[datetime, datetime]:
+    normalize_times(datetime_ini: datetime, datetime_fin: datetime):
         Normalise the initial and final datetimes.
     truncate_to_hour(time: datetime) -> datetime:
         Truncate the `datetime` to the current hour.
@@ -139,6 +154,13 @@ class GOESProductLocator(ProductLocatorGG):
     # - Level 2  (calibrated and geographically corrected,
     #             reflectance/brightness [Kelvin] units)
     AVAILABLE_LEVELS: set[str] = {"L1b", "L2"}
+
+    AVAILABLE_SCENES: dict[str, str] = {
+        "F": "F",
+        "C": "C",
+        "M1": "M",
+        "M2": "M",
+    }
 
     def __init__(
         self,
@@ -190,6 +212,9 @@ class GOESProductLocator(ProductLocatorGG):
             if an unexpected or unsupported setting is required for an
             instrument that does not support it.
         """
+        # TODO: Too many positional arguments. Solve it by using
+        #       the Builder or Factory methods, or patterns like
+        #       Essence or Fluent.
         if origin not in self.AVAILABLE_ORIGINS:
             available_origins: list[str] = sorted(self.AVAILABLE_ORIGINS)
             raise ValueError(
@@ -257,22 +282,15 @@ class GOESProductLocator(ProductLocatorGG):
                 f"Supported datasources: {supported_datasources}"
             )
 
-        AVAILABLE_SCENES: dict[str, str] = {
-            "F": "F",
-            "C": "C",
-            "M1": "M",
-            "M2": "M",
-        }
-
-        scene: str = AVAILABLE_SCENES[self.scene] if self.scene else ""
+        scene: str = self.AVAILABLE_SCENES[self.scene] if self.scene else ""
         product: str = f"{self.instrument}-{self.level}-{self.name}{scene}"
         satellite: str = self.AVAILABLE_ORIGINS[self.origin]
 
-        AVAILABLE_DATASOURCES: dict[str, str] = {
+        available_datasources: dict[str, str] = {
             "AWS": f"s3://noaa-{satellite}/{product}/"
         }
 
-        return (AVAILABLE_DATASOURCES[datasource], "")
+        return (available_datasources[datasource], "")
 
     def get_date_format(self) -> str:
         """
