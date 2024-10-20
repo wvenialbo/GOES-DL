@@ -229,7 +229,8 @@ class DatasourceHTTP(Datasource):
 
         return href_links
 
-    def _path_exists(self, folder_url: str) -> bool:
+    @staticmethod
+    def _path_exists(folder_url: str) -> bool:
         """Check if a folder exists in a host server.
 
         Parameters
@@ -245,7 +246,8 @@ class DatasourceHTTP(Datasource):
         response = requests.head(folder_url, timeout=10)
         return response.status_code == HTTP_STATUS_OK
 
-    def _get_content(self, folder_url: str) -> str:
+    @staticmethod
+    def _get_content(folder_url: str) -> str:
         headers = RequestHeaders(accept=TEXT_HTML).headers
         response = requests.get(folder_url, headers=headers, timeout=15)
         if response.status_code == HTTP_STATUS_OK:
