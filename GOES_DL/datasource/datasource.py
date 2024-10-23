@@ -7,7 +7,6 @@ Classes:
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass(eq=False, frozen=True)
@@ -37,7 +36,7 @@ class Datasource(ABC):
     base_url: str
 
     @abstractmethod
-    def get_file(self, file_path: str) -> Any:
+    def get_file(self, file_path: str) -> bytes:
         """
         Get a file.
 
@@ -51,7 +50,7 @@ class Datasource(ABC):
 
         Returns
         -------
-        Any
+        bytes
             The file object.
         """
 
