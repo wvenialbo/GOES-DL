@@ -70,7 +70,9 @@ class Downloader:
         """
         assert self.time_tolerance >= 0
 
-    def get_files(self, *, start: str, end: str = "") -> list[bytes]:
+    def get_files(
+        self, *, start: str, end: str = ""
+    ) -> list[tuple[str, bytes]]:
         """
         Get the files from the datasource.
 
@@ -96,8 +98,10 @@ class Downloader:
 
         Returns
         -------
-        list[bytes]
-            A list with the file objects.
+        list[tuple[str, bytes]]
+            A list of tuples with the file paths and the file objects in
+            the directory that match the timestamps between `start` and
+            `end`.
 
         Raises
         ------
@@ -113,7 +117,9 @@ class Downloader:
         """
         files_in_range: list[str] = self.get_file_list(start, end)
 
-        return self.retrieve_files(files_in_range)
+        retrieved_files: list[bytes] = self.retrieve_files(files_in_range)
+
+        return list(zip(files_in_range, retrieved_files))
 
     def get_file_list(self, start_time: str, end_time: str = "") -> list[str]:
         """
