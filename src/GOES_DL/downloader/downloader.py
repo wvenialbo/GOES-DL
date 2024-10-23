@@ -13,7 +13,6 @@ Downloader
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
@@ -72,7 +71,9 @@ class Downloader:
         if self.time_tolerance < 0:
             raise ValueError("time_tolerance must be non-negative")
 
-    def get_files(self, *, start: str, end: str = "") -> list[Any]:
+    def get_files(
+        self, *, start: str, end: str = ""
+    ) -> list[tuple[str, bytes]]:
         """
         Get the files from the datasource.
 
@@ -98,8 +99,10 @@ class Downloader:
 
         Returns
         -------
-        list[Any]
-            A list with the file objects.
+        list[tuple[str, bytes]]
+            A list of tuples with the file paths and the file objects in
+            the directory that match the timestamps between `start` and
+            `end`.
 
         Raises
         ------
@@ -115,7 +118,9 @@ class Downloader:
         """
         files_in_range: list[str] = self.get_file_list(start, end)
 
-        return self.retrieve_files(files_in_range)
+        retrieved_files: list[bytes] = self.retrieve_files(files_in_range)
+
+        return list(zip(files_in_range, retrieved_files))
 
     def get_file_list(self, start_time: str, end_time: str = "") -> list[str]:
         """
@@ -167,7 +172,7 @@ class Downloader:
             datetime_ini, datetime_fin, files
         )
 
-    def retrieve_files(self, file_paths: list[str]) -> list[Any]:
+    def retrieve_files(self, file_paths: list[str]) -> list[bytes]:
         """
         Retrieve the files from the datasource.
 
@@ -181,7 +186,7 @@ class Downloader:
 
         Returns
         -------
-        list[Any]
+        list[bytes]
             A list with the file objects.
 
         Raises
@@ -191,10 +196,10 @@ class Downloader:
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        file_objects: list[Any] = []
+        file_objects: list[bytes] = []
 
         for file in file_paths:
-            file_object: Any = self.datasource.get_file(file)
+            file_object: bytes = self.datasource.get_file(file)
             file_objects.append(file_object)
 
         return file_objects
