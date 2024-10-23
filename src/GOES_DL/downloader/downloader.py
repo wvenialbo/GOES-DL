@@ -69,7 +69,8 @@ class Downloader:
         """
         Validate the downloader object.
         """
-        assert self.time_tolerance >= 0
+        if self.time_tolerance < 0:
+            raise ValueError("time_tolerance must be non-negative")
 
     def get_files(self, *, start: str, end: str = "") -> list[Any]:
         """
