@@ -212,7 +212,7 @@ class DatasourceAWS(Datasource):
             config=Config(signature_version=UNSIGNED),
         )
 
-    def get_file(self, file_path: str) -> Any:
+    def get_file(self, file_path: str) -> bytes:
         """
         Download a file into memory.
 
@@ -226,7 +226,7 @@ class DatasourceAWS(Datasource):
 
         Returns
         -------
-        Any
+        bytes
             The file object.
 
         Raises
@@ -240,7 +240,7 @@ class DatasourceAWS(Datasource):
             response: Any = self.s3_client.get_object(
                 Bucket=self.bucket_name, Key=folder_path
             )
-            return response["Body"].read()
+            return bytes(response["Body"].read())
 
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"

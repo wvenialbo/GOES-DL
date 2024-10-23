@@ -7,7 +7,7 @@ Classes:
 
 import re
 import socket
-from typing import Any, overload
+from typing import overload
 from urllib.parse import ParseResult
 
 import requests
@@ -122,7 +122,7 @@ class DatasourceHTTP(Datasource):
         cache = DatasourceCache(life_time)
         return DatasourceHTTP(locator, cache)
 
-    def get_file(self, file_path: str) -> Any:
+    def get_file(self, file_path: str) -> bytes:
         """
         Download a file into memory.
 
@@ -136,7 +136,7 @@ class DatasourceHTTP(Datasource):
 
         Returns
         -------
-        Any
+        bytes
             The file object.
 
         Raises
