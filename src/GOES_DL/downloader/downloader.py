@@ -96,7 +96,7 @@ class Downloader:
 
         Returns
         -------
-        list[Any]
+        list[bytes]
             A list with the file objects.
 
         Raises
