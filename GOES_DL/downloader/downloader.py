@@ -13,7 +13,6 @@ Downloader
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
@@ -71,7 +70,7 @@ class Downloader:
         """
         assert self.time_tolerance >= 0
 
-    def get_files(self, *, start: str, end: str = "") -> list[Any]:
+    def get_files(self, *, start: str, end: str = "") -> list[bytes]:
         """
         Get the files from the datasource.
 
