@@ -166,7 +166,7 @@ class Downloader:
             datetime_ini, datetime_fin, files
         )
 
-    def retrieve_files(self, file_paths: list[str]) -> list[Any]:
+    def retrieve_files(self, file_paths: list[str]) -> list[bytes]:
         """
         Retrieve the files from the datasource.
 
@@ -180,7 +180,7 @@ class Downloader:
 
         Returns
         -------
-        list[Any]
+        list[bytes]
             A list with the file objects.
 
         Raises
@@ -190,10 +190,10 @@ class Downloader:
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        file_objects: list[Any] = []
+        file_objects: list[bytes] = []
 
         for file in file_paths:
-            file_object: Any = self.datasource.get_file(file)
+            file_object: bytes = self.datasource.get_file(file)
             file_objects.append(file_object)
 
         return file_objects
