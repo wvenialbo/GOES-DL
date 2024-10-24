@@ -7,7 +7,6 @@ Classes:
 
 import re
 import socket
-from typing import Any
 from urllib.parse import ParseResult
 
 import requests
@@ -33,8 +32,8 @@ class DatasourceHTTP(DatasourceBase):
     def __init__(
         self,
         locator: str | ProductLocator,
-        repository: str | DatasourceRepository = ".",
-        cache: float | DatasourceCache = 0.0,
+        repository: str | DatasourceRepository | None = None,
+        cache: float | DatasourceCache | None = None,
     ) -> None:
         """
         Initialize the DatasourceHTTP object.
@@ -46,20 +45,24 @@ class DatasourceHTTP(DatasourceBase):
             object.
         repository : str | DatasourceRepository, optional
             The directory where the files will be stored, by default
-            ".".
+            None (".").
         cache : float | DatasourceCache, optional
-            The cache expiration time in seconds, by default 0.0.
+            The cache expiration time in seconds, by default None (0.0).
 
         Raises
         ------
         ValueError
             If the resource does not exist or the user has no access.
         """
-        base_url: str
-        if isinstance(locator, ProductLocator):
-            base_url = locator.get_base_url("HTTP")[0]
-        else:
-            base_url = locator
+        base_url: str = (
+            locator
+            if isinstance(locator, str)
+            else locator.get_base_url("HTTP")[0]
+        )
+        if repository is None:
+            repository = "."
+        if cache is None:
+            cache = 0.0
 
         url_parts: ParseResult = url.parse(base_url)
 
@@ -70,7 +73,6 @@ class DatasourceHTTP(DatasourceBase):
             raise ValueError(
                 f"Host '{host_name}' does not exist or is out of service."
             )
-
         if not self._path_exists(base_url):
             raise ValueError(
                 f"Path '{base_path}' does not exist or you have no access."
@@ -78,7 +80,7 @@ class DatasourceHTTP(DatasourceBase):
 
         super().__init__(base_url, repository, cache)
 
-    def get_file(self, file_path: str) -> Any:
+    def get_file(self, file_path: str) -> bytes:
         """
         Download a file into memory.
 
@@ -102,8 +104,12 @@ class DatasourceHTTP(DatasourceBase):
         RuntimeError
             If the file cannot be retrieved.
         """
-        try:
+        local_file = self.repository.get_item(file_path)
 
+        if local_file is not None:
+            return local_file
+
+        try:
             file_url: str = url.join(self.base_url, file_path)
 
             headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
@@ -112,6 +118,7 @@ class DatasourceHTTP(DatasourceBase):
             response.raise_for_status()
 
             if response.status_code == HTTP_STATUS_OK:
+                self.repository.add_item(file_path, response.content)
                 return response.content
 
             raise requests.HTTPError("Request failure", response=response)
