@@ -48,7 +48,7 @@ class FileRepository:
             not a directory.
         """
         if base_directory is None:
-            base_directory = Path(".")
+            base_directory = "."
         self.base_directory = Path(base_directory)
         if not self.base_directory.exists():
             self.base_directory.mkdir(parents=True)
