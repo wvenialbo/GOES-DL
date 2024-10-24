@@ -28,17 +28,6 @@ class DatasourceHTTP(DatasourceBase):
 
     Provide methods to interact with HTTP folders and files, either
     through a base URL or a `ProductLocator` object.
-
-    Parameters
-    ----------
-    locator : str | ProductLocator
-        The base URL of a HTTP-based data sources or a `ProductLocator`
-        object.
-
-    Raises
-    ------
-    ValueError
-        If the resource does not exist or the user has no access.
     """
 
     def __init__(
