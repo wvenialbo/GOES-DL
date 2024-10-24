@@ -7,7 +7,7 @@ Classes:
 
 import re
 import socket
-from typing import Any, overload
+from typing import Any
 from urllib.parse import ParseResult
 
 import requests
@@ -69,49 +69,6 @@ class DatasourceHTTP(DatasourceBase):
             )
 
         super().__init__(base_url, repository, cache)
-
-    @overload
-    @staticmethod
-    def create(
-        locator: ProductLocator, life_time: float | None = None
-    ) -> "DatasourceHTTP": ...
-
-    @overload
-    @staticmethod
-    def create(
-        locator: str, life_time: float | None = None
-    ) -> "DatasourceHTTP": ...
-
-    @staticmethod
-    def create(
-        locator: str | ProductLocator,
-        life_time: float | None = None,
-    ) -> "DatasourceHTTP":
-        """
-        Create a new HTTP datasource.
-
-        Create a new HTTP datasource with a base URL or a ProductLocator
-        object.
-
-        Parameters
-        ----------
-        locator : str
-            The base URL of a HTTP folder or a `ProductLocator` object.
-        life_time : float, optional
-            The cache life time in seconds, by default None.
-
-        Returns
-        -------
-        DatasourceHTTP
-            A new `DatasourceHTTP` object.
-
-        Raises
-        ------
-        ValueError
-            If the resource does not exist or the user has no access.
-        """
-        cache = DatasourceCache(life_time)
-        return DatasourceHTTP(locator, cache)
 
     def get_file(self, file_path: str) -> Any:
         """
