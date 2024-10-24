@@ -15,13 +15,14 @@ import requests
 from ..dataset import ProductLocator
 from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
 from ..utils.url import url
-from .datasource import Datasource
+from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
+from .datasource_repository import DatasourceRepository
 
 HTTP_STATUS_OK = 200
 
 
-class DatasourceHTTP(Datasource):
+class DatasourceHTTP(DatasourceBase):
     """
     Handle HTTP-based data sources.
 
@@ -40,30 +41,22 @@ class DatasourceHTTP(Datasource):
         If the resource does not exist or the user has no access.
     """
 
-    @overload
-    def __init__(
-        self, locator: str, cache: DatasourceCache | None = None
-    ) -> None: ...
-
-    @overload
-    def __init__(
-        self, locator: ProductLocator, cache: DatasourceCache | None = None
-    ) -> None: ...
-
     def __init__(
         self,
         locator: str | ProductLocator,
-        cache: DatasourceCache | None = None,
+        repository: str | DatasourceRepository = ".",
+        cache: float | DatasourceCache = 0.0,
     ) -> None:
+        base_url: str
         if isinstance(locator, ProductLocator):
-            base_url: str = locator.get_base_url("HTTP")[0]
+            base_url = locator.get_base_url("HTTP")[0]
         else:
             base_url = locator
 
         url_parts: ParseResult = url.parse(base_url)
 
         host_name: str = url_parts.netloc
-        base_path: str = url_parts.path
+        base_path = url_parts.path
 
         if not self._host_exists(host_name):
             raise ValueError(
@@ -75,9 +68,7 @@ class DatasourceHTTP(Datasource):
                 f"Path '{base_path}' does not exist or you have no access."
             )
 
-        super().__init__(base_url)
-
-        self.cache: DatasourceCache = cache or DatasourceCache()
+        super().__init__(base_url, repository, cache)
 
     @overload
     @staticmethod
