@@ -1,9 +1,9 @@
 """
-Module for managing file operations within a repository.
+Provide local repository mechanisms for managing file operations.
 
-This module provides a class `DownloaderRepository` to handle file and
-directory operations such as listing, adding, deleting, moving, and
-searching files within a specified base directory.
+Classes:
+    DownloaderRepository: A local repository for managing file
+    operations.
 """
 
 import shutil
