@@ -47,6 +47,25 @@ class DatasourceHTTP(DatasourceBase):
         repository: str | DatasourceRepository = ".",
         cache: float | DatasourceCache = 0.0,
     ) -> None:
+        """
+        Initialize the DatasourceHTTP object.
+
+        Parameters
+        ----------
+        locator : str | ProductLocator
+            The base URL of a HTTP-based data sources or a `ProductLocator`
+            object.
+        repository : str | DatasourceRepository, optional
+            The directory where the files will be stored, by default
+            ".".
+        cache : float | DatasourceCache, optional
+            The cache expiration time in seconds, by default 0.0.
+
+        Raises
+        ------
+        ValueError
+            If the resource does not exist or the user has no access.
+        """
         base_url: str
         if isinstance(locator, ProductLocator):
             base_url = locator.get_base_url("HTTP")[0]
