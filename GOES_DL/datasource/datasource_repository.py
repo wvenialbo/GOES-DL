@@ -26,7 +26,7 @@ class DatasourceRepository:
 
     base_directory: Path
 
-    def __init__(self, base_directory: str | Path) -> None:
+    def __init__(self, base_directory: str | Path | None = None) -> None:
         """Initialize the local repository in a base directory.
 
         Initialize the repository with a base directory where downloaded
@@ -36,8 +36,10 @@ class DatasourceRepository:
 
         Parameters
         ----------
-        base_directory : str | Path
-            The base directory where the repository will be created.
+        base_directory : str | Path, optional
+            The base directory where the repository will be created. If
+            not specified, the current working directory is used, by
+            default None.
 
         Raises
         ------
@@ -45,6 +47,8 @@ class DatasourceRepository:
             If the given path already exists in the file system and is
             not a directory.
         """
+        if base_directory is None:
+            base_directory = Path(".")
         self.base_directory = Path(base_directory)
         if not self.base_directory.exists():
             self.base_directory.mkdir(parents=True)
