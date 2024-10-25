@@ -41,20 +41,10 @@ class DatasourceAWS(DatasourceBase):
 
     Methods
     -------
-    bucket_exists(bucket_name: str) -> bool
-        Check if the bucket exists.
-    clear_cache(dir_path: str = "") -> None
-        Clear the cache.
-    get_client() -> S3Client
-        Get the AWS S3 client.
     get_file(file_path: str) -> Any
         Download a file into memory.
-    get_folder_path(dir_path: str) -> str
-        Get the folder path.
     listdir(dir_path: str) -> list[str]
         List the contents of a directory.
-    object_exists(bucket_name: str, object_path: str) -> bool
-        Check if the object exists.
     """
 
     bucket_name: str
