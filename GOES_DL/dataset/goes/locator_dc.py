@@ -137,14 +137,12 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
             be provided.
         """
         supported_channels: set[str] = (
-            self.CF_CHANNELS
-            if self.scene in self.CF_SCENES
-            else self.M_CHANNELS
+            self.CF_CHANNELS if scene in self.CF_SCENES else self.M_CHANNELS
         )
 
-        if not set(self.channels).issubset(supported_channels):
+        if not set(channels).issubset(supported_channels):
             raise ValueError(
-                f"Unsupported channels {self.channels} "
+                f"Unsupported channels {channels} "
                 f"for current scene '{self.scene}' "
                 f"of primary ABI product '{self.PRODUCT_NAME}'. "
                 f"Supported channels: {sorted(supported_channels)}"
