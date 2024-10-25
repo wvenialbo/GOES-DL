@@ -84,6 +84,9 @@ class GOESProductLocatorABI(GOESProductLocator):
         ValueError
             If the provided origin, level or scene is invalid.
         """
+        # TODO: Too many positional arguments. Solve it by using
+        #       the Builder or Factory methods, or patterns like
+        #       Essence or Fluent.
         if scene not in self.AVAILABLE_SCENES:
             available_scenes: list[str] = sorted(self.AVAILABLE_SCENES)
             raise ValueError(
