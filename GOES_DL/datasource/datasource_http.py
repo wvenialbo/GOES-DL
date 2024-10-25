@@ -98,7 +98,7 @@ class DatasourceHTTP(DatasourceBase):
 
         Returns
         -------
-        Any
+        bytes
             The file object.
 
         Raises
