@@ -14,7 +14,7 @@ import requests
 
 from ..dataset import ProductLocator
 from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
-from ..utils.url import url
+from ..utils.url import URL as url
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository

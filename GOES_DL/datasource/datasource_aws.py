@@ -15,7 +15,7 @@ from botocore.client import ClientError, Config
 from mypy_boto3_s3.client import S3Client
 
 from ..dataset import ProductLocator
-from ..utils.url import url
+from ..utils.url import URL as url
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository
