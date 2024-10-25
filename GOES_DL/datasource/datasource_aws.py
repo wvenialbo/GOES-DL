@@ -5,7 +5,7 @@ Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
 
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import ParseResult
 
 import boto3
@@ -17,7 +17,7 @@ from ..utils.url import url
 from .datasource import Datasource
 from .datasource_cache import DatasourceCache
 
-AWS_CLIENT: str = "s3"
+AWS_CLIENT: Literal["s3"] = "s3"
 
 
 class DatasourceAWS(Datasource):
