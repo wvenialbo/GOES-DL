@@ -75,16 +75,6 @@ class DatasourceAWS(Datasource):
         If the bucket does not exist or the user has no access.
     """
 
-    @overload
-    def __init__(
-        self, locator: tuple[str, ...], cache: DatasourceCache | None = None
-    ) -> None: ...
-
-    @overload
-    def __init__(
-        self, locator: ProductLocator, cache: DatasourceCache | None = None
-    ) -> None: ...
-
     def __init__(
         self,
         locator: ProductLocator | tuple[str, ...],
