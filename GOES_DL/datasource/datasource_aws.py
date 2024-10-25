@@ -88,6 +88,10 @@ class DatasourceAWS(DatasourceBase):
             (base_url, region) = locator.get_base_url("AWS")
         else:
             (base_url, region) = locator
+        if repository is None:
+            repository = "."
+        if cache is None:
+            cache = 0.0
 
         url_parts: ParseResult = url.parse(base_url)
 
@@ -100,11 +104,9 @@ class DatasourceAWS(DatasourceBase):
                 f"Bucket '{bucket_name}' does not exist or you have no access."
             )
 
-        super().__init__(base_url)
+        super().__init__(base_url, repository, cache)
 
         self.bucket_name: str = bucket_name
-
-        self.cache: DatasourceCache = cache or DatasourceCache()
 
     def _bucket_exists(self, bucket_name: str) -> bool:
         """
