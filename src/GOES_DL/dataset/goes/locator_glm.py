@@ -1,3 +1,11 @@
+"""
+Provide locator for GOES-R Series imagery dataset's GLM products.
+
+Classes:
+    - GOESProductLocatorGLM: All Geostationary Lightning Mapper (GLM)
+      products.
+"""
+
 from .locator import GOESProductLocator
 
 
