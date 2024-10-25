@@ -28,6 +28,13 @@ class DatasourceHTTP(DatasourceBase):
 
     Provide methods to interact with HTTP folders and files, either
     through a base URL or a `ProductLocator` object.
+
+    Methods
+    -------
+    get_file(file_path: str) -> bytes
+        Download a file into memory.
+    listdir(dir_path: str) -> list[str]
+        List the contents of a directory.
     """
 
     def __init__(
