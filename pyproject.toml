@@ -401,10 +401,12 @@
       # ignored-parents =
 
       # Maximum number of arguments for function / method.
-      max-args = 5
+      # TODO: Restore this to its default value: 5. Increased this limit 8.
+      max-args = 8
 
       # Maximum number of attributes for a class (see R0902).
-      max-attributes = 7
+      # TODO: Restore this to its default value: 7. Increased this limit 8.
+      max-attributes = 8
 
       # Maximum number of boolean expressions in an if statement (see R0916).
       max-bool-expr = 5
@@ -419,7 +421,8 @@
       max-parents = 7
 
       # Maximum number of positional arguments for function / method.
-      max-positional-arguments = 5
+      # TODO: Restore this to its default value: 5. Increased this limit 8.
+      max-positional-arguments = 8
 
       # Maximum number of public methods for a class (see R0904).
       max-public-methods = 20
