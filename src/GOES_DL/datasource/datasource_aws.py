@@ -6,7 +6,7 @@ Classes:
 """
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 from urllib.parse import ParseResult
 
 import boto3
@@ -252,10 +252,8 @@ class DatasourceAWS(DatasourceBase):
 
         folder_path: str = self._get_item_path(dir_path)
 
-        paginator: Any = self.s3_client.get_paginator("list_objects_v2")
-        pages: Any = paginator.paginate(
-            Bucket=self.bucket_name, Prefix=folder_path
-        )
+        paginator = self.s3_client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(Bucket=self.bucket_name, Prefix=folder_path)
 
         # Workaround for non-existing folders.
         for page in pages:
