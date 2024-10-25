@@ -1,3 +1,11 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABIPM: Multi-band primary ABI products.
+    - GOESProductLocatorMCMIP: Multi-band CMIP Product.
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 

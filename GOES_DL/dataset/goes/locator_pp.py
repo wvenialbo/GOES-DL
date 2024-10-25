@@ -1,3 +1,13 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABIPP: All primary ABI products.
+    - GOESProductLocatorCMIP: ABI Cloud and Moisture Imagery Product
+      (CMIP).
+    - GOESProductLocatorRad: ABI Radiance Product (Rad).
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 
