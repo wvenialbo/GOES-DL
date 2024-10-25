@@ -16,6 +16,7 @@ from ..dataset import ProductLocator
 from ..utils.url import url
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
+from .datasource_repository import DatasourceRepository
 
 AWS_CLIENT: Literal["s3"] = "s3"
 
@@ -78,6 +79,7 @@ class DatasourceAWS(DatasourceBase):
     def __init__(
         self,
         locator: ProductLocator | tuple[str, ...],
+        repository: str | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         base_url: str
