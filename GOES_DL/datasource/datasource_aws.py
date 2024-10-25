@@ -4,6 +4,7 @@ Provide the DatasourceAWS class for handling AWS-based data sources.
 Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
+
 from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import ParseResult
@@ -11,6 +12,7 @@ from urllib.parse import ParseResult
 import boto3
 from botocore import UNSIGNED
 from botocore.client import ClientError, Config
+from mypy_boto3_s3.client import S3Client
 
 from ..dataset import ProductLocator
 from ..utils.url import url
@@ -30,28 +32,12 @@ class DatasourceAWS(DatasourceBase):
     location. The base URL of the datasource is the URL of the AWS S3
     bucket.
 
-    Parameters
-    ----------
-    locator : tuple[str, ...] | ProductLocator
-        A `ProductLocator` object or a tuple of strings containing
-        the base URL and an optional region where the S3 bucket is
-        located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
-        None, the default region is used.
-
     Attributes
     ----------
-    base_url : str
-        The base URL of the datasource. This is the URL where the
-        datasource is located. The base URL is used to build the full
-        URL to the files and directories.
     bucket_name : str
         The name of the AWS S3 bucket.
-    base_path : str
-        The base path of the AWS S3 bucket.
     s3_client : boto3.Client
         The AWS S3 client.
-    cached : dict[str, list[str]]
-        The cached file lists in the datasource, organised by folder.
 
     Methods
     -------
@@ -59,7 +45,7 @@ class DatasourceAWS(DatasourceBase):
         Check if the bucket exists.
     clear_cache(dir_path: str = "") -> None
         Clear the cache.
-    get_client() -> Any
+    get_client() -> S3Client
         Get the AWS S3 client.
     get_file(file_path: str) -> Any
         Download a file into memory.
@@ -69,12 +55,10 @@ class DatasourceAWS(DatasourceBase):
         List the contents of a directory.
     object_exists(bucket_name: str, object_path: str) -> bool
         Check if the object exists.
-
-    Raises
-    ------
-    ValueError
-        If the bucket does not exist or the user has no access.
     """
+
+    bucket_name: str
+    s3_client: S3Client
 
     def __init__(
         self,
@@ -82,6 +66,27 @@ class DatasourceAWS(DatasourceBase):
         repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
+        """
+        Initialize the DatasourceAWS object.
+
+        Parameters
+        ----------
+        locator : ProductLocator | tuple[str, ...]
+            A `ProductLocator` object or a tuple of strings containing
+            the base URL and an optional region where the S3 bucket is
+            located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
+            None, the default region is used.
+        repository : str | Path | DatasourceRepository, optional
+            The directory where the files will be stored, by default
+            None (".").
+        cache : float | DatasourceCache, optional
+            The cache expiration time in seconds, by default None (0.0).
+
+        Raises
+        ------
+        ValueError
+            If the bucket does not exist or the user has no access.
+        """
         base_url: str
         region: str | None
         if isinstance(locator, ProductLocator):
@@ -97,7 +102,7 @@ class DatasourceAWS(DatasourceBase):
 
         bucket_name: str = url_parts.netloc
 
-        self.s3_client: Any = self._get_client(region)
+        self.s3_client: S3Client = self._get_client(region)
 
         if not self._bucket_exists(bucket_name):
             raise ValueError(
@@ -134,7 +139,7 @@ class DatasourceAWS(DatasourceBase):
         return True
 
     @staticmethod
-    def _get_client(region: str | None) -> Any:
+    def _get_client(region: str | None) -> S3Client:
         """
         Get the AWS S3 client.
 
