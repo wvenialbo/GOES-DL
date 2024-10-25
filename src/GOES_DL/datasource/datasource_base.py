@@ -5,6 +5,8 @@ Classes:
     DatasourceBase: Extend the Datasource interface.
 """
 
+from pathlib import Path
+
 from .datasource import Datasource
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository
@@ -28,7 +30,7 @@ class DatasourceBase(Datasource):
     def __init__(
         self,
         base_url: str,
-        repository: str | DatasourceRepository,
+        repository: str | Path | DatasourceRepository,
         cache: float | DatasourceCache,
     ) -> None:
         """
@@ -46,8 +48,8 @@ class DatasourceBase(Datasource):
             will be used as the life time for each entry in the cache.
         """
         super().__init__(base_url)
-        if isinstance(repository, str):
-            base_path: str = repository
+        if isinstance(repository, (str, Path)):
+            base_path = repository
             repository = DatasourceRepository(base_path)
         self.repository = repository
         if isinstance(cache, float):
