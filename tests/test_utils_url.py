@@ -1,6 +1,6 @@
 import unittest
 
-from GOES_DL.utils.url import url
+from GOES_DL.utils.url import URL as url
 
 
 class TestUrlMethods(unittest.TestCase):
