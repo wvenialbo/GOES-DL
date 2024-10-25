@@ -23,8 +23,6 @@ class GOESProductLocatorABIPM(GOESProductLocatorABI):
         "MCMIP": "Multi-band Cloud and Moisture Imagery Product",
     }
 
-    DEFAULT_PRODUCT_LEVEL: str = "L2"
-
     def __init__(self, name: str, scene: str, origin: str) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -91,6 +89,4 @@ class GOESProductLocatorMCMIP(GOESProductLocatorABIPM):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        super().__init__(
-            name=self.PRODUCT_NAME, scene=scene, origin=origin
-        )
+        super().__init__(name=self.PRODUCT_NAME, scene=scene, origin=origin)
