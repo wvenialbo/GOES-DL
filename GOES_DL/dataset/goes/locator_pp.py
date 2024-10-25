@@ -26,6 +26,10 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
         "Rad": "Radiance",
     }
 
+    PRODUCT_RAD: str = "Rad"
+    LEVEL_RAD: str = "L1b"
+    LEVEL_NOT_RAD: str = "L2"
+
     def __init__(
         self, name: str, scene: str, channels: str | list[str], origin: str
     ) -> None:
@@ -81,11 +85,9 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
                 f"Available product IDs: {supported_products}"
             )
 
-        PRODUCT_RAD: str = "Rad"
-        LEVEL_RAD: str = "L1b"
-        LEVEL_NOT_RAD: str = "L2"
-
-        level: str = LEVEL_RAD if name == PRODUCT_RAD else LEVEL_NOT_RAD
+        level: str = (
+            self.LEVEL_RAD if name == self.PRODUCT_RAD else self.LEVEL_NOT_RAD
+        )
 
         super().__init__(
             name=name,
@@ -104,6 +106,8 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
     Product: Radiance (Rad).
     """
 
+    PRODUCT_NAME: str = "Rad"
+
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
     ) -> None:
@@ -127,10 +131,11 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "Rad"
-
         super().__init__(
-            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
+            name=self.PRODUCT_NAME,
+            scene=scene,
+            channels=channels,
+            origin=origin,
         )
 
 
@@ -142,6 +147,8 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
     Product: Cloud and Moisture Imagery Product (CMIP).
     """
 
+    PRODUCT_NAME: str = "CMIP"
+
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
     ) -> None:
@@ -165,8 +172,9 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "CMIP"
-
         super().__init__(
-            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
+            name=self.PRODUCT_NAME,
+            scene=scene,
+            channels=channels,
+            origin=origin,
         )

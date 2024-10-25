@@ -21,6 +21,9 @@ class GOESProductLocatorGLM(GOESProductLocator):
         "LCFA": "Lightning Cluster-Filter Algorithm"
     }
 
+    INSTRUMENT_NAME: str = "GLM"
+    PRODUCT_LEVEL: str = "L2"
+
     def __init__(self, name: str, origin: str) -> None:
         """
         Initialise a GOES-R Series imagery dataset GLM product locator.
@@ -52,14 +55,11 @@ class GOESProductLocatorGLM(GOESProductLocator):
                 f"Available product IDs: {available_products}"
             )
 
-        INSTRUMENT_NAME: str = "GLM"
-        PRODUCT_LEVEL: str = "L2"
-
         super().__init__(
             name=name,
-            level=PRODUCT_LEVEL,
+            level=self.PRODUCT_LEVEL,
             scene="",
-            instrument=INSTRUMENT_NAME,
+            instrument=self.INSTRUMENT_NAME,
             modes=[],
             channels=[],
             origin=origin,

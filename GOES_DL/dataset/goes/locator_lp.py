@@ -17,6 +17,8 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
     Product: Lightning Cluster-Filter Algorithm (LCFA).
     """
 
+    PRODUCT_NAME: str = "LCFA"
+
     def __init__(self, origin: str) -> None:
         """
         Initialise a GOES-R Series imagery dataset LCFA product locator.
@@ -32,8 +34,4 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
             directories are organised, only a single origin may be
             provided.
         """
-        PRODUCT_NAME: str = "LCFA"
-
-        super().__init__(
-            name=PRODUCT_NAME, origin=origin
-        )
+        super().__init__(name=self.PRODUCT_NAME, origin=origin)
