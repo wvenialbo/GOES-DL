@@ -2,8 +2,7 @@
 Provide local repository mechanisms for managing file operations.
 
 Classes:
-    FileRepository: A local repository for managing file
-    operations.
+    FileRepository: A local repository for managing file operations.
 """
 
 import shutil
