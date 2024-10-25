@@ -87,12 +87,5 @@ class RequestHeaders:
 
     @property
     def headers(self) -> dict[str, str]:
-        """
-        Get the HTTP headers.
-
-        Returns
-        -------
-        dict[str, str]
-            A dictionary containing the HTTP headers.
-        """
+        """dict[str, str]: A dictionary containing the HTTP headers."""
         return self._headers
