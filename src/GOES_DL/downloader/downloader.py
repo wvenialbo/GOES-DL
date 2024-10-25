@@ -51,11 +51,11 @@ class Downloader:
 
     Methods
     -------
-    get_files(start_time: str, end_time: str = "") -> list[Any]
+    get_files(start_time: str, end_time: str = "")
         Get the files from the datasource.
-    get_file_list(start_time: str, end_time: str = "") -> list[str]
+    get_file_list(start_time: str, end_time: str = "")
         Get the list of files in the directory.
-    retrieve_files(file_paths: list[str]) -> list[Any]
+    retrieve_files(file_paths: list[str])
         Retrieve the files from the datasource.
     """
 
