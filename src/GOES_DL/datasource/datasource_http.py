@@ -53,9 +53,9 @@ class DatasourceHTTP(DatasourceBase):
             object.
         repository : str | Path | DatasourceRepository, optional
             The directory where the files will be stored, by default
-            None (".").
+            None.
         cache : float | DatasourceCache, optional
-            The cache expiration time in seconds, by default None (0.0).
+            The cache expiration time in seconds, by default None.
 
         Raises
         ------
@@ -67,10 +67,6 @@ class DatasourceHTTP(DatasourceBase):
             if isinstance(locator, str)
             else locator.get_base_url("HTTP")[0]
         )
-        if repository is None:
-            repository = "."
-        if cache is None:
-            cache = 0.0
 
         url_parts: ParseResult = url.parse(base_url)
 
