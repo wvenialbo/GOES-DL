@@ -87,7 +87,7 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
 
         level: str = LEVEL_RAD if name == PRODUCT_RAD else LEVEL_NOT_RAD
 
-        super(GOESProductLocatorABIPP, self).__init__(
+        super().__init__(
             name=name,
             level=level,
             scene=scene,
@@ -129,7 +129,7 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
         """
         PRODUCT_NAME: str = "Rad"
 
-        super(GOESProductLocatorRad, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
@@ -167,6 +167,6 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
         """
         PRODUCT_NAME: str = "CMIP"
 
-        super(GOESProductLocatorCMIP, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
