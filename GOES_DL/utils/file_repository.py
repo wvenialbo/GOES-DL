@@ -35,7 +35,7 @@ class FileRepository:
 
         Parameters
         ----------
-        base_directory : str | Path, optional
+        base_directory : str | Path | None, optional
             The base directory where the repository will be created. If
             not specified, the current working directory is used, by
             default None.
