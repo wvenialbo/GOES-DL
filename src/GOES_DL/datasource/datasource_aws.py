@@ -140,7 +140,7 @@ class DatasourceAWS(DatasourceBase):
 
         Returns
         -------
-        Any
+        S3Client
             The AWS S3 client.
         """
         if region:
