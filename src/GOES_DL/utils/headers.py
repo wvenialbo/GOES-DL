@@ -28,14 +28,7 @@ ACCEPT_LANGUAGE: str = (
 
 
 class RequestHeaders:
-    """
-    A class to represent HTTP headers for requests.
-
-    Attributes
-    ----------
-    accept : str
-        The value of the "accept" header.
-    """
+    """A class to represent HTTP headers for requests."""
 
     def __init__(self, *, accept: str = TEXT_HTML) -> None:
         """
