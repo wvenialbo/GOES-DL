@@ -1,5 +1,6 @@
 import os
 import platform
+
 from .. import __package_id__, __version__
 
 IMAGE_JPEG: str = "image/jpeg"
