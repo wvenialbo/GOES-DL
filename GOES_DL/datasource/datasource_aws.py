@@ -4,7 +4,7 @@ Provide the DatasourceAWS class for handling AWS-based data sources.
 Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
-
+from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import ParseResult
 
@@ -79,7 +79,7 @@ class DatasourceAWS(DatasourceBase):
     def __init__(
         self,
         locator: ProductLocator | tuple[str, ...],
-        repository: str | DatasourceRepository | None = None,
+        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         base_url: str
