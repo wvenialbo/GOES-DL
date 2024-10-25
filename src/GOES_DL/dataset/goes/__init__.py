@@ -16,3 +16,23 @@ GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC
 GOESLightningMapperProductLocator = GOESProductLocatorGLM
 GOESPrimaryMultibandProductLocator = GOESProductLocatorABIPM
 GOESPrimaryProductLocator = GOESProductLocatorABIPP
+
+__all__ = [
+    "GOESProductLocatorABI",
+    "GOESProductLocatorABIDC",
+    "GOESProductLocatorDMW",
+    "GOESProductLocatorDMWV",
+    "GOESProductLocatorABIDP",
+    "GOESProductLocatorGLM",
+    "GOESProductLocatorLCFA",
+    "GOESProductLocatorABIPM",
+    "GOESProductLocatorMCMIP",
+    "GOESProductLocatorABIPP",
+    "GOESProductLocatorCMIP",
+    "GOESProductLocatorRad",
+    "GOESDerivedProductLocator",
+    "GOESDerivedWithCannelProductLocator",
+    "GOESLightningMapperProductLocator",
+    "GOESPrimaryMultibandProductLocator",
+    "GOESPrimaryProductLocator",
+]
