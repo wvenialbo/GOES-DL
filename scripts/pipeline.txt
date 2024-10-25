@@ -1,6 +1,7 @@
 Installation pipeline
 =====================
 init.ps1        # Initialize/update the project environment
+deploy-edit.ps1 # Install the project in editable mode
 make.ps1        # Make the project development requirements.dev
 install.ps1     # Install the project development requirements.dev
 find-deps.ps1   # Find the project dependencies and create requirements.txt
