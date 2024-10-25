@@ -95,7 +95,7 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
 
         PRODUCT_LEVEL: str = "L2"
 
-        super(GOESProductLocatorABIDC, self).__init__(
+        super().__init__(
             name=name,
             level=PRODUCT_LEVEL,
             scene=scene,
@@ -153,7 +153,7 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
                 f"Supported channels: {sorted(supported_channels)}"
             )
 
-        super(GOESProductLocatorDMW, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
         )
 
@@ -187,7 +187,7 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
         PRODUCT_NAME: str = "DMWV"
         PRODUCT_CHANNELS: list[str] = ["C08"]
 
-        super(GOESProductLocatorDMWV, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME,
             scene=scene,
             channels=PRODUCT_CHANNELS,

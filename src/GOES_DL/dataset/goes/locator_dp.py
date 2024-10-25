@@ -158,7 +158,7 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
                     f"supported origins {sorted(segment)}"
                 )
 
-        super(GOESProductLocatorABIDP, self).__init__(
+        super().__init__(
             name=name,
             level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
