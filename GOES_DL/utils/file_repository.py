@@ -60,7 +60,7 @@ class FileRepository:
         self,
         source_path: str | Path,
         target_directory: str | Path = "",
-        move: bool = False,
+        move: bool | None = None,
     ) -> None:
         """Add a file to the repository by copying it or moving it.
 
@@ -79,7 +79,7 @@ class FileRepository:
             The path to the file to be added.
         target_directory : str | Path, optional
             The directory to add the file to, by default "".
-        move : bool, optional
+        move : bool | None, optional
             Whether to move the file instead of copying it, optional, by
             default False.
         """
