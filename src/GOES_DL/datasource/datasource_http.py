@@ -7,6 +7,7 @@ Classes:
 
 import re
 import socket
+from pathlib import Path
 from urllib.parse import ParseResult
 
 import requests
@@ -32,7 +33,7 @@ class DatasourceHTTP(DatasourceBase):
     def __init__(
         self,
         locator: str | ProductLocator,
-        repository: str | DatasourceRepository | None = None,
+        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
@@ -43,7 +44,7 @@ class DatasourceHTTP(DatasourceBase):
         locator : str | ProductLocator
             The base URL of a HTTP-based data sources or a `ProductLocator`
             object.
-        repository : str | DatasourceRepository, optional
+        repository : str | Path | DatasourceRepository, optional
             The directory where the files will be stored, by default
             None (".").
         cache : float | DatasourceCache, optional
