@@ -1,3 +1,11 @@
+"""
+Provide GOES-R Series imagery dataset's ABI product locator.
+
+Classes:
+    - GOESProductLocatorABIDC: Locator for ABI products with derived
+      channel.
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 
