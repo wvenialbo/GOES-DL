@@ -34,6 +34,6 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
         """
         PRODUCT_NAME: str = "LCFA"
 
-        super(GOESProductLocatorLCFA, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME, origin=origin
         )

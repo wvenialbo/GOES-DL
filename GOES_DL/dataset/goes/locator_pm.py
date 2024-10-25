@@ -54,7 +54,7 @@ class GOESProductLocatorABIPM(GOESProductLocatorABI):
 
         PRODUCT_LEVEL: str = "L2"
 
-        super(GOESProductLocatorABIPM, self).__init__(
+        super().__init__(
             name=name,
             level=PRODUCT_LEVEL,
             scene=scene,
@@ -91,6 +91,6 @@ class GOESProductLocatorMCMIP(GOESProductLocatorABIPM):
         """
         PRODUCT_NAME: str = "MCMIP"
 
-        super(GOESProductLocatorMCMIP, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME, scene=scene, origin=origin
         )
