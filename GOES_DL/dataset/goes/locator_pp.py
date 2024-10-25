@@ -69,12 +69,7 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
                 "does require channel specification"
             )
 
-        if unsupported_channel := set(channels) - set(self.AVAILABLE_CHANNELS):
-            supported_channels: list[str] = sorted(self.AVAILABLE_CHANNELS)
-            raise ValueError(
-                f"Unsupported channel: '{sorted(unsupported_channel)}'. "
-                f"Supported channels: {supported_channels}"
-            )
+        self._validate_channels(channels, self.AVAILABLE_CHANNELS)
 
         self._validate_product(name, self.AVAILABLE_PRODUCTS)
 

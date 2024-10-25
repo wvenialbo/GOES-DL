@@ -9,6 +9,7 @@ Classes:
 from abc import abstractmethod
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
+from typing import Iterable
 
 from ..locator import ProductLocator
 
@@ -249,18 +250,41 @@ class ProductLocatorGG(ProductLocator):
 
     @staticmethod
     def _validate_entity(
-        name: str, entity: str, available_entities: dict[str, str] | set[str]
+        name: str, entity: str, available_entities: Iterable[str]
     ) -> None:
         if entity not in available_entities:
             supported_entities: list[str] = sorted(available_entities)
+            supported_ids = "', '".join(supported_entities)
             raise ValueError(
                 f"Invalid {name} ID: '{entity}'. "
-                f"Available {name} IDs: {supported_entities}"
+                f"Available {name} IDs: '{supported_ids}'"
+            )
+
+    @staticmethod
+    def _validate_set(
+        name: str,
+        entities: str | Iterable[str],
+        available_entities: Iterable[str],
+    ) -> None:
+        if not set(entities).issubset(available_entities):
+            invalid_entities = set(entities) - set(available_entities)
+            supported_entities: list[str] = sorted(available_entities)
+            invalid_ids = "', '".join(invalid_entities)
+            supported_ids = "', '".join(supported_entities)
+            raise ValueError(
+                f"Invalid {name} IDs: '{invalid_ids}'. "
+                f"Available {name} IDs: '{supported_ids}'"
             )
 
     @classmethod
+    def _validate_channels(
+        cls, channel: str | Iterable[str], available_channels: Iterable[str]
+    ) -> None:
+        cls._validate_set("channel", channel, available_channels)
+
+    @classmethod
     def _validate_instrument(
-        cls, instrument: str, available_instruments: dict[str, str]
+        cls, instrument: str, available_instruments: Iterable[str]
     ) -> None:
         cls._validate_entity("instrument", instrument, available_instruments)
 
@@ -270,18 +294,18 @@ class ProductLocatorGG(ProductLocator):
 
     @classmethod
     def _validate_origin(
-        cls, origin: str, available_origins: dict[str, str]
+        cls, origin: str, available_origins: Iterable[str]
     ) -> None:
         cls._validate_entity("origin", origin, available_origins)
 
     @classmethod
     def _validate_product(
-        cls, name: str, available_products: dict[str, str]
+        cls, name: str, available_products: Iterable[str]
     ) -> None:
         cls._validate_entity("product", name, available_products)
 
     @classmethod
     def _validate_scene(
-        cls, scene: str, available_scenes: dict[str, str]
+        cls, scene: str, available_scenes: Iterable[str]
     ) -> None:
         cls._validate_entity("scene", scene, available_scenes)
