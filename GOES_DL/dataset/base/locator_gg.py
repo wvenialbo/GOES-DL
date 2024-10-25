@@ -1,3 +1,11 @@
+"""
+Provide GridSat or GOES-R series dataset product locator.
+
+Classes:
+    - ProductLocatorGG: Abstract a GridSat or GOES-R series dataset
+      product locator.
+"""
+
 from abc import abstractmethod
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch

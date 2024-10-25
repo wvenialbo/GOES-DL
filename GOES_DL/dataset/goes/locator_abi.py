@@ -1,3 +1,10 @@
+"""
+Provide GOES-R Series imagery dataset's ABI product locator.
+
+Classes:
+    - GOESProductLocatorABI: Locator for ABI products.
+"""
+
 from .locator import GOESProductLocator
 
 
