@@ -88,7 +88,7 @@ class GOESProductLocatorABI(GOESProductLocator):
         F_MODES: list[str] = ["M4"] + CM_MODES
         SCAN_MODES: list[str] = F_MODES if scene == "F" else CM_MODES
 
-        super(GOESProductLocatorABI, self).__init__(
+        super().__init__(
             name=name,
             level=level,
             scene=scene,

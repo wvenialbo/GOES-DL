@@ -91,6 +91,6 @@ class GOESProductLocatorMCMIP(GOESProductLocatorABIPM):
         """
         PRODUCT_NAME: str = "MCMIP"
 
-        super(GOESProductLocatorMCMIP, self).__init__(
+        super().__init__(
             name=PRODUCT_NAME, scene=scene, origin=origin
         )

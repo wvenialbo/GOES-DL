@@ -55,7 +55,7 @@ class GOESProductLocatorGLM(GOESProductLocator):
         INSTRUMENT_NAME: str = "GLM"
         PRODUCT_LEVEL: str = "L2"
 
-        super(GOESProductLocatorGLM, self).__init__(
+        super().__init__(
             name=name,
             level=PRODUCT_LEVEL,
             scene="",
