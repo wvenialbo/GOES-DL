@@ -40,7 +40,7 @@ class DatasourceBase(Datasource):
         ----------
         base_url : str
             The base URL for the datasource.
-        repository : str | DatasourceRepository
+        repository : str | Path | DatasourceRepository
             The repository for the datasource. If a string is provided,
             it will be used as the base path for the repository.
         cache : float | DatasourceCache
