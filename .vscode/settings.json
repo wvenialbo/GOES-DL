@@ -274,6 +274,7 @@
     },
     "git.autofetch": true,
     "git.enableSmartCommit": true,
+    "git.pruneOnFetch": true,
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
             "scope": "base",
