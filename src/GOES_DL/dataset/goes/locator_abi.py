@@ -30,6 +30,16 @@ class GOESProductLocatorABI(GOESProductLocator):
         "M2": "Mesoscale (Domain 2)",
     }
 
+    # Instrument: Advanced Baseline Imager (ABI).
+    INSTRUMENT_NAME: str = "ABI"
+
+    # Available scan modes for the GOES-R Series imagery dataset ABI
+    # products, regarding the requested scene for the product:
+    # - Mode 3 (Previous Flex Mode)
+    # - Mode 6 (Current Flex Mode)
+    CM_MODES: list[str] = ["M3", "M6"]
+    F_MODES: list[str] = ["M4"] + CM_MODES
+
     def __init__(
         self,
         name: str,
@@ -76,24 +86,14 @@ class GOESProductLocatorABI(GOESProductLocator):
                 f"Invalid scene ID: '{scene}'. "
                 f"Available scene IDs: {available_scenes}"
             )
-
-        # Instrument: Advanced Baseline Imager (ABI).
-        INSTRUMENT_NAME: str = "ABI"
-
-        # Available scan modes for the GOES-R Series imagery dataset ABI
-        # products, regarding the requested scene for the product:
-        # - Mode 3 (Previous Flex Mode)
-        # - Mode 6 (Current Flex Mode)
-        CM_MODES: list[str] = ["M3", "M6"]
-        F_MODES: list[str] = ["M4"] + CM_MODES
-        SCAN_MODES: list[str] = F_MODES if scene == "F" else CM_MODES
+        scan_modes: list[str] = self.F_MODES if scene == "F" else self.CM_MODES
 
         super().__init__(
             name=name,
             level=level,
             scene=scene,
-            instrument=INSTRUMENT_NAME,
-            modes=SCAN_MODES,
+            instrument=self.INSTRUMENT_NAME,
+            modes=scan_modes,
             channels=channels,
             origin=origin,
         )
