@@ -84,6 +84,8 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
     G16_G17_ORIGIN: set[str] = {"G16", "G17"}
     G16_G18_ORIGIN: set[str] = {"G16", "G18"}
 
+    DEFAULT_PRODUCT_LEVEL: str = "L2"
+
     def __init__(self, name: str, scene: str, origin: str) -> None:
         """
         Initialise a GOES-R Series imagery dataset ABI product locator.
@@ -149,11 +151,9 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
                     f"supported origins {sorted(segment)}"
                 )
 
-        PRODUCT_LEVEL: str = "L2"
-
         super(GOESProductLocatorABIDP, self).__init__(
             name=name,
-            level=PRODUCT_LEVEL,
+            level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
             channels=[],
             origin=origin,
