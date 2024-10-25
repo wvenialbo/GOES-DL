@@ -24,10 +24,10 @@ class GOESProductLocatorABI(GOESProductLocator):
     # of Columbia), and “Continental United States” refers to 49 states
     # (including Alaska and the District of Columbia).
     AVAILABLE_SCENES: dict[str, str] = {
-        "F": "Full Disk",
-        "C": "CONUS (Continental United States)",
-        "M1": "Mesoscale (Domain 1)",
-        "M2": "Mesoscale (Domain 2)",
+        GOESProductLocator.FULL_DISK: "Full Disk",
+        GOESProductLocator.CONUS: "CONUS (Continental United States)",
+        GOESProductLocator.MESO_1: "Mesoscale (Domain 1)",
+        GOESProductLocator.MESO_2: "Mesoscale (Domain 2)",
     }
 
     # Instrument: Advanced Baseline Imager (ABI).
@@ -90,7 +90,9 @@ class GOESProductLocatorABI(GOESProductLocator):
                 f"Invalid scene ID: '{scene}'. "
                 f"Available scene IDs: {available_scenes}"
             )
-        scan_modes: list[str] = self.F_MODES if scene == "F" else self.CM_MODES
+        scan_modes: list[str] = (
+            self.F_MODES if scene == self.FULL_DISK else self.CM_MODES
+        )
 
         super().__init__(
             name=name,

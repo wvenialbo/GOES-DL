@@ -148,11 +148,17 @@ class GOESProductLocator(ProductLocatorGG):
     #             reflectance/brightness [Kelvin] units)
     AVAILABLE_LEVELS: set[str] = {"L1b", "L2"}
 
+    FULL_DISK = "F"
+    CONUS = "C"
+    MESO = "M"
+    MESO_1 = "M1"
+    MESO_2 = "M2"
+
     AVAILABLE_SCENES: dict[str, str] = {
-        "F": "F",
-        "C": "C",
-        "M1": "M",
-        "M2": "M",
+        FULL_DISK: FULL_DISK,
+        CONUS: CONUS,
+        MESO_1: MESO,
+        MESO_2: MESO,
     }
 
     def __init__(

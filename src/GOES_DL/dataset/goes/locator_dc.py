@@ -19,9 +19,12 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
     Product: All derived ABI products supporting channels.
     """
 
+    DMW_PRODUCT: str = "DMW"
+    DMWV_PRODUCT: str = "DMWV"
+
     AVAILABLE_PRODUCTS: dict[str, str] = {
-        "DMW": "Derived Motion Winds",
-        "DMWV": "Derived Motion WV Winds",
+        DMW_PRODUCT: "Derived Motion Winds",
+        DMWV_PRODUCT: "Derived Motion WV Winds",
     }
 
     M_CHANNELS: set[str] = {"C02", "C07", "C08", "C09", "C10"}
@@ -78,7 +81,7 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
             )
 
         supported_channels: set[str]
-        if name == "DMW":
+        if name == self.DMW_PRODUCT:
             supported_channels = (
                 self.CF_CHANNELS
                 if scene in self.CF_SCENES
@@ -113,7 +116,7 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
     Product: Derived Motion Winds (DMW).
     """
 
-    PRODUCT_NAME: str = "DMW"
+    PRODUCT_NAME: str = GOESProductLocatorABIDC.DMW_PRODUCT
 
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
@@ -168,7 +171,7 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
     Product: Derived Motion WV Winds (DMWV).
     """
 
-    PRODUCT_NAME: str = "DMWV"
+    PRODUCT_NAME: str = GOESProductLocatorABIDC.DMWV_PRODUCT
 
     def __init__(self, scene: str, origin: str) -> None:
         """
