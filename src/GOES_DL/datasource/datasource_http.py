@@ -7,7 +7,7 @@ Classes:
 
 import re
 import socket
-from typing import overload
+from pathlib import Path
 from urllib.parse import ParseResult
 
 import requests
@@ -15,112 +15,74 @@ import requests
 from ..dataset import ProductLocator
 from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
 from ..utils.url import url
-from .datasource import Datasource
+from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
+from .datasource_repository import DatasourceRepository
 
 HTTP_STATUS_OK = 200
 
 
-class DatasourceHTTP(Datasource):
+class DatasourceHTTP(DatasourceBase):
     """
     Handle HTTP-based data sources.
 
     Provide methods to interact with HTTP folders and files, either
     through a base URL or a `ProductLocator` object.
 
-    Parameters
-    ----------
-    locator : str | ProductLocator
-        The base URL of a HTTP-based data sources or a `ProductLocator`
-        object.
-
-    Raises
-    ------
-    ValueError
-        If the resource does not exist or the user has no access.
+    Methods
+    -------
+    get_file(file_path: str) -> bytes
+        Download a file into memory.
+    listdir(dir_path: str) -> list[str]
+        List the contents of a directory.
     """
-
-    @overload
-    def __init__(
-        self, locator: str, cache: DatasourceCache | None = None
-    ) -> None: ...
-
-    @overload
-    def __init__(
-        self, locator: ProductLocator, cache: DatasourceCache | None = None
-    ) -> None: ...
 
     def __init__(
         self,
         locator: str | ProductLocator,
-        cache: DatasourceCache | None = None,
+        repository: str | Path | DatasourceRepository | None = None,
+        cache: float | DatasourceCache | None = None,
     ) -> None:
-        if isinstance(locator, ProductLocator):
-            base_url: str = locator.get_base_url("HTTP")[0]
-        else:
-            base_url = locator
-
-        url_parts: ParseResult = url.parse(base_url)
-
-        host_name: str = url_parts.netloc
-        base_path: str = url_parts.path
-
-        if not self._host_exists(host_name):
-            raise ValueError(
-                f"Host '{host_name}' does not exist or is out of service."
-            )
-
-        if not self._path_exists(base_url):
-            raise ValueError(
-                f"Path '{base_path}' does not exist or you have no access."
-            )
-
-        super().__init__(base_url)
-
-        self.cache: DatasourceCache = cache or DatasourceCache()
-
-    @overload
-    @staticmethod
-    def create(
-        locator: ProductLocator, life_time: float | None = None
-    ) -> "DatasourceHTTP": ...
-
-    @overload
-    @staticmethod
-    def create(
-        locator: str, life_time: float | None = None
-    ) -> "DatasourceHTTP": ...
-
-    @staticmethod
-    def create(
-        locator: str | ProductLocator,
-        life_time: float | None = None,
-    ) -> "DatasourceHTTP":
         """
-        Create a new HTTP datasource.
-
-        Create a new HTTP datasource with a base URL or a ProductLocator
-        object.
+        Initialize the DatasourceHTTP object.
 
         Parameters
         ----------
-        locator : str
-            The base URL of a HTTP folder or a `ProductLocator` object.
-        life_time : float, optional
-            The cache life time in seconds, by default None.
-
-        Returns
-        -------
-        DatasourceHTTP
-            A new `DatasourceHTTP` object.
+        locator : str | ProductLocator
+            The base URL of a HTTP-based data sources or a `ProductLocator`
+            object.
+        repository : str | Path | DatasourceRepository, optional
+            The directory where the files will be stored, by default
+            None.
+        cache : float | DatasourceCache, optional
+            The cache expiration time in seconds, by default None.
 
         Raises
         ------
         ValueError
             If the resource does not exist or the user has no access.
         """
-        cache = DatasourceCache(life_time)
-        return DatasourceHTTP(locator, cache)
+        base_url: str = (
+            locator
+            if isinstance(locator, str)
+            else locator.get_base_url("HTTP")[0]
+        )
+
+        url_parts: ParseResult = url.parse(base_url)
+
+        host_name: str = url_parts.netloc
+        base_path = url_parts.path
+
+        if not self._host_exists(host_name):
+            raise ValueError(
+                f"Host '{host_name}' does not exist or is out of service."
+            )
+        if not self._path_exists(base_url):
+            raise ValueError(
+                f"Path '{base_path}' does not exist or you have no access."
+            )
+
+        super().__init__(base_url, repository, cache)
 
     def get_file(self, file_path: str) -> bytes:
         """
@@ -146,8 +108,12 @@ class DatasourceHTTP(Datasource):
         RuntimeError
             If the file cannot be retrieved.
         """
-        try:
+        local_file = self.repository.get_item(file_path)
 
+        if local_file is not None:
+            return local_file
+
+        try:
             file_url: str = url.join(self.base_url, file_path)
 
             headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
@@ -156,6 +122,7 @@ class DatasourceHTTP(Datasource):
             response.raise_for_status()
 
             if response.status_code == HTTP_STATUS_OK:
+                self.repository.add_item(file_path, response.content)
                 return response.content
 
             raise requests.HTTPError("Request failure", response=response)
