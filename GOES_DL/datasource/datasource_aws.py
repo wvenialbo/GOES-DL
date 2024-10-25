@@ -5,7 +5,7 @@ Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
 
-from typing import Any, overload
+from typing import Any
 from urllib.parse import ParseResult
 
 import boto3
