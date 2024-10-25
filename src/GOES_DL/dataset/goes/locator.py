@@ -1,12 +1,5 @@
 """
-Provide the GOESProductLocator class for locating GOES-R data files.
-
-Module for .
-
-The `GOESProductLocator` class implements the `ProductLocator` interface
-for locating GOES-R Series imagery dataset products. It includes methods
-for generating dataset directory paths, verifying product filenames, and
-extracting datetime information from filenames.
+Provide an abstract product locator for GOES-R Series imagery dataset.
 
 Classes:
     GOESProductLocator: Abstract a product locator for GOES-R Series

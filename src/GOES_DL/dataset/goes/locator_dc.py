@@ -1,9 +1,11 @@
 """
-Provide GOES-R Series imagery dataset's ABI product locator.
+Provide locator for GOES-R Series imagery dataset's ABI products.
 
 Classes:
-    - GOESProductLocatorABIDC: Locator for ABI products with derived
-      channel.
+    - GOESProductLocatorABIDC: All derived ABI products supporting
+      channels.
+    - GOESProductLocatorDMW: ABI Derived Motion Winds (DMW).
+    - GOESProductLocatorDMWV: ABI Derived Motion WV Winds (DMWV).
 """
 
 from .locator_abi import GOESProductLocatorABI
