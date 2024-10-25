@@ -79,7 +79,7 @@ class FileRepository:
             The path to the file to be added.
         target_directory : str | Path, optional
             The directory to add the file to, by default "".
-        move : bool
+        move : bool, optional
             Whether to move the file instead of copying it, optional, by
             default False.
         """
