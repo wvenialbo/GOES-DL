@@ -98,7 +98,7 @@ class ProductLocatorGG(ProductLocator):
 
         Returns
         -------
-        datetime:
+        datetime
             The `datetime` extracted from the filename.
 
         Raises
