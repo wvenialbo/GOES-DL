@@ -25,7 +25,7 @@ class URL:
     @staticmethod
     def abspath(path: str) -> str:
         """
-        Returns the absolute path of the given URL.
+        Return the absolute path of the given URL.
 
         Parameters
         ----------
@@ -45,7 +45,7 @@ class URL:
     @staticmethod
     def join(base_url: str, *parts: str) -> str:
         """
-        Joins one or more URL parts to the base URL.
+        Join one or more URL parts to the base URL.
 
         Parameters
         ----------
@@ -67,7 +67,7 @@ class URL:
     @staticmethod
     def parse(path: str) -> ParseResult:
         """
-        Parses the given URL and returns a ParseResult object.
+        Parse the given URL and returns a ParseResult object.
 
         Parameters
         ----------
