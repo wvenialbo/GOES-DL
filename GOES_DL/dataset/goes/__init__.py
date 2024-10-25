@@ -1,3 +1,27 @@
+"""
+Export locators for GOES-R Series imagery products.
+
+Classes:
+    - GOESProductLocatorABI: Locator for ABI products.
+    - GOESProductLocatorABIDC: Locator for ABI products with derived
+      channel.
+    - GOESProductLocatorDMW: Locator for Derived Motion Winds (DMW)
+      products.
+    - GOESProductLocatorDMWV: Locator for Derived Motion Winds (DMW)
+      products with visible channel.
+    - GOESProductLocatorABIDP: Locator for ABI products with derived
+      product.
+    - GOESProductLocatorGLM: Locator for GLM products.
+    - GOESProductLocatorLCFA: Locator for LCFA products.
+    - GOESProductLocatorABIPM: Locator for ABI products with primary
+      multiband.
+    - GOESProductLocatorMCMIP: Locator for MCMIP products.
+    - GOESProductLocatorABIPP: Locator for ABI products with primary
+      product.
+    - GOESProductLocatorCMIP: Locator for CMIP products.
+    - GOESProductLocatorRad: Locator for Rad products.
+"""
+
 from .locator_abi import GOESProductLocatorABI as GOESProductLocatorABI
 from .locator_dc import GOESProductLocatorABIDC as GOESProductLocatorABIDC
 from .locator_dc import GOESProductLocatorDMW as GOESProductLocatorDMW
