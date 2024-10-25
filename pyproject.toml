@@ -113,14 +113,17 @@
     profile = "black"
 
   [tool.flake8]
-    docstring-style      = "numpy"
+    # darglint, darglint2
+    docstring_style      = "numpy"
+    # flake8-docstrings
     docstring-convention = "numpy"
     extend-ignore        = [
       "ANN101",
     ]
     max-line-length      = 79
     per-file-ignores     = [
-      "__init__.py:F401"
+      "__init__.py:F401",
+      "./src/GOES_DL/utils/headers.py:DAR201",
     ]
     strictness           = "full"
     allow-init-docstring = true
