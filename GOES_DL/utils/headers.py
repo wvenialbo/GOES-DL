@@ -30,16 +30,18 @@ ACCEPT_LANGUAGE: str = (
 class RequestHeaders:
     """A class to represent HTTP headers for requests."""
 
-    def __init__(self, *, accept: str = TEXT_HTML) -> None:
+    def __init__(self, *, accept: str | None = None) -> None:
         """
         Initialize the RequestHeaders object.
 
         Parameters
         ----------
-        accept : str, optional
+        accept : str | None, optional
             The value of the "accept" header, by default TEXT_HTML
             ("text/html").
         """
+        if accept is None:
+            accept = TEXT_HTML
         self._headers: dict[str, str] = self._build_headers(accept)
 
     @staticmethod
