@@ -68,9 +68,9 @@ class DatasourceAWS(DatasourceBase):
             None, the default region is used.
         repository : str | Path | DatasourceRepository, optional
             The directory where the files will be stored, by default
-            None (".").
+            None.
         cache : float | DatasourceCache, optional
-            The cache expiration time in seconds, by default None (0.0).
+            The cache expiration time in seconds, by default None.
 
         Raises
         ------
@@ -83,10 +83,6 @@ class DatasourceAWS(DatasourceBase):
             (base_url, region) = locator.get_base_url("AWS")
         else:
             (base_url, region) = locator
-        if repository is None:
-            repository = "."
-        if cache is None:
-            cache = 0.0
 
         url_parts: ParseResult = url.parse(base_url)
 
