@@ -132,7 +132,7 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
                     f"supported scenes {sorted(segment)}"
                 )
 
-        only_in_segment: list[set[str]] = [
+        only_in_segment = [
             self.ONLY_G16_G17,
             self.ONLY_G16_G18,
         ]
