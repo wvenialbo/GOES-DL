@@ -41,9 +41,9 @@ class DatasourceAWS(DatasourceBase):
 
     Methods
     -------
-    get_file(file_path: str) -> Any
+    get_file(file_path: str)
         Download a file into memory.
-    listdir(dir_path: str) -> list[str]
+    listdir(dir_path: str)
         List the contents of a directory.
     """
 
