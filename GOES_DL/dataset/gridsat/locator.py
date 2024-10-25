@@ -91,21 +91,21 @@ class GridSatProductLocator(ProductLocatorGG):
 
     Methods
     -------
-    get_date_format() -> str:
+    get_date_format()
         Return the date format specification for the GridSat product's
         filename.
-    get_paths(datetime_ini: datetime, datetime_fin: datetime) -> list[str]:
+    get_paths(datetime_ini: datetime, datetime_fin: datetime)
         Generate a list of paths containing the product files for the
         specified date range.
-    get_prefix() -> str:
+    get_prefix()
         Generate the prefix for the GridSat product's filename.
-    get_suffix() -> str:
+    get_suffix()
         Generate the suffix for the GridSat product's filename.
-    get_timestamp_pattern() -> str:
+    get_timestamp_pattern()
         Return the timestamp pattern for the GridSat product's filename.
-    next_time(current_time: datetime) -> datetime:
+    next_time(current_time: datetime)
         Get the next time interval.
-    normalize_times(datetime_ini: datetime, datetime_fin: datetime) -> tuple[datetime, datetime]:
+    normalize_times(datetime_ini: datetime, datetime_fin: datetime)
         Normalise the initial and final datetimes.
 
     Caution
