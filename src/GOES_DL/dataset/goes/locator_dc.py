@@ -32,6 +32,8 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
     CF_SCENES: set[str] = {"C", "F"}
     WV_CHANNELS: set[str] = {"C08"}
 
+    available_channels: set[str]
+
     def __init__(
         self, name: str, scene: str, channels: str | list[str], origin: str
     ) -> None:
@@ -75,24 +77,7 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
                 "does require channel specification"
             )
 
-        supported_channels: set[str]
-        if name == self.DMW_PRODUCT:
-            supported_channels = (
-                self.CF_CHANNELS
-                if scene in self.CF_SCENES
-                else self.M_CHANNELS
-            )
-
-        else:
-            supported_channels = self.WV_CHANNELS
-
-        if unsupported_channels := set(channels) - supported_channels:
-            raise ValueError(
-                f"Unsupported channels {sorted(unsupported_channels)} "
-                f"for current scene '{scene}' "
-                f"of derived ABI product '{name}'. "
-                f"Supported channels: {sorted(supported_channels)}"
-            )
+        self._validate_channels(channels, self.available_channels)
 
         super().__init__(
             name=name,
@@ -136,17 +121,9 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        supported_channels: set[str] = (
+        self.available_channels = (
             self.CF_CHANNELS if scene in self.CF_SCENES else self.M_CHANNELS
         )
-
-        if not set(channels).issubset(supported_channels):
-            raise ValueError(
-                f"Unsupported channels {channels} "
-                f"for current scene '{self.scene}' "
-                f"of primary ABI product '{self.PRODUCT_NAME}'. "
-                f"Supported channels: {sorted(supported_channels)}"
-            )
 
         super().__init__(
             name=self.PRODUCT_NAME,
@@ -184,6 +161,8 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
             dataset directories are organised, only a single origin may
             be provided.
         """
+
+        self.available_channels = self.WV_CHANNELS
 
         super().__init__(
             name=self.PRODUCT_NAME,
