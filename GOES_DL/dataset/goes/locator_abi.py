@@ -1,8 +1,9 @@
 """
-Provide GOES-R Series imagery dataset's ABI product locator.
+Provide locator for GOES-R Series imagery dataset's ABI products.
 
 Classes:
-    - GOESProductLocatorABI: Locator for ABI products.
+    - GOESProductLocatorABI: All primary and derived Advanced Baseline
+      Imager (ABI) products.
 """
 
 from .locator import GOESProductLocator

@@ -1,9 +1,8 @@
 """
-Provide a Product locator for locating GOES-R Series ABI products.
+Provide locator for GOES-R Series imagery dataset's ABI products.
 
-This module defines the `GOESProductLocatorABIDP` class, which is used
-to locate Advanced Baseline Imager (ABI) products from the GOES-R Series
-imagery dataset.
+Classes:
+    - GOESProductLocatorABIDP: All derived ABI products.
 """
 
 from .locator_abi import GOESProductLocatorABI
