@@ -27,9 +27,9 @@ class Datasource(ABC):
 
     Methods
     -------
-    get_file(file_path: str) -> Any
+    get_file(file_path: str)
         Get a file from the datasource.
-    listdir(dir_path: str) -> list[str]
+    listdir(dir_path: str)
         List the contents of a directory.
     """
 
