@@ -62,17 +62,18 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
                 "does require channel specification"
             )
 
+        supported_channels: set[str]
         if name == "DMW":
             M_CHANNELS: set[str] = {"C02", "C07", "C08", "C09", "C10"}
             CF_CHANNELS: set[str] = {"C14"} | M_CHANNELS
             CF_SCENES: set[str] = {"C", "F"}
 
-            supported_channels: set[str] = (
+            supported_channels = (
                 CF_CHANNELS if scene in CF_SCENES else M_CHANNELS
             )
 
         else:
-            supported_channels: set[str] = {"C08"}
+            supported_channels = {"C08"}
 
         if unsupported_channels := set(channels) - supported_channels:
             raise ValueError(
