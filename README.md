@@ -41,7 +41,7 @@ other applications.
 1. **GOES 2nd Generation (GOES-8 to GOES-15)**: Also known as the I to P
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
-   
+
 2. **GOES 3rd Generation (GOES-16 to GOES-18)**: Also known as the R to U
    Series, these satellites offer advanced imagery and atmospheric measurements
    with better spatial, spectral, and temporal resolution &#91;[7](#goesr)&#93;.
@@ -102,6 +102,9 @@ files2 = downloader.get_files(
    start="2012-08-23T00:00-0004",
    end="2012-08-24T00:00-0004",
 )
+
+# `files1` and files2` are lists of tuple[str, bytes] with file path and
+# file content, respectively. The file path is relative to the base URL.
 ```
 
 ### 2. Download GOES 3rd Generation Data
@@ -130,6 +133,9 @@ files2 = downloader.get_files(
    start="2024-08-23T00:00:00-0004",  # use the default date format
    end="2024-08-24T00:00:00-0004",
 )
+
+# `files1` and files2` are lists of tuple[str, bytes] with file path and
+# file content, respectively. The file path is relative to the base URL.
 ```
 
 ### 3. Download GridSat-B1 Data
@@ -159,6 +165,9 @@ files2 = downloader.get_files(
    start="1984-08-23T00:00-0004",
    end="1984-08-24T00:00-0004",
 )
+
+# `files1` and files2` are lists of tuple[str, bytes] with file path and
+# file content, respectively. The file path is relative to the base URL.
 ```
 
 ## Pipeline and parameters
@@ -182,6 +191,7 @@ The general workflow for downloading data using **GOES-DL** is as follows:
    date format to be used in the download process.
 
 The Downloader.get_files method accepts the following parameters:
+
 - **start_time**: A string specifying the starting date for the dataset to be
   downloaded.
 - **end_time**: A string specifying the ending date for the dataset to be
