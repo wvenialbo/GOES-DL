@@ -87,12 +87,8 @@ class GOESProductLocatorABI(GOESProductLocator):
         # TODO: Too many positional arguments. Solve it by using
         #       the Builder or Factory methods, or patterns like
         #       Essence or Fluent.
-        if scene not in self.AVAILABLE_SCENES:
-            available_scenes: list[str] = sorted(self.AVAILABLE_SCENES)
-            raise ValueError(
-                f"Invalid scene ID: '{scene}'. "
-                f"Available scene IDs: {available_scenes}"
-            )
+        self._validate_scene(scene, self.AVAILABLE_SCENES)
+
         scan_modes: list[str] = (
             self.F_MODES if scene == self.FULL_DISK else self.CM_MODES
         )

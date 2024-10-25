@@ -48,12 +48,7 @@ class GOESProductLocatorGLM(GOESProductLocator):
         ValueError
             If the provided product name is invalid.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            available_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {available_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
         super().__init__(
             name=name,
