@@ -47,13 +47,42 @@ class RequestHeaders:
             The value of the "accept" header, by default TEXT_HTML
             ("text/html").
         """
-        user_agent: str = (
+        self._headers: dict[str, str] = self._build_headers(accept)
+
+    @staticmethod
+    def get_user_agent() -> str:
+        """
+        Get the user agent string.
+
+        Returns
+        -------
+        str
+            The user agent string.
+        """
+        return (
             f"{__package_id__}/{__version__} "
             f"({platform.system()} {os.name.upper()} "
             f"{platform.release()}/{platform.version()})"
         )
 
-        self._headers: dict[str, str] = {
+    @staticmethod
+    def _build_headers(accept: str) -> dict[str, str]:
+        """
+        Build the headers dictionary.
+
+        Parameters
+        ----------
+        accept : str
+            The value of the "accept" header.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the headers.
+        """
+        user_agent: str = RequestHeaders.get_user_agent()
+
+        return {
             "accept": accept,
             "accept-encoding": "gzip, deflate, br, zstd",
             "accept-language": ACCEPT_LANGUAGE,
