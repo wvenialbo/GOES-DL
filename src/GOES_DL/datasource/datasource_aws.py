@@ -14,13 +14,13 @@ from botocore.client import ClientError, Config
 
 from ..dataset import ProductLocator
 from ..utils.url import url
-from .datasource import Datasource
+from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 
 AWS_CLIENT: Literal["s3"] = "s3"
 
 
-class DatasourceAWS(Datasource):
+class DatasourceAWS(DatasourceBase):
     """
     Handle AWS-based data sources.
 
@@ -78,7 +78,7 @@ class DatasourceAWS(Datasource):
     def __init__(
         self,
         locator: ProductLocator | tuple[str, ...],
-        cache: DatasourceCache | None = None,
+        cache: float | DatasourceCache | None = None,
     ) -> None:
         base_url: str
         region: str | None
