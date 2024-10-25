@@ -40,6 +40,10 @@ class GOESProductLocatorABI(GOESProductLocator):
     CM_MODES: list[str] = ["M3", "M6"]
     F_MODES: list[str] = ["M4"] + CM_MODES
 
+    LEVEL_RAD: str = "L1b"
+    LEVEL_NOT_RAD: str = "L2"
+    DEFAULT_PRODUCT_LEVEL: str = LEVEL_NOT_RAD
+
     def __init__(
         self,
         name: str,

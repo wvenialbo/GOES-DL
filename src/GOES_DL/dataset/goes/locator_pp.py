@@ -27,8 +27,6 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
     }
 
     PRODUCT_RAD: str = "Rad"
-    LEVEL_RAD: str = "L1b"
-    LEVEL_NOT_RAD: str = "L2"
 
     def __init__(
         self, name: str, scene: str, channels: str | list[str], origin: str

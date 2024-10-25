@@ -29,8 +29,6 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
     CF_SCENES: set[str] = {"C", "F"}
     WV_CHANNELS: set[str] = {"C08"}
 
-    DEFAULT_PRODUCT_LEVEL: str = "L2"
-
     def __init__(
         self, name: str, scene: str, channels: str | list[str], origin: str
     ) -> None:
