@@ -180,13 +180,20 @@ class DatasourceAWS(DatasourceBase):
         RuntimeError
             If the file cannot be retrieved.
         """
+        local_file = self.repository.get_item(file_path)
+
+        if local_file is not None:
+            return local_file
+
         folder_path: str = self._get_item_path(file_path)
 
         try:
             response = self.s3_client.get_object(
                 Bucket=self.bucket_name, Key=folder_path
             )
-            return response["Body"].read()
+            content = response["Body"].read()
+            self.repository.add_item(file_path, content)
+            return content
 
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
