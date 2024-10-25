@@ -122,8 +122,9 @@ class DatasourceHTTP(DatasourceBase):
             response.raise_for_status()
 
             if response.status_code == HTTP_STATUS_OK:
-                self.repository.add_item(file_path, response.content)
-                return response.content
+                content: bytes = response.content
+                self.repository.add_item(file_path, content)
+                return content
 
             raise requests.HTTPError("Request failure", response=response)
 
