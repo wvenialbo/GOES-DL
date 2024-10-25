@@ -1,25 +1,24 @@
 """
-Export locators for GOES-R Series imagery products.
+Export locators for GOES-R Series imagery dataset products.
 
 Classes:
-    - GOESProductLocatorABI: Locator for ABI products.
-    - GOESProductLocatorABIDC: Locator for ABI products with derived
-      channel.
-    - GOESProductLocatorDMW: Locator for Derived Motion Winds (DMW)
+    - GOESProductLocatorABI: All primary and derived Advanced Baseline
+      Imager (ABI) products.
+    - GOESProductLocatorABIDC: All derived ABI products supporting
+      channels.
+    - GOESProductLocatorDMW: ABI Derived Motion Winds (DMW).
+    - GOESProductLocatorDMWV: ABI Derived Motion WV Winds (DMWV).
+    - GOESProductLocatorABIDP: All derived ABI products.
+    - GOESProductLocatorGLM: All Geostationary Lightning Mapper (GLM)
       products.
-    - GOESProductLocatorDMWV: Locator for Derived Motion Winds (DMW)
-      products with visible channel.
-    - GOESProductLocatorABIDP: Locator for ABI products with derived
-      product.
-    - GOESProductLocatorGLM: Locator for GLM products.
-    - GOESProductLocatorLCFA: Locator for LCFA products.
-    - GOESProductLocatorABIPM: Locator for ABI products with primary
-      multiband.
-    - GOESProductLocatorMCMIP: Locator for MCMIP products.
-    - GOESProductLocatorABIPP: Locator for ABI products with primary
-      product.
-    - GOESProductLocatorCMIP: Locator for CMIP products.
-    - GOESProductLocatorRad: Locator for Rad products.
+    - GOESProductLocatorLCFA: GLM Lightning Cluster-Filter Algorithm
+      (LCFA).
+    - GOESProductLocatorABIPM: Multi-band primary ABI products.
+    - GOESProductLocatorMCMIP: Multi-band CMIP Product.
+    - GOESProductLocatorABIPP: All primary ABI products.
+    - GOESProductLocatorCMIP: ABI Cloud and Moisture Imagery Product
+      (CMIP).
+    - GOESProductLocatorRad: ABI Radiance Product (Rad).
 """
 
 from .locator_abi import GOESProductLocatorABI as GOESProductLocatorABI
