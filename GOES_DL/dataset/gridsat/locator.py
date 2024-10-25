@@ -1,3 +1,11 @@
+"""
+Provide locator for GridSat family of imagery datasets products.
+
+Classes:
+    - GridSatProductLocator: Abstract a product locator for GridSat
+      family of imagery datasets.
+"""
+
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
