@@ -1,3 +1,13 @@
+"""
+Provide a class to manage HTTP request headers.
+
+Defines the `RequestHeaders` class, which is used to manage HTTP request
+headers for the GOES-DL project.
+
+Classes:
+    RequestHeaders: A class to represent HTTP headers for requests.
+"""
+
 import os
 import platform
 

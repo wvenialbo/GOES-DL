@@ -1,3 +1,9 @@
+"""
+Provide a utility class for URL manipulations.
+
+Classes:
+    url: Utility class for URL manipulations.
+"""
 from urllib.parse import ParseResult, urljoin, urlparse
 
 
