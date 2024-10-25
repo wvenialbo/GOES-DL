@@ -214,28 +214,9 @@ class GOESProductLocator(ProductLocatorGG):
         # TODO: Too many positional arguments. Solve it by using
         #       the Builder or Factory methods, or patterns like
         #       Essence or Fluent.
-        if origin not in self.AVAILABLE_ORIGINS:
-            available_origins: list[str] = sorted(self.AVAILABLE_ORIGINS)
-            raise ValueError(
-                f"Invalid origin ID: '{origin}'. "
-                f"Available origin IDs: {available_origins}"
-            )
-
-        if instrument not in self.AVAILABLE_INSTRUMENTS:
-            available_instruments: list[str] = sorted(
-                self.AVAILABLE_INSTRUMENTS
-            )
-            raise ValueError(
-                f"Invalid instrument ID: '{instrument}'. "
-                f"Available instrument IDs: {available_instruments}"
-            )
-
-        if level not in self.AVAILABLE_LEVELS:
-            available_levels: list[str] = sorted(self.AVAILABLE_LEVELS)
-            raise ValueError(
-                f"Invalid level ID: '{level}'. "
-                f"Available level IDs: {available_levels}"
-            )
+        self._validate_origin(origin, self.AVAILABLE_ORIGINS)
+        self._validate_instrument(instrument, self.AVAILABLE_INSTRUMENTS)
+        self._validate_level(level, self.AVAILABLE_LEVELS)
 
         self.name: str = name
         self.level: str = level

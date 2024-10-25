@@ -246,3 +246,42 @@ class ProductLocatorGG(ProductLocator):
         )
 
         return file_date.astimezone(timezone.utc)
+
+    @staticmethod
+    def _validate_entity(
+        name: str, entity: str, available_entities: dict[str, str] | set[str]
+    ) -> None:
+        if entity not in available_entities:
+            supported_entities: list[str] = sorted(available_entities)
+            raise ValueError(
+                f"Invalid {name} ID: '{entity}'. "
+                f"Available {name} IDs: {supported_entities}"
+            )
+
+    @classmethod
+    def _validate_instrument(
+        cls, instrument: str, available_instruments: dict[str, str]
+    ) -> None:
+        cls._validate_entity("instrument", instrument, available_instruments)
+
+    @classmethod
+    def _validate_level(cls, level: str, available_levels: set[str]) -> None:
+        cls._validate_entity("level", level, available_levels)
+
+    @classmethod
+    def _validate_origin(
+        cls, origin: str, available_origins: dict[str, str]
+    ) -> None:
+        cls._validate_entity("origin", origin, available_origins)
+
+    @classmethod
+    def _validate_product(
+        cls, name: str, available_products: dict[str, str]
+    ) -> None:
+        cls._validate_entity("product", name, available_products)
+
+    @classmethod
+    def _validate_scene(
+        cls, scene: str, available_scenes: dict[str, str]
+    ) -> None:
+        cls._validate_entity("scene", scene, available_scenes)

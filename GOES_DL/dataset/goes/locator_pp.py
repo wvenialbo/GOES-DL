@@ -76,12 +76,7 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
                 f"Supported channels: {supported_channels}"
             )
 
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
         level: str = (
             self.LEVEL_RAD if name == self.PRODUCT_RAD else self.LEVEL_NOT_RAD

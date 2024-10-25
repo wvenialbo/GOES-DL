@@ -64,12 +64,7 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
         ValueError
             If the provided product name is invalid.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
         if isinstance(channels, str):
             channels = [channels]

@@ -113,12 +113,7 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
         only_in_segment: list[set[str]] = [
             self.ONLY_CF_SCENE,
