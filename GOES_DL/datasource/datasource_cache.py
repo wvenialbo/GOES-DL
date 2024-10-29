@@ -34,16 +34,16 @@ class DatasourceCache:
     """
     Cache for the file list of a datasource directory/bucket.
 
-    Implement a caching mechanism for the file list of a directory.
-    The cache is used to store the list of files in a directory for
-    a certain amount of time. The cache is cleared every time the
-    time life is reached.
+    Implement a caching mechanism for the file list of a directory.  The
+    cache is used to store the list of files in a directory for a
+    certain amount of time. The cache is cleared every time the time
+    life is reached.
 
     Parameters
     ----------
     life_time : float, optional
         The time in seconds that an item will be kept in the cache.
-        (default: 0, no-cache)
+        (default: +inf)
 
     Methods
     -------
@@ -61,14 +61,16 @@ class DatasourceCache:
     Notes
     -----
     Set `life_time` to a positive number of second to enable the cache.
-    The cache will be cleared every time the `life_time` is reached. Set
-    it to "+inf" to keep the cache forever. Setting to `life_time` to a
-    non-positive number will disable the cache. If `life_time` is set to
-    "nan", the behavior is undefined. The default value is 0 (no-cache).
+    The cache will be cleared every time the `life_time` is reached.
+    Setting `life_time` to a non-positive number will disable the cache.
+    If `life_time` is set to "nan", the behavior is undefined. The
+    default value is +inf.
     """
 
     def __init__(self, life_time: float | None = None) -> None:
-        self.life_time: float = life_time or 0.0
+        self.life_time: float = (
+            float("+inf") if life_time is None else life_time
+        )
         self.cache: dict[str, DatasourceCacheItem] = {}
 
     def add_item(self, dir_path: str, files: list[str]) -> None:
