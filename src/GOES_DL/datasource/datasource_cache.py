@@ -152,6 +152,8 @@ class DatasourceCache:
             if expire_time > current_time:
                 return cache_item.files
 
+            self.remove_item(dir_path)
+
         return None
 
     def has_item(self, dir_path: str) -> bool:
