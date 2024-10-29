@@ -33,7 +33,7 @@ class Datasource(ABC):
     get_file(file_path: str)
         Get a file from the datasource or local repository.
     listdir(dir_path: str)
-        List the contents of a directory.
+        List the contents of a remote directory.
     """
 
     base_url: str

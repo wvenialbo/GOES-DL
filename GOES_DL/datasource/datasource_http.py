@@ -31,10 +31,13 @@ class DatasourceHTTP(DatasourceBase):
 
     Methods
     -------
-    get_file(file_path: str) -> bytes
-        Download a file into memory.
-    listdir(dir_path: str) -> list[str]
-        List the contents of a directory.
+    download_file(file_path: str)
+        Retrieve a file from the datasource and save it into the local
+        repository.
+    get_file(file_path: str)
+        Get a file from the datasource or local repository.
+    listdir(dir_path: str)
+        List the contents of a remote directory.
     """
 
     def __init__(
