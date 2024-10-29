@@ -67,6 +67,8 @@ def test(dl: Downloader, start: str, end: str = "") -> list[tuple[str, bytes]]:
     else:
         print(f"Downloading data from {start}")
 
+    dl.download_files(start=start, end=end)
+
     files: list[tuple[str, bytes]] = dl.get_files(start=start, end=end)
 
     return files
