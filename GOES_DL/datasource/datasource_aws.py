@@ -99,6 +99,116 @@ class DatasourceAWS(DatasourceBase):
 
         self.bucket_name: str = bucket_name
 
+    def download_file(self, file_path: str) -> None:
+        """
+        Download a file from the datasource into the local repository.
+
+        Get a file from a remote location or local repository. The path
+        is relative to the base URL and local repository root directory.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the file. The path is relative to the base URL.
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be retrieved
+        """
+        if self.repository.has_item(file_path):
+            return
+
+        try:
+            self._retrieve_file(file_path)
+
+        except ClientError as exc:
+            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
+            raise RuntimeError(message) from exc
+
+    def get_file(self, file_path: str) -> bytes:
+        """
+        Download a file into memory.
+
+        Get a file from a remote location. The path is relative to the
+        base URL.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the file. The path is relative to the base URL.
+
+        Returns
+        -------
+        bytes
+            The file object.
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be retrieved.
+        """
+        local_file = self.repository.get_item(file_path)
+
+        if local_file is not None:
+            return local_file
+
+        try:
+            return self._retrieve_file(file_path)
+        except ClientError as exc:
+            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
+            raise RuntimeError(message) from exc
+
+    def listdir(self, dir_path: str) -> list[str]:
+        """
+        List the contents of a directory.
+
+        List the contents of a directory in a remote location. The path
+        is relative to the base URL.
+
+        Parameters
+        ----------
+        dir_path : str
+            The path to the directory. The path is relative to the base
+            URL.
+
+        Returns
+        -------
+        list[str]
+            A list of file names in the directory.
+        """
+        cached_list = self.cache.get_item(dir_path)
+
+        if cached_list is not None:
+            return cached_list
+
+        folder_path: str = self._get_item_path(dir_path)
+
+        paginator = self.s3_client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(Bucket=self.bucket_name, Prefix=folder_path)
+
+        # Workaround for non-existing folders.
+        for page in pages:
+            if page["KeyCount"] == 0:
+                return []
+
+            break
+
+        ss: int = len(folder_path)
+
+        file_list: list[str] = []
+
+        file_list.extend(
+            f"{dir_path}{obj['Key'][ss:]}"
+            for page in pages
+            for obj in page["Contents"]
+            if obj["Size"] > 0
+        )
+
+        self.cache.add_item(dir_path, file_list)
+
+        return file_list
+
     def _bucket_exists(self, bucket_name: str) -> bool:
         """
         Check if the bucket exists.
@@ -154,55 +264,6 @@ class DatasourceAWS(DatasourceBase):
             config=Config(signature_version=UNSIGNED),
         )
 
-    def get_file(self, file_path: str) -> bytes:
-        """
-        Download a file into memory.
-
-        Get a file from a remote location. The path is relative to the
-        base URL.
-
-        Parameters
-        ----------
-        file_path : str
-            The path to the file. The path is relative to the base URL.
-
-        Returns
-        -------
-        bytes
-            The file object.
-
-        Raises
-        ------
-        RuntimeError
-            If the file cannot be retrieved.
-        """
-        local_file = self.repository.get_item(file_path)
-
-        if local_file is not None:
-            return local_file
-
-        folder_path: str = self._get_item_path(file_path)
-
-        try:
-            response = self.s3_client.get_object(
-                Bucket=self.bucket_name, Key=folder_path
-            )
-            content = response["Body"].read()
-            self.repository.add_item(file_path, content)
-            return content
-
-        except ClientError as exc:
-            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
-            raise RuntimeError(message) from exc
-
-    @staticmethod
-    def _url_join(head: str, tail: str) -> str:
-        if head.endswith("/") and tail.startswith("/"):
-            head = head[:-1]
-        if not head.endswith("/") and not tail.startswith("/"):
-            return f"{head}/{tail}"
-        return head + tail
-
     def _get_item_path(self, dir_path: str) -> str:
         """
         Get the folder path.
@@ -226,56 +287,6 @@ class DatasourceAWS(DatasourceBase):
         url_parts: ParseResult = url.parse(folder_url)
 
         return url_parts.path[1:]
-
-    def listdir(self, dir_path: str) -> list[str]:
-        """
-        List the contents of a directory.
-
-        List the contents of a directory in a remote location. The path
-        is relative to the base URL.
-
-        Parameters
-        ----------
-        dir_path : str
-            The path to the directory. The path is relative to the base
-            URL.
-
-        Returns
-        -------
-        list[str]
-            A list of file names in the directory.
-        """
-        cached_list = self.cache.get_item(dir_path)
-
-        if cached_list is not None:
-            return cached_list
-
-        folder_path: str = self._get_item_path(dir_path)
-
-        paginator = self.s3_client.get_paginator("list_objects_v2")
-        pages = paginator.paginate(Bucket=self.bucket_name, Prefix=folder_path)
-
-        # Workaround for non-existing folders.
-        for page in pages:
-            if page["KeyCount"] == 0:
-                return []
-
-            break
-
-        ss: int = len(folder_path)
-
-        file_list: list[str] = []
-
-        file_list.extend(
-            f"{dir_path}{obj['Key'][ss:]}"
-            for page in pages
-            for obj in page["Contents"]
-            if obj["Size"] > 0
-        )
-
-        self.cache.add_item(dir_path, file_list)
-
-        return file_list
 
     def _object_exists(self, bucket_name: str, object_path: str) -> bool:
         """
@@ -304,3 +315,22 @@ class DatasourceAWS(DatasourceBase):
             return False
 
         return True
+
+    def _retrieve_file(self, file_path: str) -> bytes:
+        folder_path: str = self._get_item_path(file_path)
+
+        response = self.s3_client.get_object(
+            Bucket=self.bucket_name, Key=folder_path
+        )
+        content = response["Body"].read()
+        self.repository.add_item(file_path, content)
+
+        return content
+
+    @staticmethod
+    def _url_join(head: str, tail: str) -> str:
+        if head.endswith("/") and tail.startswith("/"):
+            head = head[:-1]
+        if not head.endswith("/") and not tail.startswith("/"):
+            return f"{head}/{tail}"
+        return head + tail
