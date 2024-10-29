@@ -114,7 +114,9 @@ def test_goes() -> None:
     Test the downloader object with GOES-16 data and AWS datasource.
     """
     pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
-    ds = DatasourceAWS(pd, REPO_GOES)
+
+    # GOES-16 data is updated every 10 minutes
+    ds = DatasourceAWS(pd, REPO_GOES, 10 * 60)
     dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
 
     test(dl, "2024-08-23T00:00+0000")
