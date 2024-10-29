@@ -283,6 +283,12 @@ class ProductLocatorGG(ProductLocator):
         cls._validate_set("channel", channel, available_channels)
 
     @classmethod
+    def _validate_datasource(
+        cls, datasource: str, available_datasources: Iterable[str]
+    ) -> None:
+        cls._validate_entity("datasource", datasource, available_datasources)
+
+    @classmethod
     def _validate_instrument(
         cls, instrument: str, available_instruments: Iterable[str]
     ) -> None:

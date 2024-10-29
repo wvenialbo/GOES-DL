@@ -357,6 +357,9 @@
         "yaml": true,
     },
     "vsintellicode.python.completionsEnabled": true,
+    "vsintellicode.java.completionsEnabled": false,
+    "vsintellicode.sql.completionsEnabled": false,
+    "vsintellicode.typescript.completionsEnabled": false,
     // Productivity tools settings
     "diffEditor.diffAlgorithm": "advanced",
     "diffEditor.wordWrap": "off",
