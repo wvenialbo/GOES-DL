@@ -84,6 +84,32 @@ class DatasourceHTTP(DatasourceBase):
 
         super().__init__(base_url, repository, cache)
 
+    def download_file(self, file_path: str) -> None:
+        """
+        Download a file from the datasource into the local repository.
+
+        Get a file from a remote location or local repository. The path
+        is relative to the base URL and local repository root directory.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the file. The path is relative to the base URL.
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be retrieved
+        """
+        if self.repository.has_item(file_path):
+            return
+
+        try:
+            self._retrieve_file(file_path)
+        except requests.HTTPError as exc:
+            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
+            raise RuntimeError(message) from exc
+
     def get_file(self, file_path: str) -> bytes:
         """
         Download a file into memory.
@@ -114,20 +140,7 @@ class DatasourceHTTP(DatasourceBase):
             return local_file
 
         try:
-            file_url: str = url.join(self.base_url, file_path)
-
-            headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
-            response = requests.get(file_url, headers=headers, timeout=15)
-
-            response.raise_for_status()
-
-            if response.status_code == HTTP_STATUS_OK:
-                content: bytes = response.content
-                self.repository.add_item(file_path, content)
-                return content
-
-            raise requests.HTTPError("Request failure", response=response)
-
+            return self._retrieve_file(file_path)
         except requests.HTTPError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
             raise RuntimeError(message) from exc
@@ -222,3 +235,19 @@ class DatasourceHTTP(DatasourceBase):
             response.encoding = response.apparent_encoding
             return response.text
         return ""
+
+    def _retrieve_file(self, file_path: str) -> bytes:
+        file_url: str = url.join(self.base_url, file_path)
+
+        headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
+        response = requests.get(file_url, headers=headers, timeout=15)
+
+        response.raise_for_status()
+
+        if response.status_code != HTTP_STATUS_OK:
+            raise requests.HTTPError("Request failure", response=response)
+
+        content: bytes = response.content
+        self.repository.add_item(file_path, content)
+
+        return content
