@@ -115,7 +115,8 @@ def test_goes() -> None:
     """
     pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
 
-    # GOES-16 data is updated every 10 minutes
+    # GOES-16 data is updated every 10 minutes. If you are downloading
+    # old data, you may leave the refresh rate as default.
     ds = DatasourceAWS(pd, REPO_GOES, 10 * 60)
     dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
 
