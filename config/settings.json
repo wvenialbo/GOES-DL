@@ -1,210 +1,466 @@
 {
-    "product": "retspy-radar",
-    "version": "1.0",
-    "client": {
-        "chunk_size": 1024,
-        "repository_path": "./"
-    },
-    "services": [
-        "sinarame",
-        "simepar"
-    ],
-    "timing": {
-        "wait_for_next_request": "PT1S",
-        "wait_for_next_authorization": "PT2S",
-        "scan_interval": "PT1M"
-    },
-    "sinarame": {
-        "metadata": {
-            "name": "SINARAME",
-            "description": "Sistema Nacional de Radares Meteorológicos",
-            "organization": "Servicio Meteorológico Nacional (SMN)",
-            "country": "Argentina",
-            "product": "Colmax"
-        },
-        "server": {
-            "base_url": "https://www.smn.gob.ar/",
-            "bypassed_url": "https://www.smn.gob.ar/radar/",
-            "radar_url": "http://200.16.116.35/radar/",
-            "inventory_url": "https://ws1.smn.gob.ar/v1/images/radar/",
-            "repository_url": "https://estaticos.smn.gob.ar/vmsr/radar/"
-        },
-        "station_groups": {
-            "mosaicos": [
-                "COMP_ARG",
-                "COMP_CEN",
-                "COMP_NOR"
-            ],
-            "norte": [
-                "PAR_240",
-                "PER_240",
-                "RMA1_240",
-                "RMA2_240",
-                "RMA3_240",
-                "RMA4_240",
-                "RMA5_240",
-                "RMA8_240",
-                "RMA11_240",
-                "RMA15_240"
-            ],
-            "centro": [
-                "PAR_240",
-                "PER_240",
-                "RMA1_240",
-                "RMA2_240",
-                "RMA6_240",
-                "RMA7_240",
-                "RMA8_240",
-                "RMA10_240",
-                "RMA12_240",
-                "RMA15_240"
-            ],
-            "sur": [
-                "ANG_240",
-                "RMA9_240"
-            ],
-            "retspy": [
-                "RMA3_240",
-                "RMA4_240",
-                "RMA5_240",
-                "RMA8_240"
+  "dataset": {
+    "goes": {
+      "description": "GOES-R Series Imagery Dataset", 
+      "metadata": {
+        "channel": [
+          "C01", 
+          "C02", 
+          "C03", 
+          "C04", 
+          "C05", 
+          "C06", 
+          "C07", 
+          "C08", 
+          "C09", 
+          "C10", 
+          "C11", 
+          "C12", 
+          "C13", 
+          "C14", 
+          "C15", 
+          "C16"
+        ], 
+        "datasource": {
+          "AWS": {
+            "base-path": "{instrument}-{level}-{product}{scene}/", 
+            "description": "NOAA's AWS archive", 
+            "host-name": "s3://noaa-{origin_name}/"
+          }
+        }, 
+        "instrument": {
+          "ABI": "Advanced Baseline Imager", 
+          "GLM": "Geostationary Lightning Mapper"
+        }, 
+        "level": {
+          "L1b": "Level 1b (calibrated and geographically corrected, radiance units)", 
+          "L2": "Level 2 (calibrated and geographically corrected, reflectance/brightness [Kelvin] units)"
+        }, 
+        "mode": {
+          "M3": {
+            "C": "produces a CONUS image every five minutes (resolution 3000 km by 5000 km)", 
+            "F": "produces a full disk image every 15 minutes", 
+            "M1": "produces two MESO image every 60 seconds or one sub-domain every 30 seconds (resolution 1000 km by 1000 km)", 
+            "M2": "produces two MESO image every 60 seconds or one sub-domain every 30 seconds (resolution 1000 km by 1000 km)", 
+            "description": "Mode 3 (Previous Flex Mode)"
+          }, 
+          "M4": {
+            "F": "produces a full disk image every five minutes", 
+            "description": "Mode 4 (Continuous Full Disk Mode)"
+          }, 
+          "M6": {
+            "C": "produces a CONUS/PACUS image every five minutes (resolution 3000 km by 5000 km)", 
+            "F": "produces a full disk image every 10 minutes", 
+            "M1": "produces two MESO image every 60 seconds or one sub-domain every 30 seconds (resolution 1000 km by 1000 km)", 
+            "M2": "produces two MESO image every 60 seconds or one sub-domain every 30 seconds (resolution 1000 km by 1000 km)", 
+            "description": "Mode 6 (10-minute Current Flex Mode)"
+          }
+        }, 
+        "origin": {
+          "G16": "goes16", 
+          "G17": "goes17", 
+          "G18": "goes18"
+        }, 
+        "scene": {
+          "C": {
+            "description": "CONUS (Continental United States)/PACUS (Pacific United States)", 
+            "mode": [
+              "M3", 
+              "M6"
             ]
-        },
-        "stations": {
-            "ANG_240": {
-                "name": "Anguil (La Pampa)",
-                "lat": -36.53954849540453,
-                "lon": -63.98987921347703
-            },
-            "PAR_240": {
-                "name": "Paraná (Entre Ríos)",
-                "lat": -31.84847115491203,
-                "lon": -60.537147529755124
-            },
-            "PER_240": {
-                "name": "Pergamino (Buenos Aires)",
-                "lat": -33.94611598846878,
-                "lon": -60.56251857010105
-            },
-            "RMA1_240": {
-                "name": "Córdoba (Córdoba)",
-                "lat": -31.441121074640172,
-                "lon": -64.1919271572934
-            },
-            "RMA2_240": {
-                "name": "Ezeiza (Buenos Aires)",
-                "lat": -34.800741497568275,
-                "lon": -58.51565663293616
-            },
-            "RMA3_240": {
-                "name": "Las Lomitas (Formosa)",
-                "lat": -24.73003376914212,
-                "lon": -60.551664791087006
-            },
-            "RMA4_240": {
-                "name": "Resistencia (Chaco)",
-                "lat": -27.451625844454597,
-                "lon": -59.05100121260466
-            },
-            "RMA5_240": {
-                "name": "Bernardo de Irigoyen (Misiones)",
-                "lat": -26.27795763696331,
-                "lon": -53.67085936308859
-            },
-            "RMA6_240": {
-                "name": "Mar del Plata (Buenos Aires)",
-                "lat": -37.91282331797286,
-                "lon": -57.52770279009119
-            },
-            "RMA7_240": {
-                "name": "Neuquén (Neuquén)",
-                "lat": -38.803032436548925,
-                "lon": -68.14982233334665
-            },
-            "RMA8_240": {
-                "name": "Mercedes (Corrientes)",
-                "lat": -29.195821469913184,
-                "lon": -58.04468223243145
-            },
-            "RMA9_240": {
-                "name": "Río Grande (Tierra del Fuego)",
-                "lat": -53.78392224756485,
-                "lon": -67.74426844891154
-            },
-            "RMA10_240": {
-                "name": "Bahía Blanca (Buenos Aires)",
-                "lat": -38.73412020114079,
-                "lon": -62.16542600320446
-            },
-            "RMA11_240": {
-                "name": "Termas de Río Hondo (Santiago del Estero)",
-                "lat": -27.50258155975688,
-                "lon": -64.90591760478367
-            },
-            "RMA12_240": {
-                "name": "Las Grutas (Río Negro)",
-                "lat": -40.7719994150929,
-                "lon": -65.0760002500423
-            },
-            "RMA15_240": {
-                "name": "Patquía (La Rioja)",
-                "lat": -30.030959269847997,
-                "lon": -66.87629521523205
-            },
-            "COMP_ARG": {
-                "name": "Mosaico general (Argentina)",
-                "lat": 0.0,
-                "lon": 0.0
-            },
-            "COMP_CEN": {
-                "name": "Mosaico - región central (Argentina)",
-                "lat": 0.0,
-                "lon": 0.0
-            },
-            "COMP_NOR": {
-                "name": "Mosaico - región norte (Argentina)",
-                "lat": 0.0,
-                "lon": 0.0
-            }
-        }
-    },
-    "simepar": {
-        "metadata": {
-            "name": "SIMEPAR",
-            "description": "Sistema de Tecnologia e Monitoramento Ambiental do Paraná",
-            "organization": "Secretaria de Estado do Desenvolvimento Sustentável (SEDEST)",
-            "country": "Brasil",
-            "product": "mosaic"
-        },
-        "server": {
-            "base_url": "http://www.simepar.br/",
-            "radar_url": "http://www.simepar.br/prognozweb/simepar/radar_msc",
-            "inventory_url": "http://www.simepar.br/prognozweb/simepar/radar_msc",
-            "repository_url": "https://lb01.simepar.br/riak/pgw-radar/"
-        },
-        "station_groups": {
-            "mosaico": [
-                "TEIXEIRA_SOARES",
-                "CASCAVEL",
-                "CURITIBA"
+          }, 
+          "F": {
+            "description": "Full Disk", 
+            "mode": [
+              "M3", 
+              "M4", 
+              "M6"
             ]
-        },
-        "stations": {
-            "TEIXEIRA_SOARES": {
-                "name": "Teixeira Soares (Paraná)",
-                "lat": -25.5057004985389,
-                "lon": -50.36165253934563
-            },
-            "CASCAVEL": {
-                "name": "Aroeira, Cascavel (Paraná)",
-                "lat": -24.876029271456197,
-                "lon": -53.52582104447966
-            },
-            "CURITIBA": {
-                "name": "Curitiba (Paraná)",
-                "lat": -25.451865206991965,
-                "lon": -49.237138924947544
-            }
+          }, 
+          "M1": {
+            "description": "Mesoscale (Domain 1)", 
+            "mode": [
+              "M3", 
+              "M6"
+            ]
+          }, 
+          "M2": {
+            "description": "Mesoscale (Domain 2)", 
+            "mode": [
+              "M3", 
+              "M6"
+            ]
+          }
         }
+      }, 
+      "product": {
+        "ACHA": {
+          "description": "Cloud Top Height (10km for 'F' and 'C', 4km for 'M')", 
+          "inherit": "derived-product"
+        }, 
+        "ACHA2KM": {
+          "description": "Cloud Top Height (2km since 24 March 2023)", 
+          "inherit": "derived-product-g16-and-g18"
+        }, 
+        "ACHP2KM": {
+          "description": "Cloud Top Pressure (2km spatial resolution)", 
+          "inherit": "derived-product-g16-and-g18"
+        }, 
+        "ACHT": {
+          "description": "Cloud Top Temperature", 
+          "inherit": "derived-product-full-disk-and-meso"
+        }, 
+        "ACM": {
+          "description": "Clear Sky Mask", 
+          "inherit": "derived-product"
+        }, 
+        "ACTP": {
+          "description": "Cloud Top Phase", 
+          "inherit": "derived-product"
+        }, 
+        "ADP": {
+          "description": "Aerosol Detection Product", 
+          "inherit": "derived-product"
+        }, 
+        "AICE": {
+          "description": "Ice Concentration and Extent", 
+          "inherit": "derived-product-full-disk"
+        }, 
+        "AITA": {
+          "description": "Ice Age and Thickness", 
+          "inherit": "derived-product-full-disk"
+        }, 
+        "AOD": {
+          "description": "Aerosol Optical Depth", 
+          "inherit": "derived-product-conus-and-full-disk"
+        }, 
+        "BRF": {
+          "description": "Bidirectional Reflectance Factor (Land Surface)", 
+          "inherit": "derived-product"
+        }, 
+        "CCL": {
+          "description": "Cloud Cover Layers", 
+          "inherit": "derived-product-g16-and-g18"
+        }, 
+        "CMIP": {
+          "description": "Cloud and Moisture Imagery Product", 
+          "inherit": "primary-product"
+        }, 
+        "COD": {
+          "description": "Cloud Optical Depth (4km for 'F' and 2km for 'C')", 
+          "inherit": "derived-product-conus-and-full-disk"
+        }, 
+        "COD2KM": {
+          "description": "Cloud Optical Depth (2km since 22 March 2023)", 
+          "inherit": [
+            "derived-product-full-disk", 
+            "derived-product-g16-and-g18"
+          ]
+        }, 
+        "CPS": {
+          "description": "Cloud Particle Size", 
+          "inherit": "derived-product"
+        }, 
+        "CTP": {
+          "description": "Cloud Top Pressure", 
+          "inherit": "derived-product-conus-and-full-disk"
+        }, 
+        "DMW": {
+          "constraints": {
+            "channel": [
+              "C02", 
+              "C07", 
+              "C08", 
+              "C09", 
+              "C10", 
+              "C14"
+            ]
+          }, 
+          "description": "Derived Motion Winds", 
+          "inherit": "derived-product-conus-and-full-disk"
+        }, 
+        "DMWM": {
+          "constraints": {
+            "channel": [
+              "C02", 
+              "C07", 
+              "C08", 
+              "C09", 
+              "C10"
+            ]
+          }, 
+          "description": "Derived Motion Winds (Mesoscale)", 
+          "inherit": "derived-product-meso", 
+          "product": "DMW"
+        }, 
+        "DMWV": {
+          "constraints": {
+            "channel": [
+              "C08"
+            ]
+          }, 
+          "description": "Derived Motion WV Winds", 
+          "inherit": "derived-product"
+        }, 
+        "DSI": {
+          "description": "Derived Stability Indices", 
+          "inherit": "derived-product"
+        }, 
+        "DSR": {
+          "description": "Downward Shortwave Radiation", 
+          "inherit": "derived-product"
+        }, 
+        "FDC": {
+          "description": "Fire (Hot Spot Characterization)", 
+          "inherit": "derived-product"
+        }, 
+        "FSC": {
+          "description": "Fractional Snow Cover", 
+          "inherit": "derived-product-g16-and-g18"
+        }, 
+        "LCFA": {
+          "constraints": {
+            "origin": [
+              "G16", 
+              "G17", 
+              "G18"
+            ]
+          }, 
+          "description": "Lightning Cluster-Filter Algorithm", 
+          "inherit": "glm"
+        }, 
+        "LSA": {
+          "description": "Land Surface Albedo", 
+          "inherit": "derived-product"
+        }, 
+        "LST": {
+          "description": "Land Surface Temperature (10km for 'F', 2km for 'C' and 'M')", 
+          "inherit": "derived-product"
+        }, 
+        "LST2KM": {
+          "description": "Land Surface Temperature (2km since 10 September 2021)", 
+          "inherit": "derived-product-full-disk"
+        }, 
+        "LVMP": {
+          "description": "Legacy Vertical Moisture Profile", 
+          "inherit": "derived-product"
+        }, 
+        "LVTP": {
+          "description": "Legacy Vertical Temperature Profile", 
+          "inherit": "derived-product"
+        }, 
+        "MCMIP": {
+          "description": "Multi-band Cloud and Moisture Imagery Product", 
+          "inherit": "derived-product"
+        }, 
+        "RRQPE": {
+          "description": "Rainfall Rate (Quantitative Precipitation Estimate)", 
+          "inherit": "derived-product-full-disk"
+        }, 
+        "RSR": {
+          "description": "Reflected Shortwave Radiation (Top-Of-Atmosphere)", 
+          "inherit": "derived-product-conus-and-full-disk"
+        }, 
+        "Rad": {
+          "description": "Radiance", 
+          "inherit": "primary-product", 
+          "prototype": {
+            "level": "L1b"
+          }
+        }, 
+        "SST": {
+          "description": "Sea Surface Temperature", 
+          "inherit": "derived-product-full-disk"
+        }, 
+        "TPW": {
+          "description": "Total Precipitable Water", 
+          "inherit": "derived-product"
+        }, 
+        "VAA": {
+          "description": "Volcanic Ash (Detection and Height)", 
+          "inherit": [
+            "derived-product-full-disk", 
+            "derived-product-g16-and-g17"
+          ]
+        }, 
+        "abi": {
+          "description": "ABI product prototype", 
+          "inherit": "base", 
+          "prototype": {
+            "instrument": "ABI"
+          }
+        }, 
+        "base": {
+          "description": "Base product prototype", 
+          "prototype": {
+            "channel": [], 
+            "instrument": "", 
+            "level": "", 
+            "mode": [], 
+            "origin-id": "", 
+            "origin-name": "", 
+            "product": "", 
+            "scene": ""
+          }
+        }, 
+        "derived-product": {
+          "constraints": {
+            "origin": [
+              "G16", 
+              "G17", 
+              "G18"
+            ], 
+            "scene": [
+              "C", 
+              "F", 
+              "M1", 
+              "M2"
+            ]
+          }, 
+          "description": "Derived product prototype", 
+          "inherit": "abi", 
+          "prototype": {
+            "level": "L2"
+          }
+        }, 
+        "derived-product-conus-and-full-disk": {
+          "constraints": {
+            "scene": [
+              "C", 
+              "F"
+            ]
+          }, 
+          "description": "Derived product prototype (C and F only)", 
+          "inherit": "derived-product"
+        }, 
+        "derived-product-full-disk": {
+          "constraints": {
+            "scene": [
+              "F"
+            ]
+          }, 
+          "description": "Derived product prototype (F only)", 
+          "inherit": "derived-product"
+        }, 
+        "derived-product-full-disk-and-meso": {
+          "constraints": {
+            "scene": [
+              "F", 
+              "M1", 
+              "M2"
+            ]
+          }, 
+          "description": "Derived product prototype (F and M only)", 
+          "inherit": "derived-product"
+        }, 
+        "derived-product-g16-and-g17": {
+          "constraints": {
+            "origin": [
+              "G16", 
+              "G17"
+            ]
+          }, 
+          "description": "Derived product prototype (G16 and G17 only)", 
+          "inherit": "derived-product"
+        }, 
+        "derived-product-g16-and-g18": {
+          "constraints": {
+            "origin": [
+              "G16", 
+              "G18"
+            ]
+          }, 
+          "description": "Derived product prototype (G16 and G18 only)", 
+          "inherit": "derived-product"
+        }, 
+        "derived-product-meso": {
+          "constraints": {
+            "scene": [
+              "M1", 
+              "M2"
+            ]
+          }, 
+          "description": "Derived product prototype (M only)", 
+          "inherit": "derived-product"
+        }, 
+        "glm": {
+          "description": "GLM product prototype", 
+          "inherit": "base", 
+          "prototype": {
+            "instrument": "GLM", 
+            "level": "L2"
+          }
+        }, 
+        "primary-product": {
+          "constraints": {
+            "channel": [
+              "C01", 
+              "C02", 
+              "C03", 
+              "C04", 
+              "C05", 
+              "C06", 
+              "C07", 
+              "C08", 
+              "C09", 
+              "C10", 
+              "C11", 
+              "C12", 
+              "C13", 
+              "C14", 
+              "C15", 
+              "C16"
+            ]
+          }, 
+          "description": "Primary product prototype", 
+          "inherit": "derived-product"
+        }
+      }, 
+      "template": {
+        "file-date-format": "%Y%j%H%M%S%f", 
+        "file-date-pattern": "\\d{14}", 
+        "file-suffix": ".nc", 
+        "path-date-format": "%Y/%j/%H"
+      }
     }
+  }, 
+  "product": {
+    "ACHA": "goes", 
+    "ACHA2KM": "goes", 
+    "ACHP2KM": "goes", 
+    "ACHT": "goes", 
+    "ACM": "goes", 
+    "ACTP": "goes", 
+    "ADP": "goes", 
+    "AICE": "goes", 
+    "AITA": "goes", 
+    "AOD": "goes", 
+    "BRF": "goes", 
+    "CCL": "goes", 
+    "CMIP": "goes", 
+    "COD": "goes", 
+    "COD2KM": "goes", 
+    "CPS": "goes", 
+    "CTP": "goes", 
+    "DMW": "goes", 
+    "DMWM": "goes", 
+    "DMWV": "goes", 
+    "DSI": "goes", 
+    "DSR": "goes", 
+    "FDC": "goes", 
+    "FSC": "goes", 
+    "LCFA": "goes", 
+    "LSA": "goes", 
+    "LST": "goes", 
+    "LST2KM": "goes", 
+    "LVMP": "goes", 
+    "LVTP": "goes", 
+    "MCMIP": "goes", 
+    "RRQPE": "goes", 
+    "RSR": "goes", 
+    "Rad": "goes", 
+    "SST": "goes", 
+    "TPW": "goes", 
+    "VAA": "goes"
+  }
 }
