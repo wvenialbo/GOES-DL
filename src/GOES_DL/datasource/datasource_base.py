@@ -52,16 +52,12 @@ class DatasourceBase(Datasource):
             time of 0.0 seconds, i.e. no caching.
         """
         super().__init__(base_url)
-        if repository is None:
-            repository = "."
-        if isinstance(repository, (str, Path)):
-            base_path = repository
-            repository = DatasourceRepository(base_path)
-        self.repository = repository
+        if isinstance(repository, DatasourceRepository):
+            self.repository = repository
+        else:
+            self.repository = DatasourceRepository(repository)
 
-        if cache is None:
-            cache = 0.0
-        if isinstance(cache, float):
-            life_time: float = cache
-            cache = DatasourceCache(life_time)
-        self.cache = cache
+        if isinstance(cache, DatasourceCache):
+            self.cache = cache
+        else:
+            self.cache = DatasourceCache(cache)
