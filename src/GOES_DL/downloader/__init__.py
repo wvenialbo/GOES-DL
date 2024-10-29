@@ -11,3 +11,5 @@ Downloader
 """
 
 from .downloader import Downloader as Downloader
+
+__all__ = ["Downloader"]

@@ -1,3 +1,11 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABIPM: Multi-band primary ABI products.
+    - GOESProductLocatorMCMIP: Multi-band CMIP Product.
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 
@@ -37,18 +45,11 @@ class GOESProductLocatorABIPM(GOESProductLocatorABI):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
-        PRODUCT_LEVEL: str = "L2"
-
-        super(GOESProductLocatorABIPM, self).__init__(
+        super().__init__(
             name=name,
-            level=PRODUCT_LEVEL,
+            level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
             channels=[],
             origin=origin,
@@ -62,6 +63,8 @@ class GOESProductLocatorMCMIP(GOESProductLocatorABIPM):
     Instrument: Advanced Baseline Imager (ABI)
     Product: Cloud and Moisture Imagery Product (CMIP).
     """
+
+    PRODUCT_NAME: str = "MCMIP"
 
     def __init__(self, scene: str, origin: str) -> None:
         """
@@ -81,8 +84,4 @@ class GOESProductLocatorMCMIP(GOESProductLocatorABIPM):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "MCMIP"
-
-        super(GOESProductLocatorMCMIP, self).__init__(
-            name=PRODUCT_NAME, scene=scene, origin=origin
-        )
+        super().__init__(name=self.PRODUCT_NAME, scene=scene, origin=origin)

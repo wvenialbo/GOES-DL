@@ -1,3 +1,10 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABIDP: All derived ABI products.
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 
@@ -106,12 +113,7 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
         only_in_segment: list[set[str]] = [
             self.ONLY_CF_SCENE,
@@ -132,7 +134,7 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
                     f"supported scenes {sorted(segment)}"
                 )
 
-        only_in_segment: list[set[str]] = [
+        only_in_segment = [
             self.ONLY_G16_G17,
             self.ONLY_G16_G18,
         ]
@@ -149,11 +151,9 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
                     f"supported origins {sorted(segment)}"
                 )
 
-        PRODUCT_LEVEL: str = "L2"
-
-        super(GOESProductLocatorABIDP, self).__init__(
+        super().__init__(
             name=name,
-            level=PRODUCT_LEVEL,
+            level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
             channels=[],
             origin=origin,

@@ -1,3 +1,11 @@
+"""
+Provide locator for GOES-R Series imagery dataset's GLM products.
+
+Classes:
+    - GOESProductLocatorLCFA: GLM Lightning Cluster-Filter Algorithm
+      (LCFA).
+"""
+
 from .locator_glm import GOESProductLocatorGLM
 
 
@@ -8,6 +16,8 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
     Instrument: Geostationary Lightning Mapper (GLM).
     Product: Lightning Cluster-Filter Algorithm (LCFA).
     """
+
+    PRODUCT_NAME: str = "LCFA"
 
     def __init__(self, origin: str) -> None:
         """
@@ -24,8 +34,4 @@ class GOESProductLocatorLCFA(GOESProductLocatorGLM):
             directories are organised, only a single origin may be
             provided.
         """
-        PRODUCT_NAME: str = "LCFA"
-
-        super(GOESProductLocatorLCFA, self).__init__(
-            name=PRODUCT_NAME, origin=origin
-        )
+        super().__init__(name=self.PRODUCT_NAME, origin=origin)

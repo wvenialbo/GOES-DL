@@ -1,3 +1,11 @@
+"""
+Provide product locator for satellite imagery dataset consumers.
+
+Classes:
+    - ProductLocator: Abstract a product locator for satellite imagery
+      dataset consumers.
+"""
+
 from abc import ABC, abstractmethod
 from datetime import datetime
 

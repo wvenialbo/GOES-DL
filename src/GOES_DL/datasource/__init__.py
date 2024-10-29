@@ -15,9 +15,20 @@ DatasourceCache
     A datasource object that caches the files.
 DatasourceHTTP
     A datasource object for an HTTP server.
+DownloaderRepository
+    Manage file operations for the downloader object.
 """
 
 from .datasource import Datasource as Datasource
 from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
 from .datasource_http import DatasourceHTTP as DatasourceHTTP
+from .datasource_repository import DatasourceRepository as DatasourceRepository
+
+__all__ = [
+    "Datasource",
+    "DatasourceAWS",
+    "DatasourceCache",
+    "DatasourceHTTP",
+    "DatasourceRepository",
+]
