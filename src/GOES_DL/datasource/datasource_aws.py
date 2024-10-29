@@ -41,10 +41,13 @@ class DatasourceAWS(DatasourceBase):
 
     Methods
     -------
+    download_file(file_path: str)
+        Retrieve a file from the datasource and save it into the local
+        repository.
     get_file(file_path: str)
-        Download a file into memory.
+        Get a file from the datasource or local repository.
     listdir(dir_path: str)
-        List the contents of a directory.
+        List the contents of a remote directory.
     """
 
     bucket_name: str
