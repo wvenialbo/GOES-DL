@@ -46,9 +46,7 @@ class FileRepository:
             If the given path already exists in the file system and is
             not a directory.
         """
-        if base_directory is None:
-            base_directory = "."
-        self.base_directory = Path(base_directory)
+        self.base_directory = Path(base_directory or ".")
         if not self.base_directory.exists():
             self.base_directory.mkdir(parents=True)
         elif not self.base_directory.is_dir():

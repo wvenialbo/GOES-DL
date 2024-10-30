@@ -64,7 +64,7 @@ Satellites - R Series][4].
 
 ## Installation
 
-To install **GOES-DL**, use `pip` *(not yet)*:
+To install **GOES-DL**, use `pip`:
 
 ```bash
 pip install goes-dl
@@ -75,7 +75,7 @@ pip install goes-dl
 Below are examples of how to use the GOES-DL package to download data from each
 of the supported sources.
 
-### 1. Download GOES 2nd Generation Data
+### 1. Download GOES 2nd Generation Data (from NOAA's NCEI archive)
 
 ```python
 # Import the locator and datasource according to your desired product
@@ -86,7 +86,7 @@ from GOES_DL.downloader import Downloader
 # Initialize the downloader for GridSat-GOES (GOES-12, Full Disk)
 locator = GridSatProductLocatorGC("F", "G12")
 
-datasource = DatasourceHTTP(locator)
+datasource = DatasourceHTTP(locator, repository="./my_data/gridsat-gc")
 
 downloader = Downloader(
     datasource=datasource,
@@ -107,7 +107,7 @@ files2 = downloader.get_files(
 # file content, respectively. The file path is relative to the base URL.
 ```
 
-### 2. Download GOES 3rd Generation Data
+### 2. Download GOES 3rd Generation Data (from NOAA's AWS archive)
 
 ```python
 # Import the locator and datasource according to your desired product
@@ -118,7 +118,9 @@ from GOES_DL.downloader import Downloader
 # Initialize the downloader for GOES-R Series (set your desired product)
 locator = GOESProductLocatorABIPP("CMIP", "F", ["C02", "C08", "C13"], "G16")
 
-datasource = DatasourceAWS(locator)
+# GOES-16 data is updated every 10 minutes. If you are downloading
+# old data, you may leave the cache refresh rate as default (+inf).
+datasource = DatasourceAWS(locator, repository="./my_data/goes-r", cache=600)
 
 downloader = Downloader(
     datasource=datasource,
@@ -138,7 +140,7 @@ files2 = downloader.get_files(
 # file content, respectively. The file path is relative to the base URL.
 ```
 
-### 3. Download GridSat-B1 Data
+### 3. Download GridSat-B1 Data (from NOAA's AWS archive)
 
 ```python
 # Import the locator and datasource according to your desired product
@@ -149,7 +151,45 @@ from GOES_DL.downloader import Downloader
 # Initialize the downloader for GridSat-B1
 locator = GridSatProductLocatorB1()
 
-datasource = DatasourceAWS(locator)  # also available in HTTP from NCEI
+# Also available in HTTP from NCEI's archive, see next example
+datasource = DatasourceAWS(locator, repository="./my_data/gridsat-b1")
+
+downloader = Downloader(
+    datasource=datasource,
+    locator=locator,
+    date_format="%Y-%m-%dT%H:%M%z",
+)
+
+# Set your desired date...
+files1 = downloader.get_files(start="1984-08-23T00:00Z")
+
+# ...or your desired date range
+files2 = downloader.get_files(
+   start="1984-08-23T00:00-0004",
+   end="1984-08-24T00:00-0004",
+)
+
+# `files1` and files2` are lists of tuple[str, bytes] with file path and
+# file content, respectively. The file path is relative to the base URL.
+```
+
+### 4. Download GridSat-B1 Data (from NOAA's NCEI archive)
+
+```python
+# Import the locator and datasource according to your desired product
+from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
+from GOES_DL.datasource import DatasourceHTTP
+from GOES_DL.downloader import Downloader
+
+# Initialize the downloader for GridSat-B1
+locator = GridSatProductLocatorB1()
+
+# NCEI archive has the same folder structure as AWS, so, if you have
+# downloaded data from AWS, you can use the same locator and change the
+# datasource to HTTP. If a file is not found in the local repository, it
+# will be downloaded from the remote datasource. In all previous examples,
+# if a file was already downloaded, it will not be downloaded again.
+datasource = DatasourceHTTP(locator, repository="./my_data/gridsat-b1")
 
 downloader = Downloader(
     datasource=datasource,

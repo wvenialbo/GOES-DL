@@ -154,6 +154,10 @@ class GOESProductLocator(ProductLocatorGG):
     MESO_1 = "M1"
     MESO_2 = "M2"
 
+    # WARNING: This is being override by GOESProductLocatorABI in this
+    #          release due to an incomplete refactoring. This will be
+    #          fixed in future releases. Nevertheless, the methods that
+    #          use this attribute was fixed to use the correct values.
     AVAILABLE_SCENES: dict[str, str] = {
         FULL_DISK: FULL_DISK,
         CONUS: CONUS,
@@ -262,7 +266,7 @@ class GOESProductLocator(ProductLocatorGG):
                 f"Supported datasources: {supported_datasources}"
             )
 
-        scene: str = self.AVAILABLE_SCENES[self.scene] if self.scene else ""
+        scene: str = self.scene
         product: str = f"{self.instrument}-{self.level}-{self.name}{scene}"
         satellite: str = self.AVAILABLE_ORIGINS[self.origin]
 
