@@ -46,7 +46,7 @@ class Downloader:
     ----------
     datasource : Datasource
         A reference to the datasource object.
-    product_locator : ProductLocator
+    locator : ProductLocator
         A reference to the dataset's product locator object.
     date_format : str
         The date format specification. The default is the ISO timestamp
