@@ -95,16 +95,16 @@ downloader = Downloader(
 )
 
 # Set your desired date...
-files1 = downloader.get_files(start="2012-08-23T00:00Z")
+files1 = downloader.download_files(start="2012-08-23T00:00Z")
 
 # ...or your desired date range
-files2 = downloader.get_files(
+files2 = downloader.download_files(
    start="2012-08-23T00:00-0004",
    end="2012-08-24T00:00-0004",
 )
 
-# `files1` and files2` are lists of tuple[str, bytes] with file path and
-# file content, respectively. The file path is relative to the base URL.
+# `files1` and files2` are lists of strings with the path of the downloaded
+# files relative to the base URL and local repository root directory.
 ```
 
 ### 2. Download GOES 3rd Generation Data (from NOAA's AWS archive)
@@ -128,16 +128,16 @@ downloader = Downloader(
 )
 
 # Set your desired date...
-files1 = downloader.get_files(start="2024-08-23T00:00:00Z")
+files1 = downloader.download_files(start="2024-08-23T00:00:00Z")
 
 # ...or your desired date range
-files2 = downloader.get_files(
+files2 = downloader.download_files(
    start="2024-08-23T00:00:00-0004",  # use the default date format
    end="2024-08-24T00:00:00-0004",
 )
 
-# `files1` and files2` are lists of tuple[str, bytes] with file path and
-# file content, respectively. The file path is relative to the base URL.
+# `files1` and files2` are lists of strings with the path of the downloaded
+# files relative to the base URL and local repository root directory.
 ```
 
 ### 3. Download GridSat-B1 Data (from NOAA's AWS archive)
@@ -161,16 +161,16 @@ downloader = Downloader(
 )
 
 # Set your desired date...
-files1 = downloader.get_files(start="1984-08-23T00:00Z")
+files1 = downloader.download_files(start="1984-08-23T00:00Z")
 
 # ...or your desired date range
-files2 = downloader.get_files(
+files2 = downloader.download_files(
    start="1984-08-23T00:00-0004",
    end="1984-08-24T00:00-0004",
 )
 
-# `files1` and files2` are lists of tuple[str, bytes] with file path and
-# file content, respectively. The file path is relative to the base URL.
+# `files1` and files2` are lists of strings with the path of the downloaded
+# files relative to the base URL and local repository root directory.
 ```
 
 ### 4. Download GridSat-B1 Data (from NOAA's NCEI archive)
@@ -198,16 +198,22 @@ downloader = Downloader(
 )
 
 # Set your desired date...
-files1 = downloader.get_files(start="1984-08-23T00:00Z")
+files1 = downloader.download_files(start="1984-08-23T00:00Z")
 
-# ...or your desired date range
-files2 = downloader.get_files(
+# ...or, alternatively, your can get the list of files within a date range
+files2 = downloader.list_files(
    start="1984-08-23T00:00-0004",
    end="1984-08-24T00:00-0004",
 )
 
-# `files1` and files2` are lists of tuple[str, bytes] with file path and
-# file content, respectively. The file path is relative to the base URL.
+# ...perform any processing you need to do with the list of files...
+...
+
+# ...and pass that resulting or filtered list to the `get_files` method
+downloader.get_files(files2)
+
+# `files1` and files2` are lists of strings with the path of the downloaded
+# files relative to the base URL and local repository root directory.
 ```
 
 ## Pipeline and parameters
