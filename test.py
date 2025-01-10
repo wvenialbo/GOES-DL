@@ -44,7 +44,7 @@ REPO_GRISAT_GOES = "../temp/gridsat/goes-conus"
 REPO_GOES = "../temp/GOES-16"
 
 
-def test(dl: Downloader, start: str, end: str = "") -> list[tuple[str, bytes]]:
+def test(dl: Downloader, start: str, end: str = "") -> list[str]:
     """
     Test the downloader object by downloading files within a date range.
 
@@ -59,7 +59,7 @@ def test(dl: Downloader, start: str, end: str = "") -> list[tuple[str, bytes]]:
 
     Returns
     -------
-    list[tuple[str, bytes]]
+    list[str]
         The list of downloaded files.
     """
     if end:
@@ -67,9 +67,7 @@ def test(dl: Downloader, start: str, end: str = "") -> list[tuple[str, bytes]]:
     else:
         print(f"Downloading data from {start}")
 
-    dl.download_files(start=start, end=end)
-
-    files: list[tuple[str, bytes]] = dl.get_files(start=start, end=end)
+    files: list[str] = dl.download_files(start=start, end=end)
 
     return files
 
@@ -109,25 +107,35 @@ def test_gridsat_goes() -> None:
     test(dl, "2008-11-09T14:00+0000")
 
 
-def test_goes() -> None:
+def test_goes() -> list[str]:
     """
     Test the downloader object with GOES-16 data and AWS datasource.
+
+    Returns
+    -------
+    list[str]
+        The list of downloaded files.
     """
     pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
 
     # GOES-16 data is updated every 10 minutes. If you are downloading
     # old data, you may leave the refresh rate as default.
+    REPO_GOES = "C:/Projects/TFG/source/tutorials/repository/20201114T20"
     ds = DatasourceAWS(pd, REPO_GOES, 10 * 60)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    dl = Downloader(datasource=ds, locator=pd)
 
-    test(dl, "2024-08-23T00:00+0000")
+    files1 = test(dl, "2020-11-14T20:00:00Z")
+    files2 = test(dl, "2020-11-14T20:00:00Z", "2020-11-15T19:00:00Z")
+
+    return files2
 
 
 def main() -> None:
     """
     Run all test functions.
     """
-    test_goes()
+    files = test_goes()
+    print(files)
     test_gridsat_goes()
     test_gridsat_aws()
     test_gridsat_http()
