@@ -44,8 +44,6 @@ class DatasourceAWS(DatasourceBase):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    get_file(file_path: str)
-        Get a file from the datasource or local repository.
     listdir(dir_path: str)
         List the contents of a remote directory.
     """
@@ -125,39 +123,6 @@ class DatasourceAWS(DatasourceBase):
         try:
             self._retrieve_file(file_path)
 
-        except ClientError as exc:
-            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
-            raise RuntimeError(message) from exc
-
-    def get_file(self, file_path: str) -> bytes:
-        """
-        Download a file into memory.
-
-        Get a file from a remote location. The path is relative to the
-        base URL.
-
-        Parameters
-        ----------
-        file_path : str
-            The path to the file. The path is relative to the base URL.
-
-        Returns
-        -------
-        bytes
-            The file object.
-
-        Raises
-        ------
-        RuntimeError
-            If the file cannot be retrieved.
-        """
-        local_file = self.repository.get_item(file_path)
-
-        if local_file is not None:
-            return local_file
-
-        try:
-            return self._retrieve_file(file_path)
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
             raise RuntimeError(message) from exc
