@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
+from ..datasource.constants import DownloadStatus
 from .constants import (
     ISO_TIMESTAMP_FORMAT,
     TIME_TOLERANCE_DEFAULT,
@@ -417,5 +418,18 @@ class Downloader:
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        for file in file_paths:
-            self.datasource.download_file(file)
+        num_files = len(file_paths)
+        num_len = len(f"{num_files}")
+        padding = " ".rjust(2 * num_len + 2)
+        if self.show_progress:
+            print("Downloading files:")
+        for i, file in enumerate(file_paths):
+            result = self.datasource.download_file(file)
+            if self.show_progress:
+                num_item = f"{i}".rjust(num_len)
+                print(f"{num_item:d}/{num_files:d} {file}")
+
+                if result == DownloadStatus.SUCCESS:
+                    print(f"{padding}Downloaded succesfully")
+                else:
+                    print(f"{padding}Already downloaded")
