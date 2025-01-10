@@ -42,12 +42,14 @@ class Datasource(ABC):
         Download a file from the datasource into the local repository.
 
         Get a file from a remote location or local repository. The path
-        is relative to the base URL and local repository root directory.
+        provided must be relative to the base URL and local repository
+        root directory. The remote path is reconstructed in the local
+        repository.
 
         Parameters
         ----------
         file_path : str
-            The path to the file. The path is relative to the base URL.
+            The path to the remote file to be downloaded.
         """
 
     @abstractmethod
