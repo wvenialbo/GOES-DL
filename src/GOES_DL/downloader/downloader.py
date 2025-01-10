@@ -51,6 +51,9 @@ class Downloader:
     date_format : str
         The date format specification. The default is the ISO timestamp
         format.
+    show_progress : bool
+        A flag to show the progress of the download. The default is
+        True, to display the progress.
     time_tolerance : int
         The time tolerance in seconds. The default is 60 seconds.
 
@@ -67,6 +70,7 @@ class Downloader:
     datasource: Datasource
     locator: ProductLocator
     date_format: str = ISO_TIMESTAMP_FORMAT
+    show_progress: bool = True
     time_tolerance: int = TIME_TOLERANCE_DEFAULT
 
     def __post_init__(self) -> None:
