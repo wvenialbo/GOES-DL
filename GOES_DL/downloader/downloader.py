@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
-from .constants import ISO_TIMESTAMP_FORMAT
+from .constants import ISO_TIMESTAMP_FORMAT, TIME_TOLERANCE_DEFAULT
 
 
 @dataclass(eq=False, frozen=True)
@@ -60,7 +60,7 @@ class Downloader:
     datasource: Datasource
     locator: ProductLocator
     date_format: str = ISO_TIMESTAMP_FORMAT
-    time_tolerance: int = 60
+    time_tolerance: int = TIME_TOLERANCE_DEFAULT
 
     def __post_init__(self) -> None:
         """
