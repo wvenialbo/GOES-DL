@@ -363,6 +363,9 @@ class Downloader:
             expected format or if the timestamp format specification
             is ill-formed (which is, indeed, a bug!).
         """
+        if self.show_progress:
+            print("Retrieving available file list")
+
         datetime_ini: datetime
         datetime_fin: datetime
         datetime_ini, datetime_fin = self._get_datetimes(start_time, end_time)
