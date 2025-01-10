@@ -60,6 +60,8 @@ class Downloader:
         Download files from the datasource into the local repository.
     get_files(start_time: str, end_time: str = "")
         Load files from the datasource or local repository.
+    list_files(start_time: str, end_time: str = "")
+        List the files that can be retrieved from the datasource.
     """
 
     datasource: Datasource
@@ -185,6 +187,51 @@ class Downloader:
         retrieved_files: list[bytes] = self._load_files(files_in_range)
 
         return retrieved_files, files_in_range
+
+    def list_files(self, *, start: str, end: str = "") -> list[str]:
+        """
+        List the files that can be retrieved from the datasource.
+
+        List the files that match the timestamps between `start` and
+        `end` times, inclusive, from the datasource or local repository.
+        The list is filtered by the timestamps of the files; only files
+        in the requested range are returned.
+
+        Note that a `start` date must be always provided. If an `end`
+        date is not given, it is set equal to `start_time`. An offset of
+        `time_tolerance` seconds (60 by default) is subtracted from the
+        initial datetime and added to the final datetime to account for
+        possible differences in the files' timestamps.
+
+        Parameters
+        ----------
+        start : str
+            The start time in the format specified by the `date_format`
+            attribute.
+        end : str, optional
+            The end time in the format specified by the `date_format`
+            attribute. The default is "", in which case `end_time` is
+            set equal to `start_time`.
+
+        Returns
+        -------
+        list[str]
+            A list of file path and names with respect to the local
+            repository root directory.
+
+        Raises
+        ------
+        ValueError
+            If the start_time is not provided. The framework raises an
+            exception if the provided timestamps do not match the
+            expected format or if the timestamp format specification is
+            ill-formed (which is, indeed, a bug!).
+        RuntimeError
+            The framework may raise if the file cannot be retrieved,
+            e.g. if the file does not exist in the datasource or an
+            internal error occurred.
+        """
+        return self._get_file_list(start, end)
 
     def _filter_directory_content(
         self, datetime_ini: datetime, datetime_fin: datetime, files: list[str]
