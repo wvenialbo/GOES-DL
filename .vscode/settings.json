@@ -324,14 +324,9 @@
     ],
     // AI assistance tools settings
     "github.copilot.advanced": {},
-    "github.copilot.chat.experimental.codeFeedback.instructions": [
+    "github.copilot.chat.codeGeneration.instructions": [
         {
-            "text": "Generate NumPy Style Python Docstrings (numpydoc)."
-        }
-    ],
-    "github.copilot.chat.experimental.codeGeneration.instructions": [
-        {
-            "text": "Generate NumPy Style Python Docstrings (numpydoc)."
+            "text": "In Python always generate NumPy style docstrings (numpydoc).",
         }
     ],
     "github.copilot.chat.fixTestFailure.enabled": true,
