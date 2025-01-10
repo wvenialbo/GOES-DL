@@ -370,38 +370,6 @@ class Downloader:
             datetime_ini, datetime_fin, files
         )
 
-    def _load_files(self, file_paths: list[str]) -> list[bytes]:
-        """
-        Retrieve the files from the datasource.
-
-        Retrieve the files from the datasource using the file paths
-        provided in the `file_paths` list.
-
-        Parameters
-        ----------
-        file_paths : list[str]
-            A list with the file paths.
-
-        Returns
-        -------
-        list[bytes]
-            A list with the file objects.
-
-        Raises
-        ------
-        RuntimeError
-            The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the datasource or an
-            internal error occurred.
-        """
-        file_objects: list[bytes] = []
-
-        for file in file_paths:
-            file_object: bytes = self.datasource.get_file(file)
-            file_objects.append(file_object)
-
-        return file_objects
-
     def _retrieve_directory_content(self, paths: list[str]) -> list[str]:
         """
         Retrieve the content of the directories.
