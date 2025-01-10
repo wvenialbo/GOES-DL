@@ -421,15 +421,19 @@ class Downloader:
         num_files = len(file_paths)
         num_len = len(f"{num_files}")
         padding = " ".rjust(2 * num_len + 2)
+
         if self.show_progress:
             print("Downloading files:")
-        for i, file in enumerate(file_paths):
-            result = self.datasource.download_file(file)
-            if self.show_progress:
-                num_item = f"{i}".rjust(num_len)
-                print(f"{num_item:d}/{num_files:d} {file}")
 
+        for i, file in enumerate(file_paths):
+            if self.show_progress:
+                num_item = f"{i + 1}".rjust(num_len)
+                print(f"{num_item}/{num_files} {file}")
+
+            result = self.datasource.download_file(file)
+
+            if self.show_progress:
                 if result == DownloadStatus.SUCCESS:
-                    print(f"{padding}Downloaded succesfully")
+                    print(f"{padding}... downloaded succesfully")
                 else:
-                    print(f"{padding}Already downloaded")
+                    print(f"{padding}... already downloaded")
