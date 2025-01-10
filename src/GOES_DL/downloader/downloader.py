@@ -82,7 +82,7 @@ class Downloader:
                 f"to {TIME_TOLERANCE_MAX} seconds"
             )
 
-    def download_files(self, *, start: str, end: str = "") -> None:
+    def download_files(self, *, start: str, end: str = "") -> list[str]:
         """
         Download files from the datasource into the local repository.
 
@@ -93,20 +93,27 @@ class Downloader:
         file is already in the local repository, it is not downloaded
         again.
 
-        Note that `start` must be always provided. An offset of 60
-        seconds is added to the initial datetime and subtracted from the
-        final datetime to account for possible differences in the files'
-        timestamps.
+        Note that a `start` date must be always provided. If an `end`
+        date is not given, it is set equal to `start_time`. An offset of
+        `time_tolerance` seconds (60 by default) is subtracted from the
+        initial datetime and added to the final datetime to account for
+        possible differences in the files' timestamps.
 
         Parameters
         ----------
         start : str
-            The start time in the format specified by the date_format
+            The start time in the format specified by the `date_format`
             attribute.
         end : str, optional
-            The end time in the format specified by the date_format
+            The end time in the format specified by the `date_format`
             attribute. The default is "", in which case `end_time` is
             set equal to `start_time`.
+
+        Returns
+        -------
+        list[str]
+            A list of file path and names with respect to the local
+            repository root directory.
 
         Raises
         ------
@@ -123,6 +130,8 @@ class Downloader:
         files_in_range: list[str] = self._get_file_list(start, end)
 
         self._retrieve_files(files_in_range)
+
+        return files_in_range
 
     def get_files(
         self, *, start: str, end: str = ""
