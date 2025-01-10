@@ -11,3 +11,8 @@ ISO_TIMESTAMP_FORMAT : str
 """
 
 ISO_TIMESTAMP_FORMAT: str = "%Y-%m-%dT%H:%M:%S%z"
+
+# Default values for the time tolerance (in seconds).
+TIME_TOLERANCE_DEFAULT: int = 60
+TIME_TOLERANCE_MAX: int = 300
+TIME_TOLERANCE_MIN: int = 30
