@@ -8,6 +8,8 @@ Classes:
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from .constants import DownloadStatus
+
 
 @dataclass(eq=False, frozen=True)
 class Datasource(ABC):
@@ -37,7 +39,7 @@ class Datasource(ABC):
     base_url: str
 
     @abstractmethod
-    def download_file(self, file_path: str) -> None:
+    def download_file(self, file_path: str) -> DownloadStatus:
         """
         Download a file from the datasource into the local repository.
 
@@ -50,6 +52,11 @@ class Datasource(ABC):
         ----------
         file_path : str
             The path to the remote file to be downloaded.
+
+        Returns
+        -------
+        DownloadStatus
+            The status of the download operation.
         """
 
     @abstractmethod
