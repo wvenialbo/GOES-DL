@@ -30,8 +30,6 @@ class Datasource(ABC):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    get_file(file_path: str)
-        Get a file from the datasource or local repository.
     listdir(dir_path: str)
         List the contents of a remote directory.
     """
@@ -50,25 +48,6 @@ class Datasource(ABC):
         ----------
         file_path : str
             The path to the file. The path is relative to the base URL.
-        """
-
-    @abstractmethod
-    def get_file(self, file_path: str) -> bytes:
-        """
-        Get a file from the datasource or local repository.
-
-        Get a file from a remote location or local repository. The path
-        is relative to the base URL and local repository root directory.
-
-        Parameters
-        ----------
-        file_path : str
-            The path to the file. The path is relative to the base URL.
-
-        Returns
-        -------
-        bytes
-            The file object.
         """
 
     @abstractmethod
