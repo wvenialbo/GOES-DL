@@ -15,6 +15,7 @@ import requests
 from ..dataset import ProductLocator
 from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
 from ..utils.url import URL as url
+from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository
@@ -85,7 +86,7 @@ class DatasourceHTTP(DatasourceBase):
 
         super().__init__(base_url, repository, cache)
 
-    def download_file(self, file_path: str) -> None:
+    def download_file(self, file_path: str) -> DownloadStatus:
         """
         Download a file from the datasource into the local repository.
 
@@ -99,16 +100,25 @@ class DatasourceHTTP(DatasourceBase):
         file_path : str
             The path to the remote file to be downloaded.
 
+        Returns
+        -------
+        DownloadStatus
+            `DownloadStatus.SUCCESS` if the file was downloaded
+            successfully; otherwise, `DownloadStatus.ALREADY` if the
+            file is already in the local repository.
+
         Raises
         ------
         RuntimeError
-            If the file cannot be retrieved
+            If the file cannot be retrieved.
         """
         if self.repository.has_item(file_path):
-            return
+            return DownloadStatus.ALREADY
 
         try:
             self._retrieve_file(file_path)
+            return DownloadStatus.SUCCESS
+
         except requests.HTTPError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
             raise RuntimeError(message) from exc
