@@ -16,7 +16,12 @@ from datetime import datetime, timedelta
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
-from .constants import ISO_TIMESTAMP_FORMAT, TIME_TOLERANCE_DEFAULT
+from .constants import (
+    ISO_TIMESTAMP_FORMAT,
+    TIME_TOLERANCE_DEFAULT,
+    TIME_TOLERANCE_MAX,
+    TIME_TOLERANCE_MIN,
+)
 
 
 @dataclass(eq=False, frozen=True)
@@ -66,8 +71,16 @@ class Downloader:
         """
         Validate the downloader object.
         """
-        if self.time_tolerance < 0:
-            raise ValueError("time_tolerance must be non-negative")
+        if self.time_tolerance < TIME_TOLERANCE_MIN:
+            raise ValueError(
+                "time_tolerance must be greater than or equal "
+                f"to {TIME_TOLERANCE_MIN} seconds"
+            )
+        if self.time_tolerance > TIME_TOLERANCE_MAX:
+            raise ValueError(
+                "time_tolerance must be less than or equal "
+                f"to {TIME_TOLERANCE_MAX} seconds"
+            )
 
     def download_files(self, *, start: str, end: str = "") -> None:
         """
