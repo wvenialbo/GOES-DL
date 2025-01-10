@@ -184,7 +184,8 @@ class Downloader:
         List the files that match the timestamps between `start` and
         `end` times, inclusive, from the datasource or local repository.
         The list is filtered by the timestamps of the files; only files
-        in the requested range are returned.
+        in the requested range are returned. This list can be filtered
+        using custom criteria then passed to the `get_files()` method.
 
         Note that a `start` date must be always provided. If an `end`
         date is not given, it is set equal to `start_time`. An offset of
