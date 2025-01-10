@@ -59,7 +59,7 @@ class Downloader:
     download_files(start_time: str, end_time: str = "")
         Download files from the datasource into the local repository.
     get_files(start_time: str, end_time: str = "")
-        Load files from the datasource or local repository.
+        Load a list of files from the datasource or local repository.
     list_files(start_time: str, end_time: str = "")
         List the files that can be retrieved from the datasource.
     """
@@ -135,18 +135,14 @@ class Downloader:
 
         return files_in_range
 
-    def get_files(
-        self, *, start: str, end: str = ""
-    ) -> tuple[list[bytes], list[str]]:
+    def get_files(self, *, file_paths: list[str]) -> list[str]:
         """
-        Load files from the datasource or local repository.
+        Load a list of files from the datasource or local repository.
 
-        Load the files that match the timestamps between `start` and
-        `end` times, inclusive, from the datasource or local repository.
-        The list is filtered by the timestamps of the files; only files
-        in the requested range are returned. If the file is not in the
-        local repository, it is retrieved from the datasource and saved
-        in the local repository.
+        Load the files in the `file_paths` list from the datasource or
+        local repository. If the file is not in the local repository, it
+        is retrieved from the datasource and saved in the local
+        repository.
 
         Note that `start` must be always provided. An offset of 60
         seconds is added to the initial datetime and subtracted from the
@@ -155,13 +151,8 @@ class Downloader:
 
         Parameters
         ----------
-        start : str
-            The start time in the format specified by the date_format
-            attribute.
-        end : str, optional
-            The end time in the format specified by the date_format
-            attribute. The default is "", in which case `end_time` is
-            set equal to `start_time`.
+        file_paths : list[str]
+            A list with the file paths.
 
         Returns
         -------
@@ -182,11 +173,9 @@ class Downloader:
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        files_in_range: list[str] = self._get_file_list(start, end)
+        self._retrieve_files(file_paths)
 
-        retrieved_files: list[bytes] = self._load_files(files_in_range)
-
-        return retrieved_files, files_in_range
+        return file_paths
 
     def list_files(self, *, start: str, end: str = "") -> list[str]:
         """
