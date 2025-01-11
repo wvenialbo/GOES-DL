@@ -365,7 +365,7 @@
     "editor.showFoldingControls": "mouseover",
     "files.exclude": {
         "*.coverage": true,
-        "*.egg-info": true,
+        "**/*.egg-info": true,
         "**/__pycache__": true,
         "**/.git": true,
         "**/.github": true,
