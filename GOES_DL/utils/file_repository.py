@@ -169,7 +169,7 @@ class FileRepository:
             file_path.unlink()
         else:
             raise FileNotFoundError(
-                f"The file '{file_path}' does not exist " "or is not a file."
+                f"The file '{file_path}' does not exist or is not a file."
             )
 
     def get_full_path(
