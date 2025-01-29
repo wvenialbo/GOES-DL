@@ -1,3 +1,13 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABIDC: All derived ABI products supporting
+      channels.
+    - GOESProductLocatorDMW: ABI Derived Motion Winds (DMW).
+    - GOESProductLocatorDMWV: ABI Derived Motion WV Winds (DMWV).
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 
@@ -9,10 +19,20 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
     Product: All derived ABI products supporting channels.
     """
 
+    DMW_PRODUCT: str = "DMW"
+    DMWV_PRODUCT: str = "DMWV"
+
     AVAILABLE_PRODUCTS: dict[str, str] = {
-        "DMW": "Derived Motion Winds",
-        "DMWV": "Derived Motion WV Winds",
+        DMW_PRODUCT: "Derived Motion Winds",
+        DMWV_PRODUCT: "Derived Motion WV Winds",
     }
+
+    M_CHANNELS: set[str] = {"C02", "C07", "C08", "C09", "C10"}
+    CF_CHANNELS: set[str] = {"C14"} | M_CHANNELS
+    CF_SCENES: set[str] = {"C", "F"}
+    WV_CHANNELS: set[str] = {"C08"}
+
+    available_channels: set[str]
 
     def __init__(
         self, name: str, scene: str, channels: str | list[str], origin: str
@@ -46,12 +66,7 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
         ValueError
             If the provided product name is invalid.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
         if isinstance(channels, str):
             channels = [channels]
@@ -62,31 +77,11 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
                 "does require channel specification"
             )
 
-        if name == "DMW":
-            M_CHANNELS: set[str] = {"C02", "C07", "C08", "C09", "C10"}
-            CF_CHANNELS: set[str] = {"C14"} | M_CHANNELS
-            CF_SCENES: set[str] = {"C", "F"}
+        self._validate_channels(channels, self.available_channels)
 
-            supported_channels: set[str] = (
-                CF_CHANNELS if scene in CF_SCENES else M_CHANNELS
-            )
-
-        else:
-            supported_channels: set[str] = {"C08"}
-
-        if unsupported_channels := set(channels) - supported_channels:
-            raise ValueError(
-                f"Unsupported channels {sorted(unsupported_channels)} "
-                f"for current scene '{scene}' "
-                f"of derived ABI product '{name}'. "
-                f"Supported channels: {sorted(supported_channels)}"
-            )
-
-        PRODUCT_LEVEL: str = "L2"
-
-        super(GOESProductLocatorABIDC, self).__init__(
+        super().__init__(
             name=name,
-            level=PRODUCT_LEVEL,
+            level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
             channels=channels,
             origin=origin,
@@ -100,6 +95,8 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
     Instrument: Advanced Baseline Imager (ABI)
     Product: Derived Motion Winds (DMW).
     """
+
+    PRODUCT_NAME: str = GOESProductLocatorABIDC.DMW_PRODUCT
 
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
@@ -124,26 +121,15 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "DMW"
-
-        M_CHANNELS: set[str] = {"C02", "C07", "C08", "C09", "C10"}
-        CF_CHANNELS: set[str] = {"C14"} | M_CHANNELS
-        CF_SCENES: set[str] = {"C", "F"}
-
-        supported_channels: set[str] = (
-            CF_CHANNELS if self.scene in CF_SCENES else M_CHANNELS
+        self.available_channels = (
+            self.CF_CHANNELS if scene in self.CF_SCENES else self.M_CHANNELS
         )
 
-        if not set(self.channels).issubset(supported_channels):
-            raise ValueError(
-                f"Unsupported channels {self.channels} "
-                f"for current scene '{self.scene}' "
-                f"of primary ABI product '{PRODUCT_NAME}'. "
-                f"Supported channels: {sorted(supported_channels)}"
-            )
-
-        super(GOESProductLocatorDMW, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
+        super().__init__(
+            name=self.PRODUCT_NAME,
+            scene=scene,
+            channels=channels,
+            origin=origin,
         )
 
 
@@ -154,6 +140,8 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
     Instrument: Advanced Baseline Imager (ABI)
     Product: Derived Motion WV Winds (DMWV).
     """
+
+    PRODUCT_NAME: str = GOESProductLocatorABIDC.DMWV_PRODUCT
 
     def __init__(self, scene: str, origin: str) -> None:
         """
@@ -173,12 +161,12 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "DMWV"
-        PRODUCT_CHANNELS: list[str] = ["C08"]
 
-        super(GOESProductLocatorDMWV, self).__init__(
-            name=PRODUCT_NAME,
+        self.available_channels = self.WV_CHANNELS
+
+        super().__init__(
+            name=self.PRODUCT_NAME,
             scene=scene,
-            channels=PRODUCT_CHANNELS,
+            channels=list(self.WV_CHANNELS),
             origin=origin,
         )

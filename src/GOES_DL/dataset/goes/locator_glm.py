@@ -1,3 +1,11 @@
+"""
+Provide locator for GOES-R Series imagery dataset's GLM products.
+
+Classes:
+    - GOESProductLocatorGLM: All Geostationary Lightning Mapper (GLM)
+      products.
+"""
+
 from .locator import GOESProductLocator
 
 
@@ -12,6 +20,9 @@ class GOESProductLocatorGLM(GOESProductLocator):
     AVAILABLE_PRODUCTS: dict[str, str] = {
         "LCFA": "Lightning Cluster-Filter Algorithm"
     }
+
+    INSTRUMENT_NAME: str = "GLM"
+    PRODUCT_LEVEL: str = "L2"
 
     def __init__(self, name: str, origin: str) -> None:
         """
@@ -37,21 +48,13 @@ class GOESProductLocatorGLM(GOESProductLocator):
         ValueError
             If the provided product name is invalid.
         """
-        if name not in self.AVAILABLE_PRODUCTS:
-            available_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {available_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
-        INSTRUMENT_NAME: str = "GLM"
-        PRODUCT_LEVEL: str = "L2"
-
-        super(GOESProductLocatorGLM, self).__init__(
+        super().__init__(
             name=name,
-            level=PRODUCT_LEVEL,
+            level=self.PRODUCT_LEVEL,
             scene="",
-            instrument=INSTRUMENT_NAME,
+            instrument=self.INSTRUMENT_NAME,
             modes=[],
             channels=[],
             origin=origin,

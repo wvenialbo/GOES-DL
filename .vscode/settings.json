@@ -155,6 +155,7 @@
     },
     // Python analysis tools settings
     "python.analysis.autoFormatStrings": true,
+    "python.analysis.autoImportCompletions": true,
     "python.analysis.completeFunctionParens": true,
     "python.analysis.enableSyncServer": false,
     "python.analysis.fixAll": [
@@ -274,6 +275,7 @@
     },
     "git.autofetch": true,
     "git.enableSmartCommit": true,
+    "git.pruneOnFetch": true,
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
             "scope": "base",
@@ -322,14 +324,9 @@
     ],
     // AI assistance tools settings
     "github.copilot.advanced": {},
-    "github.copilot.chat.experimental.codeFeedback.instructions": [
+    "github.copilot.chat.codeGeneration.instructions": [
         {
-            "text": "Generate NumPy Style Python Docstrings (numpydoc)."
-        }
-    ],
-    "github.copilot.chat.experimental.codeGeneration.instructions": [
-        {
-            "text": "Generate NumPy Style Python Docstrings (numpydoc)."
+            "text": "In Python always generate NumPy style docstrings (numpydoc).",
         }
     ],
     "github.copilot.chat.fixTestFailure.enabled": true,
@@ -355,6 +352,9 @@
         "yaml": true,
     },
     "vsintellicode.python.completionsEnabled": true,
+    "vsintellicode.java.completionsEnabled": false,
+    "vsintellicode.sql.completionsEnabled": false,
+    "vsintellicode.typescript.completionsEnabled": false,
     // Productivity tools settings
     "diffEditor.diffAlgorithm": "advanced",
     "diffEditor.wordWrap": "off",

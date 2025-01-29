@@ -1,3 +1,13 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABIPP: All primary ABI products.
+    - GOESProductLocatorCMIP: ABI Cloud and Moisture Imagery Product
+      (CMIP).
+    - GOESProductLocatorRad: ABI Radiance Product (Rad).
+"""
+
 from .locator_abi import GOESProductLocatorABI
 
 
@@ -15,6 +25,8 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
         "CMIP": "Cloud and Moisture Imagery Product",
         "Rad": "Radiance",
     }
+
+    PRODUCT_RAD: str = "Rad"
 
     def __init__(
         self, name: str, scene: str, channels: str | list[str], origin: str
@@ -57,27 +69,15 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
                 "does require channel specification"
             )
 
-        if unsupported_channel := set(channels) - set(self.AVAILABLE_CHANNELS):
-            supported_channels: list[str] = sorted(self.AVAILABLE_CHANNELS)
-            raise ValueError(
-                f"Unsupported channel: '{sorted(unsupported_channel)}'. "
-                f"Supported channels: {supported_channels}"
-            )
+        self._validate_channels(channels, self.AVAILABLE_CHANNELS)
 
-        if name not in self.AVAILABLE_PRODUCTS:
-            supported_products: list[str] = sorted(self.AVAILABLE_PRODUCTS)
-            raise ValueError(
-                f"Invalid product ID: '{name}'. "
-                f"Available product IDs: {supported_products}"
-            )
+        self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
-        PRODUCT_RAD: str = "Rad"
-        LEVEL_RAD: str = "L1b"
-        LEVEL_NOT_RAD: str = "L2"
+        level: str = (
+            self.LEVEL_RAD if name == self.PRODUCT_RAD else self.LEVEL_NOT_RAD
+        )
 
-        level: str = LEVEL_RAD if name == PRODUCT_RAD else LEVEL_NOT_RAD
-
-        super(GOESProductLocatorABIPP, self).__init__(
+        super().__init__(
             name=name,
             level=level,
             scene=scene,
@@ -94,6 +94,8 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
     Product: Radiance (Rad).
     """
 
+    PRODUCT_NAME: str = "Rad"
+
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
     ) -> None:
@@ -117,10 +119,11 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "Rad"
-
-        super(GOESProductLocatorRad, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
+        super().__init__(
+            name=self.PRODUCT_NAME,
+            scene=scene,
+            channels=channels,
+            origin=origin,
         )
 
 
@@ -132,6 +135,8 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
     Product: Cloud and Moisture Imagery Product (CMIP).
     """
 
+    PRODUCT_NAME: str = "CMIP"
+
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
     ) -> None:
@@ -155,8 +160,9 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
             dataset directories are organised, only a single origin may
             be provided.
         """
-        PRODUCT_NAME: str = "CMIP"
-
-        super(GOESProductLocatorCMIP, self).__init__(
-            name=PRODUCT_NAME, scene=scene, channels=channels, origin=origin
+        super().__init__(
+            name=self.PRODUCT_NAME,
+            scene=scene,
+            channels=channels,
+            origin=origin,
         )

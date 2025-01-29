@@ -1,3 +1,11 @@
+"""
+Provide locator for GOES-R Series imagery dataset's ABI products.
+
+Classes:
+    - GOESProductLocatorABI: All primary and derived Advanced Baseline
+      Imager (ABI) products.
+"""
+
 from .locator import GOESProductLocator
 
 
@@ -16,11 +24,25 @@ class GOESProductLocatorABI(GOESProductLocator):
     # of Columbia), and “Continental United States” refers to 49 states
     # (including Alaska and the District of Columbia).
     AVAILABLE_SCENES: dict[str, str] = {
-        "F": "Full Disk",
-        "C": "CONUS (Continental United States)",
-        "M1": "Mesoscale (Domain 1)",
-        "M2": "Mesoscale (Domain 2)",
+        GOESProductLocator.FULL_DISK: "Full Disk",
+        GOESProductLocator.CONUS: "CONUS (Continental United States)",
+        GOESProductLocator.MESO_1: "Mesoscale (Domain 1)",
+        GOESProductLocator.MESO_2: "Mesoscale (Domain 2)",
     }
+
+    # Instrument: Advanced Baseline Imager (ABI).
+    INSTRUMENT_NAME: str = "ABI"
+
+    # Available scan modes for the GOES-R Series imagery dataset ABI
+    # products, regarding the requested scene for the product:
+    # - Mode 3 (Previous Flex Mode)
+    # - Mode 6 (Current Flex Mode)
+    CM_MODES: list[str] = ["M3", "M6"]
+    F_MODES: list[str] = ["M4"] + CM_MODES
+
+    LEVEL_RAD: str = "L1b"
+    LEVEL_NOT_RAD: str = "L2"
+    DEFAULT_PRODUCT_LEVEL: str = LEVEL_NOT_RAD
 
     def __init__(
         self,
@@ -62,30 +84,21 @@ class GOESProductLocatorABI(GOESProductLocator):
         ValueError
             If the provided origin, level or scene is invalid.
         """
-        if scene not in self.AVAILABLE_SCENES:
-            available_scenes: list[str] = sorted(self.AVAILABLE_SCENES)
-            raise ValueError(
-                f"Invalid scene ID: '{scene}'. "
-                f"Available scene IDs: {available_scenes}"
-            )
+        # TODO: Too many positional arguments. Solve it by using
+        #       the Builder or Factory methods, or patterns like
+        #       Essence or Fluent.
+        self._validate_scene(scene, self.AVAILABLE_SCENES)
 
-        # Instrument: Advanced Baseline Imager (ABI).
-        INSTRUMENT_NAME: str = "ABI"
+        scan_modes: list[str] = (
+            self.F_MODES if scene == self.FULL_DISK else self.CM_MODES
+        )
 
-        # Available scan modes for the GOES-R Series imagery dataset ABI
-        # products, regarding the requested scene for the product:
-        # - Mode 3 (Previous Flex Mode)
-        # - Mode 6 (Current Flex Mode)
-        CM_MODES: list[str] = ["M3", "M6"]
-        F_MODES: list[str] = ["M4"] + CM_MODES
-        SCAN_MODES: list[str] = F_MODES if scene == "F" else CM_MODES
-
-        super(GOESProductLocatorABI, self).__init__(
+        super().__init__(
             name=name,
             level=level,
             scene=scene,
-            instrument=INSTRUMENT_NAME,
-            modes=SCAN_MODES,
+            instrument=self.INSTRUMENT_NAME,
+            modes=scan_modes,
             channels=channels,
             origin=origin,
         )

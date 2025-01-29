@@ -1,3 +1,10 @@
+"""
+Constants for the GridSat dataset file handling.
+
+This module contains constants used for processing GridSat dataset
+files, including file suffixes, date formats, and product versions.
+"""
+
 GRIDSAT_FILE_SUFFIX: str = ".nc"
 
 B1_FILE_DATE_FORMAT: str = "%Y.%m.%d.%H"

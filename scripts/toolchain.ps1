@@ -26,8 +26,6 @@ if (-not $env:VIRTUAL_ENV) {
     & $venv/Scripts/Activate.ps1
 }
 
-$LASTEXITCODE = 0
-
 Write-Host "--- Running bandit <file>|<dir> --recursive"
 if ($isFolder) {
     bandit $project --recursive
@@ -68,6 +66,15 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "All checks passed!"
 Write-Host ""
 
+Write-Host "--- Running isort {<file>|<dir>} [--check] [--diff] [--atomic]"
+isort $project --check --diff
+
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
+Write-Host "All checks passed!"
+Write-Host ""
+
 Write-Host "--- Running pylint {<file>|<dir>}"
 pylint $project
 
@@ -82,15 +89,6 @@ if ($isFolder) {
 else {
     eradicate $project --aggressive
 }
-
-if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
-}
-Write-Host "All checks passed!"
-Write-Host ""
-
-Write-Host "--- Running isort {<file>|<dir>} [--check] [--diff] [--atomic]"
-isort $project --check --diff
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
@@ -140,7 +138,7 @@ Write-Host "All checks passed!"
 Write-Host ""
 
 Write-Host "--- Running pydoclint {<file>|<dir>} [--quiet]"
-pydoclint $project --quiet
+pydoclint $project
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE

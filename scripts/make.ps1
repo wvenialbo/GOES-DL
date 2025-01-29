@@ -6,18 +6,17 @@ $venv = '.venv'
 
 # Set the list of development tool packages to install
 
-$devs = 'flake8', 'black', 'pylint', 'mypy', 'bandit', 'ruff', 'eradicate', `
-    'pydocstyle', 'flake8-black', 'flake8-pylint', 'flake8-isort', `
-    'flake8-bandit', 'flake8-eradicate', 'flake8-bugbear', 'darglint2', `
-    'flake8-builtins', 'flake8-comprehensions', 'flake8-docstrings', `
-    'pep8-naming', 'flake8-docstrings-complete', 'flake8-ruff', `
-    'flake8-pyproject', 'flake8-annotations', 'jupyterlab', 'pyright', `
-    'pytest', 'pytest-cov', 'pytest-xdist', 'pytest-mock', 'coverage', `
-    'safety', 'xenon', 'pydoctest', 'docsig', 'pydoclint'
-    # 'flake8-mypy', 'flake8-confusables'
+$devs = 'bandit', 'ruff', 'mypy', 'pyflakes', 'isort', 'pylint', `
+    'eradicate', 'black', 'pycodestyle', 'autopep8', 'pydocstyle', `
+    'pydoclint', 'pydoctest', 'docsig', 'flake8', 'pep8-naming', `
+    'flake8-bugbear', 'flake8-pyproject', 'flake8-builtins', `
+    'flake8-annotations', 'flake8-comprehensions', 'darglint2', `
+    'flake8-pytest-style', 'pytest', 'pytest-cov', 'pytest-mock', `
+    'pytest-xdist', 'coverage', 'pyinstrument', 'jupyterlab', `
+    'types-requests', 'boto3-stubs[s3]'
 
-$tool = 'pip', 'setuptools', 'build', 'wheel', 'pip-tools', 'findpydeps', `
-    'pyinstaller'
+$tool = 'pip', 'setuptools', 'build', 'wheel', 'pip-tools', 'twine', `
+    'findpydeps'
 
 # Activate the environment if it is not active, and upgrade tools
 

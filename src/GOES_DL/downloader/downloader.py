@@ -16,7 +16,13 @@ from datetime import datetime, timedelta
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
-from .constants import ISO_TIMESTAMP_FORMAT
+from ..datasource.constants import DownloadStatus
+from .constants import (
+    ISO_TIMESTAMP_FORMAT,
+    TIME_TOLERANCE_DEFAULT,
+    TIME_TOLERANCE_MAX,
+    TIME_TOLERANCE_MIN,
+)
 
 
 @dataclass(eq=False, frozen=True)
@@ -41,68 +47,80 @@ class Downloader:
     ----------
     datasource : Datasource
         A reference to the datasource object.
-    product_locator : ProductLocator
+    locator : ProductLocator
         A reference to the dataset's product locator object.
     date_format : str
         The date format specification. The default is the ISO timestamp
         format.
+    show_progress : bool
+        A flag to show the progress of the download. The default is
+        True, to display the progress.
     time_tolerance : int
         The time tolerance in seconds. The default is 60 seconds.
 
     Methods
     -------
-    get_files(start_time: str, end_time: str = "") -> list[Any]
-        Get the files from the datasource.
-    get_file_list(start_time: str, end_time: str = "") -> list[str]
-        Get the list of files in the directory.
-    retrieve_files(file_paths: list[str]) -> list[Any]
-        Retrieve the files from the datasource.
+    download_files(start_time: str, end_time: str = "")
+        Download files from the datasource into the local repository.
+    get_files(start_time: str, end_time: str = "")
+        Load a list of files from the datasource or local repository.
+    list_files(start_time: str, end_time: str = "")
+        List the files that can be retrieved from the datasource.
     """
 
     datasource: Datasource
     locator: ProductLocator
     date_format: str = ISO_TIMESTAMP_FORMAT
-    time_tolerance: int = 60
+    show_progress: bool = True
+    time_tolerance: int = TIME_TOLERANCE_DEFAULT
 
     def __post_init__(self) -> None:
         """
         Validate the downloader object.
         """
-        if self.time_tolerance < 0:
-            raise ValueError("time_tolerance must be non-negative")
+        if self.time_tolerance < TIME_TOLERANCE_MIN:
+            raise ValueError(
+                "time_tolerance must be greater than or equal "
+                f"to {TIME_TOLERANCE_MIN} seconds"
+            )
+        if self.time_tolerance > TIME_TOLERANCE_MAX:
+            raise ValueError(
+                "time_tolerance must be less than or equal "
+                f"to {TIME_TOLERANCE_MAX} seconds"
+            )
 
-    def get_files(
-        self, *, start: str, end: str = ""
-    ) -> list[tuple[str, bytes]]:
+    def download_files(self, *, start: str, end: str = "") -> list[str]:
         """
-        Get the files from the datasource.
+        Download files from the datasource into the local repository.
 
-        Get the files from the datasource that match the timestamps
-        between `start` and `end` times, inclusive. The list is filtered
-        by the timestamps of the files; only files in the requested
-        range are returned.
+        Download the files that match the timestamps between `start` and
+        `end` times, inclusive, from the datasource and save them in the
+        local repository. The list is filtered by the timestamps of the
+        files; only files in the requested range are downloaded. If the
+        file is already in the local repository, it is not downloaded
+        again.
 
-        Note that `start` must be always provided. An offset of 60
-        seconds is added to the initial datetime and subtracted from the
-        final datetime to account for possible differences in the files'
-        timestamps.
+        Note that a `start` date must be always provided. If an `end`
+        date is not given, it is set equal to `start_time`. An offset of
+        `time_tolerance` seconds (60 by default) is subtracted from the
+        initial datetime and added to the final datetime to account for
+        possible differences in the files' timestamps.
 
         Parameters
         ----------
         start : str
-            The start time in the format specified by the date_format
+            The start time in the format specified by the `date_format`
             attribute.
         end : str, optional
-            The end time in the format specified by the date_format
+            The end time in the format specified by the `date_format`
             attribute. The default is "", in which case `end_time` is
             set equal to `start_time`.
 
         Returns
         -------
-        list[tuple[str, bytes]]
-            A list of tuples with the file paths and the file objects in
-            the directory that match the timestamps between `start` and
-            `end`.
+        list[str]
+            A list of file path and names with respect to the local
+            repository root directory.
 
         Raises
         ------
@@ -116,68 +134,25 @@ class Downloader:
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        files_in_range: list[str] = self.get_file_list(start, end)
+        files_in_range: list[str] = self._get_file_list(start, end)
 
-        retrieved_files: list[bytes] = self.retrieve_files(files_in_range)
+        self._retrieve_files(files_in_range)
 
-        return list(zip(files_in_range, retrieved_files))
+        return files_in_range
 
-    def get_file_list(self, start_time: str, end_time: str = "") -> list[str]:
+    def get_files(self, *, file_paths: list[str]) -> list[str]:
         """
-        Get the list of files in the directory.
+        Load a list of files from the datasource or local repository.
 
-        Get the list of files in the directory that match the timestamps
-        between `start_time` and `end_time`, inclusive, from the data
-        source. The list is filtered by the timestamps of the files;
-        only files in the requested range are returned.
+        Load the files in the `file_paths` list from the datasource or
+        local repository. If the file is not in the local repository, it
+        is retrieved from the datasource and saved in the local
+        repository.
 
-        Note that `start_time` must be always provided. An offset of 60
+        Note that `start` must be always provided. An offset of 60
         seconds is added to the initial datetime and subtracted from the
         final datetime to account for possible differences in the files'
         timestamps.
-
-        Parameters
-        ----------
-        start_time : str
-            The start time in the format specified by the date_format
-            attribute.
-        end_time : str, optional
-            The end time in the format specified by the date_format
-            attribute. The default is "", in which case `end_time` is
-            set equal to `start_time`.
-
-        Returns
-        -------
-        list[str]
-            A list with the files in the directory that match the
-            timestamps between `start_time` and `end_time`.
-
-        Raises
-        ------
-        ValueError
-            If `start_time` is not provided. The framework raises
-            an exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification
-            is ill-formed (which is, indeed, a bug!).
-        """
-        datetime_ini: datetime
-        datetime_fin: datetime
-        datetime_ini, datetime_fin = self._get_datetimes(start_time, end_time)
-
-        paths: list[str] = self.locator.get_paths(datetime_ini, datetime_fin)
-
-        files: list[str] = self._retrieve_directory_content(paths)
-
-        return self._filter_directory_content(
-            datetime_ini, datetime_fin, files
-        )
-
-    def retrieve_files(self, file_paths: list[str]) -> list[bytes]:
-        """
-        Retrieve the files from the datasource.
-
-        Retrieve the files from the datasource using the file paths
-        provided in the `file_paths` list.
 
         Parameters
         ----------
@@ -186,23 +161,72 @@ class Downloader:
 
         Returns
         -------
-        list[bytes]
-            A list with the file objects.
+        tuple[list[bytes], list[str]]
+            A tuple with the list of file objects and the list of file
+            path and names with respect to the local repository root
+            directory.
 
         Raises
         ------
+        ValueError
+            If the start_time is not provided. The framework raises an
+            exception if the provided timestamps do not match the
+            expected format or if the timestamp format specification is
+            ill-formed (which is, indeed, a bug!).
         RuntimeError
             The framework may raise if the file cannot be retrieved,
             e.g. if the file does not exist in the datasource or an
             internal error occurred.
         """
-        file_objects: list[bytes] = []
+        self._retrieve_files(file_paths)
 
-        for file in file_paths:
-            file_object: bytes = self.datasource.get_file(file)
-            file_objects.append(file_object)
+        return file_paths
 
-        return file_objects
+    def list_files(self, *, start: str, end: str = "") -> list[str]:
+        """
+        List the files that can be retrieved from the datasource.
+
+        List the files that match the timestamps between `start` and
+        `end` times, inclusive, from the datasource or local repository.
+        The list is filtered by the timestamps of the files; only files
+        in the requested range are returned. This list can be filtered
+        using custom criteria then passed to the `get_files()` method.
+
+        Note that a `start` date must be always provided. If an `end`
+        date is not given, it is set equal to `start_time`. An offset of
+        `time_tolerance` seconds (60 by default) is subtracted from the
+        initial datetime and added to the final datetime to account for
+        possible differences in the files' timestamps.
+
+        Parameters
+        ----------
+        start : str
+            The start time in the format specified by the `date_format`
+            attribute.
+        end : str, optional
+            The end time in the format specified by the `date_format`
+            attribute. The default is "", in which case `end_time` is
+            set equal to `start_time`.
+
+        Returns
+        -------
+        list[str]
+            A list of file path and names with respect to the local
+            repository root directory.
+
+        Raises
+        ------
+        ValueError
+            If the start_time is not provided. The framework raises an
+            exception if the provided timestamps do not match the
+            expected format or if the timestamp format specification is
+            ill-formed (which is, indeed, a bug!).
+        RuntimeError
+            The framework may raise if the file cannot be retrieved,
+            e.g. if the file does not exist in the datasource or an
+            internal error occurred.
+        """
+        return self._get_file_list(start, end)
 
     def _filter_directory_content(
         self, datetime_ini: datetime, datetime_fin: datetime, files: list[str]
@@ -301,6 +325,59 @@ class Downloader:
 
         return datetime_ini, datetime_fin
 
+    def _get_file_list(self, start_time: str, end_time: str = "") -> list[str]:
+        """
+        Get the list of files in the directory.
+
+        Get the list of files in the directory that match the timestamps
+        between `start_time` and `end_time`, inclusive, from the data
+        source. The list is filtered by the timestamps of the files;
+        only files in the requested range are returned.
+
+        Note that `start_time` must be always provided. An offset of 60
+        seconds is added to the initial datetime and subtracted from the
+        final datetime to account for possible differences in the files'
+        timestamps.
+
+        Parameters
+        ----------
+        start_time : str
+            The start time in the format specified by the date_format
+            attribute.
+        end_time : str, optional
+            The end time in the format specified by the date_format
+            attribute. The default is "", in which case `end_time` is
+            set equal to `start_time`.
+
+        Returns
+        -------
+        list[str]
+            A list with the files in the directory that match the
+            timestamps between `start_time` and `end_time`.
+
+        Raises
+        ------
+        ValueError
+            If `start_time` is not provided. The framework raises
+            an exception if the provided timestamps do not match the
+            expected format or if the timestamp format specification
+            is ill-formed (which is, indeed, a bug!).
+        """
+        if self.show_progress:
+            print("Retrieving available file list")
+
+        datetime_ini: datetime
+        datetime_fin: datetime
+        datetime_ini, datetime_fin = self._get_datetimes(start_time, end_time)
+
+        paths: list[str] = self.locator.get_paths(datetime_ini, datetime_fin)
+
+        files: list[str] = self._retrieve_directory_content(paths)
+
+        return self._filter_directory_content(
+            datetime_ini, datetime_fin, files
+        )
+
     def _retrieve_directory_content(self, paths: list[str]) -> list[str]:
         """
         Retrieve the content of the directories.
@@ -324,3 +401,42 @@ class Downloader:
             files.extend(self.datasource.listdir(path))
 
         return files
+
+    def _retrieve_files(self, file_paths: list[str]) -> None:
+        """
+        Retrieve the files from the datasource.
+
+        Retrieve the files from the datasource using the file paths
+        provided in the `file_paths` list.
+
+        Parameters
+        ----------
+        file_paths : list[str]
+            A list with the file paths.
+
+        Raises
+        ------
+        RuntimeError
+            The framework may raise if the file cannot be retrieved,
+            e.g. if the file does not exist in the datasource or an
+            internal error occurred.
+        """
+        num_files = len(file_paths)
+        num_len = len(f"{num_files}")
+        padding = " ".rjust(2 * num_len + 2)
+
+        if self.show_progress:
+            print("Downloading files:")
+
+        for i, file in enumerate(file_paths):
+            if self.show_progress:
+                num_item = f"{i + 1}".rjust(num_len)
+                print(f"{num_item}/{num_files} {file}")
+
+            result = self.datasource.download_file(file)
+
+            if self.show_progress:
+                if result == DownloadStatus.SUCCESS:
+                    print(f"{padding}... downloaded succesfully")
+                else:
+                    print(f"{padding}... already downloaded")

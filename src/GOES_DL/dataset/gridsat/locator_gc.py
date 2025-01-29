@@ -183,12 +183,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
         ValueError
             If the provided origin, scene, or version is invalid.
         """
-        if scene not in self.AVAILABLE_SCENES:
-            available_scenes: list[str] = sorted(self.AVAILABLE_SCENES)
-            raise ValueError(
-                f"Invalid scene ID: '{scene}'. "
-                f"Available scene IDs: {available_scenes}"
-            )
+        self._validate_scene(scene, self.AVAILABLE_SCENES)
 
         if isinstance(origins, str):
             origins = [origins]

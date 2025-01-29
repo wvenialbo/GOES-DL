@@ -1,12 +1,5 @@
 """
-Provide the GOESProductLocator class for locating GOES-R data files.
-
-Module for .
-
-The `GOESProductLocator` class implements the `ProductLocator` interface
-for locating GOES-R Series imagery dataset products. It includes methods
-for generating dataset directory paths, verifying product filenames, and
-extracting datetime information from filenames.
+Provide an abstract product locator for GOES-R Series imagery dataset.
 
 Classes:
     GOESProductLocator: Abstract a product locator for GOES-R Series
@@ -155,11 +148,21 @@ class GOESProductLocator(ProductLocatorGG):
     #             reflectance/brightness [Kelvin] units)
     AVAILABLE_LEVELS: set[str] = {"L1b", "L2"}
 
+    FULL_DISK = "F"
+    CONUS = "C"
+    MESO = "M"
+    MESO_1 = "M1"
+    MESO_2 = "M2"
+
+    # WARNING: This is being override by GOESProductLocatorABI in this
+    #          release due to an incomplete refactoring. This will be
+    #          fixed in future releases. Nevertheless, the methods that
+    #          use this attribute was fixed to use the correct values.
     AVAILABLE_SCENES: dict[str, str] = {
-        "F": "F",
-        "C": "C",
-        "M1": "M",
-        "M2": "M",
+        FULL_DISK: FULL_DISK,
+        CONUS: CONUS,
+        MESO_1: MESO,
+        MESO_2: MESO,
     }
 
     def __init__(
@@ -215,28 +218,9 @@ class GOESProductLocator(ProductLocatorGG):
         # TODO: Too many positional arguments. Solve it by using
         #       the Builder or Factory methods, or patterns like
         #       Essence or Fluent.
-        if origin not in self.AVAILABLE_ORIGINS:
-            available_origins: list[str] = sorted(self.AVAILABLE_ORIGINS)
-            raise ValueError(
-                f"Invalid origin ID: '{origin}'. "
-                f"Available origin IDs: {available_origins}"
-            )
-
-        if instrument not in self.AVAILABLE_INSTRUMENTS:
-            available_instruments: list[str] = sorted(
-                self.AVAILABLE_INSTRUMENTS
-            )
-            raise ValueError(
-                f"Invalid instrument ID: '{instrument}'. "
-                f"Available instrument IDs: {available_instruments}"
-            )
-
-        if level not in self.AVAILABLE_LEVELS:
-            available_levels: list[str] = sorted(self.AVAILABLE_LEVELS)
-            raise ValueError(
-                f"Invalid level ID: '{level}'. "
-                f"Available level IDs: {available_levels}"
-            )
+        self._validate_origin(origin, self.AVAILABLE_ORIGINS)
+        self._validate_instrument(instrument, self.AVAILABLE_INSTRUMENTS)
+        self._validate_level(level, self.AVAILABLE_LEVELS)
 
         self.name: str = name
         self.level: str = level
@@ -282,7 +266,7 @@ class GOESProductLocator(ProductLocatorGG):
                 f"Supported datasources: {supported_datasources}"
             )
 
-        scene: str = self.AVAILABLE_SCENES[self.scene] if self.scene else ""
+        scene: str = self.scene
         product: str = f"{self.instrument}-{self.level}-{self.name}{scene}"
         satellite: str = self.AVAILABLE_ORIGINS[self.origin]
 
