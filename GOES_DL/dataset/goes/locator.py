@@ -132,7 +132,7 @@ class GOESProductLocator(ProductLocatorGG):
     # Satellites in the GOES-R Series are identified by the following
     # IDs:
     AVAILABLE_ORIGINS: dict[str, str] = {
-        f"G{id:02d}": f"goes{id:02d}" for id in range(16, 19)
+        f"G{idn:02d}": f"goes{idn:02d}" for idn in range(16, 19)
     }
 
     # Supported instruments from the GOES-R series:
@@ -208,12 +208,11 @@ class GOESProductLocator(ProductLocatorGG):
             dataset directories are organised, only a single origin may
             be provided.
 
-        Raises
-        ------
-        ValueError
-            If the provided origin, level or instrument is invalid. Or
-            if an unexpected or unsupported setting is required for an
-            instrument that does not support it.
+        Notes
+        -----
+        ValueError is raised if the provided origin, level or instrument
+        is invalid. Or if an unexpected or unsupported setting is
+        required for an instrument that does not support it.
         """
         # TODO: Too many positional arguments. Solve it by using
         #       the Builder or Factory methods, or patterns like
