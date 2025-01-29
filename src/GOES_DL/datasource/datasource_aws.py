@@ -15,7 +15,7 @@ from botocore.client import ClientError, Config
 from mypy_boto3_s3.client import S3Client
 
 from ..dataset import ProductLocator
-from ..utils.url import URL as url
+from ..utils.url import URL
 from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
@@ -33,13 +33,6 @@ class DatasourceAWS(DatasourceBase):
     location. The base URL of the datasource is the URL of the AWS S3
     bucket.
 
-    Attributes
-    ----------
-    bucket_name : str
-        The name of the AWS S3 bucket.
-    s3_client : boto3.Client
-        The AWS S3 client.
-
     Methods
     -------
     download_file(file_path: str)
@@ -47,6 +40,13 @@ class DatasourceAWS(DatasourceBase):
         repository.
     listdir(dir_path: str)
         List the contents of a remote directory.
+
+    Attributes
+    ----------
+    bucket_name : str
+        The name of the AWS S3 bucket.
+    s3_client : S3Client
+        The AWS S3 client.
     """
 
     bucket_name: str
@@ -68,10 +68,10 @@ class DatasourceAWS(DatasourceBase):
             the base URL and an optional region where the S3 bucket is
             located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
             None, the default region is used.
-        repository : str | Path | DatasourceRepository, optional
+        repository : str | Path | DatasourceRepository | None, optional
             The directory where the files will be stored, by default
             None.
-        cache : float | DatasourceCache, optional
+        cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
         Raises
@@ -86,7 +86,7 @@ class DatasourceAWS(DatasourceBase):
         else:
             (base_url, region) = locator
 
-        url_parts: ParseResult = url.parse(base_url)
+        url_parts: ParseResult = URL.parse(base_url)
 
         bucket_name: str = url_parts.netloc
 
@@ -218,7 +218,7 @@ class DatasourceAWS(DatasourceBase):
 
         Parameters
         ----------
-        region : str
+        region : str | None, optional
             The region where the S3 bucket is located. E.g. "us-west-1",
             "us-east-1", "eu-west-1", etc. If None, the default region
             is used.
@@ -259,7 +259,7 @@ class DatasourceAWS(DatasourceBase):
         # BUG: url.join() fails with "s3://" URLs.
         # > folder_url: str = url.join(self.base_url, dir_path)
         folder_url: str = self._url_join(self.base_url, dir_path)
-        url_parts: ParseResult = url.parse(folder_url)
+        url_parts: ParseResult = URL.parse(folder_url)
 
         return url_parts.path[1:]
 

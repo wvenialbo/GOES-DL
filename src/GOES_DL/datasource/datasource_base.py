@@ -65,9 +65,6 @@ class DatasourceBase(Datasource):
             self.cache = DatasourceCache(cache)
 
     def _download_file(self, file_path: str) -> DownloadStatus:
-        """
-        Download a file from the datasource into the local repository.
-        """
         if self.repository.has_item(file_path):
             return DownloadStatus.ALREADY
 
@@ -76,6 +73,4 @@ class DatasourceBase(Datasource):
 
     @abstractmethod
     def _retrieve_file(self, file_path: str) -> bytes:
-        """
-        Retrieve a file from the datasource.
-        """
+        pass

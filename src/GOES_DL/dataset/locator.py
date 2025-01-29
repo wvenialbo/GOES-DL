@@ -51,7 +51,7 @@ class ProductLocator(ABC):
 
     Methods
     -------
-    get_base_url(datasource: str) -> str:
+    get_base_url(datasource: str) -> tuple[str, ...]:
         Get the base URL for the dataset's products.
     get_datetime(filename: str) -> datetime:
         Extracts the `datetime` from the product's filename.
@@ -81,7 +81,7 @@ class ProductLocator(ABC):
 
         Returns
         -------
-        tuple[str, ...]:
+        tuple[str, ...]
             A tuple where the first element is the base URL for the
             dataset's products. Additional elements may be included if
             the dataset is distributed across multiple sources or the
@@ -104,14 +104,14 @@ class ProductLocator(ABC):
 
         Returns
         -------
-        datetime:
+        datetime
             The `datetime` extracted from the filename.
 
-        Raises
-        ------
-        ValueError:
-            If the filename does not match the expected pattern or if
-            the dataset's datetime format specification is ill-formed.
+        Notes
+        -----
+        ValueError is raised if the filename does not match the expected
+        pattern or if the dataset's datetime format specification is
+        ill-formed.
         """
 
     @abstractmethod
@@ -158,6 +158,6 @@ class ProductLocator(ABC):
 
         Returns
         -------
-        bool:
+        bool
             True if the filename matches the pattern, False otherwise.
         """

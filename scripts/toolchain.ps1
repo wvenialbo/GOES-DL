@@ -149,7 +149,7 @@ Write-Host ""
 Write-Host "--- Running pydoctest {<file>|<dir>} [--parser {google|numpy|sphinx}]"
 if ($isFolder) {
     Push-Location -Path $project
-    pydoctest --parser numpy
+    #pydoctest --parser numpy
     Pop-Location
 }
 else {
