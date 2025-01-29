@@ -3,7 +3,8 @@ name: Ruff
 on: [push]
 
 jobs:
-  build:
+  code-linting:
+    name: Linting with Ruff
     runs-on: ubuntu-latest
     strategy:
       matrix:
