@@ -3,7 +3,6 @@ name: Bandit
 on: [push]
 
 jobs:
-  build:
   security-checking:
     name: Security checking with Bandit
     runs-on: ubuntu-latest
