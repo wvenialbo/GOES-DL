@@ -127,12 +127,8 @@ class DatasourceAWS(DatasourceBase):
         RuntimeError
             If the file cannot be retrieved.
         """
-        if self.repository.has_item(file_path):
-            return DownloadStatus.ALREADY
-
         try:
-            self._retrieve_file(file_path)
-            return DownloadStatus.SUCCESS
+            return self._download_file(file_path)
 
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
