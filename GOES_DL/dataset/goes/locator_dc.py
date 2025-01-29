@@ -96,7 +96,7 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
     Product: Derived Motion Winds (DMW).
     """
 
-    PRODUCT_NAME: str = GOESProductLocatorABIDC.DMW_PRODUCT
+    PRODUCT_NAME_DMW: str = GOESProductLocatorABIDC.DMW_PRODUCT
 
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
@@ -126,7 +126,7 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
         )
 
         super().__init__(
-            name=self.PRODUCT_NAME,
+            name=self.PRODUCT_NAME_DMW,
             scene=scene,
             channels=channels,
             origin=origin,
@@ -141,7 +141,7 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
     Product: Derived Motion WV Winds (DMWV).
     """
 
-    PRODUCT_NAME: str = GOESProductLocatorABIDC.DMWV_PRODUCT
+    PRODUCT_NAME_DMWV: str = GOESProductLocatorABIDC.DMWV_PRODUCT
 
     def __init__(self, scene: str, origin: str) -> None:
         """
@@ -165,7 +165,7 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
         self.available_channels = self.WV_CHANNELS
 
         super().__init__(
-            name=self.PRODUCT_NAME,
+            name=self.PRODUCT_NAME_DMWV,
             scene=scene,
             channels=list(self.WV_CHANNELS),
             origin=origin,
