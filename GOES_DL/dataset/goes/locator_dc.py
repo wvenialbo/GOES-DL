@@ -52,7 +52,7 @@ class GOESProductLocatorABIDC(GOESProductLocatorABI):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channels : list[str]
+        channels : str | list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -112,7 +112,7 @@ class GOESProductLocatorDMW(GOESProductLocatorABIDC):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channels : list[str]
+        channels : str | list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C14".
         origin : str

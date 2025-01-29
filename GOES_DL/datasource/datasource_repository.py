@@ -35,7 +35,7 @@ class DatasourceRepository:
 
         Parameters
         ----------
-        repository : str | Path  | FileRepository, optional
+        repository : str | Path | FileRepository | None, optional
             An initialised `FileRepository` instance or the path to the
             base directory where the repository will be created. If not
             specified, the current working directory is used; by default
@@ -77,7 +77,7 @@ class DatasourceRepository:
 
         Returns
         -------
-        bytes or None
+        bytes | None
             The file content as bytes if the file exists, otherwise None.
         """
         if self.has_item(file_path):
