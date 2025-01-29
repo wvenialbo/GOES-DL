@@ -19,7 +19,7 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
     Product: All primary ABI products.
     """
 
-    AVAILABLE_CHANNELS: set[str] = {f"C{id:02d}" for id in range(1, 17)}
+    AVAILABLE_CHANNELS: set[str] = {f"C{idn:02d}" for idn in range(1, 17)}
 
     AVAILABLE_PRODUCTS: dict[str, str] = {
         "CMIP": "Cloud and Moisture Imagery Product",
