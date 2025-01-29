@@ -4,7 +4,7 @@ on: [workflow_dispatch]
 
 jobs:
   flake:
-    name: Code format checking with Flake8
+    name: Linting and style checking with Flake8
     runs-on: ubuntu-latest
     strategy:
       matrix:

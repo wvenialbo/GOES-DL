@@ -56,32 +56,6 @@ class GOESProductLocator(ProductLocatorGG):
     Subclasses are responsible for initialising the attributes with the
     appropriate values for the dataset and product details.
 
-    Attributes
-    ----------
-    name : str
-        The name of the GOES-R Series imagery dataset product. Due to
-        how the dataset directories are organised, only a single product
-        can be provided.
-    level : str
-        The level of the GOES-R Series imagery dataset product, e.g.
-        "L1b" or "L2".
-    scene : str
-        The scene of the GOES-R Series imagery dataset product, e.g.
-        "F" or "C".
-    instrument : str
-        The instrument of the GOES-R Series imagery dataset product,
-        e.g. "ABI" or "GLM".
-    modes : list[str]
-        The list of modes of the GOES-R Series imagery dataset product,
-        e.g. "M3" or "M6".
-    channels : list[str]
-        The list of channels of the GOES-R Series imagery dataset
-        product, e.g. "C08" or "C13".
-    origin : str
-        The  origin identifier of the GOES-R Series imagery dataset
-        product, e.g. "G16". Due to how the dataset directories are
-        organised, only a single origin may be provided.
-
     Methods
     -------
     get_base_url(datasource: str)

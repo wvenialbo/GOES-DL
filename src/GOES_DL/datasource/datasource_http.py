@@ -14,7 +14,7 @@ import requests
 
 from ..dataset import ProductLocator
 from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
-from ..utils.url import URL as url
+from ..utils.url import URL
 from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
@@ -51,12 +51,12 @@ class DatasourceHTTP(DatasourceBase):
         Parameters
         ----------
         locator : str | ProductLocator
-            The base URL of a HTTP-based data sources or a `ProductLocator`
-            object.
-        repository : str | Path | DatasourceRepository, optional
+            The base URL of a HTTP-based data sources or a
+            `ProductLocator` object.
+        repository : str | Path | DatasourceRepository | None, optional
             The directory where the files will be stored, by default
             None.
-        cache : float | DatasourceCache, optional
+        cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
         Raises
@@ -70,7 +70,7 @@ class DatasourceHTTP(DatasourceBase):
             else locator.get_base_url("HTTP")[0]
         )
 
-        url_parts: ParseResult = url.parse(base_url)
+        url_parts: ParseResult = URL.parse(base_url)
 
         host_name: str = url_parts.netloc
         base_path = url_parts.path
@@ -170,14 +170,14 @@ class DatasourceHTTP(DatasourceBase):
         if cached_links is not None:
             return cached_links
 
-        folder_url: str = url.join(self.base_url, dir_path)
+        folder_url: str = URL.join(self.base_url, dir_path)
         index_html: str = self._get_content(folder_url)
 
         if not index_html:
             return []
 
         href_links = re.findall(r'<a\s+href="([^"]+)"', index_html)
-        href_links = [url.join(folder_url, href) for href in href_links]
+        href_links = [URL.join(folder_url, href) for href in href_links]
         href_links = [href.replace(self.base_url, "") for href in href_links]
 
         self.cache.add_item(dir_path, href_links)
@@ -211,7 +211,7 @@ class DatasourceHTTP(DatasourceBase):
         return ""
 
     def _retrieve_file(self, file_path: str) -> bytes:
-        file_url: str = url.join(self.base_url, file_path)
+        file_url: str = URL.join(self.base_url, file_path)
 
         headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
         response = requests.get(file_url, headers=headers, timeout=15)

@@ -27,6 +27,6 @@ class DownloadStatus(Enum):
         Indicates that the file was already downloaded.
     """
 
-    SUCCESS = 0
-    FAILED = 1
-    ALREADY = 2
+    SUCCESS: int = 0
+    FAILED: int = 1
+    ALREADY: int = 2

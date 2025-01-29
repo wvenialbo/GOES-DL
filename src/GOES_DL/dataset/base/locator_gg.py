@@ -220,8 +220,8 @@ class ProductLocatorGG(ProductLocator):
         utilities should be aware of this assumption. The user could
         convert the `datetime` object to the desired timezone if needed.
 
-        The framework raises ValueError if the timestamp does not match
-        the expected format or if the format specification is
+        The framework raises `ValueError` if the timestamp does not
+        match the expected format or if the format specification is
         ill-formed.
 
         Parameters

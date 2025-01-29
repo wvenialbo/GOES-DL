@@ -113,7 +113,7 @@ class GridSatProductLocatorGC(GridSatProductLocator):
     # Satellites in the GOES 2nd generation (GOES-I to GOES-M) series
     # are identified by the following IDs:
     AVAILABLE_ORIGINS: dict[str, str] = {
-        f"G{id:02d}": f"goes{id:02d}" for id in range(8, 16)
+        f"G{idn:02d}": f"goes{idn:02d}" for idn in range(8, 16)
     }
 
     # Available scenes for the GridSat-GOES/CONUS imagery dataset
