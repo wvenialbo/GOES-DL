@@ -6,10 +6,10 @@ Classes:
     - GOESProductLocatorMCMIP: Multi-band CMIP Product.
 """
 
-from .locator_abi import GOESProductLocatorABI
+from .locator_nso import GOESProductLocatorABINSO
 
 
-class GOESProductLocatorABIPM(GOESProductLocatorABI):
+class GOESProductLocatorABIPM(GOESProductLocatorABINSO):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
@@ -49,9 +49,7 @@ class GOESProductLocatorABIPM(GOESProductLocatorABI):
 
         super().__init__(
             name=name,
-            level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
-            channels=[],
             origin=origin,
         )
 

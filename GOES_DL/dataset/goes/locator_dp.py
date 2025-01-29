@@ -5,10 +5,10 @@ Classes:
     - GOESProductLocatorABIDP: All derived ABI products.
 """
 
-from .locator_abi import GOESProductLocatorABI
+from .locator_nso import GOESProductLocatorABINSO
 
 
-class GOESProductLocatorABIDP(GOESProductLocatorABI):
+class GOESProductLocatorABIDP(GOESProductLocatorABINSO):
     """
     Product locator for GOES-R Series imagery dataset's ABI products.
 
@@ -153,8 +153,6 @@ class GOESProductLocatorABIDP(GOESProductLocatorABI):
 
         super().__init__(
             name=name,
-            level=self.DEFAULT_PRODUCT_LEVEL,
             scene=scene,
-            channels=[],
             origin=origin,
         )
