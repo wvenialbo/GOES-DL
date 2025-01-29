@@ -79,10 +79,10 @@ class GOESProductLocatorABI(GOESProductLocator):
             dataset directories are organised, only a single origin may
             be provided.
 
-        Raises
-        ------
-        ValueError
-            If the provided origin, level or scene is invalid.
+        Notes
+        -----
+        ValueError is raised if the provided origin, level or scene is
+        invalid.
         """
         # TODO: Too many positional arguments. Solve it by using
         #       the Builder or Factory methods, or patterns like

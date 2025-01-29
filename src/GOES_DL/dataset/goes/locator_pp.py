@@ -19,7 +19,7 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
     Product: All primary ABI products.
     """
 
-    AVAILABLE_CHANNELS: set[str] = {f"C{id:02d}" for id in range(1, 17)}
+    AVAILABLE_CHANNELS: set[str] = {f"C{idn:02d}" for idn in range(1, 17)}
 
     AVAILABLE_PRODUCTS: dict[str, str] = {
         "CMIP": "Cloud and Moisture Imagery Product",
@@ -46,7 +46,7 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channels : list[str]
+        channels : str | list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -110,7 +110,7 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channels : list[str]
+        channels : str | list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str
@@ -151,7 +151,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
         scene : str
             The scene of the GOES-R Series imagery dataset product, e.g.
             "F" or "C".
-        channels : list[str]
+        channels : str | list[str]
             The list of channels of the GOES-R Series imagery dataset
             ABI product, e.g. "C08" or "C13".
         origin : str

@@ -43,6 +43,15 @@ class Downloader:
     `GOES_DL.dataset.ProductLocator` and `GOES_DL.dataset.Product`
     interfaces.
 
+    Methods
+    -------
+    download_files(start_time: str, end_time: str = "")
+        Download files from the datasource into the local repository.
+    get_files(start_time: str, end_time: str = "")
+        Load a list of files from the datasource or local repository.
+    list_files(start_time: str, end_time: str = "")
+        List the files that can be retrieved from the datasource.
+
     Attributes
     ----------
     datasource : Datasource
@@ -57,15 +66,6 @@ class Downloader:
         True, to display the progress.
     time_tolerance : int
         The time tolerance in seconds. The default is 60 seconds.
-
-    Methods
-    -------
-    download_files(start_time: str, end_time: str = "")
-        Download files from the datasource into the local repository.
-    get_files(start_time: str, end_time: str = "")
-        Load a list of files from the datasource or local repository.
-    list_files(start_time: str, end_time: str = "")
-        List the files that can be retrieved from the datasource.
     """
 
     datasource: Datasource
@@ -77,6 +77,12 @@ class Downloader:
     def __post_init__(self) -> None:
         """
         Validate the downloader object.
+
+        Raises
+        ------
+        ValueError
+            If the `time_tolerance` is less than the minimum allowed
+            value or greater than the maximum allowed value.
         """
         if self.time_tolerance < TIME_TOLERANCE_MIN:
             raise ValueError(
@@ -111,7 +117,7 @@ class Downloader:
         start : str
             The start time in the format specified by the `date_format`
             attribute.
-        end : str, optional
+        end : str
             The end time in the format specified by the `date_format`
             attribute. The default is "", in which case `end_time` is
             set equal to `start_time`.
@@ -122,17 +128,16 @@ class Downloader:
             A list of file path and names with respect to the local
             repository root directory.
 
-        Raises
-        ------
-        ValueError
-            If the start_time is not provided. The framework raises an
-            exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification is
-            ill-formed (which is, indeed, a bug!).
-        RuntimeError
-            The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the datasource or an
-            internal error occurred.
+        Notes
+        -----
+        `ValueError` is raised if the start_time is not provided. The
+        framework raises an exception if the provided timestamps do not
+        match the expected format or if the timestamp format
+        specification is ill-formed (which is, indeed, a bug!).
+
+        The framework may raise `RuntimeError` if the file cannot be
+        retrieved, e.g. if the file does not exist in the datasource or
+        an internal error occurred.
         """
         files_in_range: list[str] = self._get_file_list(start, end)
 
@@ -161,22 +166,20 @@ class Downloader:
 
         Returns
         -------
-        tuple[list[bytes], list[str]]
-            A tuple with the list of file objects and the list of file
-            path and names with respect to the local repository root
-            directory.
+        list[str]
+            The list of file path and names with respect to the local
+            repository root directory.
 
-        Raises
-        ------
-        ValueError
-            If the start_time is not provided. The framework raises an
-            exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification is
-            ill-formed (which is, indeed, a bug!).
-        RuntimeError
-            The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the datasource or an
-            internal error occurred.
+        Notes
+        -----
+        `ValueError` is raised if the start_time is not provided. The
+        framework raises an exception if the provided timestamps do not
+        match the expected format or if the timestamp format
+        specification is ill-formed (which is, indeed, a bug!).
+
+        The framework may raise `RuntimeError` if the file cannot be
+        retrieved, e.g. if the file does not exist in the datasource or
+        an internal error occurred.
         """
         self._retrieve_files(file_paths)
 
@@ -203,7 +206,7 @@ class Downloader:
         start : str
             The start time in the format specified by the `date_format`
             attribute.
-        end : str, optional
+        end : str
             The end time in the format specified by the `date_format`
             attribute. The default is "", in which case `end_time` is
             set equal to `start_time`.
@@ -214,17 +217,16 @@ class Downloader:
             A list of file path and names with respect to the local
             repository root directory.
 
-        Raises
-        ------
-        ValueError
-            If the start_time is not provided. The framework raises an
-            exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification is
-            ill-formed (which is, indeed, a bug!).
-        RuntimeError
-            The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the datasource or an
-            internal error occurred.
+        Notes
+        -----
+        `ValueError` is raised if the start_time is not provided. The
+        framework raises an exception if the provided timestamps do not
+        match the expected format or if the timestamp format
+        specification is ill-formed (which is, indeed, a bug!).
+
+        The framework may raise `RuntimeError` if the file cannot be
+        retrieved, e.g. if the file does not exist in the datasource or
+        an internal error occurred.
         """
         return self._get_file_list(start, end)
 
@@ -344,7 +346,7 @@ class Downloader:
         start_time : str
             The start time in the format specified by the date_format
             attribute.
-        end_time : str, optional
+        end_time : str
             The end time in the format specified by the date_format
             attribute. The default is "", in which case `end_time` is
             set equal to `start_time`.
@@ -355,13 +357,12 @@ class Downloader:
             A list with the files in the directory that match the
             timestamps between `start_time` and `end_time`.
 
-        Raises
-        ------
-        ValueError
-            If `start_time` is not provided. The framework raises
-            an exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification
-            is ill-formed (which is, indeed, a bug!).
+        Notes
+        -----
+        If `start_time` is not provided, `ValueError` is raised. The
+        framework raises an exception if the provided timestamps do not
+        match the expected format or if the timestamp format
+        specification is ill-formed (which is, indeed, a bug!).
         """
         if self.show_progress:
             print("Retrieving available file list")
@@ -414,12 +415,11 @@ class Downloader:
         file_paths : list[str]
             A list with the file paths.
 
-        Raises
-        ------
-        RuntimeError
-            The framework may raise if the file cannot be retrieved,
-            e.g. if the file does not exist in the datasource or an
-            internal error occurred.
+        Notes
+        -----
+        The framework may raise `RuntimeError` if the file cannot be
+        retrieved, e.g. if the file does not exist in the datasource or
+        an internal error occurred.
         """
         num_files = len(file_paths)
         num_len = len(f"{num_files}")
