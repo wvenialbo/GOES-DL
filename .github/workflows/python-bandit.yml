@@ -1,9 +1,9 @@
 name: Bandit
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
-  security-checking:
+  bandit:
     name: Security checking with Bandit
     runs-on: ubuntu-latest
     strategy:

@@ -1,9 +1,9 @@
 name: MyPy
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
-  type-check:
+  mypy:
     name: Type checking with MyPy
     runs-on: ubuntu-latest
     strategy:

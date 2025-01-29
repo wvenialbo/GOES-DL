@@ -1,9 +1,9 @@
 name: PyFlakes
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
-  code-linting:
+  pyflakes:
     name: Linting with PyFlakes
     runs-on: ubuntu-latest
     strategy:

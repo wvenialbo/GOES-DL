@@ -1,9 +1,9 @@
 name: Pylint
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
-  code-linting:
+  pylint:
     name: Linting with Pylint
     runs-on: ubuntu-latest
     strategy:
