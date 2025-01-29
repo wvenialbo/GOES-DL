@@ -20,13 +20,6 @@ class Datasource(ABC):
     datasource is responsible for listing the contents of a directory in
     a remote location and for downloading files from that location.
 
-    Attributes
-    ----------
-    base_url : str
-        The base URL of the datasource. This is the URL where the
-        datasource is located. The base URL is used to build the full
-        URL to the files and directories.
-
     Methods
     -------
     download_file(file_path: str)
@@ -34,6 +27,13 @@ class Datasource(ABC):
         repository.
     listdir(dir_path: str)
         List the contents of a remote directory.
+
+    Attributes
+    ----------
+    base_url : str
+        The base URL of the datasource. This is the URL where the
+        datasource is located. The base URL is used to build the full
+        URL to the files and directories.
     """
 
     base_url: str
