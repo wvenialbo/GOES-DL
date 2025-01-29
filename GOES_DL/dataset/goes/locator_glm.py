@@ -43,10 +43,9 @@ class GOESProductLocatorGLM(GOESProductLocator):
             dataset directories are organised, only a single origin may
             be provided.
 
-        Raises
-        ------
-        ValueError
-            If the provided product name is invalid.
+        Notes
+        -----
+        ValueError is raised if the provided product name is invalid.
         """
         self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
