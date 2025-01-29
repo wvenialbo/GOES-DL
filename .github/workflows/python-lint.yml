@@ -1,0 +1,113 @@
+name: Python
+
+on: [push]
+
+jobs:
+  bandit:
+    name: Security checking with Bandit
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade bandit
+        pip install -r requirements.txt
+    - name: Analysing the code with bandit
+      run: |
+        bandit "./src/GOES_DL" --recursive
+
+  ruff:
+    name: Linting with Ruff
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade ruff
+        pip install -r requirements.txt
+    - name: Analysing the code with ruff
+      run: |
+        ruff check "./src/GOES_DL"
+
+  mypy:
+    name: Type checking with MyPy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade mypy
+        pip install -r requirements.txt
+    - name: Install mypy type stubs
+      run: |
+        pip install --upgrade types-requests
+        pip install --upgrade boto3-stubs
+    - name: Analysing the code with mypy
+      run: |
+        mypy "./src/GOES_DL"
+
+  pyflakes:
+    name: Linting with PyFlakes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade pyflakes
+        pip install -r requirements.txt
+    - name: Analysing the code with pyflakes
+      run: |
+        pyflakes "./src/GOES_DL"
+
+  pylint:
+    name: Linting with Pylint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade pylint
+        pip install -r requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        pylint "./src/GOES_DL"

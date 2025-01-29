@@ -94,7 +94,7 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
     Product: Radiance (Rad).
     """
 
-    PRODUCT_NAME: str = "Rad"
+    PRODUCT_NAME_RAD: str = GOESProductLocatorABIPP.PRODUCT_RAD
 
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
@@ -120,7 +120,7 @@ class GOESProductLocatorRad(GOESProductLocatorABIPP):
             be provided.
         """
         super().__init__(
-            name=self.PRODUCT_NAME,
+            name=self.PRODUCT_NAME_RAD,
             scene=scene,
             channels=channels,
             origin=origin,
@@ -135,7 +135,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
     Product: Cloud and Moisture Imagery Product (CMIP).
     """
 
-    PRODUCT_NAME: str = "CMIP"
+    PRODUCT_NAME_CMIP: str = "CMIP"
 
     def __init__(
         self, scene: str, channels: str | list[str], origin: str
@@ -161,7 +161,7 @@ class GOESProductLocatorCMIP(GOESProductLocatorABIPP):
             be provided.
         """
         super().__init__(
-            name=self.PRODUCT_NAME,
+            name=self.PRODUCT_NAME_CMIP,
             scene=scene,
             channels=channels,
             origin=origin,

@@ -548,6 +548,10 @@
         "use-implicit-booleaness-not-comparison-to-zero",
         "use-symbolic-message-instead",
         "useless-suppression",
+        # temporary disable (avoid complaint about GOES_DL module)
+        "invalid-name",
+        # temporary disable (avoid complaint about TODOs)
+        "fixme",
       ]
 
       # Enable the message, report, category or checker with the given id(s). You can

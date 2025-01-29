@@ -1,10 +1,10 @@
-name: Pylint
+name: Bandit
 
 on: [workflow_dispatch]
 
 jobs:
-  pylint:
-    name: Linting with Pylint
+  bandit:
+    name: Security checking with Bandit
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,8 +18,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pylint
+        pip install --upgrade bandit
         pip install -r requirements.txt
-    - name: Analysing the code with pylint
+    - name: Analysing the code with bandit
       run: |
-        pylint "./src/GOES_DL"
+        bandit "./src/GOES_DL" --recursive
