@@ -161,7 +161,6 @@ class GOESProductLocatorDMWV(GOESProductLocatorABIDC):
             dataset directories are organised, only a single origin may
             be provided.
         """
-
         self.available_channels = self.WV_CHANNELS
 
         super().__init__(
