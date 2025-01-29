@@ -112,6 +112,11 @@ class GOESProductLocatorABIDP(GOESProductLocatorABINSO):
             namely a satellite identifier, e.g. "G16". Due to how the
             dataset directories are organised, only a single origin may
             be provided.
+
+        Raises
+        ------
+        ValueError
+            If the provided scene or origin is invalid.
         """
         self._validate_product(name, self.AVAILABLE_PRODUCTS)
 
