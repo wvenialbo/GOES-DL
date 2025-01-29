@@ -75,9 +75,7 @@ class Downloader:
     time_tolerance: int = TIME_TOLERANCE_DEFAULT
 
     def __post_init__(self) -> None:
-        """
-        Validate the downloader object.
-        """
+        """Validate the downloader object."""
         if self.time_tolerance < TIME_TOLERANCE_MIN:
             raise ValueError(
                 "time_tolerance must be greater than or equal "
