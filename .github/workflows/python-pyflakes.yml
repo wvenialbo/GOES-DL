@@ -3,7 +3,8 @@ name: PyFlakes
 on: [push]
 
 jobs:
-  build:
+  code-linting:
+    name: Linting with PyFlakes
     runs-on: ubuntu-latest
     strategy:
       matrix:
