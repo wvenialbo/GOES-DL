@@ -12,7 +12,6 @@ from pathlib import Path
 from ..utils import FileRepository
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
-from .datasource_repository import DatasourceRepository
 
 
 class DatasourceLocal(DatasourceBase):
@@ -24,8 +23,7 @@ class DatasourceLocal(DatasourceBase):
     Methods
     -------
     download_file(file_path: str)
-        Retrieve a file from the datasource and save it into the local
-        repository.
+        Retrieve a file from the datasource.
     listdir(dir_path: str)
         List the contents of a remote directory.
 
@@ -40,7 +38,6 @@ class DatasourceLocal(DatasourceBase):
     def __init__(
         self,
         root_path: str | Path,
-        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
@@ -50,9 +47,6 @@ class DatasourceLocal(DatasourceBase):
         ----------
         root_path : str | Path
             The root path of a local-based data source.
-        repository : str | Path | DatasourceRepository | None, optional
-            The directory where the files will be stored, by default
-            None.
         cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
@@ -68,7 +62,7 @@ class DatasourceLocal(DatasourceBase):
 
         self.source = FileRepository(root_path)
 
-        super().__init__(str(root_path), repository, cache)
+        super().__init__(str(root_path), cache)
 
     def download_file(self, file_path: str) -> bytes:
         """
@@ -95,7 +89,7 @@ class DatasourceLocal(DatasourceBase):
             If the file cannot be retrieved or does not exist.
         """
         try:
-            return self._retrieve_file(file_path)
+            return self.source.read_file(file_path)
 
         except FileNotFoundError as exc:
             raise RuntimeError(
@@ -106,7 +100,7 @@ class DatasourceLocal(DatasourceBase):
                 f"Unable to retrieve the file '{file_path}': {exc}"
             ) from exc
 
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a directory.
 
@@ -139,10 +133,3 @@ class DatasourceLocal(DatasourceBase):
         self.cache.add_item(dir_path, folder_content)
 
         return folder_content
-
-    def _retrieve_file(self, file_path: str) -> bytes:
-        content = self.source.read_file(file_path)
-
-        self.repository.add_item(file_path, content)
-
-        return content
