@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with isort
       run: |
-        isort "./src/GOES_DL" --check --diff
+        isort "./src/goesdl" --check --diff

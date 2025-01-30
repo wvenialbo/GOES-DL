@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with docsig
       run: |
-        docsig "./src/GOES_DL"
+        docsig "./src/goesdl"
