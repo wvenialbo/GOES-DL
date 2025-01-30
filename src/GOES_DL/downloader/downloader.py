@@ -404,12 +404,12 @@ class Downloader:
         if self.show_progress:
             print("Downloading files:")
 
-        for i, file in enumerate(file_paths):
+        for i, file_path in enumerate(file_paths):
             if self.show_progress:
                 num_item = f"{i + 1}".rjust(num_len)
-                print(f"{num_item}/{num_files} {file}")
+                print(f"{num_item}/{num_files} {file_path}")
 
-            result = self.datasource.download_file(file)
+            result = self.datasource.download_file(file_path)
 
             if self.show_progress:
                 if result == DownloadStatus.SUCCESS:
