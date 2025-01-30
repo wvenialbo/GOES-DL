@@ -154,11 +154,6 @@ class Downloader:
         is retrieved from the datasource and saved in the local
         repository.
 
-        Note that `start` must be always provided. An offset of 60
-        seconds is added to the initial datetime and subtracted from the
-        final datetime to account for possible differences in the files'
-        timestamps.
-
         Parameters
         ----------
         file_paths : list[str]
@@ -166,11 +161,6 @@ class Downloader:
 
         Notes
         -----
-        `ValueError` is raised if the start_time is not provided. The
-        framework raises an exception if the provided timestamps do not
-        match the expected format or if the timestamp format
-        specification is ill-formed (which is, indeed, a bug!).
-
         The framework may raise `RuntimeError` if the file cannot be
         retrieved, e.g. if the file does not exist in the datasource or
         an internal error occurred.
@@ -215,10 +205,6 @@ class Downloader:
         framework raises an exception if the provided timestamps do not
         match the expected format or if the timestamp format
         specification is ill-formed (which is, indeed, a bug!).
-
-        The framework may raise `RuntimeError` if the file cannot be
-        retrieved, e.g. if the file does not exist in the datasource or
-        an internal error occurred.
         """
         return self._get_file_list(start, end)
 
