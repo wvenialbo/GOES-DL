@@ -16,13 +16,13 @@ from datetime import datetime, timedelta
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
-from ..datasource.constants import DownloadStatus
 from ..utils import FileRepository
 from .constants import (
     ISO_TIMESTAMP_FORMAT,
     TIME_TOLERANCE_DEFAULT,
     TIME_TOLERANCE_MAX,
     TIME_TOLERANCE_MIN,
+    DownloadStatus,
 )
 
 
