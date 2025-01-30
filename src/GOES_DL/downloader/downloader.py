@@ -62,8 +62,8 @@ class Downloader:
     repository : FileRepository
         A reference to the local repository object.
     date_format : str
-        The date format specification. The default is the ISO timestamp
-        format.
+        The date format specification. The default is the full ISO 8601
+        timestamp format.
     time_tolerance : int
         The time tolerance in seconds. The default is 60 seconds.
     show_progress : bool
