@@ -331,11 +331,11 @@
     ],
     "github.copilot.chat.fixTestFailure.enabled": true,
     "github.copilot.chat.scopeSelection": true,
+    "github.copilot.chat.search.semanticTextResults": true,
     "github.copilot.chat.useProjectTemplates": true,
+    "github.copilot.editor.enableAutoCompletions": true,
     "github.copilot.editor.enableCodeActions": true,
     "github.copilot.renameSuggestions.triggerAutomatically": true,
-    "github.copilot.chat.search.semanticTextResults": true,
-    "github.copilot.editor.enableAutoCompletions": true,
     "github.copilot.enable": {
         "*": true,
         "css": true,
@@ -365,7 +365,7 @@
     "editor.showFoldingControls": "mouseover",
     "files.exclude": {
         "*.coverage": true,
-        "*.egg-info": true,
+        "**/*.egg-info": true,
         "**/__pycache__": true,
         "**/.git": true,
         "**/.github": true,

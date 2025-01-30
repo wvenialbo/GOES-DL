@@ -1,10 +1,10 @@
-name: Pylint
+name: PyCodeStyle
 
 on: [workflow_dispatch]
 
 jobs:
-  pylint:
-    name: Linting with Pylint
+  pycodestyle:
+    name: Code format checking with PyCodeStyle
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,8 +18,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pylint
+        pip install --upgrade pycodestyle
         pip install -r requirements.txt
-    - name: Analysing the code with pylint
+    - name: Analysing the code with pycodestyle
       run: |
-        pylint "./src/goesdl"
+        pycodestyle "./src/goesdl" --show-source --show-pep8

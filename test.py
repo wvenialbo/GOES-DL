@@ -30,11 +30,11 @@ test_goes()
     Test the downloader object with GOES-16 data and AWS datasource.
 """
 
-from GOES_DL.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
-from GOES_DL.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
-from GOES_DL.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
-from GOES_DL.datasource import DatasourceAWS, DatasourceHTTP
-from GOES_DL.downloader import Downloader
+from goesdl.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
+from goesdl.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
+from goesdl.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
+from goesdl.datasource import DatasourceAWS, DatasourceHTTP, DatasourceLocal
+from goesdl.downloader import Downloader
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M%z"
 
@@ -54,8 +54,8 @@ def test(dl: Downloader, start: str, end: str = "") -> list[str]:
         The downloader object to test.
     start : str
         The start date of the download range.
-    end : str, optional
-        The end date of the download range.
+    end : str
+        The end date of the download range, if any. The default is "".
 
     Returns
     -------
@@ -67,47 +67,79 @@ def test(dl: Downloader, start: str, end: str = "") -> list[str]:
     else:
         print(f"Downloading data from {start}")
 
-    files: list[str] = dl.download_files(start=start, end=end)
-
-    return files
+    return dl.download_files(start=start, end=end)
 
 
-def test_gridsat_aws() -> None:
+def test_gridsat_aws() -> list[str]:
     """
     Test the downloader object with GridSat-B1 data and AWS datasource.
+
+    Returns
+    -------
+    list[str]
+        The list of downloaded files.
     """
     pd = ProductLocatorB1()
-    ds = DatasourceAWS(pd.get_base_url("AWS"), REPO_GRISAT_B1)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceAWS(pd.get_base_url("AWS"))
 
-    test(dl, "1984-08-23T00:00Z")
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GRISAT_B1,
+        date_format=DATE_FORMAT,
+    )
+
+    return test(dl, "1984-08-23T00:00Z")
 
 
-def test_gridsat_http() -> None:
+def test_gridsat_http() -> tuple[list[str], list[str]]:
     """
     Test the downloader object with GridSat-B1 data and HTTP datasource.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        A tuple of lists of downloaded files.
     """
     pd = ProductLocatorB1()
-    ds = DatasourceHTTP(pd, REPO_GRISAT_B1)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceHTTP(pd)
 
-    test(dl, "1984-08-23T00:00Z")
-    test(dl, "1982-08-23T00:00Z")
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GRISAT_B1,
+        date_format=DATE_FORMAT,
+    )
+
+    files1 = test(dl, "1984-08-23T00:00Z")
+    files2 = test(dl, "1982-08-23T00:00Z")
+
+    return files1, files2
 
 
-def test_gridsat_goes() -> None:
+def test_gridsat_goes() -> list[str]:
     """
-    Test the downloader object with GridSat-GOES/CONUS data and HTTP
-    datasource.
+    Test the downloader with GridSat-GOES/CONUS and HTTP datasource.
+
+    Returns
+    -------
+    list[str]
+        The list of downloaded files.
     """
     pd = ProductLocatorGC("F", "G12")
-    ds = DatasourceHTTP(pd, REPO_GRISAT_GOES)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceHTTP(pd)
 
-    test(dl, "2008-11-09T14:00+0000")
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GRISAT_GOES,
+        date_format=DATE_FORMAT,
+    )
+
+    return test(dl, "2008-11-09T14:00Z")
 
 
-def test_goes() -> list[str]:
+def test_goes1() -> list[str]:
     """
     Test the downloader object with GOES-16 data and AWS datasource.
 
@@ -120,25 +152,99 @@ def test_goes() -> list[str]:
 
     # GOES-16 data is updated every 10 minutes. If you are downloading
     # old data, you may leave the refresh rate as default.
-    REPO_GOES = "C:/Projects/TFG/source/tutorials/repository/20201114T20"
-    ds = DatasourceAWS(pd, REPO_GOES, 10 * 60)
-    dl = Downloader(datasource=ds, locator=pd)
 
-    files1 = test(dl, "2020-11-14T20:00:00Z")
-    files2 = test(dl, "2020-11-14T20:00:00Z", "2020-11-15T19:00:00Z")
+    ds = DatasourceAWS(pd, 10 * 60)
 
-    return files2
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GOES,
+        date_format=DATE_FORMAT,
+    )
+
+    return test(dl, "2024-08-23T00:00+0000")
+
+
+def test_goes2() -> tuple[list[str], list[str]]:
+    """
+    Test the downloader object with GOES-16 data and AWS datasource.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        A tuple of lists of downloaded files.
+    """
+    pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
+
+    # GOES-16 data is updated every 10 minutes. If you are downloading
+    # old data, you may leave the refresh rate as default.
+
+    ds = DatasourceAWS(pd, 10 * 60)
+
+    repo_goes_l = "../../TFG_Tools/repository/20201114T20"
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=repo_goes_l,
+        date_format=DATE_FORMAT,
+    )
+
+    files1 = test(dl, "2020-11-14T20:00Z")
+    files2 = test(dl, "2020-11-14T20:00Z", "2020-11-15T19:00Z")
+
+    return files1, files2
+
+
+def test_goes3() -> tuple[list[str], list[str]]:
+    """
+    Test the downloader object with GOES-16 data and local datasource.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        A tuple of lists of downloaded files.
+    """
+    pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
+
+    repo_goes_s = "../../TFG_Tools/repository/20201114T20"
+
+    ds = DatasourceLocal(repo_goes_s, 0)
+
+    repo_goes_d = "../../TFG_Tools/repository/20201114T21"
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=repo_goes_d,
+        date_format=DATE_FORMAT,
+    )
+
+    files1 = test(dl, "2020-11-14T20:00Z")
+    files2 = test(dl, "2020-11-14T20:00Z", "2020-11-15T19:00Z")
+
+    return files1, files2
 
 
 def main() -> None:
-    """
-    Run all test functions.
-    """
-    files = test_goes()
+    """Run all test functions."""
+    files2 = test_goes3()
+    print(files2)
+
+    files2 = test_goes2()
+    print(files2)
+
+    files = test_goes1()
     print(files)
-    test_gridsat_goes()
-    test_gridsat_aws()
-    test_gridsat_http()
+
+    files = test_gridsat_goes()
+    print(files)
+
+    files = test_gridsat_aws()
+    print(files)
+
+    files2 = test_gridsat_http()
+    print(files2)
 
 
 if __name__ == "__main__":

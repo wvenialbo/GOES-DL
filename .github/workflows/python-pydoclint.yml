@@ -1,10 +1,10 @@
-name: Pylint
+name: PyDocLint
 
 on: [workflow_dispatch]
 
 jobs:
-  pylint:
-    name: Linting with Pylint
+  pydoclint:
+    name: Documentation linting with PyDocLint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,8 +18,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pylint
+        pip install --upgrade pydoclint
         pip install -r requirements.txt
-    - name: Analysing the code with pylint
+    - name: Analysing the code with pydoclint
       run: |
-        pylint "./src/goesdl"
+        pydoclint "./src/goesdl"

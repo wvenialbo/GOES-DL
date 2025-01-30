@@ -1,10 +1,10 @@
-name: Pylint
+name: AutoPEP
 
 on: [workflow_dispatch]
 
 jobs:
-  pylint:
-    name: Linting with Pylint
+  autopep:
+    name: Code format checking with AutoPEP8
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,8 +18,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pylint
+        pip install --upgrade autopep8
         pip install -r requirements.txt
-    - name: Analysing the code with pylint
+    - name: Analysing the code with autopep8
       run: |
-        pylint "./src/goesdl"
+        autopep8 "./src/goesdl" --recursive --jobs 0 --diff --aggressive

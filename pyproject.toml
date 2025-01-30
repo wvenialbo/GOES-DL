@@ -52,7 +52,7 @@
   license = { file = "LICENSE" }
   name = "goes-dl"
   readme = { file = "README.md", content-type = "text/markdown" }
-  requires-python = ">=3.8"
+  requires-python = ">=3.9"
 
   [project.urls]
     # Homepage = "https://example.com"
@@ -67,9 +67,12 @@
     include-package-data = true
 
     [tool.setuptools.dynamic]
-      version = { attr = "GOES_DL.__version__" }
+      version = { attr = "goesdl.__version__" }
 
     [tool.setuptools.package-data]
+      goesdl = [
+        "py.typed",
+      ]
       config = [
         "settings.json",
       ]
@@ -84,12 +87,16 @@
     description = "Satellite imagery downloader for GOES and GridSat datasets"
     license     = "MIT"
     name        = "goes-dl"
+    packages    = [
+      { include = "goesdl" },
+      { include = "goesdl/py.typed" },
+    ]
     readme      = "README.md"
     version     = "0.1.0"
 
     [tool.poetry.dependencies]
       boto3    = "~1.35.42"
-      python   = "^3.8"
+      python   = "^3.9"
       requests = "~2.32.3"
 
   [tool.black]
@@ -123,7 +130,7 @@
     max-line-length      = 79
     per-file-ignores     = [
       "__init__.py:F401",
-      "./src/GOES_DL/utils/headers.py:DAR201",
+      "./src/goesdl/utils/headers.py:DAR201",
     ]
     strictness           = "full"
     allow-init-docstring = true
@@ -548,6 +555,8 @@
         "use-implicit-booleaness-not-comparison-to-zero",
         "use-symbolic-message-instead",
         "useless-suppression",
+        # temporary disable (avoid complaint about TODOs)
+        "fixme",
       ]
 
       # Enable the message, report, category or checker with the given id(s). You can

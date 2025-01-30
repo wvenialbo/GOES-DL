@@ -1,10 +1,10 @@
-name: Pylint
+name: PyDocStyle
 
 on: [workflow_dispatch]
 
 jobs:
-  pylint:
-    name: Linting with Pylint
+  pydocstyle:
+    name: Documentation linting with PyDocStyle
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,8 +18,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pylint
+        pip install --upgrade pydocstyle
         pip install -r requirements.txt
-    - name: Analysing the code with pylint
+    - name: Analysing the code with pydocstyle
       run: |
-        pylint "./src/goesdl"
+        pydocstyle "./src/goesdl"

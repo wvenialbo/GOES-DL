@@ -1,10 +1,10 @@
-name: Pylint
+name: Black
 
 on: [workflow_dispatch]
 
 jobs:
-  pylint:
-    name: Linting with Pylint
+  black:
+    name: Code format checking with Black
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,8 +18,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade pylint
+        pip install --upgrade black
         pip install -r requirements.txt
-    - name: Analysing the code with pylint
+    - name: Analysing the code with black
       run: |
-        pylint "./src/goesdl"
+        black "./src/goesdl" --check

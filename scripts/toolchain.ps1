@@ -7,7 +7,7 @@ $venv = '.venv'
 $project = $args[0]
 
 if (-not $project) {
-    $project = './GOES_DL'
+    $project = './src/goesdl'
 }
 
 $isFolder = Test-Path -Type Container -LiteralPath $project
@@ -149,7 +149,7 @@ Write-Host ""
 Write-Host "--- Running pydoctest {<file>|<dir>} [--parser {google|numpy|sphinx}]"
 if ($isFolder) {
     Push-Location -Path $project
-    pydoctest --parser numpy
+    #pydoctest --parser numpy
     Pop-Location
 }
 else {
