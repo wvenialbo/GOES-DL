@@ -48,6 +48,30 @@ class Downloader(DownloaderBase):
         time_tolerance: int = TIME_TOLERANCE_DEFAULT,
         show_progress: bool = True,
     ) -> None:
+        """
+        Initialize the downloader object.
+
+        Parameters
+        ----------
+        datasource : Datasource
+            The datasource object to use for downloading files.
+        locator : ProductLocator
+            The product locator object to use for locating files.
+        repository : str or Path or FileRepository
+            The repository to store the downloaded files. If a string or
+            Path object is provided, a FileRepository object is created
+            using the provided path. If None, a FileRepository object is
+            created using the current working directory. Default is
+            None.
+        date_format : str
+            The date format to use for parsing timestamps. Default is
+            'iso'.
+        time_tolerance : int
+            The time tolerance value to use for matching timestamps.
+            Default is 5.
+        show_progress : bool
+            A flag to show the download progress. Default is True.
+        """
         if not isinstance(repository, FileRepository):
             repository = FileRepository(repository)
 
