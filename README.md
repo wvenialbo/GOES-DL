@@ -79,7 +79,9 @@ pip install goes-dl
 ## Usage
 
 Below are examples of how to use the GOES-DL package to download data from each
-of the supported sources.
+of the supported sources. You will find more examples in the
+[examples](https://github.com/wvenialbo/GOES-DL/tree/main/examples) directory
+of the repository.
 
 ### 1. Download GOES 2nd Generation Data (from NOAA's NCEI archive)
 
