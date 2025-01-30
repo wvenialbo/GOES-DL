@@ -1,4 +1,4 @@
-# GOES-DL
+# GOES-DL — GOES Dataset Downloader
 
 [![Bandit](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml)
 [![MyPy](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml)
@@ -85,9 +85,9 @@ of the supported sources.
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.gridsat import GridSatProductLocatorGC
-from GOES_DL.datasource import DatasourceHTTP
-from GOES_DL.downloader import Downloader
+from goesdl.dataset.gridsat import GridSatProductLocatorGC
+from goesdl.datasource import DatasourceHTTP
+from goesdl.downloader import Downloader
 
 # Initialize the product locator for GridSat-GOES (GOES-12, Full Disk)
 locator = GridSatProductLocatorGC("F", "G12")
@@ -120,9 +120,9 @@ files2 = downloader.download_files(
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.goes import GOESProductLocatorABIPP
-from GOES_DL.datasource import DatasourceAWS
-from GOES_DL.downloader import Downloader
+from goesdl.dataset.goes import GOESProductLocatorABIPP
+from goesdl.datasource import DatasourceAWS
+from goesdl.downloader import Downloader
 
 # Initialize the product locator for GOES-R Series (set your desired product)
 locator = GOESProductLocatorABIPP("CMIP", "F", ["C02", "C08", "C13"], "G16")
@@ -161,9 +161,9 @@ downloader.get_files(file_list)
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
-from GOES_DL.datasource import DatasourceAWS
-from GOES_DL.downloader import Downloader
+from goesdl.dataset.gridsat import GridSatProductLocatorB1
+from goesdl.datasource import DatasourceAWS
+from goesdl.downloader import Downloader
 
 # Initialize the product locator for GridSat-B1
 locator = GridSatProductLocatorB1()
@@ -198,9 +198,9 @@ files2 = downloader.download_files(
 
 ```python
 # Import the locator and datasource according to your desired product
-from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
-from GOES_DL.datasource import DatasourceHTTP
-from GOES_DL.downloader import Downloader
+from goesdl.dataset.gridsat import GridSatProductLocatorB1
+from goesdl.datasource import DatasourceHTTP
+from goesdl.downloader import Downloader
 
 # Initialize the product locator for GridSat-B1
 locator = GridSatProductLocatorB1()
