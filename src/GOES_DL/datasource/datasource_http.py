@@ -111,37 +111,6 @@ class DatasourceHTTP(DatasourceBase):
                 f"Unable to retrieve the file '{file_path}': {exc}"
             ) from exc
 
-    @staticmethod
-    def _host_exists(host_name: str) -> bool:
-        """Check if a host server exists or is not out of service.
-
-        This function takes the hostname part of a URL as input and
-        uses the socket.gethostbyname() function to try to resolve the
-        hostname to an IP address. If this is successful, it means the
-        host server exists and is not out of service, so the function
-        returns True. If an exception is raised, it means the host
-        server does not exist or is out of service, so the function
-        returns False.
-
-        Parameters
-        ----------
-        host_name : str
-            The host server name.
-
-        Returns
-        -------
-        bool
-            True if the host server exists, False otherwise.
-        """
-        try:
-            socket.gethostbyname(host_name)
-
-        except socket.gaierror:  # as exc
-            # Host does not exist or is out of service (log this!)
-            return False
-
-        return True
-
     def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a directory.
@@ -180,19 +149,18 @@ class DatasourceHTTP(DatasourceBase):
         return href_links
 
     @staticmethod
+    def _host_exists(host_name: str) -> bool:
+        try:
+            socket.gethostbyname(host_name)
+
+        except socket.gaierror:  # as exc
+            # Host does not exist or is out of service (log this!)
+            return False
+
+        return True
+
+    @staticmethod
     def _path_exists(folder_url: str) -> bool:
-        """Check if a folder exists in a host server.
-
-        Parameters
-        ----------
-        folder_url : str
-            The URL of the folder to check.
-
-        Returns
-        -------
-        bool
-            True if the folder exists, False otherwise.
-        """
         response = requests.head(folder_url, timeout=10)
 
         return response.status_code == HTTP_STATUS_OK
