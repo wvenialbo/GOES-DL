@@ -57,7 +57,7 @@ class Downloader(DownloaderBase):
             The datasource object to use for downloading files.
         locator : ProductLocator
             The product locator object to use for locating files.
-        repository : str or Path or FileRepository
+        repository : str | Path | FileRepository
             The repository to store the downloaded files. If a string or
             Path object is provided, a FileRepository object is created
             using the provided path. If None, a FileRepository object is
