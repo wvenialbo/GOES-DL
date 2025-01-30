@@ -17,7 +17,7 @@ them &#91;[6](#hist)&#93;.*
 
 **GOES-DL** is an open-source Python package that simplifies the process of
 downloading satellite imagery datasets from various NOAA archives. The package
-supports both second and third-generation GOES satellite data
+supports both second and fourth-generation GOES satellite data
 &#91;[4](#goesi),[7](#goesr)&#93;, as well as the Gridded Satellite B1
 (GridSat-B1) Climate Data Record &#91;[3](#gridb1)&#93;. GOES-DL provides an
 easy-to-use interface to access data for scientific analysis, research, and
@@ -25,7 +25,7 @@ other applications.
 
 ## Key Features
 
-- **Real-time GOES 3rd Generation Satellite Data (GOES Series R)**: Access
+- **Real-time GOES 4th Generation Satellite Data (GOES Series R)**: Access
   real-time and archived data from NOAA's Amazon Web Services (AWS) cloud
   archive.
 
@@ -48,7 +48,7 @@ other applications.
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
 
-2. **GOES 3rd Generation (GOES-16 to GOES-18)**: Also known as the R to U
+2. **GOES 4th Generation (GOES-16 to GOES-18)**: Also known as the R to U
    Series, these satellites offer advanced imagery and atmospheric measurements
    with better spatial, spectral, and temporal resolution &#91;[7](#goesr)&#93;.
 
