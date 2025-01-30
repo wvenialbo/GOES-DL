@@ -201,8 +201,6 @@ class DatasourceAWS(DatasourceBase):
         )
 
     def _get_item_path(self, dir_path: str) -> str:
-        # BUG: url.join() fails with "s3://" URLs.
-        # > folder_url: str = url.join(self.base_url, dir_path)
 
         folder_url = self._url_join(self.base_url, dir_path)
 
@@ -231,6 +229,9 @@ class DatasourceAWS(DatasourceBase):
 
     @staticmethod
     def _url_join(head: str, tail: str) -> str:
+        # Note: url.join() fails with "s3://" URLs.
+        # > folder_url: str = url.join(self.base_url, dir_path)
+
         if head.endswith("/") and tail.startswith("/"):
             head = head[:-1]
 
