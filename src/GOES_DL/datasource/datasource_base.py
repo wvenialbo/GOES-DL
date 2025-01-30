@@ -33,11 +33,6 @@ class DatasourceBase(Datasource):
         ----------
         base_url : str
             The base URL for the datasource.
-        repository : str | Path | DatasourceRepository | None
-            The repository for the datasource. If a path string is
-            provided, it will be used as the base path for the
-            repository. If `None` is provided, the repository will be
-            set to the current directory.
         cache : float | DatasourceCache | None
             The cache for the datasource. If a float is provided, it
             will be used as the life time for each entry in the cache.
