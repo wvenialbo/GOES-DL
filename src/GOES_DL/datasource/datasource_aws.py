@@ -177,21 +177,6 @@ class DatasourceAWS(DatasourceBase):
         return file_list
 
     def _bucket_exists(self, bucket_name: str) -> bool:
-        """
-        Check if the bucket exists.
-
-        Check if the bucket exists in the AWS S3 service.
-
-        Parameters
-        ----------
-        bucket_name : str
-            The name of the bucket to check.
-
-        Returns
-        -------
-        bool
-            True if the bucket exists, False otherwise.
-        """
         try:
             self.s3_client.head_bucket(Bucket=bucket_name)
 
@@ -203,23 +188,6 @@ class DatasourceAWS(DatasourceBase):
 
     @staticmethod
     def _get_client(region: str | None) -> S3Client:
-        """
-        Get the AWS S3 client.
-
-        Returns the AWS S3 client with the UNSIGNED signature version.
-
-        Parameters
-        ----------
-        region : str | None, optional
-            The region where the S3 bucket is located. E.g. "us-west-1",
-            "us-east-1", "eu-west-1", etc. If None, the default region
-            is used.
-
-        Returns
-        -------
-        S3Client
-            The AWS S3 client.
-        """
         if region:
             return boto3.client(
                 AWS_CLIENT,
@@ -233,22 +201,6 @@ class DatasourceAWS(DatasourceBase):
         )
 
     def _get_item_path(self, dir_path: str) -> str:
-        """
-        Get the folder path.
-
-        Get the folder path from the base URL and the directory path.
-
-        Parameters
-        ----------
-        dir_path : str
-            The path to the directory. The path is relative to the base
-            URL.
-
-        Returns
-        -------
-        str
-            The folder path.
-        """
         # BUG: url.join() fails with "s3://" URLs.
         # > folder_url: str = url.join(self.base_url, dir_path)
 
@@ -259,23 +211,6 @@ class DatasourceAWS(DatasourceBase):
         return url_parts.path[1:]
 
     def _object_exists(self, bucket_name: str, object_path: str) -> bool:
-        """
-        Check if the object exists.
-
-        Check if the object exists in the AWS S3 service.
-
-        Parameters
-        ----------
-        bucket_name : str
-            The name of the bucket where the object is located.
-        object_path : str
-            The path to the object to check.
-
-        Returns
-        -------
-        bool
-            True if the object exists, False otherwise.
-        """
         try:
             self.s3_client.head_object(Bucket=bucket_name, Key=object_path)
 
