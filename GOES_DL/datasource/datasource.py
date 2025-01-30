@@ -37,7 +37,7 @@ class Datasource(ABC):
     base_url: str
 
     @abstractmethod
-    def download_file(self, file_path: str) -> None:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -50,6 +50,11 @@ class Datasource(ABC):
         ----------
         file_path : str
             The path to the remote file to be downloaded.
+
+        Returns
+        -------
+        bytes
+            The content of the file as a byte string.
         """
 
     @abstractmethod

@@ -100,7 +100,7 @@ class DatasourceAWS(DatasourceBase):
 
         self.bucket_name: str = bucket_name
 
-    def download_file(self, file_path: str) -> None:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -114,13 +114,18 @@ class DatasourceAWS(DatasourceBase):
         file_path : str
             The path to the remote file to be downloaded.
 
+        Returns
+        -------
+        bytes
+            The content of the file as a byte string.
+
         Raises
         ------
         RuntimeError
             If the file cannot be retrieved.
         """
         try:
-            self._retrieve_file(file_path)
+            return self._retrieve_file(file_path)
 
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
