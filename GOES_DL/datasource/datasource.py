@@ -23,7 +23,7 @@ class Datasource(ABC):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
 
     Attributes
@@ -58,7 +58,7 @@ class Datasource(ABC):
         """
 
     @abstractmethod
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a remote directory.
 
