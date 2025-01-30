@@ -34,8 +34,8 @@ class Downloader(DownloaderBase):
     The downloader object is agnostic to the datasource, dataset, and
     dataset's product implementations. It only requires that the
     datasource and product locator objects implement the methods
-    specified in the `GOES_DL.datasource.Datasource`,
-    `GOES_DL.dataset.ProductLocator` and `GOES_DL.dataset.Product`
+    specified in the `goesdl.datasource.Datasource`,
+    `goesdl.dataset.ProductLocator` and `goesdl.dataset.Product`
     interfaces.
     """
 
