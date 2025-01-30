@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from ..dataset import ProductLocator
 from ..datasource import Datasource
 from ..datasource.constants import DownloadStatus
+from ..utils import FileRepository
 from .constants import (
     ISO_TIMESTAMP_FORMAT,
     TIME_TOLERANCE_DEFAULT,
@@ -58,21 +59,24 @@ class Downloader:
         A reference to the datasource object.
     locator : ProductLocator
         A reference to the dataset's product locator object.
+    repository : FileRepository
+        A reference to the local repository object.
     date_format : str
         The date format specification. The default is the ISO timestamp
         format.
+    time_tolerance : int
+        The time tolerance in seconds. The default is 60 seconds.
     show_progress : bool
         A flag to show the progress of the download. The default is
         True, to display the progress.
-    time_tolerance : int
-        The time tolerance in seconds. The default is 60 seconds.
     """
 
     datasource: Datasource
     locator: ProductLocator
+    repository: FileRepository
     date_format: str = ISO_TIMESTAMP_FORMAT
-    show_progress: bool = True
     time_tolerance: int = TIME_TOLERANCE_DEFAULT
+    show_progress: bool = True
 
     def __post_init__(self) -> None:
         """
