@@ -5,11 +5,8 @@ Classes:
     DatasourceBase: Extend the Datasource interface.
 """
 
-from pathlib import Path
-
 from .datasource import Datasource
 from .datasource_cache import DatasourceCache
-from .datasource_repository import DatasourceRepository
 
 
 class DatasourceBase(Datasource):
@@ -20,17 +17,13 @@ class DatasourceBase(Datasource):
     ----------
     cache : DatasourceCache
         The cache for the datasource.
-    repository : DatasourceRepository
-        The repository for the datasource.
     """
 
     cache: DatasourceCache
-    repository: DatasourceRepository
 
     def __init__(
         self,
         base_url: str,
-        repository: str | Path | DatasourceRepository | None,
         cache: float | DatasourceCache | None,
     ) -> None:
         """
@@ -52,10 +45,6 @@ class DatasourceBase(Datasource):
             time of 0.0 seconds, i.e. no caching.
         """
         super().__init__(base_url)
-        if isinstance(repository, DatasourceRepository):
-            self.repository = repository
-        else:
-            self.repository = DatasourceRepository(repository)
 
         if isinstance(cache, DatasourceCache):
             self.cache = cache
