@@ -409,10 +409,13 @@ class Downloader:
                 num_item = f"{i + 1}".rjust(num_len)
                 print(f"{num_item}/{num_files} {file_path}")
 
-            result = self.datasource.download_file(file_path)
+            result = self._dowload_file(file_path)
 
             if self.show_progress:
                 if result == DownloadStatus.SUCCESS:
                     print(f"{padding}... downloaded succesfully")
                 else:
                     print(f"{padding}... already downloaded")
+
+    def _dowload_file(self, file_path: str) -> DownloadStatus:
+        return self.datasource.download_file(file_path)
