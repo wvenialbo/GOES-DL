@@ -5,10 +5,8 @@ Classes:
     DatasourceBase: Extend the Datasource interface.
 """
 
-from abc import abstractmethod
 from pathlib import Path
 
-from .constants import DownloadStatus
 from .datasource import Datasource
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository
@@ -63,14 +61,3 @@ class DatasourceBase(Datasource):
             self.cache = cache
         else:
             self.cache = DatasourceCache(cache)
-
-    def _download_file(self, file_path: str) -> DownloadStatus:
-        if self.repository.has_item(file_path):
-            return DownloadStatus.ALREADY
-
-        self._retrieve_file(file_path)
-        return DownloadStatus.SUCCESS
-
-    @abstractmethod
-    def _retrieve_file(self, file_path: str) -> bytes:
-        pass
