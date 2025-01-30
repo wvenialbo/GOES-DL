@@ -104,14 +104,14 @@ class FileRepository:
         Raises
         ------
         FileExistsError
-            If the directory already exists.
+            If an object with the same path name already exists.
         """
         dir_path: Path = self.base_directory / directory
         if not dir_path.exists():
             dir_path.mkdir(parents=True)
         else:
             raise FileExistsError(
-                f"The directory '{dir_path}' already exists."
+                f"An object with the path name '{dir_path}' already exists."
             )
 
     def delete_directory(self, directory: str | Path) -> None:
@@ -260,14 +260,18 @@ class FileRepository:
         Raises
         ------
         NotADirectoryError
-            If the given directory does not exist or is not a directory.
+            If the given path is not a directory.
+        FileNotFoundError
+            If the directory does not exist.
         """
         dir_path: Path = self.base_directory / directory
         if dir_path.is_dir():
             return [item.name for item in dir_path.iterdir() if item.is_file()]
-        raise NotADirectoryError(
-            f"The directory '{dir_path}' does not exist or is not a directory."
-        )
+        if dir_path.exists():
+            raise NotADirectoryError(
+                f"The path '{dir_path}' is not a directory."
+            )
+        raise FileNotFoundError(f"The directory '{dir_path}' does not exist.")
 
     def move_file(
         self,

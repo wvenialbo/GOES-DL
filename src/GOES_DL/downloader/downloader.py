@@ -139,13 +139,13 @@ class Downloader:
         retrieved, e.g. if the file does not exist in the datasource or
         an internal error occurred.
         """
-        files_in_range: list[str] = self._get_file_list(start, end)
+        files_in_range = self._get_file_list(start, end)
 
         self._retrieve_files(files_in_range)
 
         return files_in_range
 
-    def get_files(self, *, file_paths: list[str]) -> list[str]:
+    def get_files(self, *, file_paths: list[str]) -> None:
         """
         Load a list of files from the datasource or local repository.
 
@@ -164,12 +164,6 @@ class Downloader:
         file_paths : list[str]
             A list with the file paths.
 
-        Returns
-        -------
-        list[str]
-            The list of file path and names with respect to the local
-            repository root directory.
-
         Notes
         -----
         `ValueError` is raised if the start_time is not provided. The
@@ -182,8 +176,6 @@ class Downloader:
         an internal error occurred.
         """
         self._retrieve_files(file_paths)
-
-        return file_paths
 
     def list_files(self, *, start: str, end: str = "") -> list[str]:
         """
@@ -262,7 +254,7 @@ class Downloader:
             if not self.locator.match(basename):
                 continue
 
-            ct: datetime = self.locator.get_datetime(file)
+            ct = self.locator.get_datetime(file)
 
             if datetime_ini <= ct <= datetime_fin:
                 files_in_range.append(file)
@@ -307,14 +299,10 @@ class Downloader:
         if not start_time:
             raise ValueError("start_time must be provided")
 
-        datetime_ini: datetime = datetime.strptime(
-            start_time, self.date_format
-        )
+        datetime_ini = datetime.strptime(start_time, self.date_format)
 
         if end_time:
-            datetime_fin: datetime = datetime.strptime(
-                end_time, self.date_format
-            )
+            datetime_fin = datetime.strptime(end_time, self.date_format)
         else:
             datetime_fin = datetime_ini
 
@@ -367,13 +355,11 @@ class Downloader:
         if self.show_progress:
             print("Retrieving available file list")
 
-        datetime_ini: datetime
-        datetime_fin: datetime
         datetime_ini, datetime_fin = self._get_datetimes(start_time, end_time)
 
-        paths: list[str] = self.locator.get_paths(datetime_ini, datetime_fin)
+        paths = self.locator.get_paths(datetime_ini, datetime_fin)
 
-        files: list[str] = self._retrieve_directory_content(paths)
+        files = self._retrieve_directory_content(paths)
 
         return self._filter_directory_content(
             datetime_ini, datetime_fin, files
