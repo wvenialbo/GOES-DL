@@ -7,7 +7,6 @@ Classes:
 
 import re
 import socket
-from pathlib import Path
 from urllib.parse import ParseResult
 
 import requests
@@ -17,7 +16,6 @@ from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
 from ..utils.url import URL
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
-from .datasource_repository import DatasourceRepository
 
 HTTP_STATUS_OK = 200
 
@@ -34,14 +32,13 @@ class DatasourceHTTP(DatasourceBase):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
     """
 
     def __init__(
         self,
         locator: str | ProductLocator,
-        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
@@ -52,9 +49,6 @@ class DatasourceHTTP(DatasourceBase):
         locator : str | ProductLocator
             The base URL of a HTTP-based data sources or a
             `ProductLocator` object.
-        repository : str | Path | DatasourceRepository | None, optional
-            The directory where the files will be stored, by default
-            None.
         cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
@@ -83,7 +77,7 @@ class DatasourceHTTP(DatasourceBase):
                 f"Path '{base_path}' does not exist or you have no access."
             )
 
-        super().__init__(base_url, repository, cache)
+        super().__init__(base_url, cache)
 
     def download_file(self, file_path: str) -> bytes:
         """
@@ -113,8 +107,9 @@ class DatasourceHTTP(DatasourceBase):
             return self._retrieve_file(file_path)
 
         except requests.HTTPError as exc:
-            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
-            raise RuntimeError(message) from exc
+            raise RuntimeError(
+                f"Unable to retrieve the file '{file_path}': {exc}"
+            ) from exc
 
     @staticmethod
     def _host_exists(host_name: str) -> bool:
@@ -140,11 +135,12 @@ class DatasourceHTTP(DatasourceBase):
         """
         try:
             socket.gethostbyname(host_name)
-            return True
         except socket.gaierror:
             return False
+        else:
+            return True
 
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a directory.
 
@@ -167,8 +163,8 @@ class DatasourceHTTP(DatasourceBase):
         if cached_links is not None:
             return cached_links
 
-        folder_url: str = URL.join(self.base_url, dir_path)
-        index_html: str = self._get_content(folder_url)
+        folder_url = URL.join(self.base_url, dir_path)
+        index_html = self._get_content(folder_url)
 
         if not index_html:
             return []
@@ -196,21 +192,26 @@ class DatasourceHTTP(DatasourceBase):
             True if the folder exists, False otherwise.
         """
         response = requests.head(folder_url, timeout=10)
+
         return response.status_code == HTTP_STATUS_OK
 
     @staticmethod
     def _get_content(folder_url: str) -> str:
         headers = RequestHeaders(accept=TEXT_HTML).headers
+
         response = requests.get(folder_url, headers=headers, timeout=15)
+
         if response.status_code == HTTP_STATUS_OK:
             response.encoding = response.apparent_encoding
             return response.text
+
         return ""
 
     def _retrieve_file(self, file_path: str) -> bytes:
-        file_url: str = URL.join(self.base_url, file_path)
+        file_url = URL.join(self.base_url, file_path)
 
         headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
+
         response = requests.get(file_url, headers=headers, timeout=15)
 
         response.raise_for_status()
@@ -218,7 +219,4 @@ class DatasourceHTTP(DatasourceBase):
         if response.status_code != HTTP_STATUS_OK:
             raise requests.HTTPError("Request failure", response=response)
 
-        content: bytes = response.content
-        self.repository.add_item(file_path, content)
-
-        return content
+        return bytes(response.content)
