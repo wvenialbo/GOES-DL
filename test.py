@@ -30,11 +30,11 @@ test_goes()
     Test the downloader object with GOES-16 data and AWS datasource.
 """
 
-from GOES_DL.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
-from GOES_DL.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
-from GOES_DL.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
-from GOES_DL.datasource import DatasourceAWS, DatasourceHTTP, DatasourceLocal
-from GOES_DL.downloader import Downloader
+from goesdl.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
+from goesdl.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
+from goesdl.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
+from goesdl.datasource import DatasourceAWS, DatasourceHTTP, DatasourceLocal
+from goesdl.downloader import Downloader
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M%z"
 

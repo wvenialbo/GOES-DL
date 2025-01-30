@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with autopep8
       run: |
-        autopep8 "./src/GOES_DL" --recursive --jobs 0 --diff --aggressive
+        autopep8 "./src/goesdl" --recursive --jobs 0 --diff --aggressive

@@ -67,10 +67,10 @@
     include-package-data = true
 
     [tool.setuptools.dynamic]
-      version = { attr = "GOES_DL.__version__" }
+      version = { attr = "goesdl.__version__" }
 
     [tool.setuptools.package-data]
-      GOES_DL = [
+      goesdl = [
         "py.typed",
       ]
       config = [
@@ -88,8 +88,8 @@
     license     = "MIT"
     name        = "goes-dl"
     packages    = [
-      { include = "GOES_DL" },
-      { include = "GOES_DL/py.typed" },
+      { include = "goesdl" },
+      { include = "goesdl/py.typed" },
     ]
     readme      = "README.md"
     version     = "0.1.0"
@@ -130,7 +130,7 @@
     max-line-length      = 79
     per-file-ignores     = [
       "__init__.py:F401",
-      "./src/GOES_DL/utils/headers.py:DAR201",
+      "./src/goesdl/utils/headers.py:DAR201",
     ]
     strictness           = "full"
     allow-init-docstring = true
@@ -555,8 +555,6 @@
         "use-implicit-booleaness-not-comparison-to-zero",
         "use-symbolic-message-instead",
         "useless-suppression",
-        # temporary disable (avoid complaint about GOES_DL module)
-        "invalid-name",
         # temporary disable (avoid complaint about TODOs)
         "fixme",
       ]

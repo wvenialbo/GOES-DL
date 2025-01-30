@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pyflakes
       run: |
-        pyflakes "./src/GOES_DL"
+        pyflakes "./src/goesdl"
