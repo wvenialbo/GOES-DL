@@ -33,7 +33,7 @@ test_goes()
 from GOES_DL.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
 from GOES_DL.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
 from GOES_DL.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
-from GOES_DL.datasource import DatasourceAWS, DatasourceHTTP
+from GOES_DL.datasource import DatasourceAWS, DatasourceHTTP, DatasourceLocal
 from GOES_DL.downloader import Downloader
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M%z"
@@ -54,8 +54,8 @@ def test(dl: Downloader, start: str, end: str = "") -> list[str]:
         The downloader object to test.
     start : str
         The start date of the download range.
-    end : str, optional
-        The end date of the download range.
+    end : str
+        The end date of the download range, if any. The default is "".
 
     Returns
     -------
@@ -107,8 +107,7 @@ def test_gridsat_http() -> tuple[list[str], list[str]]:
 
 def test_gridsat_goes() -> list[str]:
     """
-    Test the downloader object with GridSat-GOES/CONUS data and HTTP
-    datasource.
+    Test the downloader with GridSat-GOES/CONUS and HTTP datasource.
 
     Returns
     -------
@@ -167,10 +166,36 @@ def test_goes2() -> tuple[list[str], list[str]]:
     return files1, files2
 
 
+def test_goes3() -> tuple[list[str], list[str]]:
+    """
+    Test the downloader object with GOES-16 data and local datasource.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        A tuple of lists of downloaded files.
+    """
+    pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
+
+    # GOES-16 data is updated every 10 minutes. If you are downloading
+    # old data, you may leave the refresh rate as default.
+
+    repo_goes_l = "../../TFG_Tools/repository/20201114T20"
+
+    ds = DatasourceLocal(repo_goes_l, repo_goes_l, 0)
+    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+
+    files1 = test(dl, "2020-11-14T20:00Z")
+    files2 = test(dl, "2020-11-14T20:00Z", "2020-11-15T19:00Z")
+
+    return files1, files2
+
+
 def main() -> None:
-    """
-    Run all test functions.
-    """
+    """Run all test functions."""
+    files2 = test_goes3()
+    print(files2)
+
     files2 = test_goes2()
     print(files2)
 
