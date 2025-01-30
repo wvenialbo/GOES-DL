@@ -145,7 +145,7 @@ class Downloader:
 
         return files_in_range
 
-    def get_files(self, *, file_paths: list[str]) -> list[str]:
+    def get_files(self, *, file_paths: list[str]) -> None:
         """
         Load a list of files from the datasource or local repository.
 
@@ -164,12 +164,6 @@ class Downloader:
         file_paths : list[str]
             A list with the file paths.
 
-        Returns
-        -------
-        list[str]
-            The list of file path and names with respect to the local
-            repository root directory.
-
         Notes
         -----
         `ValueError` is raised if the start_time is not provided. The
@@ -182,8 +176,6 @@ class Downloader:
         an internal error occurred.
         """
         self._retrieve_files(file_paths)
-
-        return file_paths
 
     def list_files(self, *, start: str, end: str = "") -> list[str]:
         """
