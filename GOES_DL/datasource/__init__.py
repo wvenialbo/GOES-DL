@@ -19,6 +19,7 @@ DownloaderRepository
     Manage file operations for the downloader object.
 """
 
+from .constants import DownloadStatus as DownloadStatus
 from .datasource import Datasource as Datasource
 from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
@@ -33,4 +34,5 @@ __all__ = [
     "DatasourceHTTP",
     "DatasourceLocal",
     "DatasourceRepository",
+    "DownloadStatus",
 ]
