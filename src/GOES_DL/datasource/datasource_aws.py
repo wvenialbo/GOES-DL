@@ -16,7 +16,6 @@ from mypy_boto3_s3.client import S3Client
 
 from ..dataset import ProductLocator
 from ..utils.url import URL
-from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository
@@ -101,7 +100,7 @@ class DatasourceAWS(DatasourceBase):
 
         self.bucket_name: str = bucket_name
 
-    def download_file(self, file_path: str) -> DownloadStatus:
+    def download_file(self, file_path: str) -> None:
         """
         Download a file from the datasource into the local repository.
 
@@ -115,20 +114,13 @@ class DatasourceAWS(DatasourceBase):
         file_path : str
             The path to the remote file to be downloaded.
 
-        Returns
-        -------
-        DownloadStatus
-            `DownloadStatus.SUCCESS` if the file was downloaded
-            successfully; otherwise, `DownloadStatus.ALREADY` if the
-            file is already in the local repository.
-
         Raises
         ------
         RuntimeError
             If the file cannot be retrieved.
         """
         try:
-            return self._download_file(file_path)
+            self._retrieve_file(file_path)
 
         except ClientError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"

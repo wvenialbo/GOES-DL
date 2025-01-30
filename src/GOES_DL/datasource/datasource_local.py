@@ -10,7 +10,6 @@ import os
 from pathlib import Path
 
 from ..utils import FileRepository
-from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 from .datasource_repository import DatasourceRepository
@@ -71,7 +70,7 @@ class DatasourceLocal(DatasourceBase):
 
         super().__init__(str(root_path), repository, cache)
 
-    def download_file(self, file_path: str) -> DownloadStatus:
+    def download_file(self, file_path: str) -> None:
         """
         Download a file from the datasource into the local repository.
 
@@ -85,20 +84,13 @@ class DatasourceLocal(DatasourceBase):
         file_path : str
             The path to the remote file to be downloaded.
 
-        Returns
-        -------
-        DownloadStatus
-            `DownloadStatus.SUCCESS` if the file was downloaded
-            successfully; otherwise, `DownloadStatus.ALREADY` if the
-            file is already in the local repository.
-
         Raises
         ------
         RuntimeError
             If the file cannot be retrieved or does not exist.
         """
         try:
-            return self._download_file(file_path)
+            self._retrieve_file(file_path)
 
         except FileNotFoundError as exc:
             raise RuntimeError(
