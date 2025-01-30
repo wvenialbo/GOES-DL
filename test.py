@@ -80,8 +80,14 @@ def test_gridsat_aws() -> list[str]:
         The list of downloaded files.
     """
     pd = ProductLocatorB1()
-    ds = DatasourceAWS(pd.get_base_url("AWS"), REPO_GRISAT_B1)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceAWS(pd.get_base_url("AWS"))
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GRISAT_B1,
+        date_format=DATE_FORMAT,
+    )
 
     return test(dl, "1984-08-23T00:00Z")
 
@@ -96,8 +102,14 @@ def test_gridsat_http() -> tuple[list[str], list[str]]:
         A tuple of lists of downloaded files.
     """
     pd = ProductLocatorB1()
-    ds = DatasourceHTTP(pd, REPO_GRISAT_B1)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceHTTP(pd)
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GRISAT_B1,
+        date_format=DATE_FORMAT,
+    )
 
     files1 = test(dl, "1984-08-23T00:00Z")
     files2 = test(dl, "1982-08-23T00:00Z")
@@ -115,8 +127,14 @@ def test_gridsat_goes() -> list[str]:
         The list of downloaded files.
     """
     pd = ProductLocatorGC("F", "G12")
-    ds = DatasourceHTTP(pd, REPO_GRISAT_GOES)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceHTTP(pd)
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GRISAT_GOES,
+        date_format=DATE_FORMAT,
+    )
 
     return test(dl, "2008-11-09T14:00Z")
 
@@ -135,8 +153,14 @@ def test_goes1() -> list[str]:
     # GOES-16 data is updated every 10 minutes. If you are downloading
     # old data, you may leave the refresh rate as default.
 
-    ds = DatasourceAWS(pd, REPO_GOES, 10 * 60)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceAWS(pd, 10 * 60)
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=REPO_GOES,
+        date_format=DATE_FORMAT,
+    )
 
     return test(dl, "2024-08-23T00:00+0000")
 
@@ -155,10 +179,16 @@ def test_goes2() -> tuple[list[str], list[str]]:
     # GOES-16 data is updated every 10 minutes. If you are downloading
     # old data, you may leave the refresh rate as default.
 
+    ds = DatasourceAWS(pd, 10 * 60)
+
     repo_goes_l = "../../TFG_Tools/repository/20201114T20"
 
-    ds = DatasourceAWS(pd, repo_goes_l, 10 * 60)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=repo_goes_l,
+        date_format=DATE_FORMAT,
+    )
 
     files1 = test(dl, "2020-11-14T20:00Z")
     files2 = test(dl, "2020-11-14T20:00Z", "2020-11-15T19:00Z")
@@ -177,13 +207,16 @@ def test_goes3() -> tuple[list[str], list[str]]:
     """
     pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
 
-    # GOES-16 data is updated every 10 minutes. If you are downloading
-    # old data, you may leave the refresh rate as default.
-
     repo_goes_l = "../../TFG_Tools/repository/20201114T20"
 
-    ds = DatasourceLocal(repo_goes_l, repo_goes_l, 0)
-    dl = Downloader(datasource=ds, locator=pd, date_format=DATE_FORMAT)
+    ds = DatasourceLocal(repo_goes_l, 0)
+
+    dl = Downloader(
+        datasource=ds,
+        locator=pd,
+        repository=repo_goes_l,
+        date_format=DATE_FORMAT,
+    )
 
     files1 = test(dl, "2020-11-14T20:00Z")
     files2 = test(dl, "2020-11-14T20:00Z", "2020-11-15T19:00Z")
