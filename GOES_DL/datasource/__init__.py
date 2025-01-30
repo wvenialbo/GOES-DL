@@ -25,7 +25,6 @@ from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
 from .datasource_http import DatasourceHTTP as DatasourceHTTP
 from .datasource_local import DatasourceLocal as DatasourceLocal
-from .datasource_repository import DatasourceRepository as DatasourceRepository
 
 __all__ = [
     "Datasource",
@@ -33,6 +32,5 @@ __all__ = [
     "DatasourceCache",
     "DatasourceHTTP",
     "DatasourceLocal",
-    "DatasourceRepository",
     "DownloadStatus",
 ]
