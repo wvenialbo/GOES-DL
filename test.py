@@ -207,14 +207,16 @@ def test_goes3() -> tuple[list[str], list[str]]:
     """
     pd = ProductLocatorGOES("CMIP", "F", "C13", "G16")
 
-    repo_goes_l = "../../TFG_Tools/repository/20201114T20"
+    repo_goes_s = "../../TFG_Tools/repository/20201114T20"
 
-    ds = DatasourceLocal(repo_goes_l, 0)
+    ds = DatasourceLocal(repo_goes_s, 0)
+
+    repo_goes_d = "../../TFG_Tools/repository/20201114T21"
 
     dl = Downloader(
         datasource=ds,
         locator=pd,
-        repository=repo_goes_l,
+        repository=repo_goes_d,
         date_format=DATE_FORMAT,
     )
 
