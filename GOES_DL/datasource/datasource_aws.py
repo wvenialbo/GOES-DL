@@ -5,7 +5,6 @@ Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
 
-from pathlib import Path
 from typing import Literal
 from urllib.parse import ParseResult
 
@@ -18,7 +17,6 @@ from ..dataset import ProductLocator
 from ..utils.url import URL
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
-from .datasource_repository import DatasourceRepository
 
 AWS_CLIENT: Literal["s3"] = "s3"
 
@@ -37,7 +35,7 @@ class DatasourceAWS(DatasourceBase):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
 
     Attributes
@@ -54,7 +52,6 @@ class DatasourceAWS(DatasourceBase):
     def __init__(
         self,
         locator: ProductLocator | tuple[str, ...],
-        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
@@ -67,9 +64,6 @@ class DatasourceAWS(DatasourceBase):
             the base URL and an optional region where the S3 bucket is
             located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
             None, the default region is used.
-        repository : str | Path | DatasourceRepository | None, optional
-            The directory where the files will be stored, by default
-            None.
         cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
@@ -96,7 +90,7 @@ class DatasourceAWS(DatasourceBase):
                 f"Bucket '{bucket_name}' does not exist or you have no access."
             )
 
-        super().__init__(base_url, repository, cache)
+        super().__init__(base_url, cache)
 
         self.bucket_name: str = bucket_name
 
@@ -128,10 +122,11 @@ class DatasourceAWS(DatasourceBase):
             return self._retrieve_file(file_path)
 
         except ClientError as exc:
-            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
-            raise RuntimeError(message) from exc
+            raise RuntimeError(
+                f"Unable to retrieve the file '{file_path}': {exc}"
+            ) from exc
 
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a directory.
 
@@ -154,7 +149,7 @@ class DatasourceAWS(DatasourceBase):
         if cached_list is not None:
             return cached_list
 
-        folder_path: str = self._get_item_path(dir_path)
+        folder_path = self._get_item_path(dir_path)
 
         paginator = self.s3_client.get_paginator("list_objects_v2")
         pages = paginator.paginate(Bucket=self.bucket_name, Prefix=folder_path)
@@ -166,7 +161,7 @@ class DatasourceAWS(DatasourceBase):
 
             break
 
-        ss: int = len(folder_path)
+        ss = len(folder_path)
 
         file_list: list[str] = []
 
@@ -200,8 +195,8 @@ class DatasourceAWS(DatasourceBase):
         try:
             self.s3_client.head_bucket(Bucket=bucket_name)
 
-        except ClientError as exc:
-            print(exc)
+        except ClientError:  # as exc
+            # Bucket not found error or host is out of service (log this!)
             return False
 
         return True
@@ -231,6 +226,7 @@ class DatasourceAWS(DatasourceBase):
                 region_name=region,
                 config=Config(signature_version=UNSIGNED),
             )
+
         return boto3.client(
             AWS_CLIENT,
             config=Config(signature_version=UNSIGNED),
@@ -255,8 +251,10 @@ class DatasourceAWS(DatasourceBase):
         """
         # BUG: url.join() fails with "s3://" URLs.
         # > folder_url: str = url.join(self.base_url, dir_path)
-        folder_url: str = self._url_join(self.base_url, dir_path)
-        url_parts: ParseResult = URL.parse(folder_url)
+
+        folder_url = self._url_join(self.base_url, dir_path)
+
+        url_parts = URL.parse(folder_url)
 
         return url_parts.path[1:]
 
@@ -281,28 +279,27 @@ class DatasourceAWS(DatasourceBase):
         try:
             self.s3_client.head_object(Bucket=bucket_name, Key=object_path)
 
-        except ClientError as exc:
-            print(exc)
-
+        except ClientError:  # as exc
+            # Object not found error or host is out of service (log this!)
             return False
 
         return True
 
     def _retrieve_file(self, file_path: str) -> bytes:
-        folder_path: str = self._get_item_path(file_path)
+        folder_path = self._get_item_path(file_path)
 
         response = self.s3_client.get_object(
             Bucket=self.bucket_name, Key=folder_path
         )
-        content = response["Body"].read()
-        self.repository.add_item(file_path, content)
 
-        return content
+        return response["Body"].read()
 
     @staticmethod
     def _url_join(head: str, tail: str) -> str:
         if head.endswith("/") and tail.startswith("/"):
             head = head[:-1]
+
         if not head.endswith("/") and not tail.startswith("/"):
             return f"{head}/{tail}"
+
         return head + tail
