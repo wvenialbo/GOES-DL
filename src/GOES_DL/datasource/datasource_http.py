@@ -135,11 +135,12 @@ class DatasourceHTTP(DatasourceBase):
         """
         try:
             socket.gethostbyname(host_name)
+
         except socket.gaierror:  # as exc
             # Host does not exist or is out of service (log this!)
             return False
-        else:
-            return True
+
+        return True
 
     def list_files(self, dir_path: str) -> list[str]:
         """
