@@ -104,14 +104,14 @@ class FileRepository:
         Raises
         ------
         FileExistsError
-            If an object with the same path name already exists.
+            If the directory already exists.
         """
         dir_path: Path = self.base_directory / directory
         if not dir_path.exists():
             dir_path.mkdir(parents=True)
         else:
             raise FileExistsError(
-                f"An object with the path name '{dir_path}' already exists."
+                f"The directory '{dir_path}' already exists."
             )
 
     def delete_directory(self, directory: str | Path) -> None:
