@@ -260,14 +260,18 @@ class FileRepository:
         Raises
         ------
         NotADirectoryError
-            If the given directory does not exist or is not a directory.
+            If the given path is not a directory.
+        FileNotFoundError
+            If the directory does not exist.
         """
         dir_path: Path = self.base_directory / directory
         if dir_path.is_dir():
             return [item.name for item in dir_path.iterdir() if item.is_file()]
-        raise NotADirectoryError(
-            f"The directory '{dir_path}' does not exist or is not a directory."
-        )
+        if dir_path.exists():
+            raise NotADirectoryError(
+                f"The path '{dir_path}' is not a directory."
+            )
+        raise FileNotFoundError(f"The directory '{dir_path}' does not exist.")
 
     def move_file(
         self,
