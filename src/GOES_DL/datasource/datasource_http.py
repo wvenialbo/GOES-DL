@@ -135,7 +135,8 @@ class DatasourceHTTP(DatasourceBase):
         """
         try:
             socket.gethostbyname(host_name)
-        except socket.gaierror:
+        except socket.gaierror:  # as exc
+            # Host does not exist or is out of service (log this!)
             return False
         else:
             return True
