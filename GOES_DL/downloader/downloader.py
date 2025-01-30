@@ -134,14 +134,16 @@ class Downloader:
 
         Notes
         -----
-        `ValueError` is raised if the start_time is not provided. The
-        framework raises an exception if the provided timestamps do not
-        match the expected format or if the timestamp format
-        specification is ill-formed (which is, indeed, a bug!).
+        `ValueError` is raised if `start_time` is not provided or if the
+        provided timestamp strings and format can't be parsed (which is,
+        indeed, a bug!).
 
         The framework may raise `RuntimeError` if the file cannot be
         retrieved, e.g. if the file does not exist in the datasource or
         an internal error occurred.
+
+        `FileExistsError` might be raised if the file already exists in
+        the repository.
         """
         files_in_range = self._get_file_list(start, end)
 
@@ -168,6 +170,9 @@ class Downloader:
         The framework may raise `RuntimeError` if the file cannot be
         retrieved, e.g. if the file does not exist in the datasource or
         an internal error occurred.
+
+        `FileExistsError` might be raised if the file already exists in
+        the repository.
         """
         self._retrieve_files(file_paths)
 
@@ -205,38 +210,31 @@ class Downloader:
 
         Notes
         -----
-        `ValueError` is raised if the start_time is not provided. The
-        framework raises an exception if the provided timestamps do not
-        match the expected format or if the timestamp format
-        specification is ill-formed (which is, indeed, a bug!).
+        `ValueError` is raised if `start_time` is not provided or if the
+        provided timestamp strings and format can't be parsed (which is,
+        indeed, a bug!).
         """
         return self._get_file_list(start, end)
+
+    def _add_item(self, file_path: str, file: bytes) -> None:
+        if self._has_item(file_path):
+            raise FileExistsError(f"File '{file_path}' already in repository.")
+
+        self.repository.save_file(file, file_path)
+
+    def _dowload_file(self, file_path: str) -> DownloadStatus:
+        if self._has_item(file_path):
+            return DownloadStatus.ALREADY
+
+        content = self.datasource.download_file(file_path)
+
+        self._add_item(file_path, content)
+
+        return DownloadStatus.SUCCESS
 
     def _filter_directory_content(
         self, datetime_ini: datetime, datetime_fin: datetime, files: list[str]
     ) -> list[str]:
-        """
-        Filter the files in the directory.
-
-        Filter the files in the directory by the timestamps of the
-        files. The files are filtered by the timestamps between the
-        `datetime_ini` and `datetime_fin`.
-
-        Parameters
-        ----------
-        datetime_ini : datetime
-            The initial datetime.
-        datetime_fin : datetime
-            The final datetime.
-        files : list[str]
-            A list with the files in the directory.
-
-        Returns
-        -------
-        list[str]
-            A list with the files in the directory that match the
-            timestamps between `datetime_ini` and `datetime_fin`.
-        """
         files_in_range: list[str] = []
 
         for file in files:
@@ -254,38 +252,6 @@ class Downloader:
     def _get_datetimes(
         self, start_time: str, end_time: str
     ) -> tuple[datetime, datetime]:
-        """
-        Get the datetime objects from the start and end times.
-
-        Get the initial and final datetimes from `start_time` and
-        `end_time`. `start_time` must be always provided. An offset of
-        60 seconds is added to the initial datetime and subtracted from
-        the final datetime to account for possible differences in the
-        files' timestamps.
-
-        Parameters
-        ----------
-        start_time : str
-            The start time in the format specified by the date_format
-            attribute.
-        end_time : str
-            The end time in the format specified by the date_format
-            attribute. If it is set to "", `end_time` is set equal to
-            `start_time`.
-
-        Returns
-        -------
-        tuple[datetime, datetime]
-            A tuple with the initial and final datetimes.
-
-        Raises
-        ------
-        ValueError
-            If `start_time` is not provided. The framework raises
-            an exception if the provided timestamps do not match the
-            expected format or if the timestamp format specification
-            is ill-formed (which is, indeed, a bug!).
-        """
         if not start_time:
             raise ValueError("start_time must be provided")
 
@@ -306,42 +272,6 @@ class Downloader:
         return datetime_ini, datetime_fin
 
     def _get_file_list(self, start_time: str, end_time: str = "") -> list[str]:
-        """
-        Get the list of files in the directory.
-
-        Get the list of files in the directory that match the timestamps
-        between `start_time` and `end_time`, inclusive, from the data
-        source. The list is filtered by the timestamps of the files;
-        only files in the requested range are returned.
-
-        Note that `start_time` must be always provided. An offset of 60
-        seconds is added to the initial datetime and subtracted from the
-        final datetime to account for possible differences in the files'
-        timestamps.
-
-        Parameters
-        ----------
-        start_time : str
-            The start time in the format specified by the date_format
-            attribute.
-        end_time : str
-            The end time in the format specified by the date_format
-            attribute. The default is "", in which case `end_time` is
-            set equal to `start_time`.
-
-        Returns
-        -------
-        list[str]
-            A list with the files in the directory that match the
-            timestamps between `start_time` and `end_time`.
-
-        Notes
-        -----
-        If `start_time` is not provided, `ValueError` is raised. The
-        framework raises an exception if the provided timestamps do not
-        match the expected format or if the timestamp format
-        specification is ill-formed (which is, indeed, a bug!).
-        """
         if self.show_progress:
             print("Retrieving available file list")
 
@@ -355,48 +285,18 @@ class Downloader:
             datetime_ini, datetime_fin, files
         )
 
+    def _has_item(self, file_path: str) -> bool:
+        return self.repository.is_file(file_path)
+
     def _retrieve_directory_content(self, paths: list[str]) -> list[str]:
-        """
-        Retrieve the content of the directories.
-
-        Retrieve the content of the directories specified by the `paths`
-        list from the datasource.
-
-        Parameters
-        ----------
-        paths : list[str]
-            A list with the paths to the directories.
-
-        Returns
-        -------
-        list[str]
-            A list with the files in the directories.
-        """
         files: list[str] = []
 
         for path in paths:
-            files.extend(self.datasource.listdir(path))
+            files.extend(self.datasource.list_files(path))
 
         return files
 
     def _retrieve_files(self, file_paths: list[str]) -> None:
-        """
-        Retrieve the files from the datasource.
-
-        Retrieve the files from the datasource using the file paths
-        provided in the `file_paths` list.
-
-        Parameters
-        ----------
-        file_paths : list[str]
-            A list with the file paths.
-
-        Notes
-        -----
-        The framework may raise `RuntimeError` if the file cannot be
-        retrieved, e.g. if the file does not exist in the datasource or
-        an internal error occurred.
-        """
         num_files = len(file_paths)
         num_len = len(f"{num_files}")
         padding = " ".rjust(2 * num_len + 2)
@@ -416,6 +316,3 @@ class Downloader:
                     print(f"{padding}... downloaded succesfully")
                 else:
                     print(f"{padding}... already downloaded")
-
-    def _dowload_file(self, file_path: str) -> DownloadStatus:
-        return self.datasource.download_file(file_path)
