@@ -7,9 +7,9 @@ Classes:
 """
 
 from abc import abstractmethod
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
-from typing import Iterable
 
 from ..locator import ProductLocator
 
@@ -215,11 +215,14 @@ class ProductLocatorGG(ProductLocator):
 
         Notes
         -----
-        The timestamp string extracted from the product's filename
-        are (or assumed to be) always in UTC timezone. Consumer of
-        product utilities should be aware of this assumption. The
-        user could convert the `datetime` object to the desired
-        timezone if needed.
+        The timestamp string extracted from the product's filename are
+        (or assumed to be) always in UTC timezone. Consumer of product
+        utilities should be aware of this assumption. The user could
+        convert the `datetime` object to the desired timezone if needed.
+
+        The framework raises `ValueError` if the timestamp does not
+        match the expected format or if the format specification is
+        ill-formed.
 
         Parameters
         ----------
@@ -230,13 +233,6 @@ class ProductLocatorGG(ProductLocator):
         -------
         datetime
             The converted `datetime` object in UTC timezone.
-
-        Raises
-        ------
-        ValueError
-            The framework raises an exception if the timestamp does not
-            match the expected format or if the format specification is
-            ill-formed.
         """
         # File dates are always in UTC.
         file_timestamp: str = f"{timestamp}+0000"
@@ -278,40 +274,54 @@ class ProductLocatorGG(ProductLocator):
 
     @classmethod
     def _validate_channels(
-        cls, channel: str | Iterable[str], available_channels: Iterable[str]
+        cls: type["ProductLocatorGG"],
+        channel: str | Iterable[str],
+        available_channels: Iterable[str],
     ) -> None:
         cls._validate_set("channel", channel, available_channels)
 
     @classmethod
     def _validate_datasource(
-        cls, datasource: str, available_datasources: Iterable[str]
+        cls: type["ProductLocatorGG"],
+        datasource: str,
+        available_datasources: Iterable[str],
     ) -> None:
         cls._validate_entity("datasource", datasource, available_datasources)
 
     @classmethod
     def _validate_instrument(
-        cls, instrument: str, available_instruments: Iterable[str]
+        cls: type["ProductLocatorGG"],
+        instrument: str,
+        available_instruments: Iterable[str],
     ) -> None:
         cls._validate_entity("instrument", instrument, available_instruments)
 
     @classmethod
-    def _validate_level(cls, level: str, available_levels: set[str]) -> None:
+    def _validate_level(
+        cls: type["ProductLocatorGG"], level: str, available_levels: set[str]
+    ) -> None:
         cls._validate_entity("level", level, available_levels)
 
     @classmethod
     def _validate_origin(
-        cls, origin: str, available_origins: Iterable[str]
+        cls: type["ProductLocatorGG"],
+        origin: str,
+        available_origins: Iterable[str],
     ) -> None:
         cls._validate_entity("origin", origin, available_origins)
 
     @classmethod
     def _validate_product(
-        cls, name: str, available_products: Iterable[str]
+        cls: type["ProductLocatorGG"],
+        name: str,
+        available_products: Iterable[str],
     ) -> None:
         cls._validate_entity("product", name, available_products)
 
     @classmethod
     def _validate_scene(
-        cls, scene: str, available_scenes: Iterable[str]
+        cls: type["ProductLocatorGG"],
+        scene: str,
+        available_scenes: Iterable[str],
     ) -> None:
         cls._validate_entity("scene", scene, available_scenes)

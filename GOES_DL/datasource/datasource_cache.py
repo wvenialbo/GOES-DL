@@ -39,12 +39,6 @@ class DatasourceCache:
     certain amount of time. The cache is cleared every time the time
     life is reached.
 
-    Parameters
-    ----------
-    life_time : float, optional
-        The time in seconds that an item will be kept in the cache.
-        (default: +inf)
-
     Methods
     -------
     add_item(dir_path: str, files: list[str]) -> None
@@ -68,6 +62,17 @@ class DatasourceCache:
     """
 
     def __init__(self, life_time: float | None = None) -> None:
+        """
+        Initialize the cache.
+
+        Initialize the cache with an optional life time.
+
+        Parameters
+        ----------
+        life_time : float | None, optional
+            The time in seconds that an item will be kept in the cache.
+            (default: +inf)
+        """
         self.life_time: float = (
             float("+inf") if life_time is None else life_time
         )

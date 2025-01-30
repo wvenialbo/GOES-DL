@@ -19,11 +19,11 @@ class DownloadStatus(Enum):
 
     Attributes
     ----------
-    SUCCESS : int
+    SUCCESS
         Indicates that the download was successful.
-    FAILED : int
+    FAILED
         Indicates that the download failed.
-    ALREADY : int
+    ALREADY
         Indicates that the file was already downloaded.
     """
 

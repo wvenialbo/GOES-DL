@@ -62,32 +62,13 @@ class GridSatProductLocator(ProductLocatorGG):
     - GridSat B1' and the 'Geostationary Operational Environmental
     Satellites - GOES/CONUS' datasets's products are supported.
 
-    Attributes
-    ----------
-    file_date_format : str
-        The specification of the date format used in the GridSat product
-        filename.
-    file_date_pattern : str
-        The regex pattern of the date format used in the GridSat product
-        filename.
-    file_prefix : str
-        The prefix for the GridSat product's filenames.
-    name : str
-        The name of the GridSat dataset product. A dataset can have
-        multiple products. E.g. "B1", "GOES". Due to how the GridSat
-        dataset is structured, the name is always a single string.
-    origins : list[str]
-        The list of origins of the GridSat product, namely one or more
-        satellite identifier, e.g. "goes08". Multi-origin datasets, like
-        GridSat-B1, set this attribute to an empty list.
-    path_date_format : str
-        The specification of the path's date format convention used in
-        the dataset.
-    path_prefix : str
-        The path prefix to the dataset directories.
-    versions : list[str]
-        The version or list of versions of the GridSat product; e.g.
-        "v01r01".
+    Caution
+    -------
+    Members of this class not defined by the `ProductLocator` interface
+    are helper methods and can be considered as implementation details,
+    even though they are defined as part of the public API. In future
+    releases, these methods may be moved to a private scope, suffer name
+    changes, or be removed altogether.
 
     Methods
     -------
@@ -108,13 +89,32 @@ class GridSatProductLocator(ProductLocatorGG):
     normalize_times(datetime_ini: datetime, datetime_fin: datetime)
         Normalise the initial and final datetimes.
 
-    Caution
-    -------
-    Members of this class not defined by the `ProductLocator` interface
-    are helper methods and can be considered as implementation details,
-    even though they are defined as part of the public API. In future
-    releases, these methods may be moved to a private scope, suffer name
-    changes, or be removed altogether.
+    Attributes
+    ----------
+    name : str
+        The name of the GridSat dataset product. A dataset can have
+        multiple products. E.g. "B1", "GOES". Due to how the GridSat
+        dataset is structured, the name is always a single string.
+    origins : list[str]
+        The list of origins of the GridSat product, namely one or more
+        satellite identifier, e.g. "goes08". Multi-origin datasets, like
+        GridSat-B1, set this attribute to an empty list.
+    versions : list[str]
+        The version or list of versions of the GridSat product; e.g.
+        "v01r01".
+    file_date_format : str
+        The specification of the date format used in the GridSat product
+        filename.
+    file_date_pattern : str
+        The regex pattern of the date format used in the GridSat product
+        filename.
+    file_prefix : str
+        The prefix for the GridSat product's filenames.
+    path_date_format : str
+        The specification of the path's date format convention used in
+        the dataset.
+    path_prefix : str
+        The path prefix to the dataset directories.
     """  # noqa: E501
 
     name: str
