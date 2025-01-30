@@ -70,7 +70,7 @@ class DatasourceLocal(DatasourceBase):
 
         super().__init__(str(root_path), repository, cache)
 
-    def download_file(self, file_path: str) -> None:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -84,13 +84,18 @@ class DatasourceLocal(DatasourceBase):
         file_path : str
             The path to the remote file to be downloaded.
 
+        Returns
+        -------
+        bytes
+            The content of the file as a byte string.
+
         Raises
         ------
         RuntimeError
             If the file cannot be retrieved or does not exist.
         """
         try:
-            self._retrieve_file(file_path)
+            return self._retrieve_file(file_path)
 
         except FileNotFoundError as exc:
             raise RuntimeError(

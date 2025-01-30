@@ -85,7 +85,7 @@ class DatasourceHTTP(DatasourceBase):
 
         super().__init__(base_url, repository, cache)
 
-    def download_file(self, file_path: str) -> None:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -99,13 +99,18 @@ class DatasourceHTTP(DatasourceBase):
         file_path : str
             The path to the remote file to be downloaded.
 
+        Returns
+        -------
+        bytes
+            The content of the file as a byte string.
+
         Raises
         ------
         RuntimeError
             If the file cannot be retrieved.
         """
         try:
-            self._retrieve_file(file_path)
+            return self._retrieve_file(file_path)
 
         except requests.HTTPError as exc:
             message: str = f"Unable to retrieve the file '{file_path}': {exc}"
