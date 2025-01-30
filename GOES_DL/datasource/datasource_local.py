@@ -24,7 +24,7 @@ class DatasourceLocal(DatasourceBase):
     -------
     download_file(file_path: str)
         Retrieve a file from the datasource.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
 
     Attributes
