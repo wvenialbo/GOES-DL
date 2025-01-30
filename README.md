@@ -1,5 +1,11 @@
 # GOES-DL
 
+[![Bandit](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml)
+[![MyPy](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml)
+[![PyFlakes](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pyflakes.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pyflakes.yml)
+[![Pylint](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pylint.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pylint.yml)
+[![Ruff](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-ruff.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-ruff.yml)
+
 *Since 1975, Geostationary Operational Environmental Satellites (GOES) have
 provided continuous imagery and data on atmospheric conditions and solar
 activity (space weather). They have even aided in search and rescue of people
@@ -83,21 +89,24 @@ from GOES_DL.dataset.gridsat import GridSatProductLocatorGC
 from GOES_DL.datasource import DatasourceHTTP
 from GOES_DL.downloader import Downloader
 
-# Initialize the downloader for GridSat-GOES (GOES-12, Full Disk)
+# Initialize the product locator for GridSat-GOES (GOES-12, Full Disk)
 locator = GridSatProductLocatorGC("F", "G12")
 
-datasource = DatasourceHTTP(locator, repository="./my_data/gridsat-gc")
+# GridSat-GOES data is available in HTTP from NCEI's archive
+datasource = DatasourceHTTP(locator)
 
+# Initialize the downloader with the locator and datasource
 downloader = Downloader(
     datasource=datasource,
     locator=locator,
+    repository="./my_data/gridsat-gc",
     date_format="%Y-%m-%dT%H:%M%z",  # use a custom short date format
 )
 
-# Set your desired date...
+# Download the dataset for a specific date
 files1 = downloader.download_files(start="2012-08-23T00:00Z")
 
-# ...or your desired date range
+# ...or download the datasets within a given date range
 files2 = downloader.download_files(
    start="2012-08-23T00:00-0004",
    end="2012-08-24T00:00-0004",
@@ -107,7 +116,7 @@ files2 = downloader.download_files(
 # files relative to the base URL and local repository root directory.
 ```
 
-### 2. Download GOES 3rd Generation Data (from NOAA's AWS archive)
+### 2. Download GOES 4th Generation Data (from NOAA's AWS archive)
 
 ```python
 # Import the locator and datasource according to your desired product
@@ -115,26 +124,34 @@ from GOES_DL.dataset.goes import GOESProductLocatorABIPP
 from GOES_DL.datasource import DatasourceAWS
 from GOES_DL.downloader import Downloader
 
-# Initialize the downloader for GOES-R Series (set your desired product)
+# Initialize the product locator for GOES-R Series (set your desired product)
 locator = GOESProductLocatorABIPP("CMIP", "F", ["C02", "C08", "C13"], "G16")
 
 # GOES-16 data is updated every 10 minutes. If you are downloading
 # old data, you may leave the cache refresh rate as default (+inf).
-datasource = DatasourceAWS(locator, repository="./my_data/goes-r", cache=600)
+datasource = DatasourceAWS(locator, cache=600)
 
+# Initialize the downloader with the locator and datasource
 downloader = Downloader(
     datasource=datasource,
     locator=locator,
+    repository="./my_data/goes-r",
 )
 
-# Set your desired date...
+# Download the dataset for a specific date
 files1 = downloader.download_files(start="2024-08-23T00:00:00Z")
 
-# ...or your desired date range
-files2 = downloader.download_files(
+# ...or get the list of datasets within a given date range
+files2 = downloader.list_files(
    start="2024-08-23T00:00:00-0004",  # use the default date format
    end="2024-08-24T00:00:00-0004",
 )
+
+# ...custom filter the dataset list to download only the desired channels
+file_list = [f for f in files2 if "C13" in f]
+
+# ...and download the files in the filtered list
+downloader.get_files(file_list)
 
 # `files1` and files2` are lists of strings with the path of the downloaded
 # files relative to the base URL and local repository root directory.
@@ -148,22 +165,26 @@ from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
 from GOES_DL.datasource import DatasourceAWS
 from GOES_DL.downloader import Downloader
 
-# Initialize the downloader for GridSat-B1
+# Initialize the product locator for GridSat-B1
 locator = GridSatProductLocatorB1()
 
-# Also available in HTTP from NCEI's archive, see next example
-datasource = DatasourceAWS(locator, repository="./my_data/gridsat-b1")
+# GridSat-B1 data is available in AWS from NOAA's archive
+# Note: GridSat-B1 is lso available in HTTP from NCEI's
+# archive, see next example
+datasource = DatasourceAWS(locator)
 
+# Initialize the downloader with the locator and datasource
 downloader = Downloader(
     datasource=datasource,
     locator=locator,
+    repository="./my_data/gridsat-b1",
     date_format="%Y-%m-%dT%H:%M%z",
 )
 
-# Set your desired date...
+# Download the dataset for a specific date
 files1 = downloader.download_files(start="1984-08-23T00:00Z")
 
-# ...or your desired date range
+# ...or download the datasets within a given date range
 files2 = downloader.download_files(
    start="1984-08-23T00:00-0004",
    end="1984-08-24T00:00-0004",
@@ -181,23 +202,26 @@ from GOES_DL.dataset.gridsat import GridSatProductLocatorB1
 from GOES_DL.datasource import DatasourceHTTP
 from GOES_DL.downloader import Downloader
 
-# Initialize the downloader for GridSat-B1
+# Initialize the product locator for GridSat-B1
 locator = GridSatProductLocatorB1()
 
-# NCEI archive has the same folder structure as AWS, so, if you have
+# GridSat-B1 data is available in HTTP from NCEI's archive
+# Note: NCEI archive has the same folder structure as AWS, so, if you have
 # downloaded data from AWS, you can use the same locator and change the
 # datasource to HTTP. If a file is not found in the local repository, it
 # will be downloaded from the remote datasource. In all previous examples,
 # if a file was already downloaded, it will not be downloaded again.
-datasource = DatasourceHTTP(locator, repository="./my_data/gridsat-b1")
+datasource = DatasourceHTTP(locator)
 
+# Initialize the downloader with the locator and datasource
 downloader = Downloader(
     datasource=datasource,
     locator=locator,
+    repository="./my_data/gridsat-b1",
     date_format="%Y-%m-%dT%H:%M%z",
 )
 
-# Set your desired date...
+# Download the dataset for a specific date
 files1 = downloader.download_files(start="1984-08-23T00:00Z")
 
 # ...or, alternatively, your can get the list of files within a date range
@@ -210,7 +234,7 @@ files2 = downloader.list_files(
 ...
 
 # ...and pass that resulting or filtered list to the `get_files` method
-downloader.get_files(files2)
+downloader.get_files(files2_filtered)
 
 # `files1` and files2` are lists of strings with the path of the downloaded
 # files relative to the base URL and local repository root directory.

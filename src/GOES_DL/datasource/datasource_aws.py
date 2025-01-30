@@ -5,7 +5,6 @@ Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
 
-from pathlib import Path
 from typing import Literal
 from urllib.parse import ParseResult
 
@@ -16,10 +15,8 @@ from mypy_boto3_s3.client import S3Client
 
 from ..dataset import ProductLocator
 from ..utils.url import URL
-from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
-from .datasource_repository import DatasourceRepository
 
 AWS_CLIENT: Literal["s3"] = "s3"
 
@@ -38,7 +35,7 @@ class DatasourceAWS(DatasourceBase):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
 
     Attributes
@@ -55,7 +52,6 @@ class DatasourceAWS(DatasourceBase):
     def __init__(
         self,
         locator: ProductLocator | tuple[str, ...],
-        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
@@ -68,9 +64,6 @@ class DatasourceAWS(DatasourceBase):
             the base URL and an optional region where the S3 bucket is
             located. E.g. "us-west-1", "us-east-1", "eu-west-1", etc. If
             None, the default region is used.
-        repository : str | Path | DatasourceRepository | None, optional
-            The directory where the files will be stored, by default
-            None.
         cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
@@ -97,11 +90,11 @@ class DatasourceAWS(DatasourceBase):
                 f"Bucket '{bucket_name}' does not exist or you have no access."
             )
 
-        super().__init__(base_url, repository, cache)
+        super().__init__(base_url, cache)
 
         self.bucket_name: str = bucket_name
 
-    def download_file(self, file_path: str) -> DownloadStatus:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -117,10 +110,8 @@ class DatasourceAWS(DatasourceBase):
 
         Returns
         -------
-        DownloadStatus
-            `DownloadStatus.SUCCESS` if the file was downloaded
-            successfully; otherwise, `DownloadStatus.ALREADY` if the
-            file is already in the local repository.
+        bytes
+            The content of the file as a byte string.
 
         Raises
         ------
@@ -128,13 +119,14 @@ class DatasourceAWS(DatasourceBase):
             If the file cannot be retrieved.
         """
         try:
-            return self._download_file(file_path)
+            return self._retrieve_file(file_path)
 
         except ClientError as exc:
-            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
-            raise RuntimeError(message) from exc
+            raise RuntimeError(
+                f"Unable to retrieve the file '{file_path}': {exc}"
+            ) from exc
 
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a directory.
 
@@ -157,7 +149,7 @@ class DatasourceAWS(DatasourceBase):
         if cached_list is not None:
             return cached_list
 
-        folder_path: str = self._get_item_path(dir_path)
+        folder_path = self._get_item_path(dir_path)
 
         paginator = self.s3_client.get_paginator("list_objects_v2")
         pages = paginator.paginate(Bucket=self.bucket_name, Prefix=folder_path)
@@ -169,7 +161,7 @@ class DatasourceAWS(DatasourceBase):
 
             break
 
-        ss: int = len(folder_path)
+        ss = len(folder_path)
 
         file_list: list[str] = []
 
@@ -185,127 +177,65 @@ class DatasourceAWS(DatasourceBase):
         return file_list
 
     def _bucket_exists(self, bucket_name: str) -> bool:
-        """
-        Check if the bucket exists.
-
-        Check if the bucket exists in the AWS S3 service.
-
-        Parameters
-        ----------
-        bucket_name : str
-            The name of the bucket to check.
-
-        Returns
-        -------
-        bool
-            True if the bucket exists, False otherwise.
-        """
         try:
             self.s3_client.head_bucket(Bucket=bucket_name)
 
-        except ClientError as exc:
-            print(exc)
+        except ClientError:  # as exc
+            # Bucket not found error or host is out of service (log this!)
             return False
 
         return True
 
     @staticmethod
     def _get_client(region: str | None) -> S3Client:
-        """
-        Get the AWS S3 client.
-
-        Returns the AWS S3 client with the UNSIGNED signature version.
-
-        Parameters
-        ----------
-        region : str | None, optional
-            The region where the S3 bucket is located. E.g. "us-west-1",
-            "us-east-1", "eu-west-1", etc. If None, the default region
-            is used.
-
-        Returns
-        -------
-        S3Client
-            The AWS S3 client.
-        """
         if region:
             return boto3.client(
                 AWS_CLIENT,
                 region_name=region,
                 config=Config(signature_version=UNSIGNED),
             )
+
         return boto3.client(
             AWS_CLIENT,
             config=Config(signature_version=UNSIGNED),
         )
 
     def _get_item_path(self, dir_path: str) -> str:
-        """
-        Get the folder path.
 
-        Get the folder path from the base URL and the directory path.
+        folder_url = self._url_join(self.base_url, dir_path)
 
-        Parameters
-        ----------
-        dir_path : str
-            The path to the directory. The path is relative to the base
-            URL.
-
-        Returns
-        -------
-        str
-            The folder path.
-        """
-        # BUG: url.join() fails with "s3://" URLs.
-        # > folder_url: str = url.join(self.base_url, dir_path)
-        folder_url: str = self._url_join(self.base_url, dir_path)
-        url_parts: ParseResult = URL.parse(folder_url)
+        url_parts = URL.parse(folder_url)
 
         return url_parts.path[1:]
 
     def _object_exists(self, bucket_name: str, object_path: str) -> bool:
-        """
-        Check if the object exists.
-
-        Check if the object exists in the AWS S3 service.
-
-        Parameters
-        ----------
-        bucket_name : str
-            The name of the bucket where the object is located.
-        object_path : str
-            The path to the object to check.
-
-        Returns
-        -------
-        bool
-            True if the object exists, False otherwise.
-        """
         try:
             self.s3_client.head_object(Bucket=bucket_name, Key=object_path)
 
-        except ClientError as exc:
-            print(exc)
-
+        except ClientError:  # as exc
+            # Object not found error or host is out of service (log this!)
             return False
 
         return True
 
     def _retrieve_file(self, file_path: str) -> bytes:
-        folder_path: str = self._get_item_path(file_path)
+        folder_path = self._get_item_path(file_path)
 
         response = self.s3_client.get_object(
             Bucket=self.bucket_name, Key=folder_path
         )
-        content = response["Body"].read()
-        self.repository.add_item(file_path, content)
 
-        return content
+        return response["Body"].read()
 
     @staticmethod
     def _url_join(head: str, tail: str) -> str:
+        # Note: url.join() fails with "s3://" URLs.
+        # > folder_url: str = url.join(self.base_url, dir_path)
+
         if head.endswith("/") and tail.startswith("/"):
             head = head[:-1]
+
         if not head.endswith("/") and not tail.startswith("/"):
             return f"{head}/{tail}"
+
         return head + tail

@@ -8,8 +8,6 @@ Classes:
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from .constants import DownloadStatus
-
 
 @dataclass(eq=False, frozen=True)
 class Datasource(ABC):
@@ -25,7 +23,7 @@ class Datasource(ABC):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
 
     Attributes
@@ -39,7 +37,7 @@ class Datasource(ABC):
     base_url: str
 
     @abstractmethod
-    def download_file(self, file_path: str) -> DownloadStatus:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -55,12 +53,12 @@ class Datasource(ABC):
 
         Returns
         -------
-        DownloadStatus
-            The status of the download operation.
+        bytes
+            The content of the file as a byte string.
         """
 
     @abstractmethod
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a remote directory.
 

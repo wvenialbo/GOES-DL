@@ -7,7 +7,6 @@ Classes:
 
 import re
 import socket
-from pathlib import Path
 from urllib.parse import ParseResult
 
 import requests
@@ -15,10 +14,8 @@ import requests
 from ..dataset import ProductLocator
 from ..utils.headers import APPLICATION_NETCDF4, TEXT_HTML, RequestHeaders
 from ..utils.url import URL
-from .constants import DownloadStatus
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
-from .datasource_repository import DatasourceRepository
 
 HTTP_STATUS_OK = 200
 
@@ -35,14 +32,13 @@ class DatasourceHTTP(DatasourceBase):
     download_file(file_path: str)
         Retrieve a file from the datasource and save it into the local
         repository.
-    listdir(dir_path: str)
+    list_files(dir_path: str)
         List the contents of a remote directory.
     """
 
     def __init__(
         self,
         locator: str | ProductLocator,
-        repository: str | Path | DatasourceRepository | None = None,
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
@@ -53,9 +49,6 @@ class DatasourceHTTP(DatasourceBase):
         locator : str | ProductLocator
             The base URL of a HTTP-based data sources or a
             `ProductLocator` object.
-        repository : str | Path | DatasourceRepository | None, optional
-            The directory where the files will be stored, by default
-            None.
         cache : float | DatasourceCache | None, optional
             The cache expiration time in seconds, by default None.
 
@@ -84,9 +77,9 @@ class DatasourceHTTP(DatasourceBase):
                 f"Path '{base_path}' does not exist or you have no access."
             )
 
-        super().__init__(base_url, repository, cache)
+        super().__init__(base_url, cache)
 
-    def download_file(self, file_path: str) -> DownloadStatus:
+    def download_file(self, file_path: str) -> bytes:
         """
         Download a file from the datasource into the local repository.
 
@@ -102,10 +95,8 @@ class DatasourceHTTP(DatasourceBase):
 
         Returns
         -------
-        DownloadStatus
-            `DownloadStatus.SUCCESS` if the file was downloaded
-            successfully; otherwise, `DownloadStatus.ALREADY` if the
-            file is already in the local repository.
+        bytes
+            The content of the file as a byte string.
 
         Raises
         ------
@@ -113,41 +104,14 @@ class DatasourceHTTP(DatasourceBase):
             If the file cannot be retrieved.
         """
         try:
-            return self._download_file(file_path)
+            return self._retrieve_file(file_path)
 
         except requests.HTTPError as exc:
-            message: str = f"Unable to retrieve the file '{file_path}': {exc}"
-            raise RuntimeError(message) from exc
+            raise RuntimeError(
+                f"Unable to retrieve the file '{file_path}': {exc}"
+            ) from exc
 
-    @staticmethod
-    def _host_exists(host_name: str) -> bool:
-        """Check if a host server exists or is not out of service.
-
-        This function takes the hostname part of a URL as input and
-        uses the socket.gethostbyname() function to try to resolve the
-        hostname to an IP address. If this is successful, it means the
-        host server exists and is not out of service, so the function
-        returns True. If an exception is raised, it means the host
-        server does not exist or is out of service, so the function
-        returns False.
-
-        Parameters
-        ----------
-        host_name : str
-            The host server name.
-
-        Returns
-        -------
-        bool
-            True if the host server exists, False otherwise.
-        """
-        try:
-            socket.gethostbyname(host_name)
-            return True
-        except socket.gaierror:
-            return False
-
-    def listdir(self, dir_path: str) -> list[str]:
+    def list_files(self, dir_path: str) -> list[str]:
         """
         List the contents of a directory.
 
@@ -170,8 +134,8 @@ class DatasourceHTTP(DatasourceBase):
         if cached_links is not None:
             return cached_links
 
-        folder_url: str = URL.join(self.base_url, dir_path)
-        index_html: str = self._get_content(folder_url)
+        folder_url = URL.join(self.base_url, dir_path)
+        index_html = self._get_content(folder_url)
 
         if not index_html:
             return []
@@ -185,35 +149,39 @@ class DatasourceHTTP(DatasourceBase):
         return href_links
 
     @staticmethod
+    def _host_exists(host_name: str) -> bool:
+        try:
+            socket.gethostbyname(host_name)
+
+        except socket.gaierror:  # as exc
+            # Host does not exist or is out of service (log this!)
+            return False
+
+        return True
+
+    @staticmethod
     def _path_exists(folder_url: str) -> bool:
-        """Check if a folder exists in a host server.
-
-        Parameters
-        ----------
-        folder_url : str
-            The URL of the folder to check.
-
-        Returns
-        -------
-        bool
-            True if the folder exists, False otherwise.
-        """
         response = requests.head(folder_url, timeout=10)
+
         return response.status_code == HTTP_STATUS_OK
 
     @staticmethod
     def _get_content(folder_url: str) -> str:
         headers = RequestHeaders(accept=TEXT_HTML).headers
+
         response = requests.get(folder_url, headers=headers, timeout=15)
+
         if response.status_code == HTTP_STATUS_OK:
             response.encoding = response.apparent_encoding
             return response.text
+
         return ""
 
     def _retrieve_file(self, file_path: str) -> bytes:
-        file_url: str = URL.join(self.base_url, file_path)
+        file_url = URL.join(self.base_url, file_path)
 
         headers = RequestHeaders(accept=APPLICATION_NETCDF4).headers
+
         response = requests.get(file_url, headers=headers, timeout=15)
 
         response.raise_for_status()
@@ -221,7 +189,4 @@ class DatasourceHTTP(DatasourceBase):
         if response.status_code != HTTP_STATUS_OK:
             raise requests.HTTPError("Request failure", response=response)
 
-        content: bytes = response.content
-        self.repository.add_item(file_path, content)
-
-        return content
+        return bytes(response.content)
