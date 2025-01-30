@@ -15,11 +15,10 @@ DatasourceCache
     A datasource object that caches the files.
 DatasourceHTTP
     A datasource object for an HTTP server.
-DownloaderRepository
-    Manage file operations for the downloader object.
+DatasourceLocal
+    A datasource object for a local directory.
 """
 
-from .constants import DownloadStatus as DownloadStatus
 from .datasource import Datasource as Datasource
 from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
@@ -32,5 +31,4 @@ __all__ = [
     "DatasourceCache",
     "DatasourceHTTP",
     "DatasourceLocal",
-    "DownloadStatus",
 ]
