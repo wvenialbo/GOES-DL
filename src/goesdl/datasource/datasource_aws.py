@@ -5,18 +5,20 @@ Classes:
     DatasourceAWS: Handle AWS-based data sources.
 """
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from urllib.parse import ParseResult
 
 import boto3
 from botocore import UNSIGNED
 from botocore.client import ClientError, Config
-from mypy_boto3_s3.client import S3Client
 
 from ..dataset import ProductLocator
 from ..utils.url import URL
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
+
+if TYPE_CHECKING:
+    from mypy_boto3_s3.client import S3Client
 
 AWS_CLIENT: Literal["s3"] = "s3"
 
@@ -47,7 +49,7 @@ class DatasourceAWS(DatasourceBase):
     """
 
     bucket_name: str
-    s3_client: S3Client
+    s3_client: "S3Client"
 
     def __init__(
         self,
@@ -187,7 +189,7 @@ class DatasourceAWS(DatasourceBase):
         return True
 
     @staticmethod
-    def _get_client(region: str | None) -> S3Client:
+    def _get_client(region: str | None) -> "S3Client":
         if region:
             return boto3.client(
                 AWS_CLIENT,
