@@ -1,3 +1,2 @@
-boto3~=1.35.47
-mypy-boto3-s3~=1.35.46
+boto3~=1.35.99
 requests~=2.32.3
