@@ -129,10 +129,6 @@
         "black",
     ],
     "isort.check": true,
-    "ruff.lint.args": [
-        "--line-length",
-        "79",
-    ],
     "ruff.fixAll": true,
     "ruff.importStrategy": "fromEnvironment",
     "ruff.organizeImports": false,
