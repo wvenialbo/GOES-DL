@@ -48,15 +48,15 @@ other applications.
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
 
-1. **GOES 3rd Generation (GOES-13 to GOES-15)**: Also known as the N to P
+2. **GOES 3rd Generation (GOES-13 to GOES-15)**: Also known as the N to P
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
 
-2. **GOES 4th Generation (GOES-16 to GOES-18)**: Also known as the R to U
+3. **GOES 4th Generation (GOES-16 to GOES-18)**: Also known as the R to U
    Series, these satellites offer advanced imagery and atmospheric measurements
    with better spatial, spectral, and temporal resolution &#91;[7](#goesr)&#93;.
 
-3. **GridSat-B1 Climate Data Record (Version 2)**: Gridded satellite imagery
+4. **GridSat-B1 Climate Data Record (Version 2)**: Gridded satellite imagery
    for climate research, containing global infrared window, visible, and water
    vapor data over long time periods &#91;[3](#gridb1)&#93;.
 
