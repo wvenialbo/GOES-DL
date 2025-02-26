@@ -61,9 +61,9 @@ other applications.
    vapor data over long time periods &#91;[3](#gridb1)&#93;.
 
 Refer to [Gridded Satellite GOES (GridSat-GOES) East and West Full Disk and
-CONUS Coverage, Version 1][51] and [NOAA Climate Data Record (CDR) of Gridded
+CONUS Coverage, Version 1][52] and [NOAA Climate Data Record (CDR) of Gridded
 Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
-Temperature, Version 2][52] for more information on the data format and details
+Temperature, Version 2][53] for more information on the data format and details
 of the content.
 
 See [NOAA Geostationary Operational Environmental Satellites (GOES) 16, 17 &
@@ -364,14 +364,27 @@ package as:
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 
+### Credits for GOES-R Series Data
+
+**Dataset Citation:**
+
+For Cloud and Moisture Imagery Products (CMIP), please cite the following:
+
+> GOES-R Algorithm Working Group, and GOES-R Series Program (2017): NOAA GOES-R
+> Series Advanced Baseline Imager (ABI) Level 2 Cloud and Moisture Imagery
+> Products (CMIP). *[indicate subset used]*. *NOAA National Centers for
+> Environmental Information*, [doi:10.7289/V5736P36][51], *[access date]*.
+
+For other products, please, visit [NOAA National Centers for Environmental
+Information][10].
+
 ### Credits for GridSat-GOES/CONUS
 
 **Dataset Citation:**
 
 > Knapp, K. R. (2017): Gridded Satellite GOES Coverage Data (GridSat-GOES),
 > *[indicate subset used]*. *NOAA National Centers for Environmental
-> Information*, [doi:10.7289/V5HM56GM](https://doi.org/10.7289/V5HM56GM),
-> *[indicate access date]*.
+> Information*, [doi:10.7289/V5HM56GM][52], *[indicate access date]*.
 
 Please cite the following article when using GridSat-GOES/CONUS data in any
 publication:
@@ -388,8 +401,7 @@ publication:
 > Knapp, K. R.; NOAA CDR Program; (2014): NOAA Climate Data Record (CDR) of
 > Gridded Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
 > Temperature, Version 2, *[indicate subset used]*. *NOAA National Centers for
-> Environmental Information*,
-> [doi:10.7289/V59P2ZKR](https://doi.org/10.7289/V59P2ZKR), *[indicate access
+> Environmental Information*, [doi:10.7289/V59P2ZKR][53], *[indicate access
 > date]*.
 
 Please cite the following article when using GridSat-B1 data in any publication:
@@ -442,11 +454,11 @@ gmail.com](mailto:wvenialbo@gmail.com).
 3. Knapp, K. R; NOAA CDR Program; (2014): NOAA Climate Data Record (CDR) of
    Gridded Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
    Temperature, Version 2. *NOAA National Centers for Environmental
-   Information*, [doi:10.7289/V59P2ZKR](https://doi.org/10.7289/V59P2ZKR).<a
+   Information*, [doi:10.7289/V59P2ZKR][53].<a
    name="gridb1"></a>
 4. Knapp, K. R; (2017): Gridded Satellite GOES Coverage Data (GridSat-GOES).
    *NOAA National Centers for Environmental Information*.
-   [doi:10.7289/V5HM56GM](https://doi.org/10.7289/V5HM56GM).<a name="goesi"></a>
+   [doi:10.7289/V5HM56GM][52].<a name="goesi"></a>
 5. Knapp, K. R. and Wilkins, S. L.; (2018): Gridded Satellite (GridSat) GOES and
    CONUS data, *Earth System Science Data*, 10(3), 1417–1425,
    [doi:10.5194/essd-10-1417-2018](https://doi.org/10.5194/essd-10-1417-2018).
@@ -475,6 +487,7 @@ gmail.com](mailto:wvenialbo@gmail.com).
 [0]: https://www.goes-r.gov/
 [1]: https://www.goes-r.gov/mission/history.html
 [2]: https://www.goes-r.gov/products/overview.html
+[10]: https://www.ncei.noaa.gov/
 [11]: https://registry.opendata.aws/noaa-goes/
 [12]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
 [21]: https://github.com/NOAA-Big-Data-Program/bdp-data-docs
@@ -483,5 +496,6 @@ gmail.com](mailto:wvenialbo@gmail.com).
 [31]: https://goes2go.readthedocs.io/
 [41]: https://www.goes-r.gov/downloads/resources/documents/GOES-RSeriesDataBook.pdf
 [42]: https://www.goes-r.gov/downloads/resources/documents/Beginners_Guide_to_GOES-R_Series_Data.pdf
-[51]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
-[52]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
+[51]: https://doi.org/10.7289/V5736P36
+[52]: https://doi.org/10.7289/V5HM56GM
+[53]: https://doi.org/10.7289/V59P2ZKR
