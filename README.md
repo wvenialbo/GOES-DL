@@ -451,13 +451,13 @@ gmail.com](mailto:wvenialbo@gmail.com).
 5. Knapp, K. R. and Wilkins, S. L.; (2018): Gridded Satellite (GridSat) GOES and
    CONUS data, *Earth System Science Data*, 10(3), 1417–1425,
    [doi:10.5194/essd-10-1417-2018](https://doi.org/10.5194/essd-10-1417-2018).
-6. GOES History. *GOES-R Website*, https://www.goes-r.gov/mission/history.html,
+6. GOES History. *GOES-R Website*, [https://www.goes-r.gov/mission/history.html][5],
    retrieved on 2024.<a name="hist"></a>
 7. GOES-R Series Data Products. *GOES-R Website*,
-   https://www.goes-r.gov/products/overview.html, retrieved on 2024.<a
+   [https://www.goes-r.gov/products/overview.html][6], retrieved on 2024.<a
    name="goesr"></a>
 8. NOAA Big Data Program, *NOAA Open Data Dissemination Program*,
-   https://github.com/NOAA-Big-Data-Program/bdp-data-docs, retrieved on 2024.
+   [https://github.com/NOAA-Big-Data-Program/bdp-data-docs][7], retrieved on 2024.
 9. Beginner’s Guide to GOES-R Series Data: How to acquire, analyze, and
    visualize GOES-R Series data, *Resources compiled by GOES-R Product Readiness
    and Operations*, Satellite Products and Services Division, National Oceanic
@@ -471,9 +471,13 @@ gmail.com](mailto:wvenialbo@gmail.com).
 
 <!-- markdownlint-restore -->
 
-[0]: hidden_references:
+<!-- hidden-references: named links -->
+
 [2]: https://registry.opendata.aws/noaa-goes/
 [3]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
 [4]: https://www.goes-r.gov/
+[5]: https://www.goes-r.gov/mission/history.html
+[6]: https://www.goes-r.gov/products/overview.html
+[7]: https://github.com/NOAA-Big-Data-Program/bdp-data-docs
 [11]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
 [12]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
