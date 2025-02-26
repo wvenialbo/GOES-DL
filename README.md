@@ -297,6 +297,37 @@ a subset of the files listed by the `Downloader.list_files` method.
 2. **NOAA AWS Cloud Archive**: GOES-16 to GOES-18 data and GridSat-B1 Climate
    Data Record are accessible via the NOAA archive hosted on AWS.
 
+## Project description
+
+Tool package to download GOES (Geostationary Operational Environmental
+Satellite) 2nd and 3rd generation (GOES-8 to GOES-15) data from NOAA's NCEI
+archive, 4th Generation (GOES-16 to GOES-18) data from NOAA's archive on AWS,
+and Gridded Satellite B1 (GridSat-B1) Climate Data Record, Version 2, from
+NOAA's AWS and NCEI archives using Python.
+
+**Keywords:**
+[goes](https://github.com/topics/goes),
+[satellite](https://github.com/topics/satellite),
+[satellite-dataset](https://github.com/topics/satellite-dataset),
+[satellite-imagery](https://github.com/topics/satellite-imagery),
+[satellite-imagery-analysis](https://github.com/topics/satellite-imagery-analysis),
+[satellite-imagery-python](https://github.com/topics/satellite-imagery-python),
+[satellite-data](https://github.com/topics/satellite-data),
+[noaa](https://github.com/topics/noaa),
+[noaa-satellite](https://github.com/topics/noaa-satellite),
+[ncei](https://github.com/topics/ncei),
+[unidata](https://github.com/topics/unidata),
+[unidata-netcdf](https://github.com/topics/unidata-netcdf),
+[netcdf](https://github.com/topics/netcdf),
+[netcdf4](https://github.com/topics/netcdf4),
+[aws](https://github.com/topics/aws),
+[open-data](https://github.com/topics/open-data),
+[open-source](https://github.com/topics/open-source),
+[open-datasets](https://github.com/topics/open-datasets),
+[downloader](https://github.com/topics/downloader),
+[download](https://github.com/topics/download),
+[xarray](https://github.com/topics/xarray)
+
 ## Contributing
 
 Contributions to **GOES-DL** are welcome! If you'd like to contribute:
