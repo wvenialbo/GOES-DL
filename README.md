@@ -61,7 +61,7 @@ other applications.
    vapor data over long time periods &#91;[3](#gridb1)&#93;.
 
 Refer to [Gridded Satellite GOES (GridSat-GOES) East and West Full Disk and
-CONUS Coverage, Version 1][1] and [NOAA Climate Data Record (CDR) of Gridded
+CONUS Coverage, Version 1][11] and [NOAA Climate Data Record (CDR) of Gridded
 Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
 Temperature, Version 2][12] for more information on the data format and details
 of the content.
@@ -472,8 +472,8 @@ gmail.com](mailto:wvenialbo@gmail.com).
 <!-- markdownlint-restore -->
 
 [0]: hidden_references:
-[1]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
 [2]: https://registry.opendata.aws/noaa-goes/
 [3]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
 [4]: https://www.goes-r.gov/
+[11]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
 [12]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
