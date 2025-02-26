@@ -61,16 +61,16 @@ other applications.
    vapor data over long time periods &#91;[3](#gridb1)&#93;.
 
 Refer to [Gridded Satellite GOES (GridSat-GOES) East and West Full Disk and
-CONUS Coverage, Version 1][11] and [NOAA Climate Data Record (CDR) of Gridded
+CONUS Coverage, Version 1][31] and [NOAA Climate Data Record (CDR) of Gridded
 Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
-Temperature, Version 2][12] for more information on the data format and details
+Temperature, Version 2][32] for more information on the data format and details
 of the content.
 
 See [NOAA Geostationary Operational Environmental Satellites (GOES) 16, 17 &
-18][2] and [NOAA GOES on AWS (CICS)][3] for information on the GOES-R Series
+18][11] and [NOAA GOES on AWS (CICS)][12] for information on the GOES-R Series
 data available from NOAA on AWS. You can find much more detailed information
 about GOES-R Series data from NOAA's [Geostationary Operational Environmental
-Satellites - R Series][4].
+Satellites - R Series][0].
 
 ## Installation
 
@@ -451,13 +451,13 @@ gmail.com](mailto:wvenialbo@gmail.com).
 5. Knapp, K. R. and Wilkins, S. L.; (2018): Gridded Satellite (GridSat) GOES and
    CONUS data, *Earth System Science Data*, 10(3), 1417–1425,
    [doi:10.5194/essd-10-1417-2018](https://doi.org/10.5194/essd-10-1417-2018).
-6. GOES History. *GOES-R Website*, [https://www.goes-r.gov/mission/history.html][5],
+6. GOES History. *GOES-R Website*, [https://www.goes-r.gov/mission/history.html][1],
    retrieved on 2024.<a name="hist"></a>
 7. GOES-R Series Data Products. *GOES-R Website*,
-   [https://www.goes-r.gov/products/overview.html][6], retrieved on 2024.<a
+   [https://www.goes-r.gov/products/overview.html][2], retrieved on 2024.<a
    name="goesr"></a>
 8. NOAA Big Data Program, *NOAA Open Data Dissemination Program*,
-   [https://github.com/NOAA-Big-Data-Program/bdp-data-docs][7], retrieved on 2024.
+   [https://github.com/NOAA-Big-Data-Program/bdp-data-docs][21], retrieved on 2024.
 9. Beginner’s Guide to GOES-R Series Data: How to acquire, analyze, and
    visualize GOES-R Series data, *Resources compiled by GOES-R Product Readiness
    and Operations*, Satellite Products and Services Division, National Oceanic
@@ -473,11 +473,11 @@ gmail.com](mailto:wvenialbo@gmail.com).
 
 <!-- hidden-references: named links -->
 
-[2]: https://registry.opendata.aws/noaa-goes/
-[3]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
-[4]: https://www.goes-r.gov/
-[5]: https://www.goes-r.gov/mission/history.html
-[6]: https://www.goes-r.gov/products/overview.html
-[7]: https://github.com/NOAA-Big-Data-Program/bdp-data-docs
-[11]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
-[12]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
+[0]: https://www.goes-r.gov/
+[1]: https://www.goes-r.gov/mission/history.html
+[2]: https://www.goes-r.gov/products/overview.html
+[11]: https://registry.opendata.aws/noaa-goes/
+[12]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
+[21]: https://github.com/NOAA-Big-Data-Program/bdp-data-docs
+[31]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
+[32]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
