@@ -359,8 +359,8 @@ This package relies on data provided by NOAA’s NCEI and NOAA’s archive on AW
 When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
-> Villamayor-Venialbo, W. (2024): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.1.1)* [Software]. GitHub.
+> Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
+> GOES and GridSat-B1 satellite data (Version 0.1-rc4)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 
@@ -370,7 +370,7 @@ package as:
 
 > Knapp, K. R. (2017): Gridded Satellite GOES Coverage Data (GridSat-GOES),
 > *[indicate subset used]*. *NOAA National Centers for Environmental
-> Information* [doi:10.7289/V5HM56GM](https://doi.org/10.7289/V5HM56GM),
+> Information*, [doi:10.7289/V5HM56GM](https://doi.org/10.7289/V5HM56GM),
 > *[indicate access date]*.
 
 Please cite the following article when using GridSat-GOES/CONUS data in any
@@ -388,7 +388,7 @@ publication:
 > Knapp, K. R.; NOAA CDR Program; (2014): NOAA Climate Data Record (CDR) of
 > Gridded Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
 > Temperature, Version 2, *[indicate subset used]*. *NOAA National Centers for
-> Environmental Information*.
+> Environmental Information*,
 > [doi:10.7289/V59P2ZKR](https://doi.org/10.7289/V59P2ZKR), *[indicate access
 > date]*.
 
