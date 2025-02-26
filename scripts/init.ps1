@@ -18,13 +18,14 @@ if (Test-Path -Path $venv) {
 
     # Display the current version of python and pip
 
-    python --version
-    python -m pip --version
+    py -0
+    py --version
+    py -m pip --version
 
     # Upgrade the environment and its dependencies
 
-    python -m venv --upgrade $venv
-    python -m venv --upgrade-deps $venv
+    py -m venv --upgrade $venv
+    py -m venv --upgrade-deps $venv
 
     # Re-activate the environment if it was active
     
@@ -35,10 +36,11 @@ if (Test-Path -Path $venv) {
 else {
     # Display the current version of python and pip
 
-    python --version
-    python -m pip --version
+    py -0
+    py --version
+    py -m pip --version
 
     # Create a new environment
 
-    python -m venv $venv
+    py -m venv $venv
 }
