@@ -373,6 +373,8 @@
         "**/.vscode": true,
         "**/htmlcov": true,
         "**/node_modules": true,
+        ".deepsource.toml":true,
+        ".sourcery.yaml":true,
         "build": true,
         "coverage.xml": true,
         "dist": true,
