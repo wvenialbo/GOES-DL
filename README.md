@@ -425,6 +425,9 @@ gmail.com](mailto:wvenialbo@gmail.com).
 - [Joao Henry's GOES](https://github.com/joaohenry23/GOES): Python package to
   download and manipulate GOES-16/17/18 data.
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 ## References
 
 1. Knapp, K. R. (2008): Scientific data stewardship of International Satellite
@@ -465,6 +468,8 @@ gmail.com](mailto:wvenialbo@gmail.com).
     Flight Center, National Aeronautics and Space Administration.
     [PDF](https://www.goes-r.gov/downloads/resources/documents/GOES-RSeriesDataBook.pdf),
     retrieved on 2024.
+
+<!-- markdownlint-restore -->
 
 [0]: hidden_references:
 [1]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
