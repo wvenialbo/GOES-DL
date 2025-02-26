@@ -17,7 +17,7 @@ them &#91;[6](#hist)&#93;.*
 
 **GOES-DL** is an open-source Python package that simplifies the process of
 downloading satellite imagery datasets from various NOAA archives. The package
-supports both second and fourth-generation GOES satellite data
+supports second, third and fourth-generation GOES satellite data
 &#91;[4](#goesi),[7](#goesr)&#93;, as well as the Gridded Satellite B1
 (GridSat-B1) Climate Data Record &#91;[3](#gridb1)&#93;. GOES-DL provides an
 easy-to-use interface to access data for scientific analysis, research, and
@@ -29,9 +29,9 @@ other applications.
   real-time and archived data from NOAA's Amazon Web Services (AWS) cloud
   archive.
 
-- **Gridded Satellite Data from GOES 2nd Generation (GridSat-GOES)**: Download
-  data from NOAA's National Centers for Environmental Information (NCEI)
-  archive.
+- **Gridded Satellite Data from GOES 2nd and 3rd Generation (GridSat-GOES)**:
+  Download data from NOAA's National Centers for Environmental Information
+  (NCEI) archive.
 
 - **Gridded Satellite Data from ISCCP B1 (GridSat-B1)**: Fetch historical
   climate data from both NOAA's AWS archive and the NCEI archive.
@@ -44,7 +44,11 @@ other applications.
 
 ## Supported Datasets
 
-1. **GOES 2nd Generation (GOES-8 to GOES-15)**: Also known as the I to P
+1. **GOES 2nd Generation (GOES-8 to GOES-12)**: Also known as the I to M
+   Series, these datasets provide environmental monitoring and meteorological
+   data for the Western Hemisphere &#91;[4](#goesi)&#93;.
+
+1. **GOES 3rd Generation (GOES-13 to GOES-15)**: Also known as the N to P
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
 
@@ -76,6 +80,12 @@ To install **GOES-DL**, use `pip`:
 pip install goes-dl
 ```
 
+To update **GOES-DL**, use:
+
+```bash
+pip install --upgrade goes-dl
+```
+
 ## Usage
 
 Below are examples of how to use the GOES-DL package to download data from each
@@ -83,7 +93,7 @@ of the supported sources. You will find more examples in the
 [examples](https://github.com/wvenialbo/GOES-DL/tree/main/examples) directory
 of the repository.
 
-### 1. Download GOES 2nd Generation Data (from NOAA's NCEI archive)
+### 1. Download GOES 2nd and 3rd Generation Data (from NOAA's NCEI archive)
 
 ```python
 # Import the locator and datasource according to your desired product
@@ -262,7 +272,8 @@ The general workflow for downloading data using **GOES-DL** is as follows:
    It is initialized with the datasource and locator objects, as well as the
    date format to be used in the download process.
 
-The Downloader.get_files method accepts the following parameters:
+The `Downloader.download_files` and `Downloader.list_files` method accepts the
+following parameters:
 
 - **start_time**: A string specifying the starting date for the dataset to be
   downloaded.
@@ -271,8 +282,12 @@ The Downloader.get_files method accepts the following parameters:
   downloaded.
 
 The default date format is the ISO 8601 format with timezone information
-(`"%Y-%m-%dT%H:%M%z"`). The date format can be changed by passing the desired
+(`"%Y-%m-%dT%H:%M:%S%z"`). The date format can be changed by passing the desired
 format to the downloader object during initialization.
+
+The `Downloader.get_files` method accepts a list of strings with the paths of
+the files to be downloaded. This method is useful when you want to download only
+a subset of the files listed by the `Downloader.list_files` method.
 
 ## Data Sources
 
@@ -294,7 +309,7 @@ Please make sure to include tests for any new functionality.
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
 - [requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
   library for Python.
 - [boto3](https://pypi.org/project/boto3): AWS SDK for Python.
