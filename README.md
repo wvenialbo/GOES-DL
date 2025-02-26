@@ -419,11 +419,10 @@ gmail.com](mailto:wvenialbo@gmail.com).
 
 ## Similar Projects
 
-- [Brian Blaylock's goes2go][22]: Download
-  and process GOES-16 and GOES-17 data from NOAA's archive on AWS using Python.
-  ([readthedocs][31])
-- [Joao Henry's GOES][23]: Python package to
-  download and manipulate GOES-16/17/18 data.
+- [Brian Blaylock's goes2go][22]: Download and process GOES-16 and GOES-17 data
+  from NOAA's archive on AWS using Python.  ([readthedocs][31])
+- [Joao Henry's GOES][23]: Python package to download and manipulate
+  GOES-16/17/18 data.
 
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable MD033 -->
