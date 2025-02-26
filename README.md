@@ -63,7 +63,7 @@ other applications.
 Refer to [Gridded Satellite GOES (GridSat-GOES) East and West Full Disk and
 CONUS Coverage, Version 1][1] and [NOAA Climate Data Record (CDR) of Gridded
 Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
-Temperature, Version 2][5] for more information on the data format and details
+Temperature, Version 2][11] for more information on the data format and details
 of the content.
 
 See [NOAA Geostationary Operational Environmental Satellites (GOES) 16, 17 &
@@ -476,4 +476,4 @@ gmail.com](mailto:wvenialbo@gmail.com).
 [2]: https://registry.opendata.aws/noaa-goes/
 [3]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
 [4]: https://www.goes-r.gov/
-[5]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
+[11]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
