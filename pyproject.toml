@@ -30,7 +30,7 @@
     "boto3~=1.35.42",
     "requests~=2.32.3",
   ]
-  description = "Satellite imagery downloader for GOES and GridSat datasets"
+  description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
   dynamic = [
     "version",
   ]
@@ -84,7 +84,7 @@
     authors     = [
       "Waldemar Villamayor-Venialbo <wvenialbo@fpuna.edu.py>",
     ]
-    description = "Satellite imagery downloader for GOES and GridSat datasets"
+    description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
     license     = "MIT"
     name        = "goes-dl"
     packages    = [
