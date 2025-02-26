@@ -429,7 +429,7 @@
 
       # Maximum number of positional arguments for function / method.
       # TODO: Restore this to its default value: 5. Increased this limit 8.
-      max-positional-arguments = 8
+      # max-positional-arguments = 8
 
       # Maximum number of public methods for a class (see R0904).
       max-public-methods = 20
