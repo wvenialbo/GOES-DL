@@ -16,7 +16,7 @@ GOES, and the National Oceanic and Atmospheric Administration (NOAA) operates
 them &#91;[6](#hist)&#93;.*
 
 **GOES-DL** is an open-source Python package that simplifies the process of
-downloading satellite imagery datasets from various NOAA archives. The package
+downloading satellite imagery datasets from various NOAA archives. This toolkit
 supports second, third and fourth-generation GOES satellite data
 &#91;[4](#goesi),[7](#goesr)&#93;, as well as the Gridded Satellite B1
 (GridSat-B1) Climate Data Record &#91;[3](#gridb1)&#93;. GOES-DL provides an
