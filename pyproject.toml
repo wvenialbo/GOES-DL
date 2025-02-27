@@ -16,7 +16,7 @@
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Education",
     "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
@@ -24,7 +24,7 @@
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Utilities",
   ]
-  dependencies = ["boto3~=1.35.42", "requests~=2.32.3"]
+  dependencies = ["boto3~=1.37.2", "requests~=2.32.3"]
   description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
   dynamic = ["version"]
   keywords = [
@@ -76,10 +76,10 @@
     name        = "goes-dl"
     packages    = [{ include = "goesdl" }, { include = "goesdl/py.typed" }]
     readme      = "README.md"
-    version     = "0.1.0"
+    version     = "v0.1-rc4"
 
     [tool.poetry.dependencies]
-      boto3    = "~1.35.42"
+      boto3    = "~1.37.2"
       python   = "^3.9"
       requests = "~2.32.3"
 
@@ -195,7 +195,7 @@
 
       # Minimum Python version to use for version dependent checks. Will default to the
       # version used to run pylint.
-      py-version = "3.12"
+      py-version = "3.13"
 
       # Discover python modules and packages in the file system subtree.
       # recursive =
