@@ -3,12 +3,14 @@
 from . import fields
 from .datarecord import DataRecord
 from .fields import dimension, field, record, variable
+from .fragment import netcdf_fragment
 
 __all__ = [
     "DataRecord",
     "dimension",
     "field",
     "fields",
+    "netcdf_fragment",
     "record",
     "variable",
 ]
