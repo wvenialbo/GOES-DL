@@ -8,11 +8,7 @@ def _get_attribute_names(this: Any, root: type) -> list[str]:
     all_attributes: list[str] = []
     mro_classes = this.__class__.__mro__
     for cls in mro_classes:
-        if (
-            issubclass(cls, root)
-            and cls != root
-            and hasattr(cls, "__annotations__")
-        ):
+        if issubclass(cls, root) and cls != root:
             all_attributes.extend(
                 [
                     key
