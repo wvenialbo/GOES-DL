@@ -1,7 +1,5 @@
 [project]
-  authors = [
-    { name = "Waldemar Villamayor-Venialbo", email = "wvenialbo@fpuna.edu.py" },
-  ]
+  authors = [{ name = "Waldemar Villamayor-Venialbo", email = "wvenialbo@fpuna.edu.py" }]
   classifiers = [
     "Development Status :: 4 - Beta",
     "Development Status :: 5 - Production/Stable",
@@ -26,14 +24,9 @@
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Utilities",
   ]
-  dependencies = [
-    "boto3~=1.35.42",
-    "requests~=2.32.3",
-  ]
+  dependencies = ["boto3~=1.35.42", "requests~=2.32.3"]
   description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
-  dynamic = [
-    "version",
-  ]
+  dynamic = ["version"]
   keywords = [
     "GOES",
     "GOES-R",
@@ -70,27 +63,18 @@
       version = { attr = "goesdl.__version__" }
 
     [tool.setuptools.package-data]
-      goesdl = [
-        "py.typed",
-      ]
-      config = [
-        "settings.json",
-      ]
+      goesdl = ["py.typed"]
+      config = ["settings.json"]
 
     [tool.setuptools.packages.find]
       where = ["src"]
 
   [tool.poetry]
-    authors     = [
-      "Waldemar Villamayor-Venialbo <wvenialbo@fpuna.edu.py>",
-    ]
+    authors     = ["Waldemar Villamayor-Venialbo <wvenialbo@fpuna.edu.py>"]
     description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
     license     = "MIT"
     name        = "goes-dl"
-    packages    = [
-      { include = "goesdl" },
-      { include = "goesdl/py.typed" },
-    ]
+    packages    = [{ include = "goesdl" }, { include = "goesdl/py.typed" }]
     readme      = "README.md"
     version     = "0.1.0"
 
@@ -105,13 +89,7 @@
   [tool.coverage]
 
     [tool.coverage.run]
-      omit = [
-        ".ipynb_checkpoints/*",
-        ".venv/*",
-        ".vscode/*",
-        "htmlcov/*",
-        "var/*",
-      ]
+      omit = [".ipynb_checkpoints/*", ".venv/*", ".vscode/*", "htmlcov/*", "var/*"]
 
     [tool.coverage.report]
       show_missing = true
@@ -121,17 +99,12 @@
 
   [tool.flake8]
     # darglint, darglint2
-    docstring_style      = "numpy"
+    docstring_style = "numpy"
     # flake8-docstrings
     docstring-convention = "numpy"
-    extend-ignore        = [
-      "ANN101",
-    ]
+    extend-ignore        = ["ANN101"]
     max-line-length      = 79
-    per-file-ignores     = [
-      "__init__.py:F401",
-      "./src/goesdl/utils/headers.py:DAR201",
-    ]
+    per-file-ignores     = ["__init__.py:F401", "./src/goesdl/utils/headers.py:DAR201"]
     strictness           = "full"
     allow-init-docstring = true
 
@@ -211,11 +184,7 @@
 
       # List of plugins (as comma separated values of python module names) to load,
       # usually to register additional checkers.
-      load-plugins = [
-        "pylint.extensions.docparams",
-        "pylint.extensions.magic_value",
-        "pylint.extensions.no_self_use",
-      ]
+      load-plugins = ["pylint.extensions.docparams", "pylint.extensions.magic_value", "pylint.extensions.no_self_use"]
 
       # Pickle collected data for later comparisons.
       persistent = true
@@ -374,24 +343,11 @@
       # check-protected-access-in-special-methods =
 
       # List of method names used to declare (i.e. assign) instance attributes.
-      defining-attr-methods = [
-        "__init__",
-        "__new__",
-        "__post_init__",
-        "asyncSetUp",
-        "setUp",
-      ]
+      defining-attr-methods = ["__init__", "__new__", "__post_init__", "asyncSetUp", "setUp"]
 
       # List of member names, which should be excluded from the protected access
       # warning.
-      exclude-protected = [
-        "_asdict",
-        "_fields",
-        "_make",
-        "_replace",
-        "_source",
-        "os._exit",
-      ]
+      exclude-protected = ["_asdict", "_fields", "_make", "_replace", "_source", "os._exit"]
 
       # List of valid names for the first argument in a class method.
       valid-classmethod-first-arg = ["cls"]
@@ -429,7 +385,7 @@
 
       # Maximum number of positional arguments for function / method.
       # TODO: Restore this to its default value: 5. Increased this limit 8.
-      # max-positional-arguments = 8
+      max-positional-arguments = 8
 
       # Maximum number of public methods for a class (see R0904).
       max-public-methods = 20
@@ -527,13 +483,7 @@
     [tool.pylint."messages control"]
       # Only show warnings with the listed confidence levels. Leave empty to show all.
       # Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED.
-      confidence = [
-        "CONTROL_FLOW",
-        "HIGH",
-        "INFERENCE",
-        "INFERENCE_FAILURE",
-        "UNDEFINED",
-      ]
+      confidence = ["CONTROL_FLOW", "HIGH", "INFERENCE", "INFERENCE_FAILURE", "UNDEFINED"]
 
       # Disable the message, report, category or checker with the given id(s). You can
       # either give multiple identifiers separated by comma (,) or put this option
@@ -717,12 +667,7 @@
       # List of class names for which member attributes should not be checked (useful
       # for classes with dynamically set attributes). This supports the use of
       # qualified names.
-      ignored-classes = [
-        "_thread._local",
-        "argparse.Namespace",
-        "optparse.Values",
-        "thread._local",
-      ]
+      ignored-classes = ["_thread._local", "argparse.Namespace", "optparse.Values", "thread._local"]
 
       # Show a hint with possible names when a member name was not found. The aspect of
       # finding the hint is based on edit distance.
@@ -769,13 +714,7 @@
 
       # List of qualified module names which can have objects that can redefine
       # builtins.
-      redefining-builtins-modules = [
-        "builtins",
-        "future.builtins",
-        "io",
-        "past.builtins",
-        "six.moves",
-      ]
+      redefining-builtins-modules = ["builtins", "future.builtins", "io", "past.builtins", "six.moves"]
 
   [tool.mypy]
     # Introduce stricter options
@@ -811,7 +750,7 @@
     warn_return_any = true
 
   [tool.pydoclint]
-    style = 'numpy'
+    style                = 'numpy'
     allow-init-docstring = true
 
   [tool.pydocstyle]
@@ -819,10 +758,7 @@
 
 [build-system]
   build-backend = "setuptools.build_meta"
-  requires      = [
-    "setuptools-scm",
-    "setuptools>=75.2.0",
-  ]
+  requires      = ["setuptools-scm", "setuptools>=75.2.0"]
 
   # build-backend = "poetry.core.masonry.api"
   # requires      = [
