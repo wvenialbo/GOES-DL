@@ -1,10 +1,15 @@
 """
-This module provides utility functions for generating type hints for
-various collections and data types. The type hints are generated as
-strings that can be used for type annotations in Python code.
+Provide utility functions for generating type hints.
+
+Generate type hints for various collections and data types. The type
+hints are generated as strings that can be used for type annotations in
+Python code. Include special handling for NumPy arrays and homogeneous
+collections.
 
 Functions
 ---------
+get_value_typehint(value: Any) -> str
+    Generate a type hint for a given value.
 """
 
 from collections.abc import Iterable, Sequence

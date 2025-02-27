@@ -1,5 +1,7 @@
 """
-Provide utility functions for type validation, including special
+Provide utility functions for type validation.
+
+Validate a value against a provided type annotation. Include special
 handling for NumPy arrays and homogeneous collections.
 
 Functions
