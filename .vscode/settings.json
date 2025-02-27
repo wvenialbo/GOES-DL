@@ -109,7 +109,7 @@
     "pylint.args": [
         // "--disabe=C0116",
     ],
-    "pydoctest.workingDirectory": "src",
+    "pydoctest.workingDirectory": ".",
     // Python formatting tools settings
     "autopep8.args": [
         "--max-line-length=79",
@@ -373,8 +373,8 @@
         "**/.vscode": true,
         "**/htmlcov": true,
         "**/node_modules": true,
-        ".deepsource.toml":true,
-        ".sourcery.yaml":true,
+        ".deepsource.toml": true,
+        ".sourcery.yaml": true,
         "build": true,
         "coverage.xml": true,
         "dist": true,
