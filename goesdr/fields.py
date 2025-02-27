@@ -137,7 +137,7 @@ def dimension(
     record_name: str | None = None,
     *,
     entry: str | None = SIZE,
-    convert: Callable[..., Any] | None,
+    convert: Callable[..., Any] | None = None,
 ) -> Any:
     return DimensionField(record_name, entry, convert)
 
@@ -149,7 +149,7 @@ def field(value: Any) -> Any:
 def record(
     record_name: str | None = None,
     *,
-    convert: Callable[..., Any] | None,
+    convert: Callable[..., Any] | None = None,
 ) -> Any:
     return RecordField(record_name, convert)
 
@@ -158,6 +158,6 @@ def variable(
     record_name: str | None = None,
     *,
     entry: str | None = DATA,
-    convert: Callable[..., Any] | None,
+    convert: Callable[..., Any] | None = None,
 ) -> Any:
     return VariableField(record_name, entry, convert)
