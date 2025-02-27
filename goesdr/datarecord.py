@@ -9,7 +9,7 @@ from .hinting import get_annotated, get_typehint
 from .validation import validate_type
 
 
-class Datarecord:
+class DataRecord:
 
     def __init__(self, record: Dataset) -> None:
         self._validate_preconditions()
@@ -28,12 +28,12 @@ class Datarecord:
         raise AttributeError(f"Cannot set attribute '{name}'")
 
     def __str__(self) -> str:
-        return help_str(self, Datarecord)
+        return help_str(self, DataRecord)
 
     def _init_class_attributes(self, record: Dataset) -> None:
         # Copy class attributes to the instance provided they are not
         # field attributes
-        annotations = get_annotations(self, Datarecord)
+        annotations = get_annotations(self, DataRecord)
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 value = getattr(self, name)
@@ -53,7 +53,7 @@ class Datarecord:
 
     def _init_record_attributes(self, record: Dataset) -> None:
         # Copy record attributes to the instance
-        annotations = get_annotations(self, Datarecord)
+        annotations = get_annotations(self, DataRecord)
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 continue
@@ -68,7 +68,7 @@ class Datarecord:
     def _init_field_attributes(self, record: Dataset) -> None:
         # Copy record field attributes to the instance, do not overwrite
         # existing instance attributes
-        for name in get_annotations(self, Datarecord):
+        for name in get_annotations(self, DataRecord):
             value = getattr(self, name)
             if not isinstance(value, BaseField):
                 continue
@@ -79,7 +79,7 @@ class Datarecord:
             raise TypeError(f"Datarecord {self.__class__.__name__} is corrupt")
 
     def _validate_postconditions(self) -> None:
-        all_annotations = get_annotations(self, Datarecord)
+        all_annotations = get_annotations(self, DataRecord)
         for name, annotation in all_annotations.items():
             value = getattr(self, name)
             if validate_type(value, annotation):
