@@ -88,7 +88,7 @@ def _validate_ndarray(value: Any, annotation: type) -> bool:
     return _validate_ndarray_shape(value.shape, get_args(annotation)[0])
 
 
-def validate_value_type(value: Any, annotation: type) -> bool:
+def validate_type(value: Any, annotation: type) -> bool:
     """
     Validate the type of a given value against a specified annotation.
 
