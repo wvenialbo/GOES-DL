@@ -1,0 +1,5 @@
+{
+  "include_paths": ["src/goesdl/*.py"],
+  "fail_on_missing_docstring": true,
+  "parser": "numpy"
+}
