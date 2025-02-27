@@ -1,7 +1,15 @@
 # GOES-DL — GOES Satellite Imagery Dataset Downloader
 
+[![AutoPEP](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-autopep.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-autopep.yml)
 [![Bandit](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml)
+[![Black](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-black.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-black.yml)
+[![DocSig](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-docsig.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-docsig.yml)
+[![Flake8](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-flake.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-flake.yml)
+[![ISort](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-isort.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-isort.yml)
 [![MyPy](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml)
+[![PyCodeStyle](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pycodestyle.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pycodestyle.yml)
+[![PyDocLint](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydoclint.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydoclint.yml)
+[![PyDocStyle](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydocstyle.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydocstyle.yml)
 [![PyFlakes](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pyflakes.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pyflakes.yml)
 [![Pylint](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pylint.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pylint.yml)
 [![Ruff](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-ruff.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-ruff.yml)
