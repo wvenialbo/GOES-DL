@@ -23,7 +23,7 @@ jobs:
     - name: Install mypy type stubs
       run: |
         pip install --upgrade types-requests
-        pip install --upgrade boto3-stubs
+        pip install --upgrade boto3-stubs[s3]
     - name: Analysing the code with mypy
       run: |
         mypy "./src/goesdl"
