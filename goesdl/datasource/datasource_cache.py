@@ -117,8 +117,10 @@ class DatasourceCache:
 
         Parameters
         ----------
-        all_items : bool
-            If True, all items in the cache will be removed.
+        all_items : bool, optional
+            If True, all items in the cache will be removed. If False,
+            only the items that have expired will be removed. (default:
+            False)
         """
         if all_items:
             self.cache.clear()
@@ -190,10 +192,10 @@ class DatasourceCache:
 
         Parameters
         ----------
-        dir_path : str
+        dir_path : str, optional
             The path to the directory. The path is relative to
             the base URL. If no path is provided, the entire
-            cache should be cleared.
+            cache should be cleared. (default: "")
 
         Raises
         ------
