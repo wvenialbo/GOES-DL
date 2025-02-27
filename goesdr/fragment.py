@@ -1,9 +1,23 @@
+import inspect
+
 from .datarecord import DataRecord
 
 
 def netcdf_fragment(recordclass: type) -> type:
-    origin_bases = recordclass.__bases__
-    if DataRecord not in origin_bases:
-        new_bases = (DataRecord,) + origin_bases
-        recordclass.__bases__ = new_bases
-    return recordclass
+    class _FragmentRecord(DataRecord):
+        pass
+
+    _FragmentRecord.__annotations__ = recordclass.__annotations__.copy()
+    _FragmentRecord.__module__ = recordclass.__module__
+    _FragmentRecord.__name__ = recordclass.__name__
+    _FragmentRecord.__qualname__ = recordclass.__qualname__
+
+    for name in recordclass.__annotations__:
+        if hasattr(recordclass, name):
+            value = getattr(recordclass, name)
+            setattr(_FragmentRecord, name, value)
+
+    original_module = inspect.getmodule(recordclass)
+    setattr(original_module, recordclass.__name__, _FragmentRecord)
+
+    return _FragmentRecord
