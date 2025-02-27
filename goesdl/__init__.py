@@ -1,4 +1,4 @@
-"""Provide functionalities for downloading GOES and GridSat datasets."""
+"""Provide functionality for downloading GOES and GridSat datasets."""
 
 __package_id__ = "GOES-DL"
 __package_name__ = (
