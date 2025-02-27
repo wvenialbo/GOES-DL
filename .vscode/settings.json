@@ -375,6 +375,7 @@
         "**/node_modules": true,
         ".deepsource.toml": true,
         ".sourcery.yaml": true,
+        "pydoctest.json": true,
         "build": true,
         "coverage.xml": true,
         "dist": true,
