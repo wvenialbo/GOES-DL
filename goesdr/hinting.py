@@ -22,7 +22,7 @@ def _get_multitype_typehint(multitype: Iterable[Any], union: str) -> str:
     # Generate a type hint for a collection with multiple types.
     type_hints: set[str] = set()
     for element in multitype:
-        type_hint = get_value_typehint(element)
+        type_hint = get_typehint(element)
         type_hints.add(type_hint)
     return union.join(type_hints)
 
@@ -78,7 +78,7 @@ def _get_collection_typehint(collection: Iterable[Any]) -> str:
     return _get_mixedtype_typehint(collection)
 
 
-def get_value_typehint(value: Any) -> str:
+def get_typehint(value: Any) -> str:
     """
     Generate a type hint for a given value.
 
