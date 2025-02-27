@@ -1,5 +1,6 @@
 """Provide functionality for reading fragments of GOES-R datasets."""
 
+from . import fields
 from .datarecord import DataRecord
 from .fields import dimension, field, record, variable
 
@@ -7,6 +8,7 @@ __all__ = [
     "DataRecord",
     "dimension",
     "field",
+    "fields",
     "record",
     "variable",
 ]
