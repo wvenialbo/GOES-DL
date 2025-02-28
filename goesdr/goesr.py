@@ -322,7 +322,7 @@ def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridData:
 
     _GOESLatLonGridData.__module__ = GOESLatLonGridData.__module__
     _GOESLatLonGridData.__name__ = GOESLatLonGridData.__name__
-    _GOESLatLonGridData.__qualname__ = _GOESLatLonGridData.__qualname__
+    _GOESLatLonGridData.__qualname__ = GOESLatLonGridData.__qualname__
 
     data = _GOESLatLonGridData(record)
 
