@@ -284,7 +284,7 @@ class GOESDatasetInfo:
 
 class GOESLatLonGridDataType:
     """
-    Represent a GOES satellite latitude or longitude grid data.
+    Represent GOES satellite precomputed latitude or longitude data.
 
     Attributes
     ----------
@@ -323,7 +323,7 @@ def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridDataType:
 
 class GOESLatLonGrid:
     """
-    Represent a GOES satellite latitude and longitude metadata.
+    Represent GOES satellite precomputed latitude and longitude data.
 
     Attributes
     ----------
