@@ -172,7 +172,7 @@ class IndexedVariableField(BaseVariableField):
 
     def __init__(
         self,
-        record_name: str,
+        record_name: str | None,
         index: int,
         entry: str | None,
     ) -> None:
@@ -180,16 +180,12 @@ class IndexedVariableField(BaseVariableField):
         self.index = index
 
     def __call__(self, dataset: Dataset, name: str) -> Any:
-        if self.record is None:
-            raise ValueError("Indexed variable field requires a record name")
-        if name in {"data", "mask"}:
-            name = f"array:{name}"
-        entry = self.entry or name
-        if entry not in {"array:data", "array:mask"}:
+        alias = self.record or name
+        if self.entry not in {"array:data", "array:mask"}:
             raise ValueError(
                 "Indexed variable field requires a data or mask entry"
             )
-        value: NDArray[int32] = self._get_variable(dataset, self.record, entry)
+        value: NDArray[int32] = self._get_variable(dataset, alias, self.entry)
         return value.ravel()[self.index]
 
 
@@ -257,7 +253,7 @@ def field(value: Any) -> Any:
 
 
 def indexed(
-    record_name: str,
+    record_name: str | None = None,
     *,
     index: int,
     entry: str | None = DATA,
@@ -274,7 +270,7 @@ def record(
 
 
 def scalar(
-    record_name: str,
+    record_name: str | None = None,
     *,
     entry: str | None = DATA,
 ) -> Any:
