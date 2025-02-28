@@ -478,12 +478,32 @@ class GOESGeodeticGrid:
     Calculate the latitude and longitude grid arrays on the fly from the
     GOES Imager Projection information in the ABI Level 2 file.
 
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_. For a Python demonstration on calculating latitude and
+    longitude from GOES Imager Projection information, see [2]_. The
+    code snippet in this class is based on the Python demonstration in
+    [2]_.
+
     Attributes
     ----------
     latitude : GOESLatLonGridData
         The latitude grid data.
     longitude : GOESLatLonGridData
         The longitude grid data.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2021.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+
+    .. [2] Aerosols and Atmospheric Composition Science Team, "Python
+        Short Demo: Calculate Latitude and Longitude from GOES Imager
+        Projection (ABI Fixed Grid) Information", NOAA/NESDIS/STAR,
+        2021.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/python_abi_lat_lon.php
     """
 
     latitude: GOESLatLonGridData
