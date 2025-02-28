@@ -460,3 +460,22 @@ class GOESLatLonGridInfo:
     created: str
     rows: int = dimension()
     columns: int = dimension()
+
+
+class GOESGeodeticGrid:
+    """
+    Represent latitude and longitude grid data computed on the fly.
+
+    Calculate the latitude and longitude grid arrays on the fly from the
+    GOES Imager Projection information in the ABI Level 2 file.
+
+    Attributes
+    ----------
+    latitude : GOESLatLonMetadataType
+        The latitude metadata.
+    longitude : GOESLatLonMetadataType
+        The longitude metadata.
+    """
+
+    latitude: NDArray[float32]
+    longitude: NDArray[float32]
