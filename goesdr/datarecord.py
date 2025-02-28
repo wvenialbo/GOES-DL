@@ -1,3 +1,17 @@
+"""
+Provide a base class for data records extracted from netCDF datasets.
+
+Defines the DataRecord class, which represents a data record extracted
+from a netCDF dataset. The class provides methods for initializing
+attributes from the dataset, validating preconditions and
+postconditions, and preventing accidental modification of attributes.
+
+Classes
+-------
+DataRecord
+    Represents a data record extracted from a netCDF dataset.
+"""
+
 from typing import Any, NoReturn
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
@@ -10,10 +24,14 @@ from .validation import validate_type
 
 
 class DataRecord:
+    """Represent a data record extracted from a netCDF dataset."""
 
     def __init__(self, record: Dataset) -> None:
         """
         Initialize the DataRecord object.
+
+        Use annotations and field specificatin to initialize the
+        DataRecord object with the provided netCDF dataset.
 
         Parameters
         ----------
@@ -27,20 +45,24 @@ class DataRecord:
         self._validate_postconditions()
 
     def __delattr__(self, name: str) -> NoReturn:
+        # Prevents deletion of attributes.
         raise AttributeError(f"Cannot delete attribute '{name}'")
 
     def __setattr__(self, name: str, _: Any) -> NoReturn:
-        # This can always be bypassed by calling object.__setattr__(),
-        # but the goal is to prevent accidental assignment of attributes
-        # to the instance not to guarantee immutability.
+        # Prevents setting of attributes. This can always be bypassed
+        # by calling object.__setattr__(), but the goal is to prevent
+        # accidental assignment of attributes to the instance not to
+        # guarantee immutability.
         raise AttributeError(f"Cannot set attribute '{name}'")
 
     def __str__(self) -> str:
+        # Returns a string representation of the DataRecord object.
         return help_str(self, DataRecord)
 
     def _init_class_attributes(self, record: Dataset) -> None:
-        # Copy class attributes to the instance provided they are not
-        # field attributes
+        # Initializes class attributes from the provided dataset. Copy
+        # class attributes to the instance provided they are not field
+        # attributes.
         annotations = get_annotations(self, DataRecord)
         for name, annotation in annotations.items():
             if hasattr(self, name):
@@ -60,7 +82,8 @@ class DataRecord:
                 object.__setattr__(self, name, value)
 
     def _init_record_attributes(self, record: Dataset) -> None:
-        # Copy record attributes to the instance
+        # Initializes record attributes from the provided dataset. Copy
+        # record attributes to the instance.
         annotations = get_annotations(self, DataRecord)
         for name, annotation in annotations.items():
             if hasattr(self, name):
@@ -74,8 +97,9 @@ class DataRecord:
             object.__setattr__(self, name, value)
 
     def _init_field_attributes(self, record: Dataset) -> None:
-        # Copy record field attributes to the instance, do not overwrite
-        # existing instance attributes
+        # Initializes field attributes from the provided dataset. Copy
+        # record field attributes to the instance, convert the data if
+        # necessary.
         for name in get_annotations(self, DataRecord):
             value = getattr(self, name)
             if not isinstance(value, BaseField):
@@ -83,10 +107,12 @@ class DataRecord:
             object.__setattr__(self, name, value(record, name))
 
     def _validate_preconditions(self) -> None:
+        # Validates preconditions before initialization.
         if self.__dict__:
             raise TypeError(f"Datarecord {self.__class__.__name__} is corrupt")
 
     def _validate_postconditions(self) -> None:
+        # Validates postconditions after initialization.
         all_annotations = get_annotations(self, DataRecord)
         for name, annotation in all_annotations.items():
             value = getattr(self, name)
