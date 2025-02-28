@@ -12,6 +12,14 @@ from .validation import validate_type
 class DataRecord:
 
     def __init__(self, record: Dataset) -> None:
+        """
+        Initialize the DataRecord object.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing the data to be extracted.
+        """
         self._validate_preconditions()
         self._init_class_attributes(record)
         self._init_record_attributes(record)
