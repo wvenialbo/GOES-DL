@@ -350,6 +350,15 @@ class GOESLatLonGrid:
     """
 
     def __init__(self, record: Dataset) -> None:
+        """
+        Initialize a GOESGrid object from a precomputed netCDF dataset.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing the precomputed latitude
+            and longitude grid data.
+        """
         self.latitude = _latlon_data("latitude", record)
         self.longitude = _latlon_data("longitude", record)
 
