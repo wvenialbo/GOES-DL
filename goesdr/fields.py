@@ -3,8 +3,9 @@ from collections.abc import Callable
 from typing import Any, cast
 
 from netCDF4 import Dataset, Variable  # pylint: disable=no-name-in-module
-from numpy import ndarray
+from numpy import int32, ndarray
 from numpy.ma import MaskedArray
+from numpy.typing import NDArray
 
 
 class BaseField(ABC):
@@ -163,6 +164,34 @@ class NamedArrayVariableField(BaseNamedVariableField):
             name = f"array:{name}"
         entry = self.entry or name
         return self._get_variable(dataset, self.record, entry)
+
+
+class IndexedVariableField(BaseVariableField):
+
+    index: int
+
+    def __init__(
+        self,
+        record_name: str,
+        index: int,
+        entry: str | None,
+        convert: Callable[..., Any] | None,
+    ) -> None:
+        super().__init__(record_name, entry, convert)
+        self.index = index
+
+    def __call__(self, dataset: Dataset, name: str) -> Any:
+        if self.record is None:
+            raise ValueError("Indexed variable field requires a record name")
+        if name in {"data", "mask"}:
+            name = f"array:{name}"
+        entry = self.entry or name
+        if entry not in {"array:data", "array:mask"}:
+            raise ValueError(
+                "Indexed variable field requires a data or mask entry"
+            )
+        value: NDArray[int32] = self._get_variable(dataset, self.record, entry)
+        return value.ravel()[self.index]
 
 
 class VariableType(ABC):
