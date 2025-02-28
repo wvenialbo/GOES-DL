@@ -120,6 +120,16 @@ class GOESABIFixedGrid:
     y_coordinate_2d: NDArray[float32] = computed()
 
     def __post_init__(self, _: Dataset) -> None:
+        """
+        Initialize the GOESABIFixedGrid object.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing the GOES ABI fixed grid
+            projection variables.
+        """
+        # Create 2D coordinate matrices from 1D coordinate vectors
         self.x_coordinate_2d, self.y_coordinate_2d = meshgrid(
             self.x_coordinate_1d, self.y_coordinate_1d
         )
@@ -324,6 +334,10 @@ def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridDataType:
 class GOESLatLonGrid:
     """
     Represent GOES satellite precomputed latitude and longitude data.
+
+    See
+    https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php
+    for information on where to get the precomputed dataset.
 
     Attributes
     ----------
