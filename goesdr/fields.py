@@ -134,7 +134,7 @@ class VariableField(BaseVariableField):
         return self._get_variable(dataset, alias, self.entry)
 
 
-class NamedVariableField(BaseVariableField):
+class BaseNamedVariableField(BaseVariableField):
 
     def __init__(
         self,
@@ -144,9 +144,23 @@ class NamedVariableField(BaseVariableField):
     ) -> None:
         super().__init__(record_name, entry, convert)
 
+
+class NamedVariableField(BaseNamedVariableField):
+
     def __call__(self, dataset: Dataset, name: str) -> Any:
         if self.record is None:
             raise ValueError("Named variable field requires a record name")
+        entry = self.entry or name
+        return self._get_variable(dataset, self.record, entry)
+
+
+class NamedArrayVariableField(BaseNamedVariableField):
+
+    def __call__(self, dataset: Dataset, name: str) -> Any:
+        if self.record is None:
+            raise ValueError("Named variable field requires a record name")
+        if name in {"data", "mask", "fill_value"}:
+            name = f"array:{name}"
         entry = self.entry or name
         return self._get_variable(dataset, self.record, entry)
 
@@ -231,12 +245,16 @@ def variable(
     return VariableField(record_name, entry, convert)
 
 
-def make_variable(record_name: str) -> VariableType:
+def make_variable(record_name: str, *, array: bool = False) -> VariableType:
     def _variable(
         *,
         entry: str | None = None,
         convert: Callable[..., Any] | None = None,
     ) -> Any:
-        return NamedVariableField(record_name, entry, convert)
+        return (
+            NamedArrayVariableField(record_name, entry, convert)
+            if array
+            else NamedVariableField(record_name, entry, convert)
+        )
 
     return cast(VariableType, _variable)
