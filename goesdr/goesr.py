@@ -292,7 +292,7 @@ class GOESDatasetInfo:
     x: int = dimension()
 
 
-class GOESLatLonGridDataType:
+class GOESLatLonGridData:
     """
     Represent GOES satellite precomputed latitude or longitude data.
 
@@ -312,7 +312,7 @@ class GOESLatLonGridDataType:
     fill_value: float32
 
 
-def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridDataType:
+def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridData:
     latlon: VariableType = make_variable(name, array=True)
 
     class _GOESLatLonGridData(DataRecord):
@@ -320,15 +320,13 @@ def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridDataType:
         mask: NDArray[bool_] = latlon()
         fill_value: float32 = latlon()
 
-    _GOESLatLonGridData.__module__ = GOESLatLonGridDataType.__module__
-    _GOESLatLonGridData.__name__ = (
-        "GOESLatData" if name == "latitude" else "GOESLonData"
-    )
-    _GOESLatLonGridData.__qualname__ = _GOESLatLonGridData.__name__
+    _GOESLatLonGridData.__module__ = GOESLatLonGridData.__module__
+    _GOESLatLonGridData.__name__ = GOESLatLonGridData.__name__
+    _GOESLatLonGridData.__qualname__ = _GOESLatLonGridData.__qualname__
 
     data = _GOESLatLonGridData(record)
 
-    return cast(GOESLatLonGridDataType, data)
+    return cast(GOESLatLonGridData, data)
 
 
 class GOESLatLonGrid:
@@ -343,14 +341,14 @@ class GOESLatLonGrid:
 
     Attributes
     ----------
-    latitude : GOESLatLonGridDataType
+    latitude : GOESLatLonGridData
         The latitude metadata.
-    longitude : GOESLatLonGridDataType
+    longitude : GOESLatLonGridData
         The longitude metadata.
     """
 
-    latitude: GOESLatLonGridDataType
-    longitude: GOESLatLonGridDataType
+    latitude: GOESLatLonGridData
+    longitude: GOESLatLonGridData
 
     def __init__(self, record: Dataset) -> None:
         """
@@ -474,11 +472,11 @@ class GOESGeodeticGrid:
 
     Attributes
     ----------
-    latitude : GOESLatLonGridDataType
+    latitude : GOESLatLonGridData
         The latitude metadata.
-    longitude : GOESLatLonGridDataType
+    longitude : GOESLatLonGridData
         The longitude metadata.
     """
 
-    latitude: GOESLatLonGridDataType
-    longitude: GOESLatLonGridDataType
+    latitude: GOESLatLonGridData
+    longitude: GOESLatLonGridData
