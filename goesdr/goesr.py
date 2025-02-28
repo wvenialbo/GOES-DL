@@ -335,9 +335,11 @@ class GOESLatLonGrid:
     """
     Represent GOES satellite precomputed latitude and longitude data.
 
-    See
-    https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php
-    for information on where to get the precomputed dataset.
+    Note
+    ----
+    For information on getting the precomputed latitude and longitude
+    grid dataset, see
+    https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
 
     Attributes
     ----------
