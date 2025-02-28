@@ -24,13 +24,19 @@ from .validation import validate_type
 
 
 class DataRecord:
-    """Represent a data record extracted from a netCDF dataset."""
+    """
+    Represent a data fragment extracted from a netCDF dataset.
+
+    Attributes are dynamically set based on the annotations and field
+    specifications defined in the class and the corresponding records
+    present in the provided netCDF dataset.
+    """
 
     def __init__(self, record: Dataset) -> None:
         """
         Initialize the DataRecord object.
 
-        Use annotations and field specificatin to initialize the
+        Use annotations and field specification to initialize the
         DataRecord object with the provided netCDF dataset.
 
         Parameters
