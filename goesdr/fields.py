@@ -175,9 +175,8 @@ class IndexedVariableField(BaseVariableField):
         record_name: str,
         index: int,
         entry: str | None,
-        convert: Callable[..., Any] | None,
     ) -> None:
-        super().__init__(record_name, entry, convert)
+        super().__init__(record_name, entry, None)
         self.index = index
 
     def __call__(self, dataset: Dataset, name: str) -> Any:
@@ -257,12 +256,29 @@ def field(value: Any) -> Any:
     return ClassField(value)
 
 
+def indexed(
+    record_name: str,
+    *,
+    index: int,
+    entry: str | None = DATA,
+) -> Any:
+    return IndexedVariableField(record_name, index, entry)
+
+
 def record(
     record_name: str | None = None,
     *,
     convert: Callable[..., Any] | None = None,
 ) -> Any:
     return RecordField(record_name, convert)
+
+
+def scalar(
+    record_name: str,
+    *,
+    entry: str | None = DATA,
+) -> Any:
+    return IndexedVariableField(record_name, 0, entry)
 
 
 def variable(
