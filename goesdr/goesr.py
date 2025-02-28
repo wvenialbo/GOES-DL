@@ -419,11 +419,14 @@ class GOESLatLonGridMetadata:
 
     Attributes
     ----------
-    latitude : GOESLatLonMetadataType
+    latitude : GOESLatLonGridMetadataType
         The latitude metadata.
-    longitude : GOESLatLonMetadataType
+    longitude : GOESLatLonGridMetadataType
         The longitude metadata.
     """
+
+    latitude: GOESLatLonGridMetadataType
+    longitude: GOESLatLonGridMetadataType
 
     def __init__(self, record: Dataset) -> None:
         self.latitude = _latlon_metadata("latitude", record)
