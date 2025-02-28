@@ -1,3 +1,10 @@
+"""
+This module provides classes to extract and represent information from
+GOES satellite netCDF data files. The classes dynamically set attributes
+based on the annotations defined in the class and the corresponding
+attributes or variables present in the provided netCDF data object.
+"""
+
 from typing import cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
@@ -254,10 +261,10 @@ class GOESDatasetInfo:
     production_environment: str
     spatial_resolution: str
     orbital_slot: str
-    platform_ID: str
+    platform_ID: str  # NOSONAR
     instrument_type: str
     scene_id: str
-    instrument_ID: str
+    instrument_ID: str  # NOSONAR
     dataset_name: str
     title: str
     summary: str
@@ -295,7 +302,7 @@ class GOESLatLonGridDataType:
     fill_value: float32
 
 
-def latlon_data(name: str, record: Dataset) -> GOESLatLonGridDataType:
+def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridDataType:
     latlon: VariableType = make_variable(name, array=True)
 
     class _GOESLatLonGridData(DataRecord):
@@ -327,8 +334,8 @@ class GOESLatLonGrid:
     """
 
     def __init__(self, record: Dataset) -> None:
-        self.latitude = latlon_data("latitude", record)
-        self.longitude = latlon_data("longitude", record)
+        self.latitude = _latlon_data("latitude", record)
+        self.longitude = _latlon_data("longitude", record)
 
     def __str__(self) -> str:
         # Returns a string representation of the DataRecord object.
@@ -360,7 +367,7 @@ class GOESLatLonGridMetadataType:
     comment: str
 
 
-def latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
+def _latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
     latlon: VariableType = make_variable(name)
 
     class _GOESLatLonGridMetadata(DataRecord):
@@ -393,8 +400,8 @@ class GOESLatLonGridMetadata:
     """
 
     def __init__(self, record: Dataset) -> None:
-        self.latitude = latlon_metadata("latitude", record)
-        self.longitude = latlon_metadata("longitude", record)
+        self.latitude = _latlon_metadata("latitude", record)
+        self.longitude = _latlon_metadata("longitude", record)
 
     def __str__(self) -> str:
         # Returns a string representation of the DataRecord object.
