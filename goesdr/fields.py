@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 from netCDF4 import Dataset, Variable  # pylint: disable=no-name-in-module
 from numpy import ndarray
@@ -86,29 +86,7 @@ VARIABLE_ENTRY_FILL_VALUE = "array:fill_value"
 VARIABLE_ENTRY_MASK = "array:mask"
 
 
-class VariableField(BaseField):
-
-    def __call__(self, dataset: Dataset, name: str) -> Any:
-        alias = self.record or name
-        if alias not in dataset.variables:
-            raise ValueError(f"Unknown variable '{alias}'")
-        variable_: Variable[Any] = dataset.variables[alias]
-        if self.entry is None:
-            return self.convert(variable_)
-        try:
-            if self.entry.startswith(VARIABLE_ARRAY_PREFIX):
-                value_ = self._extract_array(variable_, self.entry)
-            else:
-                value_ = getattr(variable_, self.entry)
-            return self.convert(value_)
-        except AttributeError as error:
-            raise ValueError(
-                f"Unknown variable entry '{alias}:{self.entry}'"
-            ) from error
-        except TypeError as error:
-            raise ValueError(
-                f"Unexpected variable entry type '{alias}:{self.entry}'"
-            ) from error
+class BaseVariableField(BaseField):
 
     def _extract_array(self, variable_: Any, alias: str) -> Any:
         array_value = variable_[:]
@@ -124,6 +102,65 @@ class VariableField(BaseField):
         if alias == VARIABLE_ENTRY_ARRAY:
             return array_value
         raise AttributeError("Unknown array entry")
+
+    def _get_variable(
+        self, dataset: Dataset, alias: str, entry: str | None
+    ) -> Any:
+        if alias not in dataset.variables:
+            raise ValueError(f"Unknown variable '{alias}'")
+        variable_: Variable[Any] = dataset.variables[alias]
+        if entry is None:
+            return self.convert(variable_)
+        try:
+            if entry.startswith(VARIABLE_ARRAY_PREFIX):
+                value_ = self._extract_array(variable_, entry)
+            else:
+                value_ = getattr(variable_, entry)
+            return self.convert(value_)
+        except AttributeError as error:
+            raise ValueError(
+                f"Unknown variable entry '{alias}:{entry}'"
+            ) from error
+        except TypeError as error:
+            raise ValueError(
+                f"Unexpected variable entry type '{alias}:{entry}'"
+            ) from error
+
+
+class VariableField(BaseVariableField):
+
+    def __call__(self, dataset: Dataset, name: str) -> Any:
+        alias = self.record or name
+        return self._get_variable(dataset, alias, self.entry)
+
+
+class NamedVariableField(BaseVariableField):
+
+    def __init__(
+        self,
+        record_name: str,
+        entry: str | None,
+        convert: Callable[..., Any] | None,
+    ) -> None:
+        super().__init__(record_name, entry, convert)
+
+    def __call__(self, dataset: Dataset, name: str) -> Any:
+        if self.record is None:
+            raise ValueError("Named variable field requires a record name")
+        entry = self.entry or name
+        return self._get_variable(dataset, self.record, entry)
+
+
+class VariableType(ABC):
+
+    @abstractmethod
+    def __call__(
+        self,
+        *,
+        entry: str | None = None,
+        convert: Callable[..., Any] | None = None,
+    ) -> Any:
+        pass
 
 
 ARRAY = VARIABLE_ENTRY_ARRAY
@@ -143,6 +180,22 @@ def dimension(
 
 
 def field(value: Any) -> Any:
+    """
+    Placeholder for field attributes.
+
+    Mark attributes that will be copied from the given value to the
+    instance without any conversion.
+
+    Parameters
+    ----------
+    value : Any
+        The value to be copied.
+
+    Returns
+    -------
+    Any
+        Placeholder for field attributes, 'ClassField(value)'.
+    """
     return ClassField(value)
 
 
@@ -161,3 +214,14 @@ def variable(
     convert: Callable[..., Any] | None = None,
 ) -> Any:
     return VariableField(record_name, entry, convert)
+
+
+def make_variable(record_name: str) -> VariableType:
+    def _variable(
+        *,
+        entry: str | None = None,
+        convert: Callable[..., Any] | None = None,
+    ) -> Any:
+        return NamedVariableField(record_name, entry, convert)
+
+    return cast(VariableType, _variable)
