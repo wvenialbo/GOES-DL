@@ -342,9 +342,9 @@ class GOESLatLonGrid:
     Attributes
     ----------
     latitude : GOESLatLonGridData
-        The latitude metadata.
+        The latitude grid data.
     longitude : GOESLatLonGridData
-        The longitude metadata.
+        The longitude grid data.
     """
 
     latitude: GOESLatLonGridData
@@ -473,9 +473,9 @@ class GOESGeodeticGrid:
     Attributes
     ----------
     latitude : GOESLatLonGridData
-        The latitude metadata.
+        The latitude grid data.
     longitude : GOESLatLonGridData
-        The longitude metadata.
+        The longitude grid data.
     """
 
     latitude: GOESLatLonGridData
