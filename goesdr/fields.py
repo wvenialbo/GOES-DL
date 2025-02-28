@@ -170,6 +170,21 @@ MASK = VARIABLE_ENTRY_MASK
 SIZE = DIMENSION_ENTRY_SIZE
 
 
+def computed() -> Any:
+    """
+    Placeholder for computed fields.
+
+    Mark attributes that will be computed during the record
+    initialization in the __post_init__ method.
+
+    Returns
+    -------
+    Any
+        Placeholder for computed fields, 'ClassField(None)'.
+    """
+    return ClassField(None)
+
+
 def dimension(
     record_name: str | None = None,
     *,
