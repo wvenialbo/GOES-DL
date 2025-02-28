@@ -349,6 +349,9 @@ class GOESLatLonGrid:
         The longitude metadata.
     """
 
+    latitude: GOESLatLonGridDataType
+    longitude: GOESLatLonGridDataType
+
     def __init__(self, record: Dataset) -> None:
         """
         Initialize a GOESGrid object from a precomputed netCDF dataset.
@@ -471,11 +474,11 @@ class GOESGeodeticGrid:
 
     Attributes
     ----------
-    latitude : GOESLatLonMetadataType
+    latitude : GOESLatLonGridDataType
         The latitude metadata.
-    longitude : GOESLatLonMetadataType
+    longitude : GOESLatLonGridDataType
         The longitude metadata.
     """
 
-    latitude: NDArray[float32]
-    longitude: NDArray[float32]
+    latitude: GOESLatLonGridDataType
+    longitude: GOESLatLonGridDataType
