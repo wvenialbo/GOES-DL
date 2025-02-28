@@ -12,6 +12,7 @@ DataRecord
     Represents a data record extracted from a netCDF dataset.
 """
 
+from inspect import currentframe
 from typing import Any, NoReturn
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
@@ -48,17 +49,41 @@ class DataRecord:
         self._init_class_attributes(record)
         self._init_record_attributes(record)
         self._init_field_attributes(record)
+        self._perform_post_init_setup(record)
         self._validate_postconditions()
+
+    def __post_init__(self, record: Dataset) -> None:
+        """
+        Perform post-initialization setup.
+
+        This method is called after the initialization of the DataRecord
+        object. It can be overridden by subclasses to perform additional
+        setup tasks.
+        """
+
+    def _perform_post_init_setup(self, record: Dataset) -> None:
+        self.__post_init__(record)
 
     def __delattr__(self, name: str) -> NoReturn:
         # Prevents deletion of attributes.
         raise AttributeError(f"Cannot delete attribute '{name}'")
 
-    def __setattr__(self, name: str, _: Any) -> NoReturn:
-        # Prevents setting of attributes. This can always be bypassed
-        # by calling object.__setattr__(), but the goal is to prevent
-        # accidental assignment of attributes to the instance not to
-        # guarantee immutability.
+    def __setattr__(self, name: str, value: Any) -> None:
+        # Prevents setting of attributes outside of the __post_init__
+        # method. Note tha this can always be bypassed by calling
+        # object.__setattr__, but the goal is to prevent accidental
+        # assignment of attributes to the instance not to guarantee
+        # immutability.
+        current = currentframe()
+        frame = current.f_back if current else None
+        while frame:
+            if (
+                frame.f_code.co_name == "__post_init__"
+                and frame.f_locals.get("self") is self
+            ):
+                object.__setattr__(self, name, value)
+                return
+            frame = frame.f_back
         raise AttributeError(f"Cannot set attribute '{name}'")
 
     def __str__(self) -> str:
