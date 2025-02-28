@@ -336,8 +336,7 @@ class GOESLatLonGrid:
     Note
     ----
     For information on getting the precomputed latitude and longitude
-    grid dataset, see
-    https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    grid dataset, see [1]_.
 
     Attributes
     ----------
@@ -345,6 +344,12 @@ class GOESLatLonGrid:
         The latitude grid data.
     longitude : GOESLatLonGridData
         The longitude grid data.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2021.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
     """
 
     latitude: GOESLatLonGridData
