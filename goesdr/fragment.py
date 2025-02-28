@@ -17,6 +17,10 @@ def netcdf_fragment(recordclass: type) -> type:
             value = getattr(recordclass, name)
             setattr(_FragmentRecord, name, value)
 
+    __post_init__ = getattr(recordclass, "__post_init__", None)
+    if callable(__post_init__):
+        setattr(_FragmentRecord, "__post_init__", __post_init__)
+
     original_module = inspect.getmodule(recordclass)
     setattr(original_module, recordclass.__name__, _FragmentRecord)
 
