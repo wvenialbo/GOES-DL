@@ -30,6 +30,11 @@ class GOESOrbitGeometry:
     """
     Represent GOES-R series satellite orbit geometry information.
 
+    Note
+    ----
+    For information on GOES orbit geometry, see [1]_ and Section 4.2. of
+    [2]_
+
     Attributes
     ----------
     longitude_of_projection_origin : np.float64
@@ -39,6 +44,16 @@ class GOESOrbitGeometry:
         Earth's surface the ideal satellite sub-point.
     sweep_angle_axis : str
         The sweep angle axis.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     # Information about the projection
@@ -52,6 +67,11 @@ class GOESGlobe:
     """
     Represent GOES-R series satellite globe definition.
 
+    Note
+    ----
+    For information on GOES orbit geometry and Earth globe definition,
+    see [1]_ and Section 4.2. of [2]_
+
     Attributes
     ----------
     semi_major_axis : np.float64
@@ -60,6 +80,16 @@ class GOESGlobe:
         The semi-minor axis of the globe.
     inverse_flattening : np.float64
         The inverse flattening of the globe.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     # Information about the globe
@@ -72,10 +102,25 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
     """
     Represent GOES-R series satellite projection information.
 
+    Note
+    ----
+    For information on GOES Imager Projection, see [1]_ and Section 4.2.
+    of [2]_
+
     Properties
     ----------
     orbital_radius : np.float64
         The orbital radius of the GOES satellite.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     @property
@@ -102,6 +147,11 @@ class GOESABIFixedGrid:
     projection based on the geostationary viewing perspective of the
     GOES-East or GOES-West satellite.
 
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2. of [2]_
+
     Attributes
     ----------
     x_coordinate_1d : NDArray[float32]
@@ -112,6 +162,16 @@ class GOESABIFixedGrid:
         2D array of E/W scanning angles in radians.
     y_coordinate_2d : NDArray[float32]
         2D array of N/S elevation angles in radians.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     x_coordinate_1d: NDArray[float32] = variable("x")
@@ -333,10 +393,11 @@ class GOESLatLonGrid:
     """
     Represent GOES satellite precomputed latitude and longitude data.
 
-    Note
-    ----
-    For information on getting the precomputed latitude and longitude
-    grid dataset, see [1]_.
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2. of [2]_ For information on getting the
+    precomputed latitude and longitude grid dataset, see [1]_.
 
     Attributes
     ----------
@@ -348,8 +409,12 @@ class GOESLatLonGrid:
     References
     ----------
     .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
-        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2021.
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
         https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     latitude: GOESLatLonGridData
@@ -481,10 +546,10 @@ class GOESGeodeticGrid:
     Notes
     -----
     For information on GOES Imager Projection and GOES orbit geometry,
-    see [1]_. For a Python demonstration on calculating latitude and
-    longitude from GOES Imager Projection information, see [2]_. The
-    code snippet in this class is based on the Python demonstration in
-    [2]_.
+    see [1]_ and Section 4.2. of [3]_. For a Python demonstration on
+    calculating latitude and longitude from GOES Imager Projection
+    information, see [2]_. The code snippet in this class is based on
+    the Python demonstration in [2]_.
 
     Attributes
     ----------
@@ -496,14 +561,17 @@ class GOESGeodeticGrid:
     References
     ----------
     .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
-        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2021.
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
         https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
-
     .. [2] Aerosols and Atmospheric Composition Science Team, "Python
         Short Demo: Calculate Latitude and Longitude from GOES Imager
         Projection (ABI Fixed Grid) Information", NOAA/NESDIS/STAR,
-        2021.
+        2024.
         https://www.star.nesdis.noaa.gov/atmospheric-composition-training/python_abi_lat_lon.php
+    .. [3] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     latitude: GOESLatLonGridData
