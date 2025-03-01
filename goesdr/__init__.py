@@ -1,9 +1,8 @@
 """Provide functionality for reading fragments of GOES-R datasets."""
 
 from . import fields
-from .datarecord import DataFragment
+from .data_fragment import DataFragment, netcdf_fragment
 from .fields import dimension, field, record, variable
-from .fragment import netcdf_fragment
 
 __all__ = [
     "DataFragment",
