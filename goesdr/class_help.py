@@ -105,3 +105,18 @@ def help_str(this: Any, root: type = object, indent: str = "    ") -> str:
             )
             attributes.append(f"{indent}{attribute_name}: {attribute_value}")
     return "\n".join(attributes)
+
+
+class HasStrHelp:
+    """
+    Provide a string representation of its instance.
+
+    Methods
+    -------
+    __str__() -> str
+        Returns a string representation of the object's class instance.
+    """
+
+    def __str__(self) -> str:
+        # Returns a representation of the object's class instance.
+        return help_str(self, HasStrHelp)
