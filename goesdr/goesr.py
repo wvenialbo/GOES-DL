@@ -8,7 +8,23 @@ attributes or variables present in the provided netCDF data object.
 from typing import cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import bool_, float32, float64, int8, int16, int32, meshgrid, uint16
+from numpy import (
+    arctan,
+    bool_,
+    cos,
+    float32,
+    float64,
+    int8,
+    int16,
+    int32,
+    meshgrid,
+    pi,
+    power,
+    seterr,
+    sin,
+    sqrt,
+    uint16,
+)
 from numpy.typing import NDArray
 
 from .datarecord import DataRecord
@@ -20,13 +36,11 @@ from .fields import (
     scalar,
     variable,
 )
-from .fragment import netcdf_fragment
 
 imager_proj = make_variable("goes_imager_projection")
 
 
-@netcdf_fragment
-class GOESOrbitGeometry:
+class GOESOrbitGeometry(DataRecord):
     """
     Represent GOES-R series satellite orbit geometry information.
 
@@ -62,8 +76,7 @@ class GOESOrbitGeometry:
     sweep_angle_axis: str = imager_proj()
 
 
-@netcdf_fragment
-class GOESGlobe:
+class GOESGlobe(DataRecord):
     """
     Represent GOES-R series satellite globe definition.
 
@@ -136,8 +149,7 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
         return self.perspective_point_height + self.semi_major_axis
 
 
-@netcdf_fragment
-class GOESABIFixedGrid:
+class GOESABIFixedGrid(DataRecord):
     """
     Represent GOES-R series satellite ABI fixed grid projection data.
 
@@ -198,8 +210,7 @@ class GOESABIFixedGrid:
 cmip: VariableType = make_variable("CMI", array=True)
 
 
-@netcdf_fragment
-class GOESImage:
+class GOESImage(DataRecord):
     """
     Represent a GOES satellite image data.
 
@@ -228,8 +239,7 @@ class GOESImage:
     fill_value: uint16 = cmip()
 
 
-@netcdf_fragment
-class GOESImageMetadata:
+class GOESImageMetadata(DataRecord):
     """
     Represent GOES image metadata attributes.
 
@@ -266,8 +276,7 @@ class GOESImageMetadata:
     grid_mapping: str = cmip()
 
 
-@netcdf_fragment
-class GOESDatasetInfo:
+class GOESDatasetInfo(DataRecord):
     """
     Hold GOES dataset metadata information.
 
@@ -510,8 +519,7 @@ class GOESLatLonGridMetadata:
         return "\n".join(lines)
 
 
-@netcdf_fragment
-class GOESLatLonGridInfo:
+class GOESLatLonGridInfo(DataRecord):
     """
     Hold GOES geodetic grid dataset metadata information.
 
