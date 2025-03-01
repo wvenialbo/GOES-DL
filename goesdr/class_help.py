@@ -65,7 +65,7 @@ def _str_ndarray(array: NDArray[float32]) -> str:
     return value.replace(">,", ",")
 
 
-def help_str(this: Any, root: type, indent: str = "    ") -> str:
+def help_str(this: Any, root: type = object, indent: str = "    ") -> str:
     """
     Generate a formatted string representation of an instance.
 
