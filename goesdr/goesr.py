@@ -12,11 +12,11 @@ from numpy import (
     arctan,
     bool_,
     cos,
-    deg2rad,
     dtype,
     errstate,
     float32,
     float64,
+    hstack,
     int8,
     int16,
     int32,
@@ -26,6 +26,7 @@ from numpy import (
     sin,
     sqrt,
     uint16,
+    vstack,
 )
 from numpy.ma import MaskedArray, masked_invalid
 from numpy.typing import NDArray
@@ -659,7 +660,7 @@ class GOESGeodeticGrid:
             The netCDF dataset containing the precomputed latitude
             and longitude grid data.
         """
-        lat, lon = self._initialize_latlon(record)
+        lat, lon = self._initialize_latlon_grid(record)
 
         self.latitude = GOESLatLonGridData(lat)
         self.longitude = GOESLatLonGridData(lon)
@@ -668,14 +669,15 @@ class GOESGeodeticGrid:
         # Returns a string representation of the GOESLatLonGridData object.
         return help_str(self)
 
-    def _initialize_latlon(
-        self, record: Dataset
+    @classmethod
+    def _initialize_latlon_grid(
+        cls, record: Dataset
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
         # Ignore numpy errors for `sqrt` of negative number; reference
         # [2] states that this "occurs for GOES-16 ABI CONUS sector
         # data", however I found it also occurs for Full Disd sector.
         with errstate(invalid="ignore"):
-            lat, lon = self.calculate_latlon(record)
+            lat, lon = cls._calculate_latlon_grid(record)
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
         longitude: MaskedFloat32 = masked_invalid(lon)  # type: ignore
@@ -685,8 +687,9 @@ class GOESGeodeticGrid:
 
         return latitude, longitude
 
-    def calculate_latlon(
-        self, record: Dataset
+    @classmethod
+    def _calculate_latlon_grid(
+        cls, record: Dataset
     ) -> tuple[NDArray[float32], NDArray[float32]]:
         """
         Calculate latitude and longitude grids.
@@ -707,7 +710,7 @@ class GOESGeodeticGrid:
         """
         projection_info = GOESProjection(record)
 
-        lon_origin = projection_info.longitude_of_projection_origin
+        lambda_0 = projection_info.longitude_of_projection_origin
 
         r_orb = projection_info.orbital_radius
         r_eq = projection_info.semi_major_axis
@@ -723,8 +726,87 @@ class GOESGeodeticGrid:
         sin_x, sin_y = meshgrid(sin_x, sin_y)
         cos_x, cos_y = meshgrid(cos_x, cos_y)
 
+        lat, lon = cls._compute_latlon_grid(
+            (r_orb, r_eq, r_pol),
+            (sin_x, sin_y),
+            (cos_x, cos_y),
+        )
+
+        return lat.astype(float32), (lon + lambda_0).astype(float32)
+
+    @classmethod
+    def calculate_latlon_grid_fast(
+        cls, record: Dataset
+    ) -> tuple[NDArray[float32], NDArray[float32]]:
+        """
+        Calculate latitude and longitude grids.
+
+        Calculate latitude and longitude from GOES ABI fixed grid
+        projection data in the ABI Level 2 file.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing the GOES ABI fixed grid
+            projection data.
+
+        Returns
+        -------
+        tuple[NDArray[float32], NDArray[float32]]
+            A tuple containing the latitude and longitude data.
+        """
+        projection_info = GOESProjection(record)
+
+        lambda_0 = projection_info.longitude_of_projection_origin
+
+        r_orb = projection_info.orbital_radius
+        r_eq = projection_info.semi_major_axis
+        r_pol = projection_info.semi_minor_axis
+
+        # Compute only the first quadrant of the grid
+        grid_data = GOESABIFixedGridArray(record)
+
+        # pylint: disable=no-member # pylint false positive
+        center = grid_data.x.size // 2
+        is_odd = bool(grid_data.x.size % 2)
+        # pylint: enable=no-member
+
+        # pylint: disable=unsubscriptable-object # pylint false positive
+        grid_x = grid_data.x[center:]
+        grid_y = grid_x[::-1]
+        # pylint: enable=unsubscriptable-object
+
+        sin_x: NDArray[float64] = sin(grid_x)
+        cos_x: NDArray[float64] = cos(grid_x)
+        sin_y: NDArray[float64] = sin(grid_y)
+        cos_y: NDArray[float64] = cos(grid_y)
+
+        sin_x, sin_y = meshgrid(sin_x, sin_y)
+        cos_x, cos_y = meshgrid(cos_x, cos_y)
+
+        lat, lon = cls._compute_latlon_grid(
+            (r_orb, r_eq, r_pol),
+            (sin_x, sin_y),
+            (cos_x, cos_y),
+        )
+
+        lat = cls._reconstruct_lat_grid(lat, is_odd)
+        lon = cls._reconstruct_lat_grid(lon, is_odd)
+
+        return lat.astype(float32), (lon + lambda_0).astype(float32)
+
+    @staticmethod
+    def _compute_latlon_grid(
+        params: tuple[float64, float64, float64],
+        sin_xy: tuple[NDArray[float64], NDArray[float64]],
+        cos_xy: tuple[NDArray[float64], NDArray[float64]],
+    ) -> tuple[NDArray[float64], NDArray[float64]]:
+
+        r_orb, r_eq, r_pol = params
+        sin_x, sin_y = sin_xy
+        cos_x, cos_y = cos_xy
+
         # Equations to calculate latitude and longitude
-        lambda_0 = deg2rad(lon_origin)
         a_var = power(sin_x, 2.0) + (
             power(cos_x, 2.0)
             * (
@@ -749,8 +831,32 @@ class GOESGeodeticGrid:
                 * (s_z / sqrt(((r_orb - s_x) * (r_orb - s_x)) + (s_y * s_y)))
             )
         )
-        abi_lon: NDArray[float64] = rad2deg(
-            lambda_0 - arctan(s_y / (r_orb - s_x))
-        )
+        abi_lon: NDArray[float64] = rad2deg(arctan(s_y / (s_x - r_orb)))
 
-        return abi_lat.astype(float32), abi_lon.astype(float32)
+        return abi_lat, abi_lon
+
+    @staticmethod
+    def _reconstruct_lat_grid(
+        northeast_grid: NDArray[float64], odd_size: bool
+    ) -> NDArray[float64]:
+        southeast_grid = (
+            -northeast_grid[-2::-1, :]
+            if odd_size
+            else -northeast_grid[::-1, :]
+        )
+        east_grid = vstack((northeast_grid, southeast_grid))
+        west_grid = east_grid[:, -1:0:-1] if odd_size else east_grid[:, ::-1]
+        return hstack((west_grid, east_grid))
+
+    @staticmethod
+    def _reconstruct_lon_grid(
+        northeast_grid: NDArray[float64], odd_size: bool
+    ) -> NDArray[float64]:
+        northwest_grid = (
+            -northeast_grid[:, -1:0:-1]
+            if odd_size
+            else -northeast_grid[:, ::-1]
+        )
+        north_grid = hstack((northwest_grid, northeast_grid))
+        south_grid = north_grid[-2::-1, :] if odd_size else north_grid[::-1, :]
+        return vstack((north_grid, south_grid))
