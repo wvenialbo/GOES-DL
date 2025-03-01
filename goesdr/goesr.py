@@ -5,27 +5,29 @@ based on the annotations defined in the class and the corresponding
 attributes or variables present in the provided netCDF data object.
 """
 
-from typing import cast
+from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import (
     arctan,
     bool_,
     cos,
+    deg2rad,
+    dtype,
+    errstate,
     float32,
     float64,
     int8,
     int16,
     int32,
     meshgrid,
-    pi,
     power,
     rad2deg,
-    seterr,
     sin,
     sqrt,
     uint16,
 )
+from numpy.ma import MaskedArray, masked_invalid
 from numpy.typing import NDArray
 
 from .datarecord import DataRecord
@@ -148,6 +150,60 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
             The orbital radius of the GOES satellite.
         """
         return self.perspective_point_height + self.semi_major_axis
+
+
+def to_float64(array: NDArray[float32]) -> NDArray[float64]:
+    """
+    Convert a float32 array to a float64 array.
+
+    Parameters
+    ----------
+    array : NDArray[float32]
+        The float32 array to convert.
+
+    Returns
+    -------
+    NDArray[float64]
+        The float64 array.
+    """
+    return array.astype(float64)
+
+
+class GOESABIFixedGridArray(DataRecord):
+    """
+    Represent GOES-R series satellite ABI Fixed Grid projection data.
+
+    The GOES Imager Projection, also called the ABI Fixed Grid, is the
+    projection information included in all ABI Level 1b radiance data
+    files and most ABI Level 2 derived product data files. It is a map
+    projection based on the geostationary viewing perspective of the
+    GOES-East or GOES-West satellite.
+
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2. of [2]_
+
+    Attributes
+    ----------
+    x_coordinate_1d : NDArray[float32]
+        1D array of E/W scanning angles in radians.
+    y_coordinate_1d : NDArray[float32]
+        1D array of N/S elevation angles in radians.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
+    """
+
+    x: NDArray[float64] = variable(convert=to_float64)
+    y: NDArray[float64] = variable(convert=to_float64)
 
 
 class GOESABIFixedGrid(DataRecord):
@@ -362,6 +418,9 @@ class GOESDatasetInfo(DataRecord):
     x: int = dimension()
 
 
+MaskedFloat32 = MaskedArray[Any, dtype[float32]]
+
+
 class GOESLatLonGridData:
     """
     Represent GOES satellite precomputed latitude or longitude data.
@@ -376,6 +435,20 @@ class GOESLatLonGridData:
     fill_value : uint16
         The fill value used for missing or invalid data points.
     """
+
+    def __init__(self, array: MaskedFloat32) -> None:
+        """
+        Initialize a GOESLatLonGridData object.
+
+        Parameters
+        ----------
+        array : MaskedFloat32
+            The masked array containing the latitude or longitude grid
+            data.
+        """
+        self.data = array.data
+        self.mask = array.mask
+        self.fill_value = array.fill_value
 
     data: NDArray[float32]
     mask: NDArray[bool_]
@@ -545,6 +618,9 @@ class GOESLatLonGridInfo(DataRecord):
     columns: int = dimension()
 
 
+FILL_VALUE = -999.99
+
+
 class GOESGeodeticGrid:
     """
     Represent latitude and longitude grid data computed on the fly.
@@ -586,7 +662,39 @@ class GOESGeodeticGrid:
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
 
-    def calculate_degrees(
+    def __init__(self, record: Dataset) -> None:
+        """
+        Initialize a GOESGrid object from a precomputed netCDF dataset.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing the precomputed latitude
+            and longitude grid data.
+        """
+        lat, lon = self._initialize_latlon(record)
+
+        self.latitude = GOESLatLonGridData(lat)
+        self.longitude = GOESLatLonGridData(lon)
+
+    def _initialize_latlon(
+        self, record: Dataset
+    ) -> tuple[MaskedFloat32, MaskedFloat32]:
+        # Ignore numpy errors for `sqrt` of negative number; reference
+        # [2] states that this "occurs for GOES-16 ABI CONUS sector
+        # data", however I found it also occurs for Full Disd sector.
+        with errstate(invalid="ignore"):
+            lat, lon = self.calculate_latlon(record)
+
+        latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
+        longitude: MaskedFloat32 = masked_invalid(lon)  # type: ignore
+
+        latitude.fill_value = FILL_VALUE
+        longitude.fill_value = FILL_VALUE
+
+        return latitude, longitude
+
+    def calculate_latlon(
         self, record: Dataset
     ) -> tuple[NDArray[float32], NDArray[float32]]:
         """
@@ -614,15 +722,18 @@ class GOESGeodeticGrid:
         r_eq = projection_info.semi_major_axis
         r_pol = projection_info.semi_minor_axis
 
-        grid_data = GOESABIFixedGrid(record)
+        grid_data = GOESABIFixedGridArray(record)
 
-        sin_x = sin(grid_data.x_coordinate_2d.astype(float64))
-        cos_x = cos(grid_data.x_coordinate_2d.astype(float64))
-        sin_y = sin(grid_data.y_coordinate_2d.astype(float64))
-        cos_y = cos(grid_data.y_coordinate_2d.astype(float64))
+        sin_x: NDArray[float64] = sin(grid_data.x)
+        cos_x: NDArray[float64] = cos(grid_data.x)
+        sin_y: NDArray[float64] = sin(grid_data.y)
+        cos_y: NDArray[float64] = cos(grid_data.y)
+
+        sin_x, sin_y = meshgrid(sin_x, sin_y)
+        cos_x, cos_y = meshgrid(cos_x, cos_y)
 
         # Equations to calculate latitude and longitude
-        lambda_0 = (lon_origin * pi) / 180.0
+        lambda_0 = deg2rad(lon_origin)
         a_var = power(sin_x, 2.0) + (
             power(cos_x, 2.0)
             * (
@@ -630,10 +741,6 @@ class GOESGeodeticGrid:
                 + (((r_eq * r_eq) / (r_pol * r_pol)) * power(sin_y, 2.0))
             )
         )
-
-        # Ignore numpy errors for sqrt of negative number; occurs for
-        # GOES-16 ABI CONUS sector data
-        seterr(all="ignore")
 
         b_var = -2.0 * r_orb * cos_x * cos_y
         c_var = (r_orb**2.0) - (r_eq**2.0)
@@ -645,13 +752,14 @@ class GOESGeodeticGrid:
         s_y = -r_s * sin_x
         s_z = r_s * cos_x * sin_y
 
-        abi_lat = arctan(
-            ((r_eq * r_eq) / (r_pol * r_pol))
-            * (s_z / sqrt(((r_orb - s_x) * (r_orb - s_x)) + (s_y * s_y)))
+        abi_lat: NDArray[float64] = rad2deg(
+            arctan(
+                ((r_eq * r_eq) / (r_pol * r_pol))
+                * (s_z / sqrt(((r_orb - s_x) * (r_orb - s_x)) + (s_y * s_y)))
+            )
         )
-        abi_lat = rad2deg(abi_lat)
-
-        abi_lon = lambda_0 - arctan(s_y / (r_orb - s_x))
-        abi_lon = rad2deg(abi_lon)
+        abi_lon: NDArray[float64] = rad2deg(
+            lambda_0 - arctan(s_y / (r_orb - s_x))
+        )
 
         return abi_lat.astype(float32), abi_lon.astype(float32)
