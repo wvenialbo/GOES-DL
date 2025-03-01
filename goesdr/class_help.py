@@ -22,7 +22,7 @@ from numpy.typing import NDArray
 def _get_attribute_names(this: Any, root: type) -> list[str]:
     # Retrieve a list of attribute names for a given instance and its
     # superclasses up to a specified root class.
-    all_attributes: list[str] = []
+    all_attributes: list[str] = list(this.__dict__.keys())
     mro_classes = this.__class__.__mro__
     for cls in mro_classes:
         if issubclass(cls, root) and cls != root:
