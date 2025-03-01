@@ -30,7 +30,7 @@ from numpy import (
 from numpy.ma import MaskedArray, masked_invalid
 from numpy.typing import NDArray
 
-from .fragment import DataFragment
+from .class_help import HasStrHelp, help_str
 from .fields import (
     VariableType,
     computed,
@@ -39,6 +39,7 @@ from .fields import (
     scalar,
     variable,
 )
+from .fragment import DataFragment
 
 imager_proj = make_variable("goes_imager_projection")
 
@@ -472,7 +473,7 @@ def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridData:
     return cast(GOESLatLonGridData, data)
 
 
-class GOESLatLonGrid:
+class GOESLatLonGrid(HasStrHelp):
     """
     Represent GOES satellite precomputed latitude and longitude data.
 
@@ -515,13 +516,6 @@ class GOESLatLonGrid:
         """
         self.latitude = _latlon_data("latitude", record)
         self.longitude = _latlon_data("longitude", record)
-
-    def __str__(self) -> str:
-        # Returns a string representation of the DataFragment object.
-        lines = [str(self.__class__)]
-        lines += [f"    {line}" for line in str(self.latitude).split("\n")]
-        lines += [f"    {line}" for line in str(self.longitude).split("\n")]
-        return "\n".join(lines)
 
 
 class GOESLatLonGridMetadataType:
@@ -566,7 +560,7 @@ def _latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
     return cast(GOESLatLonGridMetadataType, metadata)
 
 
-class GOESLatLonGridMetadata:
+class GOESLatLonGridMetadata(HasStrHelp):
     """
     Represent a GOES satellite latitude and longitude metadata.
 
@@ -584,13 +578,6 @@ class GOESLatLonGridMetadata:
     def __init__(self, record: Dataset) -> None:
         self.latitude = _latlon_metadata("latitude", record)
         self.longitude = _latlon_metadata("longitude", record)
-
-    def __str__(self) -> str:
-        # Returns a string representation of the DataFragment object.
-        lines = [str(self.__class__)]
-        lines += [f"    {line}" for line in str(self.latitude).split("\n")]
-        lines += [f"    {line}" for line in str(self.longitude).split("\n")]
-        return "\n".join(lines)
 
 
 class GOESLatLonGridInfo(DataFragment):
@@ -676,6 +663,10 @@ class GOESGeodeticGrid:
 
         self.latitude = GOESLatLonGridData(lat)
         self.longitude = GOESLatLonGridData(lon)
+
+    def __str__(self) -> str:
+        # Returns a string representation of the GOESLatLonGridData object.
+        return help_str(self)
 
     def _initialize_latlon(
         self, record: Dataset
