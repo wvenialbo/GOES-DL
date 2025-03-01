@@ -1,9 +1,12 @@
 import inspect
+from typing import TypeVar, cast
 
 from .datarecord import DataRecord
 
+_T = TypeVar("_T")
 
-def netcdf_fragment(recordclass: type) -> type:
+
+def netcdf_fragment(recordclass: type[_T]) -> type[_T]:
     class _FragmentRecord(DataRecord):
         pass
 
@@ -24,4 +27,4 @@ def netcdf_fragment(recordclass: type) -> type:
     original_module = inspect.getmodule(recordclass)
     setattr(original_module, recordclass.__name__, _FragmentRecord)
 
-    return _FragmentRecord
+    return cast(type[_T], _FragmentRecord)
