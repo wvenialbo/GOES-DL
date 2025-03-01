@@ -18,13 +18,13 @@ from typing import Any, NoReturn, TypeVar, cast
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 
 from .annotations import get_annotations
-from .class_help import help_str
+from .class_help import HasStrHelp, help_str
 from .fields import BaseField, ClassField
 from .hinting import get_annotated, get_typehint
 from .validation import validate_type
 
 
-class DataFragment:
+class DataFragment(HasStrHelp):
     """
     Represent a data fragment extracted from a netCDF dataset.
 
