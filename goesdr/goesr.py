@@ -20,6 +20,7 @@ from numpy import (
     meshgrid,
     pi,
     power,
+    rad2deg,
     seterr,
     sin,
     sqrt,
@@ -151,7 +152,7 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
 
 class GOESABIFixedGrid(DataRecord):
     """
-    Represent GOES-R series satellite ABI fixed grid projection data.
+    Represent GOES-R series satellite ABI Fixed Grid projection data.
 
     The GOES Imager Projection, also called the ABI Fixed Grid, is the
     projection information included in all ABI Level 1b radiance data
@@ -584,3 +585,73 @@ class GOESGeodeticGrid:
 
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
+
+    def calculate_degrees(
+        self, record: Dataset
+    ) -> tuple[NDArray[float32], NDArray[float32]]:
+        """
+        Calculate latitude and longitude grids.
+
+        Calculate latitude and longitude from GOES ABI fixed grid
+        projection data in the ABI Level 2 file.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing the GOES ABI fixed grid
+            projection data.
+
+        Returns
+        -------
+        tuple[NDArray[float32], NDArray[float32]]
+            A tuple containing the latitude and longitude data.
+        """
+        projection_info = GOESProjection(record)
+
+        lon_origin = projection_info.longitude_of_projection_origin
+
+        r_orb = projection_info.orbital_radius
+        r_eq = projection_info.semi_major_axis
+        r_pol = projection_info.semi_minor_axis
+
+        grid_data = GOESABIFixedGrid(record)
+
+        sin_x = sin(grid_data.x_coordinate_2d.astype(float64))
+        cos_x = cos(grid_data.x_coordinate_2d.astype(float64))
+        sin_y = sin(grid_data.y_coordinate_2d.astype(float64))
+        cos_y = cos(grid_data.y_coordinate_2d.astype(float64))
+
+        # Equations to calculate latitude and longitude
+        lambda_0 = (lon_origin * pi) / 180.0
+        a_var = power(sin_x, 2.0) + (
+            power(cos_x, 2.0)
+            * (
+                power(cos_y, 2.0)
+                + (((r_eq * r_eq) / (r_pol * r_pol)) * power(sin_y, 2.0))
+            )
+        )
+
+        # Ignore numpy errors for sqrt of negative number; occurs for
+        # GOES-16 ABI CONUS sector data
+        seterr(all="ignore")
+
+        b_var = -2.0 * r_orb * cos_x * cos_y
+        c_var = (r_orb**2.0) - (r_eq**2.0)
+        r_s = (-1.0 * b_var - sqrt((b_var**2) - (4.0 * a_var * c_var))) / (
+            2.0 * a_var
+        )
+
+        s_x = r_s * cos_x * cos_y
+        s_y = -r_s * sin_x
+        s_z = r_s * cos_x * sin_y
+
+        abi_lat = arctan(
+            ((r_eq * r_eq) / (r_pol * r_pol))
+            * (s_z / sqrt(((r_orb - s_x) * (r_orb - s_x)) + (s_y * s_y)))
+        )
+        abi_lat = rad2deg(abi_lat)
+
+        abi_lon = lambda_0 - arctan(s_y / (r_orb - s_x))
+        abi_lon = rad2deg(abi_lon)
+
+        return abi_lat.astype(float32), abi_lon.astype(float32)
