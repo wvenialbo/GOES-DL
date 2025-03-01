@@ -30,7 +30,7 @@ from numpy import (
 from numpy.ma import MaskedArray, masked_invalid
 from numpy.typing import NDArray
 
-from .data_fragment import DataFragment
+from .fragment import DataFragment
 from .fields import (
     VariableType,
     computed,
