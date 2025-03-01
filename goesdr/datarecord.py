@@ -1,14 +1,14 @@
 """
 Provide a base class for data records extracted from netCDF datasets.
 
-Defines the DataRecord class, which represents a data record extracted
+Defines the DataFragment class, which represents a data record extracted
 from a netCDF dataset. The class provides methods for initializing
 attributes from the dataset, validating preconditions and
 postconditions, and preventing accidental modification of attributes.
 
 Classes
 -------
-DataRecord
+DataFragment
     Represents a data record extracted from a netCDF dataset.
 """
 
@@ -24,7 +24,7 @@ from .hinting import get_annotated, get_typehint
 from .validation import validate_type
 
 
-class DataRecord:
+class DataFragment:
     """
     Represent a data fragment extracted from a netCDF dataset.
 
@@ -35,10 +35,10 @@ class DataRecord:
 
     def __init__(self, record: Dataset) -> None:
         """
-        Initialize the DataRecord object.
+        Initialize the DataFragment object.
 
         Use annotations and field specification to initialize the
-        DataRecord object with the provided netCDF dataset.
+        DataFragment object with the provided netCDF dataset.
 
         Parameters
         ----------
@@ -56,7 +56,7 @@ class DataRecord:
         """
         Perform post-initialization setup.
 
-        This method is called after the initialization of the DataRecord
+        This method is called after the initialization of the DataFragment
         object. It can be overridden by subclasses to perform additional
         setup tasks.
         """
@@ -87,14 +87,14 @@ class DataRecord:
         raise AttributeError(f"Cannot set attribute '{name}'")
 
     def __str__(self) -> str:
-        # Returns a string representation of the DataRecord object.
-        return help_str(self, DataRecord)
+        # Returns a string representation of the DataFragment object.
+        return help_str(self, DataFragment)
 
     def _init_class_attributes(self, record: Dataset) -> None:
         # Initializes class attributes from the provided dataset. Copy
         # class attributes to the instance provided they are not field
         # attributes.
-        annotations = get_annotations(self, DataRecord)
+        annotations = get_annotations(self, DataFragment)
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 value = getattr(self, name)
@@ -115,7 +115,7 @@ class DataRecord:
     def _init_record_attributes(self, record: Dataset) -> None:
         # Initializes record attributes from the provided dataset. Copy
         # record attributes to the instance.
-        annotations = get_annotations(self, DataRecord)
+        annotations = get_annotations(self, DataFragment)
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 continue
@@ -131,7 +131,7 @@ class DataRecord:
         # Initializes field attributes from the provided dataset. Copy
         # record field attributes to the instance, convert the data if
         # necessary.
-        for name in get_annotations(self, DataRecord):
+        for name in get_annotations(self, DataFragment):
             value = getattr(self, name)
             if not isinstance(value, BaseField):
                 continue
@@ -144,7 +144,7 @@ class DataRecord:
 
     def _validate_postconditions(self) -> None:
         # Validates postconditions after initialization.
-        all_annotations = get_annotations(self, DataRecord)
+        all_annotations = get_annotations(self, DataFragment)
         for name, annotation in all_annotations.items():
             value = getattr(self, name)
             if validate_type(value, annotation):

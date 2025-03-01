@@ -30,7 +30,7 @@ from numpy import (
 from numpy.ma import MaskedArray, masked_invalid
 from numpy.typing import NDArray
 
-from .datarecord import DataRecord
+from .datarecord import DataFragment
 from .fields import (
     VariableType,
     computed,
@@ -43,7 +43,7 @@ from .fields import (
 imager_proj = make_variable("goes_imager_projection")
 
 
-class GOESOrbitGeometry(DataRecord):
+class GOESOrbitGeometry(DataFragment):
     """
     Represent GOES-R series satellite orbit geometry information.
 
@@ -79,7 +79,7 @@ class GOESOrbitGeometry(DataRecord):
     sweep_angle_axis: str = imager_proj()
 
 
-class GOESGlobe(DataRecord):
+class GOESGlobe(DataFragment):
     """
     Represent GOES-R series satellite globe definition.
 
@@ -169,7 +169,7 @@ def to_float64(array: NDArray[float32]) -> NDArray[float64]:
     return array.astype(float64)
 
 
-class GOESABIFixedGridArray(DataRecord):
+class GOESABIFixedGridArray(DataFragment):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 
@@ -206,7 +206,7 @@ class GOESABIFixedGridArray(DataRecord):
     y: NDArray[float64] = variable(convert=to_float64)
 
 
-class GOESABIFixedGrid(DataRecord):
+class GOESABIFixedGrid(DataFragment):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 
@@ -267,7 +267,7 @@ class GOESABIFixedGrid(DataRecord):
 cmip: VariableType = make_variable("CMI", array=True)
 
 
-class GOESImage(DataRecord):
+class GOESImage(DataFragment):
     """
     Represent a GOES satellite image data.
 
@@ -296,7 +296,7 @@ class GOESImage(DataRecord):
     fill_value: uint16 = cmip()
 
 
-class GOESImageMetadata(DataRecord):
+class GOESImageMetadata(DataFragment):
     """
     Represent GOES image metadata attributes.
 
@@ -333,7 +333,7 @@ class GOESImageMetadata(DataRecord):
     grid_mapping: str = cmip()
 
 
-class GOESDatasetInfo(DataRecord):
+class GOESDatasetInfo(DataFragment):
     """
     Hold GOES dataset metadata information.
 
@@ -458,7 +458,7 @@ class GOESLatLonGridData:
 def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridData:
     latlon: VariableType = make_variable(name, array=True)
 
-    class _GOESLatLonGridData(DataRecord):
+    class _GOESLatLonGridData(DataFragment):
         data: NDArray[float32] = latlon()
         mask: NDArray[bool_] = latlon()
         fill_value: float32 = latlon()
@@ -517,7 +517,7 @@ class GOESLatLonGrid:
         self.longitude = _latlon_data("longitude", record)
 
     def __str__(self) -> str:
-        # Returns a string representation of the DataRecord object.
+        # Returns a string representation of the DataFragment object.
         lines = [str(self.__class__)]
         lines += [f"    {line}" for line in str(self.latitude).split("\n")]
         lines += [f"    {line}" for line in str(self.longitude).split("\n")]
@@ -549,7 +549,7 @@ class GOESLatLonGridMetadataType:
 def _latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
     latlon: VariableType = make_variable(name)
 
-    class _GOESLatLonGridMetadata(DataRecord):
+    class _GOESLatLonGridMetadata(DataFragment):
         long_name: str = latlon()
         valid_range: NDArray[float64] = latlon()
         units: str = latlon()
@@ -586,14 +586,14 @@ class GOESLatLonGridMetadata:
         self.longitude = _latlon_metadata("longitude", record)
 
     def __str__(self) -> str:
-        # Returns a string representation of the DataRecord object.
+        # Returns a string representation of the DataFragment object.
         lines = [str(self.__class__)]
         lines += [f"    {line}" for line in str(self.latitude).split("\n")]
         lines += [f"    {line}" for line in str(self.longitude).split("\n")]
         return "\n".join(lines)
 
 
-class GOESLatLonGridInfo(DataRecord):
+class GOESLatLonGridInfo(DataFragment):
     """
     Hold GOES geodetic grid dataset metadata information.
 

@@ -1,13 +1,13 @@
 import inspect
 from typing import TypeVar, cast
 
-from .datarecord import DataRecord
+from .datarecord import DataFragment
 
 _T = TypeVar("_T")
 
 
 def netcdf_fragment(recordclass: type[_T]) -> type[_T]:
-    class _FragmentRecord(DataRecord):
+    class _FragmentRecord(DataFragment):
         pass
 
     _FragmentRecord.__annotations__ = recordclass.__annotations__.copy()
