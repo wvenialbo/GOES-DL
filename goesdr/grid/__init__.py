@@ -31,12 +31,14 @@ References
 
 """
 
+from .grid_cartopy import calculate_latlon_grid_cartopy
 from .grid_fast import calculate_latlon_grid_fast
 from .grid_noaa import calculate_latlon_grid_noaa
 from .grid_opti import calculate_latlon_grid_opti
 from .grid_pyproj import calculate_latlon_grid_pyproj
 
 __all__ = [
+    "calculate_latlon_grid_cartopy",
     "calculate_latlon_grid_fast",
     "calculate_latlon_grid_noaa",
     "calculate_latlon_grid_opti",

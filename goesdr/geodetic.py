@@ -32,6 +32,7 @@ from .fields import (
 )
 from .fragment import DataFragment
 from .grid import (
+    calculate_latlon_grid_cartopy,
     calculate_latlon_grid_fast,
     calculate_latlon_grid_noaa,
     calculate_latlon_grid_opti,
@@ -319,10 +320,12 @@ class GOESGeodeticGrid(HasStrHelp):
                 lat, lon = calculate_latlon_grid_fast(record)
             elif algorithm == "pyproj":
                 lat, lon = calculate_latlon_grid_pyproj(record)
+            elif algorithm == "cartopy":
+                lat, lon = calculate_latlon_grid_cartopy(record)
             else:
                 raise ValueError(
                     f"Invalid algorithm '{algorithm}'. "
-                    "Choose 'noaa', 'opti', 'fast', or 'pyproj'."
+                    "Choose 'noaa', 'opti', 'fast', 'pyproj', or 'cartopy'."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore

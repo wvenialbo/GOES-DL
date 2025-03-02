@@ -8,10 +8,10 @@ for details & example of calculations.
 
 Functions
 ---------
-calculate_latlon_grid_cartopy_deprecated
+calculate_latlon_grid_cartopy
     Calculate latitude and longitude grids using the cartopy package.
 """
-import cartopy.crs as ccrs
+
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float32, meshgrid, nan, where
 
@@ -19,7 +19,7 @@ from ..projection import GOESABIFixedGridArray, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
 
 
-def calculate_latlon_grid_cartopy_deprecated(
+def calculate_latlon_grid_cartopy(
     record: Dataset,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
@@ -34,14 +34,22 @@ def calculate_latlon_grid_cartopy_deprecated(
     Parameters:
     -----------
     record : Dataset
-        The netCDF dataset containing the GOES ABI fixed grid projection
-        data.
+        The netCDF dataset containing GOES ABI L1b or L2 data with ABI
+        fixed grid projection information. It is .nc file opened using
+        the netCDF4 library.
 
     Returns:
     --------
     tuple[ArrayFloat32, ArrayFloat32]
-        A tuple containing the latitude and longitude data.
+        A tuple containing the latitude and longitude grid data.
     """
+    try:
+        import cartopy.crs as ccrs
+    except ImportError as error:
+        raise ImportError(
+            "The 'cartopy' package is required for this functionality."
+        ) from error
+
     grid_data = GOESABIFixedGridArray(record)
     projection_info = GOESProjection(record)
 
@@ -66,12 +74,13 @@ def calculate_latlon_grid_cartopy_deprecated(
 
     globe_wgs84 = ccrs.Globe(ellipse="WGS84")
 
-    pc_crs = ccrs.PlateCarree(globe=globe_wgs84)
+    plate_carree_crs = ccrs.PlateCarree(globe=globe_wgs84)
 
-    # Transformar las coordenadas de escaneo GEOS a latitud/longitud
+    transformed_points = plate_carree_crs.transform_points(geos_crs, x_m, y_m)
+
     abi_lon: ArrayFloat64
     abi_lat: ArrayFloat64
-    abi_lon, abi_lat = pc_crs.transform_points(geos_crs, x_m, y_m)[..., :2].T
+    abi_lon, abi_lat = transformed_points[..., :2].T
 
     valid_lon = (abi_lon >= -360.0) & (abi_lon <= 360.0)
     valid_lat = (abi_lat >= -90.0) & (abi_lat <= 90.0)
