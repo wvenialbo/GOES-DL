@@ -31,7 +31,7 @@ from .array import ArrayFloat32
 
 
 def calculate_latlon_grid_noaa(
-    file_id: Dataset,
+    record: Dataset,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using NOAA's algorithm.
@@ -44,18 +44,16 @@ def calculate_latlon_grid_noaa(
 
     Parameters
     ----------
-    file_id : Dataset
+    record : Dataset
         The netCDF dataset containing ABI L1b or L2 data. It is .nc file
         opened using the netCDF4 library.
     """
     # Read in GOES ABI fixed grid projection variables and constants
-    x_coordinate_1d = file_id.variables["x"][
-        :
-    ]  # E/W scanning angle in radians
-    y_coordinate_1d = file_id.variables["y"][
+    x_coordinate_1d = record.variables["x"][:]  # E/W scanning angle in radians
+    y_coordinate_1d = record.variables["y"][
         :
     ]  # N/S elevation angle in radians
-    projection_info = file_id.variables["goes_imager_projection"]
+    projection_info = record.variables["goes_imager_projection"]
     lon_origin = projection_info.longitude_of_projection_origin
     H = (
         projection_info.perspective_point_height
