@@ -77,9 +77,8 @@ def calculate_latlon_grid_cartopy(
 
     points = plate_carree.transform_points(geos_proj, x_m, y_m)
 
-    abi_lon: ArrayFloat64
-    abi_lat: ArrayFloat64
-    abi_lon, abi_lat = points[..., :2].T
+    abi_lon: ArrayFloat64 = points[..., 0]
+    abi_lat: ArrayFloat64 = points[..., 1]
 
     valid_lon = (abi_lon >= -360.0) & (abi_lon <= 360.0)
     valid_lat = (abi_lat >= -90.0) & (abi_lat <= 90.0)
