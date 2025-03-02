@@ -64,7 +64,7 @@ def calculate_latlon_grid_cartopy(
         semiminor_axis=projection_info.semi_minor_axis,
     )
 
-    geos_crs = ccrs.Geostationary(
+    geos_proj = ccrs.Geostationary(
         satellite_height=projection_info.perspective_point_height,
         central_longitude=projection_info.longitude_of_projection_origin,
         sweep_axis=projection_info.sweep_angle_axis,
@@ -75,7 +75,7 @@ def calculate_latlon_grid_cartopy(
 
     plate_carree_crs = ccrs.PlateCarree(globe=globe_wgs84)
 
-    transformed_points = plate_carree_crs.transform_points(geos_crs, x_m, y_m)
+    transformed_points = plate_carree_crs.transform_points(geos_proj, x_m, y_m)
 
     abi_lon: ArrayFloat64
     abi_lat: ArrayFloat64
