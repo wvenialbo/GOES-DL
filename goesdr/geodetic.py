@@ -268,7 +268,7 @@ class GOESGeodeticGrid(HasStrHelp):
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
 
-    def __init__(self, record: Dataset, algorithm: str = "noaa") -> None:
+    def __init__(self, record: Dataset, algorithm: str = "opti") -> None:
         """
         Initialize a GOESGeodeticGrid object.
 
@@ -324,8 +324,8 @@ class GOESGeodeticGrid(HasStrHelp):
                 lat, lon = calculate_latlon_grid_cartopy(record)
             else:
                 raise ValueError(
-                    f"Invalid algorithm '{algorithm}'. "
-                    "Choose 'noaa', 'opti', 'fast', 'pyproj', or 'cartopy'."
+                    f"Invalid algorithm '{algorithm}'. Choose 'precomputed', "
+                    "'noaa', 'opti' (default), 'fast', 'pyproj', or 'cartopy'."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
