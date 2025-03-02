@@ -16,7 +16,8 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import (
     arctan,
     cos,
-    errstate,
+    float32,
+    float64,
     isnan,
     meshgrid,
     nan,
@@ -54,13 +55,16 @@ def calculate_latlon_grid_noaa(
         A tuple containing the latitude and longitude grid data.
     """
     # Read in GOES ABI fixed grid projection variables and constants
-    x_coordinate_1d = record.variables["x"][:]  # E/W scanning angle in radians
-    y_coordinate_1d = record.variables["y"][
-        :
-    ]  # N/S elevation angle in radians
+
+    # E/W scanning angle in radians
+    x_coordinate_1d = record.variables["x"][:].data
+
+    # N/S elevation angle in radians
+    y_coordinate_1d = record.variables["y"][:].data
+
     projection_info = record.variables["goes_imager_projection"]
     lon_origin = projection_info.longitude_of_projection_origin
-    H = (
+    r_orb = (
         projection_info.perspective_point_height
         + projection_info.semi_major_axis
     )
@@ -69,7 +73,7 @@ def calculate_latlon_grid_noaa(
 
     # Create 2D coordinate matrices from 1D coordinate vectors
     x_coordinate_2d, y_coordinate_2d = meshgrid(
-        x_coordinate_1d, y_coordinate_1d
+        x_coordinate_1d.astype(float64), y_coordinate_1d.astype(float64)
     )
 
     # Equations to calculate latitude and longitude
@@ -85,29 +89,26 @@ def calculate_latlon_grid_noaa(
         )
     )
 
-    # Ignore numpy errors for sqrt of negative number; occurs for
-    # GOES-16 ABI CONUS sector data
-    with errstate(invalid="ignore"):
-        b_var = -2.0 * H * cos(x_coordinate_2d) * cos(y_coordinate_2d)
-        c_var = (H**2.0) - (r_eq**2.0)
-        r_s = (-1.0 * b_var - sqrt((b_var**2) - (4.0 * a_var * c_var))) / (
-            2.0 * a_var
-        )
-        s_x = r_s * cos(x_coordinate_2d) * cos(y_coordinate_2d)
-        s_y = -r_s * sin(x_coordinate_2d)
-        s_z = r_s * cos(x_coordinate_2d) * sin(y_coordinate_2d)
+    b_var = -2.0 * r_orb * cos(x_coordinate_2d) * cos(y_coordinate_2d)
+    c_var = (r_orb**2.0) - (r_eq**2.0)
+    r_s = (-1.0 * b_var - sqrt((b_var**2) - (4.0 * a_var * c_var))) / (
+        2.0 * a_var
+    )
+    s_x = r_s * cos(x_coordinate_2d) * cos(y_coordinate_2d)
+    s_y = -r_s * sin(x_coordinate_2d)
+    s_z = r_s * cos(x_coordinate_2d) * sin(y_coordinate_2d)
 
-        abi_lat = (180.0 / pi) * (
-            arctan(
-                ((r_eq * r_eq) / (r_pol * r_pol))
-                * (s_z / sqrt(((H - s_x) * (H - s_x)) + (s_y * s_y)))
-            )
+    abi_lat = (180.0 / pi) * (
+        arctan(
+            ((r_eq * r_eq) / (r_pol * r_pol))
+            * (s_z / sqrt(((r_orb - s_x) * (r_orb - s_x)) + (s_y * s_y)))
         )
-        abi_lon = (lambda_0 - arctan(s_y / (H - s_x))) * (180.0 / pi)
+    )
+    abi_lon = (lambda_0 - arctan(s_y / (r_orb - s_x))) * (180.0 / pi)
 
     is_valid = ~(isnan(abi_lat) | isnan(abi_lon))
 
     abi_lat = where(is_valid, abi_lat, nan)
     abi_lon = where(is_valid, abi_lon, nan)
 
-    return abi_lat, abi_lon
+    return abi_lat.astype(float32), abi_lon.astype(float32)
