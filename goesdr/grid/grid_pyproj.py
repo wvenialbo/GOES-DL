@@ -36,7 +36,9 @@ def calculate_latlon_grid_pyproj(
     Parameters
     ----------
     record : Dataset
-        The netCDF dataset containing ABI L1b or L2 data.
+        The netCDF dataset containing GOES ABI L1b or L2 data with ABI
+        fixed grid projection information. It is .nc file opened using
+        the netCDF4 library.
 
     Returns
     -------
