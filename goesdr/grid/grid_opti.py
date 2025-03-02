@@ -45,7 +45,7 @@ def calculate_latlon_grid_opti(
 
     Parameters
     ----------
-    file_id : Dataset
+    record : Dataset
         The netCDF dataset containing ABI L1b or L2 data. It is .nc file
         opened using the netCDF4 library.
     """
