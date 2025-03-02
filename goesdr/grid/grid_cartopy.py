@@ -73,13 +73,13 @@ def calculate_latlon_grid_cartopy(
 
     globe_wgs84 = ccrs.Globe(ellipse="WGS84")
 
-    plate_carree_crs = ccrs.PlateCarree(globe=globe_wgs84)
+    plate_carree = ccrs.PlateCarree(globe=globe_wgs84)
 
-    transformed_points = plate_carree_crs.transform_points(geos_proj, x_m, y_m)
+    points = plate_carree.transform_points(geos_proj, x_m, y_m)
 
     abi_lon: ArrayFloat64
     abi_lat: ArrayFloat64
-    abi_lon, abi_lat = transformed_points[..., :2].T
+    abi_lon, abi_lat = points[..., :2].T
 
     valid_lon = (abi_lon >= -360.0) & (abi_lon <= 360.0)
     valid_lat = (abi_lat >= -90.0) & (abi_lat <= 90.0)
