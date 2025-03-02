@@ -131,4 +131,14 @@ def calculate_degrees_pyproj_deprecated(
     abi_lat: ArrayFloat64
     abi_lon, abi_lat = transformer.transform(x_m, y_m)
 
+    valid_lon = (abi_lon >= -360.0) & (abi_lon <= 360.0)
+    valid_lat = (abi_lat >= -90.0) & (abi_lat <= 90.0)
+    is_valid = valid_lon & valid_lat
+
+    abi_lon = where(is_valid, abi_lon, nan)
+    abi_lat = where(is_valid, abi_lat, nan)
+
+    abi_lon = where(abi_lon >= 180, abi_lon - 360, abi_lon)
+    abi_lon = where(abi_lon < -180, abi_lon + 360, abi_lon)
+
     return abi_lat.astype(float32), abi_lon.astype(float32)
