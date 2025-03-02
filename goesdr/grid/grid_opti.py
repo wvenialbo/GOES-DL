@@ -43,11 +43,34 @@ def calculate_latlon_grid_opti(
 
     Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
 
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2. of [3]_. For a Python demonstration on
+    calculating latitude and longitude from GOES Imager Projection
+    information, see [2]_. The code snippet in this class is based on
+    the Python demonstration in [2]_.
+
     Parameters
     ----------
     record : Dataset
         The netCDF dataset containing ABI L1b or L2 data. It is .nc file
         opened using the netCDF4 library.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] Aerosols and Atmospheric Composition Science Team, "Python
+        Short Demo: Calculate Latitude and Longitude from GOES Imager
+        Projection (ABI Fixed Grid) Information", NOAA/NESDIS/STAR,
+        2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/python_abi_lat_lon.php
+    .. [3] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
     # Reorganize operations to leverage NumPy vectorization,
     # reducing redundant computations. This yields ~6x performance
