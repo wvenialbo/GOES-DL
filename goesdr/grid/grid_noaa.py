@@ -17,7 +17,6 @@ from numpy import (
     arctan,
     cos,
     errstate,
-    float32,
     isnan,
     meshgrid,
     nan,
@@ -27,12 +26,13 @@ from numpy import (
     sqrt,
     where,
 )
-from numpy.typing import NDArray
+
+from .array import ArrayFloat32
 
 
 def calculate_latlon_grid_noaa(
     file_id: Dataset,
-) -> tuple[NDArray[float32], NDArray[float32]]:
+) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using NOAA's algorithm.
 

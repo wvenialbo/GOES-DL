@@ -16,19 +16,15 @@ calculate_latlon_opti
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import (
     cos,
-    dtype,
     float32,
-    float64,
     meshgrid,
-    ndarray,
     sin,
 )
 
 from ..projection import GOESABIFixedGridArray, GOESProjection
 from .grid_helper import compute_latlon_grid
 
-ArrayFloat32 = ndarray[tuple[int, ...], dtype[float32]]
-ArrayFloat64 = ndarray[tuple[int, ...], dtype[float64]]
+from .array import ArrayFloat32, ArrayFloat64
 
 
 def calculate_latlon_grid_opti(

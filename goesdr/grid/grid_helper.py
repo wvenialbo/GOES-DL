@@ -12,18 +12,16 @@ compute_latlon_grid
 
 from numpy import (
     arctan,
-    dtype,
     float64,
     isnan,
     nan,
-    ndarray,
     power,
     rad2deg,
     sqrt,
     where,
 )
 
-ArrayFloat64 = ndarray[tuple[int, ...], dtype[float64]]
+from.array import ArrayFloat64
 
 
 def compute_latlon_grid(
