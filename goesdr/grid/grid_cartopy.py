@@ -59,6 +59,7 @@ def calculate_latlon_grid_cartopy(
     x_m, y_m = meshgrid(x_m, y_m)
 
     globe = ccrs.Globe(
+        ellipse=None,
         semimajor_axis=projection_info.semi_major_axis,
         semiminor_axis=projection_info.semi_minor_axis,
     )
