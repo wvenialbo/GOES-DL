@@ -45,6 +45,11 @@ def compute_latlon_grid(
     cos_xy : tuple[ArrayFloat64, ArrayFloat64]
         Tuple containing the cosine values of the x and y grid points.
 
+    Returns
+    -------
+    tuple[ArrayFloat32, ArrayFloat32]
+        A tuple containing the latitude and longitude grid data.
+
     Notes
     -----
     Based on NOAA/NESDIS/STAR Aerosols and Atmospheric Composition

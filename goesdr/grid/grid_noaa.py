@@ -47,6 +47,11 @@ def calculate_latlon_grid_noaa(
     record : Dataset
         The netCDF dataset containing ABI L1b or L2 data. It is .nc file
         opened using the netCDF4 library.
+
+    Returns
+    -------
+    tuple[ArrayFloat32, ArrayFloat32]
+        A tuple containing the latitude and longitude grid data.
     """
     # Read in GOES ABI fixed grid projection variables and constants
     x_coordinate_1d = record.variables["x"][:]  # E/W scanning angle in radians

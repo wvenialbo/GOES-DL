@@ -55,6 +55,11 @@ def calculate_latlon_grid_fast(
     record : Dataset
         The netCDF dataset containing ABI L1b or L2 data.
 
+    Returns
+    -------
+    tuple[ArrayFloat32, ArrayFloat32]
+        A tuple containing the latitude and longitude grid data.
+
     References
     ----------
     .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
