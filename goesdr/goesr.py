@@ -20,13 +20,16 @@ from numpy import (
     int8,
     int16,
     int32,
+    isnan,
     meshgrid,
+    nan,
     power,
     rad2deg,
     sin,
     sqrt,
     uint16,
     vstack,
+    where,
 )
 from numpy.ma import MaskedArray, masked_invalid
 from numpy.typing import NDArray
@@ -814,6 +817,11 @@ class GOESGeodeticGrid:
             )
         )
         abi_lon: NDArray[float64] = rad2deg(arctan(s_y / (s_x - r_orb)))
+
+        is_valid = ~(isnan(abi_lat) | isnan(abi_lon))
+
+        abi_lat = where(is_valid, abi_lat, nan)
+        abi_lon = where(is_valid, abi_lon, nan)
 
         return abi_lat, abi_lon
 
