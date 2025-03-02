@@ -48,7 +48,6 @@ def calculate_latlon_grid_noaa(
         The netCDF dataset containing ABI L1b or L2 data. It is .nc file
         opened using the netCDF4 library.
     """
-
     # Read in GOES ABI fixed grid projection variables and constants
     x_coordinate_1d = file_id.variables["x"][
         :
