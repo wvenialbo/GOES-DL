@@ -650,7 +650,7 @@ class GOESGeodeticGrid:
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
 
-    def __init__(self, record: Dataset) -> None:
+    def __init__(self, record: Dataset, fast: bool = False) -> None:
         """
         Initialize a GOESGrid object from a precomputed netCDF dataset.
 
@@ -659,8 +659,9 @@ class GOESGeodeticGrid:
         record : Dataset
             The netCDF dataset containing the precomputed latitude
             and longitude grid data.
+
         """
-        lat, lon = self._initialize_latlon_grid(record)
+        lat, lon = self._initialize_latlon_grid(record, fast)
 
         self.latitude = GOESLatLonGridData(lat)
         self.longitude = GOESLatLonGridData(lon)
@@ -671,13 +672,16 @@ class GOESGeodeticGrid:
 
     @classmethod
     def _initialize_latlon_grid(
-        cls, record: Dataset
+        cls, record: Dataset, fast: bool
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
         # Ignore numpy errors for `sqrt` of negative number; reference
         # [2] states that this "occurs for GOES-16 ABI CONUS sector
         # data", however I found it also occurs for Full Disd sector.
         with errstate(invalid="ignore"):
-            lat, lon = cls._calculate_latlon_grid(record)
+            if fast:
+                lat, lon = cls._calculate_latlon_grid_fast(record)
+            else:
+                lat, lon = cls._calculate_latlon_grid(record)
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
         longitude: MaskedFloat32 = masked_invalid(lon)  # type: ignore
@@ -735,7 +739,7 @@ class GOESGeodeticGrid:
         return lat.astype(float32), (lon + lambda_0).astype(float32)
 
     @classmethod
-    def calculate_latlon_grid_fast(
+    def _calculate_latlon_grid_fast(
         cls, record: Dataset
     ) -> tuple[NDArray[float32], NDArray[float32]]:
         """
@@ -768,7 +772,7 @@ class GOESGeodeticGrid:
 
         # pylint: disable=no-member # pylint false positive
         center = grid_data.x.size // 2
-        is_odd = bool(grid_data.x.size % 2)
+        odd_size = bool(grid_data.x.size % 2)
         # pylint: enable=no-member
 
         # pylint: disable=unsubscriptable-object # pylint false positive
@@ -790,8 +794,8 @@ class GOESGeodeticGrid:
             (cos_x, cos_y),
         )
 
-        lat = cls._reconstruct_lat_grid(lat, is_odd)
-        lon = cls._reconstruct_lat_grid(lon, is_odd)
+        lat = cls._reconstruct_lat_grid(lat, odd_size)
+        lon = cls._reconstruct_lon_grid(lon, odd_size)
 
         return lat.astype(float32), (lon + lambda_0).astype(float32)
 
