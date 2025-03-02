@@ -27,7 +27,6 @@ from numpy import (
 from numpy.typing import NDArray
 
 from .fields import (
-    VariableType,
     computed,
     make_variable,
     variable,
@@ -260,6 +259,3 @@ class GOESABIFixedGrid(DataFragment):
         self.x_coordinate_2d, self.y_coordinate_2d = meshgrid(
             self.x_coordinate_1d, self.y_coordinate_1d
         )
-
-
-cmip: VariableType = make_variable("CMI", array=True)
