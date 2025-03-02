@@ -319,12 +319,10 @@ class GOESGeodeticGrid(HasStrHelp):
                 lat, lon = calculate_latlon_grid_fast(record)
             elif algorithm == "pyproj":
                 lat, lon = calculate_latlon_grid_pyproj(record)
-            elif algorithm == "pyproj[globe]":
-                lat, lon = calculate_latlon_grid_pyproj(record, True)
             else:
                 raise ValueError(
                     f"Invalid algorithm '{algorithm}'. "
-                    "Choose 'noaa', 'opti', 'fast', or 'pyproj[globe]'."
+                    "Choose 'noaa', 'opti', 'fast', or 'pyproj'."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
