@@ -24,9 +24,8 @@ from numpy import (
 )
 
 from ..projection import GOESABIFixedGridArray, GOESProjection
-from .grid_helper import compute_latlon_grid
-
 from .array import ArrayFloat32, ArrayFloat64
+from .grid_helper import compute_latlon_grid
 
 
 def calculate_latlon_grid_fast(
@@ -54,8 +53,7 @@ def calculate_latlon_grid_fast(
     Parameters
     ----------
     record : Dataset
-        The netCDF dataset containing ABI L1b or L2 data. It is .nc file
-        opened using the netCDF4 library.
+        The netCDF dataset containing ABI L1b or L2 data.
 
     References
     ----------
