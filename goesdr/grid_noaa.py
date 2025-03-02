@@ -1,19 +1,15 @@
 """
 Calculate latitude and longitude grids data.
 
-Calculate latitude and longitude from GOES ABI fixed grid projection
-data. GOES ABI fixed grid projection is a map projection relative to the
-GOES satellite.
-
-Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
-
+Notes
+-----
 See GOES-R Product User Guide (PUG) Volume 5 (L2 products) Section 4.2.8
 for details & example of calculations.
 
 Functions
 ---------
 calculate_latlon_noaa
-    Calculate latitude and longitude grids using NOAA algorithm.
+    Calculate latitude and longitude grids using NOAA's algorithm.
 """
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
@@ -38,7 +34,13 @@ def calculate_latlon_grid_noaa(
     file_id: Dataset,
 ) -> tuple[NDArray[float32], NDArray[float32]]:
     """
-    Calculate latitude and longitude grids using NOAA algorithm.
+    Calculate latitude and longitude grids using NOAA's algorithm.
+
+    Calculate latitude and longitude from GOES ABI fixed grid projection
+    data. GOES ABI fixed grid projection is a map projection relative to
+    the GOES satellite.
+
+    Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
 
     Parameters
     ----------
