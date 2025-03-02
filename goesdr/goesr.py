@@ -57,10 +57,10 @@ class GOESOrbitGeometry(DataFragment):
     Attributes
     ----------
     longitude_of_projection_origin : np.float64
-        The longitude of the ideal satellite sub-point.
+        The longitude of the ideal satellite sub-point, in East degrees.
     perspective_point_height : np.float64
         The height of the perspective point, or the height above the
-        Earth's surface the ideal satellite sub-point.
+        Earth's surface the ideal satellite sub-point, in meters.
     sweep_angle_axis : str
         The sweep angle axis.
 
@@ -122,7 +122,7 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
 
     The GOES Imager Projection, also called ABI Fixed Grid Projection,
     is a map projection relative to the GOES satellite point of view.
-    Units: latitude in °N (°S < 0), longitude in °E (°W < 0) 
+    Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
 
     Note
     ----
