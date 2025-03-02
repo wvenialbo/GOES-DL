@@ -1,3 +1,19 @@
+"""
+Calculate latitude and longitude grids data using pyproj.
+
+Notes
+-----
+See GOES-R Product User Guide (PUG) Volume 5 (L2 products) Section 4.2.8
+for details & example of calculations.
+
+Functions
+---------
+calculate_latlon_grid_pyproj
+    Calculate latitude and longitude grids using the pyproj package.
+calculate_latlon_grid_pyproj_deprecated
+    Calculate latitude and longitude grids using the pyproj package.
+"""
+
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float32, meshgrid, nan, where
 
@@ -83,8 +99,7 @@ def calculate_degrees_pyproj_deprecated(
     record: Dataset,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
-    Calculate latitude and longitude from GOES ABI fixed grid projection
-    data
+    Calculate latitude and longitude grids using the pyproj package.
 
     Parameters:
     -----------
