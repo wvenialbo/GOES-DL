@@ -10,18 +10,9 @@ compute_latlon_grid
     Calculate latitude and longitude grids.
 """
 
-from numpy import (
-    arctan,
-    float64,
-    isnan,
-    nan,
-    power,
-    rad2deg,
-    sqrt,
-    where,
-)
+from numpy import arctan, float64, isnan, nan, power, rad2deg, sqrt, where
 
-from.array import ArrayFloat64
+from .array import ArrayFloat64
 
 
 def compute_latlon_grid(

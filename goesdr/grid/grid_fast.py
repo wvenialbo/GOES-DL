@@ -14,14 +14,7 @@ calculate_latlon_grid_opti_fast
 """
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import (
-    cos,
-    float32,
-    hstack,
-    meshgrid,
-    sin,
-    vstack,
-)
+from numpy import cos, float32, hstack, meshgrid, sin, vstack
 
 from ..projection import GOESABIFixedGridArray, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64

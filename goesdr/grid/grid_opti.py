@@ -14,12 +14,7 @@ calculate_latlon_opti
 """
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import (
-    cos,
-    float32,
-    meshgrid,
-    sin,
-)
+from numpy import cos, float32, meshgrid, sin
 
 from ..projection import GOESABIFixedGridArray, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
