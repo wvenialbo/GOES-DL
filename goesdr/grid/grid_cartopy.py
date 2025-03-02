@@ -71,9 +71,9 @@ def calculate_latlon_grid_cartopy(
         globe=globe,
     )
 
-    globe_wgs84 = ccrs.Globe(ellipse="WGS84")
+    globe_grs80 = ccrs.Globe(ellipse="GRS80")
 
-    plate_carree = ccrs.PlateCarree(globe=globe_wgs84)
+    plate_carree = ccrs.PlateCarree(globe=globe_grs80)
 
     points = plate_carree.transform_points(geos_proj, x_m, y_m)
 
