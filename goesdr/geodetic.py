@@ -18,17 +18,11 @@ GOESLatLonGridInfo
     Hold GOES geodetic grid dataset metadata information.
 """
 
-from typing import Any, cast
+from typing import cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import (
-    bool_,
-    dtype,
-    float32,
-    float64,
-)
-from numpy.ma import MaskedArray
-from numpy.typing import NDArray
+from numpy import errstate, float32
+from numpy.ma import masked_invalid
 
 from .class_help import HasStrHelp
 from .fields import (
@@ -37,8 +31,13 @@ from .fields import (
     make_variable,
 )
 from .fragment import DataFragment
-
-MaskedFloat32 = MaskedArray[Any, dtype[float32]]
+from .grid import (
+    calculate_latlon_grid_fast,
+    calculate_latlon_grid_noaa,
+    calculate_latlon_grid_opti,
+    calculate_latlon_grid_pyproj,
+)
+from .grid.array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
 
 
 class GOESLatLonGridData:
@@ -47,7 +46,7 @@ class GOESLatLonGridData:
 
     Attributes
     ----------
-    data : NDArray[float32]
+    data : ArrayFloat32
         The latitude or longitude grid data.
     mask : NDArray[bool]
         The array containing the mask values indicating invalid data
@@ -70,8 +69,8 @@ class GOESLatLonGridData:
         self.mask = array.mask
         self.fill_value = array.fill_value
 
-    data: NDArray[float32]
-    mask: NDArray[bool_]
+    data: ArrayFloat32
+    mask: ArrayBool
     fill_value: float32
 
 
@@ -79,8 +78,8 @@ def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridData:
     latlon: VariableType = make_variable(name, array=True)
 
     class _GOESLatLonGridData(DataFragment):
-        data: NDArray[float32] = latlon()
-        mask: NDArray[bool_] = latlon()
+        data: ArrayFloat32 = latlon()
+        mask: ArrayBool = latlon()
         fill_value: float32 = latlon()
 
     _GOESLatLonGridData.__module__ = GOESLatLonGridData.__module__
@@ -145,7 +144,7 @@ class GOESLatLonGridMetadataType:
     ----------
     long_name : str
         A descriptive name for the variable.
-    valid_range : NDArray[float64]
+    valid_range : ArrayFloat64
         The valid range of values for the variable.
     units : str
         The units of measurement for the variable.
@@ -154,7 +153,7 @@ class GOESLatLonGridMetadataType:
     """
 
     long_name: str
-    valid_range: NDArray[float64]
+    valid_range: ArrayFloat64
     units: str
     comment: str
 
@@ -164,7 +163,7 @@ def _latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
 
     class _GOESLatLonGridMetadata(DataFragment):
         long_name: str = latlon()
-        valid_range: NDArray[float64] = latlon()
+        valid_range: ArrayFloat64 = latlon()
         units: str = latlon()
         comment: str = latlon()
 
@@ -222,3 +221,114 @@ class GOESLatLonGridInfo(DataFragment):
     created: str
     rows: int = dimension()
     columns: int = dimension()
+
+
+FILL_VALUE = -999.99
+
+
+class GOESGeodeticGrid(HasStrHelp):
+    """
+    Represent latitude and longitude grid data computed on the fly.
+
+    Calculate the latitude and longitude grid arrays on the fly from the
+    GOES Imager Projection information in ABI Level 2 files.
+
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2. of [3]_. For a Python demonstration on
+    calculating latitude and longitude from GOES Imager Projection
+    information, see [2]_. The code snippet in this class is based on
+    the Python demonstration in [2]_.
+
+    Attributes
+    ----------
+    latitude : GOESLatLonGridData
+        The latitude grid data.
+    longitude : GOESLatLonGridData
+        The longitude grid data.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] Aerosols and Atmospheric Composition Science Team, "Python
+        Short Demo: Calculate Latitude and Longitude from GOES Imager
+        Projection (ABI Fixed Grid) Information", NOAA/NESDIS/STAR,
+        2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/python_abi_lat_lon.php
+    .. [3] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
+    """
+
+    latitude: GOESLatLonGridData
+    longitude: GOESLatLonGridData
+
+    def __init__(self, record: Dataset, algorithm: str = "noaa") -> None:
+        """
+        Initialize a GOESGeodeticGrid object.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing ABI Level 2 data.
+        """
+        if algorithm == "precomputed":
+            abi_lat, abi_lon = self._initialize_precomputed(record)
+        else:
+            abi_lat, abi_lon = self._initialize_calculated(record, algorithm)
+
+        self.latitude = abi_lat
+        self.longitude = abi_lon
+
+    @staticmethod
+    def _initialize_precomputed(
+        record: Dataset,
+    ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
+        abi_lat = _latlon_data("latitude", record)
+        abi_lon = _latlon_data("longitude", record)
+
+        return abi_lat, abi_lon
+
+    def _initialize_calculated(
+        self, record: Dataset, algorithm: str
+    ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
+        lat, lon = self._initialize_latlon_grid(record, algorithm)
+
+        abi_lat = GOESLatLonGridData(lat)
+        abi_lon = GOESLatLonGridData(lon)
+
+        return abi_lat, abi_lon
+
+    @classmethod
+    def _initialize_latlon_grid(
+        cls, record: Dataset, algorithm: str
+    ) -> tuple[MaskedFloat32, MaskedFloat32]:
+        # Ignore numpy errors for `sqrt` of negative number; reference
+        # [2] states that this "occurs for GOES-16 ABI CONUS sector
+        # data", however I found it also occurs for Full Disd sector.
+        with errstate(invalid="ignore"):
+            if algorithm == "noaa":
+                lat, lon = calculate_latlon_grid_noaa(record)
+            elif algorithm == "opti":
+                lat, lon = calculate_latlon_grid_opti(record)
+            elif algorithm == "fast":
+                lat, lon = calculate_latlon_grid_fast(record)
+            elif algorithm == "pyproj":
+                lat, lon = calculate_latlon_grid_pyproj(record)
+            else:
+                raise ValueError(
+                    f"Invalid algorithm '{algorithm}'. "
+                    "Choose 'noaa', 'opti', 'fast', or 'pyproj'."
+                )
+
+        latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
+        longitude: MaskedFloat32 = masked_invalid(lon)  # type: ignore
+
+        latitude.fill_value = FILL_VALUE
+        longitude.fill_value = FILL_VALUE
+
+        return latitude, longitude
