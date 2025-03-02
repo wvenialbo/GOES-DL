@@ -58,13 +58,11 @@ def calculate_latlon_grid_cartopy(
 
     x_m, y_m = meshgrid(x_m, y_m)
 
-    # Parámetros del satélite
     globe = ccrs.Globe(
         semimajor_axis=projection_info.semi_major_axis,
         semiminor_axis=projection_info.semi_minor_axis,
     )
 
-    # Crear una proyección Cartopy con los parámetros del satélite
     geos_crs = ccrs.Geostationary(
         satellite_height=projection_info.perspective_point_height,
         central_longitude=projection_info.longitude_of_projection_origin,
