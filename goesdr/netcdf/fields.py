@@ -220,7 +220,7 @@ class VariableType(ABC):
         self,
         *,
         entry: str | None = None,
-        step: tuple[int, int] | None,
+        step: tuple[int, int] | None = None,
         convert: Callable[..., Any] | None = None,
     ) -> Any:
         pass
