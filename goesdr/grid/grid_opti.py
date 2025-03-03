@@ -18,11 +18,11 @@ from numpy import cos, float32, meshgrid, sin
 
 from ..projection import GOESABIFixedGridArray, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
-from .grid_helper import compute_latlon_grid
+from .grid_helper import calculate_pixel_edges, compute_latlon_grid
 
 
 def calculate_latlon_grid_opti(
-    record: Dataset,
+    record: Dataset, corners: bool
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids.
@@ -47,6 +47,10 @@ def calculate_latlon_grid_opti(
         The netCDF dataset containing GOES ABI L1b or L2 data with ABI
         fixed grid projection information. It is .nc file opened using
         the netCDF4 library.
+    corners : bool
+        If True, calculate the coordinates of the intersections
+        (corners) of the grid. If False, calculate the coordinates of
+        the center of the grid.
 
     Returns
     -------
@@ -83,6 +87,10 @@ def calculate_latlon_grid_opti(
 
     x_r = grid_data.x
     y_r = grid_data.y
+
+    if corners:
+        x_r = calculate_pixel_edges(x_r)
+        y_r = calculate_pixel_edges(y_r)
 
     sin_x: ArrayFloat64 = sin(x_r)
     cos_x: ArrayFloat64 = cos(x_r)

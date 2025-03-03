@@ -26,11 +26,11 @@ from numpy import (
 )
 
 from .array import ArrayFloat32
-from .grid_helper import make_common_mask
+from .grid_helper import calculate_pixel_edges, make_common_mask
 
 
 def calculate_latlon_grid_noaa(
-    record: Dataset,
+    record: Dataset, corners: bool
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using NOAA's algorithm.
@@ -47,6 +47,10 @@ def calculate_latlon_grid_noaa(
         The netCDF dataset containing GOES ABI L1b or L2 data with ABI
         fixed grid projection information. It is .nc file opened using
         the netCDF4 library.
+    corners : bool
+        If True, calculate the coordinates of the intersections
+        (corners) of the grid. If False, calculate the coordinates of
+        the center of the grid.
 
     Returns
     -------
@@ -60,6 +64,10 @@ def calculate_latlon_grid_noaa(
 
     # N/S elevation angle in radians
     y_coordinate_1d = record.variables["y"][:].data
+
+    if corners:
+        x_coordinate_1d = calculate_pixel_edges(x_coordinate_1d)
+        y_coordinate_1d = calculate_pixel_edges(y_coordinate_1d)
 
     projection_info = record.variables["goes_imager_projection"]
     lon_origin = projection_info.longitude_of_projection_origin
