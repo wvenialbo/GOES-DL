@@ -21,7 +21,7 @@ GOESLatLonGridInfo
 from typing import cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import errstate, float32, nan
+from numpy import errstate, float32
 from numpy.ma import masked_invalid
 
 from .class_help import HasStrHelp
@@ -39,7 +39,6 @@ from .grid import (
     calculate_latlon_grid_pyproj,
 )
 from .grid.array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
-from .grid.grid_helper import calculate_pixel_corners
 
 
 class GOESLatLonGridData:
@@ -285,9 +284,14 @@ class GOESGeodeticGrid(HasStrHelp):
         elif "[corner]" in algorithm:
             corners = True
             algorithm = algorithm.replace("[corner]", "")
+            if algorithm == "precomputed":
+                raise ValueError(
+                    "Algorithm 'precomputed' cannot be used "
+                    "with 'corner' option."
+                )
 
         if algorithm == "precomputed":
-            abi_lat, abi_lon = self._initialize_precomputed(record, corners)
+            abi_lat, abi_lon = self._initialize_precomputed(record)
         else:
             abi_lat, abi_lon = self._initialize_calculated(
                 record, algorithm, corners
@@ -298,23 +302,10 @@ class GOESGeodeticGrid(HasStrHelp):
 
     @staticmethod
     def _initialize_precomputed(
-        record: Dataset, corners: bool
+        record: Dataset,
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
         abi_lat = _latlon_data("latitude", record)
         abi_lon = _latlon_data("longitude", record)
-
-        if corners:
-            lat_, lon_ = calculate_pixel_corners(abi_lat.data, abi_lon.data)
-
-            lat: MaskedFloat32 = masked_invalid(lat_)  # type: ignore
-            lon: MaskedFloat32 = masked_invalid(lon_)  # type: ignore
-
-            abi_lat = GOESLatLonGridData(lat)
-            abi_lon = GOESLatLonGridData(lon)
-
-        else:
-            abi_lat.data[abi_lat.mask] = nan
-            abi_lon.data[abi_lon.mask] = nan
 
         return abi_lat, abi_lon
 
@@ -352,7 +343,8 @@ class GOESGeodeticGrid(HasStrHelp):
                     "'<algorithm>' or '<algorithm>[<option>]'. "
                     "Choose 'precomputed', 'noaa', 'opti' (default), 'fast', "
                     "'pyproj', or 'cartopy' for '<algorithm>'. Choose "
-                    "'center' (default) or 'corner' for '<option>'."
+                    "'center' (default) or 'corner' for '<option>'. "
+                    "'precomputed' cannot be used with 'corner' option."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
