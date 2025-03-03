@@ -19,19 +19,10 @@ GOESABIFixedGrid
 """
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import (
-    float32,
-    float64,
-    meshgrid,
-)
+from numpy import float32, float64, meshgrid
 from numpy.typing import NDArray
 
-from .fields import (
-    computed,
-    make_variable,
-    variable,
-)
-from .fragment import DataFragment
+from .netcdf import DataFragment, computed, make_variable, variable
 
 imager_proj = make_variable("goes_imager_projection")
 

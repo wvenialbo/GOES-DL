@@ -10,8 +10,7 @@ GOESDatasetInfo
     Represent GOES dataset metadata attributes.
 """
 
-from .fields import dimension
-from .fragment import DataFragment
+from .netcdf import DataFragment, dimension
 
 
 class GOESDatasetInfo(DataFragment):

@@ -24,13 +24,6 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import errstate, float32, nan
 from numpy.ma import masked_invalid
 
-from .class_help import HasStrHelp
-from .fields import (
-    VariableType,
-    dimension,
-    make_variable,
-)
-from .fragment import DataFragment
 from .grid import (
     calculate_latlon_grid_cartopy,
     calculate_latlon_grid_fast,
@@ -39,6 +32,8 @@ from .grid import (
     calculate_latlon_grid_pyproj,
 )
 from .grid.array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
+from .netcdf import DataFragment, HasStrHelp, dimension, make_variable
+from .netcdf.fields import VariableType
 
 
 class GOESLatLonGridData:

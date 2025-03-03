@@ -2,23 +2,43 @@
 Provide functionality for reading fragments of GOES-R datasets.
 
 This package provides classes to extract and represent information from
-GOES satellite netCDF data files. The classes dynamically set attributes
-based on the annotations defined in the class and the corresponding
-attributes or variables present in the provided netCDF data object.
+GOES satellite netCDF data files. It uses the `netCDF4` package to read
+the data files and the netcdf subpackage to extract the information.
 """
 
-from . import fields
-from .fields import dimension, field, record, variable
-from .fragment import DataFragment, netcdf_fragment
+from . import netcdf
+from .dataset import GOESDatasetInfo
+from .geodetic import (
+    GOESGeodeticGrid,
+    GOESLatLonGrid,
+    GOESLatLonGridData,
+    GOESLatLonGridInfo,
+    GOESLatLonGridMetadata,
+)
+from .image import GOESImage, GOESImageMetadata
+from .projection import (
+    GOESABIFixedGrid,
+    GOESABIFixedGridArray,
+    GOESGlobe,
+    GOESOrbitGeometry,
+    GOESProjection,
+)
 
 __all__ = [
-    "DataFragment",
-    "dimension",
-    "field",
-    "fields",
-    "netcdf_fragment",
-    "record",
-    "variable",
+    "GOESABIFixedGrid",
+    "GOESABIFixedGridArray",
+    "GOESDatasetInfo",
+    "GOESGeodeticGrid",
+    "GOESGlobe",
+    "GOESImage",
+    "GOESImageMetadata",
+    "GOESLatLonGrid",
+    "GOESLatLonGridData",
+    "GOESLatLonGridInfo",
+    "GOESLatLonGridMetadata",
+    "GOESOrbitGeometry",
+    "GOESProjection",
+    "netcdf",
 ]
 
 __package_id__ = "GOES-DR"

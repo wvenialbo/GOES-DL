@@ -12,22 +12,11 @@ GOESImageMetadata
     Represent GOES image metadata attributes.
 """
 
-from numpy import (
-    bool_,
-    float32,
-    int8,
-    int16,
-    int32,
-    uint16,
-)
+from numpy import bool_, float32, int8, int16, int32, uint16
 from numpy.typing import NDArray
 
-from .fields import (
-    VariableType,
-    make_variable,
-    scalar,
-)
-from .fragment import DataFragment
+from .netcdf import DataFragment, make_variable, scalar
+from .netcdf.fields import VariableType
 
 cmip: VariableType = make_variable("CMI", array=True)
 
