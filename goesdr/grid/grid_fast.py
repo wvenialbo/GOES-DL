@@ -84,13 +84,15 @@ def calculate_latlon_grid_fast(
     # Compute only the first quadrant of the grid
     grid_data = GOESABIFixedGridArray(record)
 
+    xy_r = grid_data.x
+
     # pylint: disable=no-member # pylint false positive
-    center = grid_data.x.size // 2
-    odd_size = bool(grid_data.x.size % 2)
+    center = xy_r.size // 2
+    odd_size = bool(xy_r.size % 2)
     # pylint: enable=no-member
 
     # pylint: disable=unsubscriptable-object # pylint false positive
-    grid_x = grid_data.x[center:]
+    grid_x = xy_r[center:]
     grid_y = grid_x[::-1]
     # pylint: enable=unsubscriptable-object
 
