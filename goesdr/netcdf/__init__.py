@@ -11,6 +11,8 @@ annotations defined in the class and the corresponding attributes or
 variables present in the provided NetCDF data object.
 """
 
+from . import fields
+from .class_help import HasStrHelp
 from .fields import (
     computed,
     dimension,
@@ -29,6 +31,7 @@ __all__ = [
     "dimension",
     "field",
     "fields",
+    "HasStrHelp",
     "indexed",
     "make_variable",
     "netcdf_fragment",
