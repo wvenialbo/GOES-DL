@@ -60,10 +60,10 @@ def calculate_latlon_grid_noaa(
     # Read in GOES ABI fixed grid projection variables and constants
 
     # E/W scanning angle in radians
-    x_coordinate_1d = record.variables["x"][:].data
+    x_coordinate_1d = record.variables["x"][:].data.astype(float64)
 
     # N/S elevation angle in radians
-    y_coordinate_1d = record.variables["y"][:].data
+    y_coordinate_1d = record.variables["y"][:].data.astype(float64)
 
     if corners:
         x_coordinate_1d = calculate_pixel_edges(x_coordinate_1d)
@@ -80,7 +80,7 @@ def calculate_latlon_grid_noaa(
 
     # Create 2D coordinate matrices from 1D coordinate vectors
     x_coordinate_2d, y_coordinate_2d = meshgrid(
-        x_coordinate_1d.astype(float64), y_coordinate_1d.astype(float64)
+        x_coordinate_1d, y_coordinate_1d
     )
 
     # Equations to calculate latitude and longitude
