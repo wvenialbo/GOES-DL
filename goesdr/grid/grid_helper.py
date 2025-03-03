@@ -80,10 +80,7 @@ def compute_latlon_grid(
     )
     abi_lon: ArrayFloat64 = rad2deg(arctan(s_y / (s_x - r_orb)))
 
-    is_valid = ~(isnan(abi_lat) | isnan(abi_lon))
-
-    abi_lat = where(is_valid, abi_lat, nan)
-    abi_lon = where(is_valid, abi_lon, nan)
+    abi_lat, abi_lon = make_common_mask(abi_lat, abi_lon)
 
     return abi_lat, abi_lon
 
@@ -121,3 +118,33 @@ def make_consistent(
     abi_lon = where(abi_lon < -180, abi_lon + 360, abi_lon)
 
     return abi_lon, abi_lat
+
+
+def make_common_mask(
+    abi_lat: ArrayFloat64, abi_lon: ArrayFloat64
+) -> tuple[ArrayFloat64, ArrayFloat64]:
+    """
+    Make the latitude and longitude grid masks consistent.
+
+    Helper function for function calculate_latlon_grid_noaa and
+    compute_latlon_grid.
+
+    Parameters
+    ----------
+    abi_lat : ArrayFloat64
+        The latitude grid data.
+    abi_lon : ArrayFloat64
+        The longitude grid data.
+
+    Returns
+    -------
+    tuple[ArrayFloat64, ArrayFloat64]
+        A tuple containing the consistent latitude and longitude grid
+        data.
+    """
+    is_valid = ~(isnan(abi_lat) | isnan(abi_lon))
+
+    abi_lat = where(is_valid, abi_lat, nan)
+    abi_lon = where(is_valid, abi_lon, nan)
+
+    return abi_lat, abi_lon

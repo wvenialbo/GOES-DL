@@ -18,17 +18,15 @@ from numpy import (
     cos,
     float32,
     float64,
-    isnan,
     meshgrid,
-    nan,
     pi,
     power,
     sin,
     sqrt,
-    where,
 )
 
 from .array import ArrayFloat32
+from .grid_helper import make_common_mask
 
 
 def calculate_latlon_grid_noaa(
@@ -107,9 +105,6 @@ def calculate_latlon_grid_noaa(
     )
     abi_lon = (lambda_0 - arctan(s_y / (r_orb - s_x))) * (180.0 / pi)
 
-    is_valid = ~(isnan(abi_lat) | isnan(abi_lon))
-
-    abi_lat = where(is_valid, abi_lat, nan)
-    abi_lon = where(is_valid, abi_lon, nan)
+    abi_lat, abi_lon = make_common_mask(abi_lat, abi_lon)
 
     return abi_lat.astype(float32), abi_lon.astype(float32)
