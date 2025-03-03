@@ -21,7 +21,7 @@ GOESLatLonGridInfo
 from typing import cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import errstate, float32
+from numpy import errstate, float32, nan
 from numpy.ma import masked_invalid
 
 from .class_help import HasStrHelp
@@ -306,6 +306,9 @@ class GOESGeodeticGrid(HasStrHelp):
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
         abi_lat = _latlon_data("latitude", record)
         abi_lon = _latlon_data("longitude", record)
+
+        abi_lat.data[abi_lat.mask] = nan
+        abi_lon.data[abi_lon.mask] = nan
 
         return abi_lat, abi_lon
 
