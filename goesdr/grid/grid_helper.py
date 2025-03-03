@@ -222,13 +222,14 @@ def calculate_pixel_corners(
         https://github.com/joaohenry23/GOES/
     """
     lat_grid = lat.astype(float64, copy=True)
-    lon_grid = lon.astype(float64, copy=True)
-
-    lon_grid = _midpoint_in_x(lon_grid)
     lat_grid = _midpoint_in_y(lat_grid)
-
-    lon_grid = _midpoint_in_y(lon_grid)
     lat_grid = _midpoint_in_x(lat_grid)
+    lat_grid = where(lat_grid < -400.0, nan, lat_grid)
+
+    lon_grid = lon.astype(float64, copy=True)
+    lon_grid = _midpoint_in_x(lon_grid)
+    lon_grid = _midpoint_in_y(lon_grid)
+    lon_grid = where(lon_grid < -400.0, nan, lon_grid)
 
     return lat_grid.astype(float32), lon_grid.astype(float32)
 
