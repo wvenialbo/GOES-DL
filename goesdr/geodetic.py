@@ -277,10 +277,25 @@ class GOESGeodeticGrid(HasStrHelp):
         record : Dataset
             The netCDF dataset containing ABI Level 2 data.
         """
+        corners: bool = False
+
+        if "[center]" in algorithm:
+            algorithm = algorithm.replace("[center]", "")
+        elif "[corner]" in algorithm:
+            corners = True
+            algorithm = algorithm.replace("[corner]", "")
+            if algorithm == "precomputed":
+                raise ValueError(
+                    "Algorithm 'precomputed' cannot be used "
+                    "with 'corner' option."
+                )
+
         if algorithm == "precomputed":
             abi_lat, abi_lon = self._initialize_precomputed(record)
         else:
-            abi_lat, abi_lon = self._initialize_calculated(record, algorithm)
+            abi_lat, abi_lon = self._initialize_calculated(
+                record, algorithm, corners
+            )
 
         self.latitude = abi_lat
         self.longitude = abi_lon
@@ -295,9 +310,9 @@ class GOESGeodeticGrid(HasStrHelp):
         return abi_lat, abi_lon
 
     def _initialize_calculated(
-        self, record: Dataset, algorithm: str
+        self, record: Dataset, algorithm: str, corners: bool
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
-        lat, lon = self._initialize_latlon_grid(record, algorithm)
+        lat, lon = self._initialize_latlon_grid(record, algorithm, corners)
 
         abi_lat = GOESLatLonGridData(lat)
         abi_lon = GOESLatLonGridData(lon)
@@ -306,26 +321,30 @@ class GOESGeodeticGrid(HasStrHelp):
 
     @classmethod
     def _initialize_latlon_grid(
-        cls, record: Dataset, algorithm: str
+        cls, record: Dataset, algorithm: str, corners: bool
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
         # Ignore numpy errors for `sqrt` of negative number; reference
         # [2] states that this "occurs for GOES-16 ABI CONUS sector
         # data", however I found it also occurs for Full Disd sector.
         with errstate(invalid="ignore"):
             if algorithm == "noaa":
-                lat, lon = calculate_latlon_grid_noaa(record)
+                lat, lon = calculate_latlon_grid_noaa(record, corners)
             elif algorithm == "opti":
-                lat, lon = calculate_latlon_grid_opti(record)
+                lat, lon = calculate_latlon_grid_opti(record, corners)
             elif algorithm == "fast":
-                lat, lon = calculate_latlon_grid_fast(record)
+                lat, lon = calculate_latlon_grid_fast(record, corners)
             elif algorithm == "pyproj":
-                lat, lon = calculate_latlon_grid_pyproj(record)
+                lat, lon = calculate_latlon_grid_pyproj(record, corners)
             elif algorithm == "cartopy":
-                lat, lon = calculate_latlon_grid_cartopy(record)
+                lat, lon = calculate_latlon_grid_cartopy(record, corners)
             else:
                 raise ValueError(
-                    f"Invalid algorithm '{algorithm}'. Choose 'precomputed', "
-                    "'noaa', 'opti' (default), 'fast', 'pyproj', or 'cartopy'."
+                    f"Invalid algorithm '{algorithm}'. Expected pattern: "
+                    "'<algorithm>' or '<algorithm>[<option>]'. "
+                    "Choose 'precomputed', 'noaa', 'opti' (default), 'fast', "
+                    "'pyproj', or 'cartopy' for '<algorithm>'. Choose "
+                    "'center' (default) or 'corner' for '<option>'. "
+                    "'precomputed' cannot be used with 'corner' option."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
