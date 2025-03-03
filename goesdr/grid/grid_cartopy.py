@@ -80,6 +80,14 @@ def calculate_latlon_grid_cartopy(
     abi_lon: ArrayFloat64 = points[..., 0]
     abi_lat: ArrayFloat64 = points[..., 1]
 
+    abi_lon, abi_lat = make_consistent(abi_lon, abi_lat)
+
+    return abi_lat.astype(float32), abi_lon.astype(float32)
+
+
+def make_consistent(
+    abi_lon: ArrayFloat64, abi_lat: ArrayFloat64
+) -> tuple[ArrayFloat64, ArrayFloat64]:
     valid_lon = (abi_lon >= -360.0) & (abi_lon <= 360.0)
     valid_lat = (abi_lat >= -90.0) & (abi_lat <= 90.0)
     is_valid = valid_lon & valid_lat
@@ -90,4 +98,4 @@ def calculate_latlon_grid_cartopy(
     abi_lon = where(abi_lon >= 180, abi_lon - 360, abi_lon)
     abi_lon = where(abi_lon < -180, abi_lon + 360, abi_lon)
 
-    return abi_lat.astype(float32), abi_lon.astype(float32)
+    return abi_lon, abi_lat
