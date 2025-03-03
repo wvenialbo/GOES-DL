@@ -179,7 +179,7 @@ def calculate_pixel_edges(centers: ArrayFloat64) -> ArrayFloat64:
     left_offset: float64 = 2 * centers[0] - centers[1]
     right_offset: float64 = 2 * centers[-1] - centers[-2]
 
-    left_centers = concatenate((centers, [right_offset]))
-    right_centers = concatenate(([left_offset], centers))
+    left_centers = concatenate(([left_offset], centers))
+    right_centers = concatenate((centers, [right_offset]))
 
     return 0.5 * (left_centers + right_centers)
