@@ -39,6 +39,7 @@ from .grid import (
     calculate_latlon_grid_pyproj,
 )
 from .grid.array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
+from .grid.grid_helper import calculate_pixel_corners
 
 
 class GOESLatLonGridData:
@@ -284,14 +285,9 @@ class GOESGeodeticGrid(HasStrHelp):
         elif "[corner]" in algorithm:
             corners = True
             algorithm = algorithm.replace("[corner]", "")
-            if algorithm == "precomputed":
-                raise ValueError(
-                    "Algorithm 'precomputed' cannot be used "
-                    "with 'corner' option."
-                )
 
         if algorithm == "precomputed":
-            abi_lat, abi_lon = self._initialize_precomputed(record)
+            abi_lat, abi_lon = self._initialize_precomputed(record, corners)
         else:
             abi_lat, abi_lon = self._initialize_calculated(
                 record, algorithm, corners
@@ -302,10 +298,19 @@ class GOESGeodeticGrid(HasStrHelp):
 
     @staticmethod
     def _initialize_precomputed(
-        record: Dataset,
+        record: Dataset, corners: bool
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
         abi_lat = _latlon_data("latitude", record)
         abi_lon = _latlon_data("longitude", record)
+
+        if corners:
+            lat_, lon_ = calculate_pixel_corners(abi_lat.data, abi_lon.data)
+
+            lat: MaskedFloat32 = masked_invalid(lat_)  # type: ignore
+            lon: MaskedFloat32 = masked_invalid(lon_)  # type: ignore
+
+            abi_lat = GOESLatLonGridData(lat)
+            abi_lon = GOESLatLonGridData(lon)
 
         return abi_lat, abi_lon
 
@@ -343,8 +348,7 @@ class GOESGeodeticGrid(HasStrHelp):
                     "'<algorithm>' or '<algorithm>[<option>]'. "
                     "Choose 'precomputed', 'noaa', 'opti' (default), 'fast', "
                     "'pyproj', or 'cartopy' for '<algorithm>'. Choose "
-                    "'center' (default) or 'corner' for '<option>'. "
-                    "'precomputed' cannot be used with 'corner' option."
+                    "'center' (default) or 'corner' for '<option>'."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
