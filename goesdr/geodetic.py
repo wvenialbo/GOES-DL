@@ -69,12 +69,14 @@ class GOESLatLonGridData:
     fill_value: float32
 
 
-def _latlon_data(name: str, record: Dataset) -> GOESLatLonGridData:
+def _latlon_data(
+    name: str, record: Dataset, step: tuple[int, int] | None
+) -> GOESLatLonGridData:
     latlon: VariableType = make_variable(name, array=True)
 
     class _GOESLatLonGridData(DataFragment):
-        data: ArrayFloat32 = latlon()
-        mask: ArrayBool = latlon()
+        data: ArrayFloat32 = latlon(step=step)
+        mask: ArrayBool = latlon(step=step)
         fill_value: float32 = latlon()
 
     _GOESLatLonGridData.__module__ = GOESLatLonGridData.__module__
@@ -117,7 +119,9 @@ class GOESLatLonGrid(HasStrHelp):
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
 
-    def __init__(self, record: Dataset) -> None:
+    def __init__(
+        self, record: Dataset, step: int | tuple[int, int] | None = None
+    ) -> None:
         """
         Initialize a GOESGrid object from a precomputed netCDF dataset.
 
@@ -127,8 +131,11 @@ class GOESLatLonGrid(HasStrHelp):
             The netCDF dataset containing the precomputed latitude
             and longitude grid data.
         """
-        self.latitude = _latlon_data("latitude", record)
-        self.longitude = _latlon_data("longitude", record)
+        if isinstance(step, int):
+            step = (step, step)
+
+        self.latitude = _latlon_data("latitude", record, step)
+        self.longitude = _latlon_data("longitude", record, step)
 
 
 class GOESLatLonGridMetadataType:
@@ -295,7 +302,7 @@ class GOESGeodeticGrid(HasStrHelp):
             step = (step, step)
 
         if algorithm == "precomputed":
-            abi_lat, abi_lon = self._initialize_precomputed(record)
+            abi_lat, abi_lon = self._initialize_precomputed(record, step)
         else:
             abi_lat, abi_lon = self._initialize_calculated(
                 record, algorithm, corners, step
@@ -306,10 +313,10 @@ class GOESGeodeticGrid(HasStrHelp):
 
     @staticmethod
     def _initialize_precomputed(
-        record: Dataset,
+        record: Dataset, step: tuple[int, int] | None
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
-        abi_lat = _latlon_data("latitude", record)
-        abi_lon = _latlon_data("longitude", record)
+        abi_lat = _latlon_data("latitude", record, step)
+        abi_lon = _latlon_data("longitude", record, step)
 
         abi_lat.data[abi_lat.mask] = nan
         abi_lon.data[abi_lon.mask] = nan
