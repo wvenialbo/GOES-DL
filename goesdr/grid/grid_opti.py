@@ -81,10 +81,13 @@ def calculate_latlon_grid_opti(
 
     grid_data = GOESABIFixedGridArray(record)
 
-    sin_x: ArrayFloat64 = sin(grid_data.x)
-    cos_x: ArrayFloat64 = cos(grid_data.x)
-    sin_y: ArrayFloat64 = sin(grid_data.y)
-    cos_y: ArrayFloat64 = cos(grid_data.y)
+    x_r = grid_data.x
+    y_r = grid_data.y
+
+    sin_x: ArrayFloat64 = sin(x_r)
+    cos_x: ArrayFloat64 = cos(x_r)
+    sin_y: ArrayFloat64 = sin(y_r)
+    cos_y: ArrayFloat64 = cos(y_r)
 
     sin_x, sin_y = meshgrid(sin_x, sin_y)
     cos_x, cos_y = meshgrid(cos_x, cos_y)
