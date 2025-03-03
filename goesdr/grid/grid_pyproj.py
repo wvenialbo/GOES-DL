@@ -15,10 +15,11 @@ calculate_latlon_grid_pyproj_deprecated
 """
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import float32, meshgrid, nan, where
+from numpy import float32, meshgrid
 
 from ..projection import GOESABIFixedGridArray, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
+from .grid_helper import make_consistent
 
 
 def calculate_latlon_grid_pyproj(
@@ -81,14 +82,6 @@ def calculate_latlon_grid_pyproj(
     #
     # abi_lon, abi_lat = transformer.transform(x_m, y_m)
 
-    valid_lon = (abi_lon >= -360.0) & (abi_lon <= 360.0)
-    valid_lat = (abi_lat >= -90.0) & (abi_lat <= 90.0)
-    is_valid = valid_lon & valid_lat
-
-    abi_lon = where(is_valid, abi_lon, nan)
-    abi_lat = where(is_valid, abi_lat, nan)
-
-    abi_lon = where(abi_lon >= 180, abi_lon - 360, abi_lon)
-    abi_lon = where(abi_lon < -180, abi_lon + 360, abi_lon)
+    abi_lon, abi_lat = make_consistent(abi_lon, abi_lat)
 
     return abi_lat.astype(float32), abi_lon.astype(float32)
