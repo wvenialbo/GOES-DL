@@ -22,7 +22,7 @@ from .grid_helper import calculate_pixel_edges, compute_latlon_grid
 
 
 def calculate_latlon_grid_fast(
-    record: Dataset, corners: bool
+    record: Dataset, corners: bool, step: tuple[int, int] | None
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids.
@@ -99,8 +99,13 @@ def calculate_latlon_grid_fast(
     # pylint: enable=no-member
 
     # pylint: disable=unsubscriptable-object # pylint false positive
-    grid_x = xy_r[center:]
-    grid_y = grid_x[::-1]
+    grid_z = xy_r[center:]
+    if step:
+        grid_x = grid_z[:: step[1]]
+        grid_z = grid_z[:: step[0]]
+    else:
+        grid_x = grid_z
+    grid_y = grid_z[::-1]
     # pylint: enable=unsubscriptable-object
 
     sin_x: ArrayFloat64 = sin(grid_x)

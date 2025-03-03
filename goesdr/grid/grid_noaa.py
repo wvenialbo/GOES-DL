@@ -30,7 +30,7 @@ from .grid_helper import calculate_pixel_edges, make_common_mask
 
 
 def calculate_latlon_grid_noaa(
-    record: Dataset, corners: bool
+    record: Dataset, corners: bool, step: tuple[int, int] | None
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using NOAA's algorithm.
@@ -68,6 +68,10 @@ def calculate_latlon_grid_noaa(
     if corners:
         x_coordinate_1d = calculate_pixel_edges(x_coordinate_1d)
         y_coordinate_1d = calculate_pixel_edges(y_coordinate_1d)
+
+    if step:
+        x_coordinate_1d = x_coordinate_1d[:: step[1]]
+        y_coordinate_1d = y_coordinate_1d[:: step[0]]
 
     projection_info = record.variables["goes_imager_projection"]
     lon_origin = projection_info.longitude_of_projection_origin

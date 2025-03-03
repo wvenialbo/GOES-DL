@@ -21,7 +21,7 @@ from .grid_helper import calculate_pixel_edges, make_consistent
 
 
 def calculate_latlon_grid_cartopy(
-    record: Dataset, corners: bool
+    record: Dataset, corners: bool, step: tuple[int, int] | None
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using the cartopy package.
@@ -64,6 +64,10 @@ def calculate_latlon_grid_cartopy(
     if corners:
         x_m = calculate_pixel_edges(x_m)
         y_m = calculate_pixel_edges(y_m)
+
+    if step:
+        x_m = x_m[:: step[1]]
+        y_m = y_m[:: step[0]]
 
     x_m, y_m = meshgrid(x_m, y_m)
 

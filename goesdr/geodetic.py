@@ -263,7 +263,12 @@ class GOESGeodeticGrid(HasStrHelp):
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
 
-    def __init__(self, record: Dataset, algorithm: str = "opti") -> None:
+    def __init__(
+        self,
+        record: Dataset,
+        algorithm: str = "opti",
+        step: int | tuple[int, int] | None = None,
+    ) -> None:
         """
         Initialize a GOESGeodeticGrid object.
 
@@ -285,11 +290,14 @@ class GOESGeodeticGrid(HasStrHelp):
                     "with 'corner' option."
                 )
 
+        if isinstance(step, int):
+            step = (step, step)
+
         if algorithm == "precomputed":
             abi_lat, abi_lon = self._initialize_precomputed(record)
         else:
             abi_lat, abi_lon = self._initialize_calculated(
-                record, algorithm, corners
+                record, algorithm, corners, step
             )
 
         self.latitude = abi_lat
@@ -308,9 +316,15 @@ class GOESGeodeticGrid(HasStrHelp):
         return abi_lat, abi_lon
 
     def _initialize_calculated(
-        self, record: Dataset, algorithm: str, corners: bool
+        self,
+        record: Dataset,
+        algorithm: str,
+        corners: bool,
+        step: tuple[int, int] | None,
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
-        lat, lon = self._initialize_latlon_grid(record, algorithm, corners)
+        lat, lon = self._initialize_latlon_grid(
+            record, algorithm, corners, step
+        )
 
         abi_lat = GOESLatLonGridData(lat)
         abi_lon = GOESLatLonGridData(lon)
@@ -319,22 +333,26 @@ class GOESGeodeticGrid(HasStrHelp):
 
     @classmethod
     def _initialize_latlon_grid(
-        cls, record: Dataset, algorithm: str, corners: bool
+        cls,
+        record: Dataset,
+        algorithm: str,
+        corners: bool,
+        step: tuple[int, int] | None,
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
         # Ignore numpy errors for `sqrt` of negative number; reference
         # [2] states that this "occurs for GOES-16 ABI CONUS sector
         # data", however I found it also occurs for Full Disd sector.
         with errstate(invalid="ignore"):
             if algorithm == "noaa":
-                lat, lon = calculate_latlon_grid_noaa(record, corners)
+                lat, lon = calculate_latlon_grid_noaa(record, corners, step)
             elif algorithm == "opti":
-                lat, lon = calculate_latlon_grid_opti(record, corners)
+                lat, lon = calculate_latlon_grid_opti(record, corners, step)
             elif algorithm == "fast":
-                lat, lon = calculate_latlon_grid_fast(record, corners)
+                lat, lon = calculate_latlon_grid_fast(record, corners, step)
             elif algorithm == "pyproj":
-                lat, lon = calculate_latlon_grid_pyproj(record, corners)
+                lat, lon = calculate_latlon_grid_pyproj(record, corners, step)
             elif algorithm == "cartopy":
-                lat, lon = calculate_latlon_grid_cartopy(record, corners)
+                lat, lon = calculate_latlon_grid_cartopy(record, corners, step)
             else:
                 raise ValueError(
                     f"Invalid algorithm '{algorithm}'. Expected pattern: "
