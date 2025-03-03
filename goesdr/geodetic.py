@@ -26,7 +26,6 @@ from numpy.ma import masked_invalid
 
 from .grid import (
     calculate_latlon_grid_cartopy,
-    calculate_latlon_grid_fast,
     calculate_latlon_grid_noaa,
     calculate_latlon_grid_opti,
     calculate_latlon_grid_pyproj,
@@ -278,17 +277,19 @@ class GOESGeodeticGrid(HasStrHelp):
             The netCDF dataset containing ABI Level 2 data.
         """
         corners: bool = False
+        has_option = False
 
         if "[center]" in algorithm:
+            has_option = True
             algorithm = algorithm.replace("[center]", "")
         elif "[corner]" in algorithm:
-            corners = True
+            corners = has_option = True
             algorithm = algorithm.replace("[corner]", "")
-            if algorithm == "precomputed":
-                raise ValueError(
-                    "Algorithm 'precomputed' cannot be used "
-                    "with 'corner' option."
-                )
+
+        if has_option and algorithm == "precomputed":
+            raise ValueError(
+                "Algorithm 'precomputed' cannot be used with options."
+            )
 
         if isinstance(step, int):
             step = (step, step)
@@ -347,8 +348,6 @@ class GOESGeodeticGrid(HasStrHelp):
                 lat, lon = calculate_latlon_grid_noaa(record, corners, step)
             elif algorithm == "opti":
                 lat, lon = calculate_latlon_grid_opti(record, corners, step)
-            elif algorithm == "fast":
-                lat, lon = calculate_latlon_grid_fast(record, corners, step)
             elif algorithm == "pyproj":
                 lat, lon = calculate_latlon_grid_pyproj(record, corners, step)
             elif algorithm == "cartopy":
@@ -357,10 +356,10 @@ class GOESGeodeticGrid(HasStrHelp):
                 raise ValueError(
                     f"Invalid algorithm '{algorithm}'. Expected pattern: "
                     "'<algorithm>' or '<algorithm>[<option>]'. "
-                    "Choose 'precomputed', 'noaa', 'opti' (default), 'fast', "
+                    "Choose 'precomputed', 'noaa', 'opti' (default), "
                     "'pyproj', or 'cartopy' for '<algorithm>'. Choose "
                     "'center' (default) or 'corner' for '<option>'. "
-                    "'precomputed' cannot be used with 'corner' option."
+                    "'precomputed' cannot be used with options."
                 )
 
         latitude: MaskedFloat32 = masked_invalid(lat)  # type: ignore
