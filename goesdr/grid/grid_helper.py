@@ -200,7 +200,13 @@ def calculate_pixel_corners(
 
     Note
     ----
-    This function is based on the algorithm found in [1]_.
+    This function is based on the algorithm found in [1]_. The function
+    calculates a rough approximation and its results is no reliable; the
+    size of the error is not negligible. We recommend using any of the
+    other functions to calculate the latitude and longitude grids on the
+    fly if you need a more accurate result using coordinates of corners.
+    A better solution should be investigated and implemented in the
+    future.
 
     Parameters
     ----------
