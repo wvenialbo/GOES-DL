@@ -12,17 +12,21 @@ compute_latlon_grid
 
 from numpy import (
     arctan,
+    column_stack,
     concatenate,
+    float32,
     float64,
+    full,
     isnan,
     nan,
     power,
     rad2deg,
     sqrt,
+    vstack,
     where,
 )
 
-from .array import ArrayFloat64
+from .array import ArrayFloat32, ArrayFloat64
 
 
 def compute_latlon_grid(
@@ -183,3 +187,99 @@ def calculate_pixel_edges(centers: ArrayFloat64) -> ArrayFloat64:
     right_centers = concatenate((centers, [right_offset]))
 
     return 0.5 * (left_centers + right_centers)
+
+
+def calculate_pixel_corners(
+    lat: ArrayFloat32, lon: ArrayFloat32
+) -> tuple[ArrayFloat32, ArrayFloat32]:
+    """
+    Calculate the coordinates of the intersection (corners) of the grid.
+
+    Calculate the coordinates of the crossing-points of the latitude and
+    longitude grids.
+
+    Note
+    ----
+    This function is based on the algorithm found in [1]_.
+
+    Parameters
+    ----------
+    lat : ArrayFloat32
+        The latitude grid data.
+    lon : ArrayFloat32
+        The longitude grid data.
+
+    Returns
+    -------
+    tuple[ArrayFloat32, ArrayFloat32]
+        A tuple containing the latitude and longitude grid data
+        representing the corners of the grid.
+
+    References
+    ----------
+    .. [1] Joao Henry Huamán Chinchay, "GOES: Python package to download
+        and manipulate GOES-16/17/18 data.", GitHub repository, 2019.
+        https://github.com/joaohenry23/GOES/
+    """
+    lat_grid = lat.astype(float64, copy=True)
+    lon_grid = lon.astype(float64, copy=True)
+
+    lon_grid = _midpoint_in_x(lon_grid)
+    lat_grid = _midpoint_in_y(lat_grid)
+
+    lon_grid = _midpoint_in_y(lon_grid)
+    lat_grid = _midpoint_in_x(lat_grid)
+
+    return lat_grid.astype(float32), lon_grid.astype(float32)
+
+
+def _midpoint_in_x(grid: ArrayFloat64) -> ArrayFloat64:
+    fill_value = float64(-999.99)
+    fill_1 = full([grid.shape[0], 1], fill_value)
+    fill_2 = full([grid.shape[0], 2], fill_value)
+
+    grid = column_stack((grid, fill_1))
+    right = column_stack((grid[:, 1:], fill_1))
+    left_1 = column_stack((fill_1, grid[:, :-1]))
+    left_2 = column_stack((fill_2, grid[:, :-2]))
+
+    cond_1 = grid > -400.0
+    cond_2 = grid < -400.0
+    cond_3 = left_1 < -400.0
+    cond_4 = left_1 > -400.0
+
+    is_valid_1 = cond_1 & cond_3
+    is_valid_2 = cond_1 & cond_4
+    is_valid_3 = cond_2 & cond_4
+
+    midpoint = where(is_valid_1, 0.5 * (3 * grid - right), fill_value)
+    midpoint = where(is_valid_2, 0.5 * (grid + left_1), midpoint)
+    midpoint = where(is_valid_3, 0.5 * (3 * left_1 - left_2), midpoint)
+
+    return midpoint
+
+
+def _midpoint_in_y(grid: ArrayFloat64) -> ArrayFloat64:
+    fill_value = float64(-999.99)
+    fill_1 = full([1, grid.shape[1]], fill_value)
+    fill_2 = full([2, grid.shape[1]], fill_value)
+
+    grid = vstack((grid, fill_1))
+    lower = vstack((grid[1:, :], fill_1))
+    upper_1 = vstack((fill_1, grid[:-1, :]))
+    upper_2 = vstack((fill_2, grid[:-2, :]))
+
+    cond_1 = grid > -400.0
+    cond_2 = grid < -400.0
+    cond_3 = upper_1 < -400.0
+    cond_4 = upper_1 > -400.0
+
+    is_valid_1 = cond_1 & cond_3
+    is_valid_2 = cond_1 & cond_4
+    is_valid_3 = cond_2 & cond_4
+
+    midpoint = where(is_valid_1, 0.5 * (3 * grid - lower), fill_value)
+    midpoint = where(is_valid_2, 0.5 * (grid + upper_1), midpoint)
+    midpoint = where(is_valid_3, 0.5 * (3 * upper_1 - upper_2), midpoint)
+
+    return midpoint
