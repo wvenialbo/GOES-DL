@@ -10,7 +10,17 @@ compute_latlon_grid
     Calculate latitude and longitude grids.
 """
 
-from numpy import arctan, float64, isnan, nan, power, rad2deg, sqrt, where
+from numpy import (
+    arctan,
+    concatenate,
+    float64,
+    isnan,
+    nan,
+    power,
+    rad2deg,
+    sqrt,
+    where,
+)
 
 from .array import ArrayFloat64
 
@@ -148,3 +158,28 @@ def make_common_mask(
     abi_lon = where(is_valid, abi_lon, nan)
 
     return abi_lat, abi_lon
+
+
+def calculate_pixel_edges(centers: ArrayFloat64) -> ArrayFloat64:
+    """
+    Calculate pixel edges coordinates from center coordinates.
+
+    Parameters
+    ----------
+    centers : ArrayFloat64
+        A n-elements 1-d array containing the coordinates of the center
+        of pixels.
+
+    Returns
+    -------
+    ArrayFloat64
+        A (n+1)-elements 1-d array containing the coordinates of the
+        edges of pixels.
+    """
+    left_offset: float64 = 2 * centers[0] - centers[1]
+    right_offset: float64 = 2 * centers[-1] - centers[-2]
+
+    left_centers = concatenate((centers, [right_offset]))
+    right_centers = concatenate(([left_offset], centers))
+
+    return 0.5 * (left_centers + right_centers)
