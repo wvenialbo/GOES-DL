@@ -89,8 +89,24 @@ VARIABLE_ENTRY_MASK = "array:mask"
 
 class BaseVariableField(BaseField):
 
-    def _extract_array(self, variable_: Any, alias: str) -> Any:
-        array_value = variable_[:]
+    step: tuple[int, int] | None
+
+    def __init__(
+        self,
+        record_name: str | None,
+        entry: str | None,
+        step: tuple[int, int] | None,
+        convert: Callable[..., Any] | None,
+    ) -> None:
+        super().__init__(record_name, entry, convert)
+        self.step = step
+
+    def _extract_array(
+        self, variable_: Any, alias: str, step: tuple[int, int] | None
+    ) -> Any:
+        array_value = (
+            variable_[:: step[0], :: step[1]] if step else variable_[:]
+        )
         if not isinstance(array_value, (MaskedArray, ndarray)):
             raise TypeError("Unsuported variable entry type")
         if isinstance(array_value, MaskedArray):
@@ -105,7 +121,11 @@ class BaseVariableField(BaseField):
         raise AttributeError("Unknown array entry")
 
     def _get_variable(
-        self, dataset: Dataset, alias: str, entry: str | None
+        self,
+        dataset: Dataset,
+        alias: str,
+        entry: str | None,
+        step: tuple[int, int] | None,
     ) -> Any:
         if alias not in dataset.variables:
             raise ValueError(f"Unknown variable '{alias}'")
@@ -114,7 +134,7 @@ class BaseVariableField(BaseField):
             return self.convert(variable_)
         try:
             if entry.startswith(VARIABLE_ARRAY_PREFIX):
-                value_ = self._extract_array(variable_, entry)
+                value_ = self._extract_array(variable_, entry, step)
             else:
                 value_ = getattr(variable_, entry)
             return self.convert(value_)
@@ -132,7 +152,7 @@ class VariableField(BaseVariableField):
 
     def __call__(self, dataset: Dataset, name: str) -> Any:
         alias = self.record or name
-        return self._get_variable(dataset, alias, self.entry)
+        return self._get_variable(dataset, alias, self.entry, self.step)
 
 
 class BaseNamedVariableField(BaseVariableField):
@@ -141,9 +161,10 @@ class BaseNamedVariableField(BaseVariableField):
         self,
         record_name: str,
         entry: str | None,
+        step: tuple[int, int] | None,
         convert: Callable[..., Any] | None,
     ) -> None:
-        super().__init__(record_name, entry, convert)
+        super().__init__(record_name, entry, step, convert)
 
 
 class NamedVariableField(BaseNamedVariableField):
@@ -152,7 +173,7 @@ class NamedVariableField(BaseNamedVariableField):
         if self.record is None:
             raise ValueError("Named variable field requires a record name")
         entry = self.entry or name
-        return self._get_variable(dataset, self.record, entry)
+        return self._get_variable(dataset, self.record, entry, self.step)
 
 
 class NamedArrayVariableField(BaseNamedVariableField):
@@ -163,7 +184,7 @@ class NamedArrayVariableField(BaseNamedVariableField):
         if name in {"data", "mask", "fill_value"}:
             name = f"array:{name}"
         entry = self.entry or name
-        return self._get_variable(dataset, self.record, entry)
+        return self._get_variable(dataset, self.record, entry, self.step)
 
 
 class IndexedVariableField(BaseVariableField):
@@ -175,8 +196,9 @@ class IndexedVariableField(BaseVariableField):
         record_name: str | None,
         index: int,
         entry: str | None,
+        step: tuple[int, int] | None,
     ) -> None:
-        super().__init__(record_name, entry, None)
+        super().__init__(record_name, entry, step, None)
         self.index = index
 
     def __call__(self, dataset: Dataset, name: str) -> Any:
@@ -185,7 +207,9 @@ class IndexedVariableField(BaseVariableField):
             raise ValueError(
                 "Indexed variable field requires a data or mask entry"
             )
-        value: NDArray[int32] = self._get_variable(dataset, alias, self.entry)
+        value: NDArray[int32] = self._get_variable(
+            dataset, alias, self.entry, self.step
+        )
         return value.ravel()[self.index]
 
 
@@ -196,6 +220,7 @@ class VariableType(ABC):
         self,
         *,
         entry: str | None = None,
+        step: tuple[int, int] | None,
         convert: Callable[..., Any] | None = None,
     ) -> Any:
         pass
@@ -257,8 +282,9 @@ def indexed(
     *,
     index: int,
     entry: str | None = DATA,
+    step: tuple[int, int] | None = None,
 ) -> Any:
-    return IndexedVariableField(record_name, index, entry)
+    return IndexedVariableField(record_name, index, entry, step)
 
 
 def record(
@@ -274,28 +300,30 @@ def scalar(
     *,
     entry: str | None = DATA,
 ) -> Any:
-    return IndexedVariableField(record_name, 0, entry)
+    return IndexedVariableField(record_name, 0, entry, None)
 
 
 def variable(
     record_name: str | None = None,
     *,
     entry: str | None = DATA,
+    step: tuple[int, int] | None = None,
     convert: Callable[..., Any] | None = None,
 ) -> Any:
-    return VariableField(record_name, entry, convert)
+    return VariableField(record_name, entry, step, convert)
 
 
 def make_variable(record_name: str, *, array: bool = False) -> VariableType:
     def _variable(
         *,
         entry: str | None = None,
+        step: tuple[int, int] | None = None,
         convert: Callable[..., Any] | None = None,
     ) -> Any:
         return (
-            NamedArrayVariableField(record_name, entry, convert)
+            NamedArrayVariableField(record_name, entry, step, convert)
             if array
-            else NamedVariableField(record_name, entry, convert)
+            else NamedVariableField(record_name, entry, step, convert)
         )
 
     return cast(VariableType, _variable)
