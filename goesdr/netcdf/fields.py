@@ -12,12 +12,14 @@ class BaseField(ABC):
 
     entry: str | None
     record: str | None
+    filter: Callable[..., Any]
     convert: Callable[..., Any]
 
     def __init__(
         self,
         record_name: str | None,
         entry: str | None,
+        filter: Callable[..., Any] | None,
         convert: Callable[..., Any] | None,
     ) -> None:
         self.record = record_name
@@ -27,6 +29,11 @@ class BaseField(ABC):
             return x
 
         self.convert = convert or _identity
+
+        def _extract(x: Any) -> Any:
+            return x[:]
+
+        self.filter = filter or _extract
 
     @abstractmethod
     def __call__(self, dataset: Dataset, name: str) -> Any:
