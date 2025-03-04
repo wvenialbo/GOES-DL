@@ -282,9 +282,8 @@ def indexed(
     *,
     index: int,
     entry: str | None = DATA,
-    step: tuple[int, int] | None = None,
 ) -> Any:
-    return IndexedVariableField(record_name, index, entry, step)
+    return IndexedVariableField(record_name, index, entry, None)
 
 
 def record(
