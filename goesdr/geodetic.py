@@ -31,7 +31,7 @@ from .grid import (
     calculate_latlon_grid_pyproj,
 )
 from .grid.array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
-from .netcdf import DataFragment, HasStrHelp, dimension, make_variable
+from .netcdf import DatasetView, HasStrHelp, dimension, make_variable
 from .netcdf.fields import VariableType
 
 
@@ -74,7 +74,7 @@ def _latlon_data(
 ) -> GOESLatLonGridData:
     latlon: VariableType = make_variable(name, array=True)
 
-    class _GOESLatLonGridData(DataFragment):
+    class _GOESLatLonGridData(DatasetView):
         data: ArrayFloat32 = latlon(step=step)
         mask: ArrayBool = latlon(step=step)
         fill_value: float32 = latlon()
@@ -163,7 +163,7 @@ class GOESLatLonGridMetadataType:
 def _latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
     latlon: VariableType = make_variable(name)
 
-    class _GOESLatLonGridMetadata(DataFragment):
+    class _GOESLatLonGridMetadata(DatasetView):
         long_name: str = latlon()
         valid_range: ArrayFloat64 = latlon()
         units: str = latlon()
@@ -200,7 +200,7 @@ class GOESLatLonGridMetadata(HasStrHelp):
         self.longitude = _latlon_metadata("longitude", record)
 
 
-class GOESLatLonGridInfo(DataFragment):
+class GOESLatLonGridInfo(DatasetView):
     """
     Hold GOES geodetic grid dataset metadata information.
 

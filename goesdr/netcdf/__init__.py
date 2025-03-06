@@ -20,12 +20,12 @@ from .fields import (
     field,
     variable,
 )
-from .view import DataFragment
+from .view import DatasetView
 
 __all__ = [
     "attribute",
     "computed",
-    "DataFragment",
+    "DatasetView",
     "dimension",
     "field",
     "fields",

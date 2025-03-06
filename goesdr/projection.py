@@ -22,12 +22,12 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float32, float64, meshgrid
 from numpy.typing import NDArray
 
-from .netcdf import DataFragment, computed, make_variable, variable
+from .netcdf import DatasetView, computed, make_variable, variable
 
 imager_proj = make_variable("goes_imager_projection")
 
 
-class GOESOrbitGeometry(DataFragment):
+class GOESOrbitGeometry(DatasetView):
     """
     Represent GOES-R series satellite orbit geometry information.
 
@@ -63,7 +63,7 @@ class GOESOrbitGeometry(DataFragment):
     sweep_angle_axis: str = imager_proj()
 
 
-class GOESGlobe(DataFragment):
+class GOESGlobe(DatasetView):
     """
     Represent GOES-R series satellite globe definition.
 
@@ -157,7 +157,7 @@ def to_float64(array: NDArray[float32]) -> NDArray[float64]:
     return array.astype(float64)
 
 
-class GOESABIFixedGridArray(DataFragment):
+class GOESABIFixedGridArray(DatasetView):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 
@@ -194,7 +194,7 @@ class GOESABIFixedGridArray(DataFragment):
     y: NDArray[float64] = variable(convert=to_float64)
 
 
-class GOESABIFixedGrid(DataFragment):
+class GOESABIFixedGrid(DatasetView):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 

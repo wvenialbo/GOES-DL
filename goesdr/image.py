@@ -15,13 +15,13 @@ GOESImageMetadata
 from numpy import bool_, float32, int8, int16, int32, uint16
 from numpy.typing import NDArray
 
-from .netcdf import DataFragment, make_variable, scalar
+from .netcdf import DatasetView, make_variable, scalar
 from .netcdf.fields import VariableType
 
 cmip: VariableType = make_variable("CMI", array=True)
 
 
-class GOESImage(DataFragment):
+class GOESImage(DatasetView):
     """
     Represent a GOES satellite image data.
 
@@ -50,7 +50,7 @@ class GOESImage(DataFragment):
     fill_value: uint16 = cmip()
 
 
-class GOESImageMetadata(DataFragment):
+class GOESImageMetadata(DatasetView):
     """
     Represent GOES image metadata attributes.
 

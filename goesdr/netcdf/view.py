@@ -24,7 +24,7 @@ from .hinting import get_annotated, get_typehint
 from .validation import validate_type
 
 
-class DataFragment(HasStrHelp):
+class DatasetView(HasStrHelp):
     """
     Represent a data fragment extracted from a netCDF dataset.
 
@@ -88,13 +88,13 @@ class DataFragment(HasStrHelp):
 
     def __str__(self) -> str:
         # Returns a string representation of the DataFragment object.
-        return help_str(self, DataFragment)
+        return help_str(self, DatasetView)
 
     def _init_class_attributes(self, record: Dataset) -> None:
         # Initializes class attributes from the provided dataset. Copy
         # class attributes to the instance provided they are not field
         # attributes.
-        annotations = get_annotations(self, DataFragment)
+        annotations = get_annotations(self, DatasetView)
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 value = getattr(self, name)
@@ -115,7 +115,7 @@ class DataFragment(HasStrHelp):
     def _init_record_attributes(self, record: Dataset) -> None:
         # Initializes record attributes from the provided dataset. Copy
         # record attributes to the instance.
-        annotations = get_annotations(self, DataFragment)
+        annotations = get_annotations(self, DatasetView)
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 continue
@@ -131,7 +131,7 @@ class DataFragment(HasStrHelp):
         # Initializes field attributes from the provided dataset. Copy
         # record field attributes to the instance, convert the data if
         # necessary.
-        for name in get_annotations(self, DataFragment):
+        for name in get_annotations(self, DatasetView):
             value = getattr(self, name)
             if not isinstance(value, ViewField):
                 continue
@@ -146,7 +146,7 @@ class DataFragment(HasStrHelp):
 
     def _validate_postconditions(self) -> None:
         # Validates postconditions after initialization.
-        all_annotations = get_annotations(self, DataFragment)
+        all_annotations = get_annotations(self, DatasetView)
         for name, annotation in all_annotations.items():
             value = getattr(self, name)
             if validate_type(value, annotation):
@@ -163,7 +163,7 @@ _T = TypeVar("_T")
 
 
 def netcdf_fragment(recordclass: type[_T]) -> type[_T]:
-    class _FragmentRecord(DataFragment):
+    class _FragmentRecord(DatasetView):
         pass
 
     _FragmentRecord.__annotations__ = recordclass.__annotations__.copy()
