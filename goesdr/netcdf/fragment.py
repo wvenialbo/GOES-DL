@@ -19,7 +19,7 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 
 from .annotations import get_annotations
 from .class_help import HasStrHelp, help_str
-from .fields import BaseField, ClassField
+from .fields import ClassField, ViewField
 from .hinting import get_annotated, get_typehint
 from .validation import validate_type
 
@@ -98,7 +98,7 @@ class DataFragment(HasStrHelp):
         for name, annotation in annotations.items():
             if hasattr(self, name):
                 value = getattr(self, name)
-                if isinstance(value, BaseField):
+                if isinstance(value, ViewField):
                     continue
                 if isinstance(value, ClassField):
                     value = value.value
@@ -133,9 +133,11 @@ class DataFragment(HasStrHelp):
         # necessary.
         for name in get_annotations(self, DataFragment):
             value = getattr(self, name)
-            if not isinstance(value, BaseField):
+            if not isinstance(value, ViewField):
                 continue
-            object.__setattr__(self, name, value(record, name))
+            value.set_entry(name)
+            extracted_value = value(record)
+            object.__setattr__(self, name, extracted_value)
 
     def _validate_preconditions(self) -> None:
         # Validates preconditions before initialization.
