@@ -25,8 +25,12 @@ class ClassField:
 
     See Also
     --------
-    computed : Placeholder for computed instance attributes.
-    field : Placeholder for instance attributes.
+    computed :
+        Placeholder for computed attributes.
+    field :
+        Placeholder for instance attributes.
+    ViewField :
+        Abstract base class for dataset view field placeholders.
     """
 
     value: Any
@@ -70,6 +74,8 @@ def computed() -> Any:
     --------
     attribute :
         Placeholder for dataset view attribute fields.
+    data :
+        Placeholder for dataset view array data fields.
     dimension :
         Placeholder proxy for dataset view dimension fields.
     field :
@@ -114,6 +120,8 @@ def field(value: Any) -> Any:
         Placeholder for dataset view attribute fields.
     computed :
         Placeholder for computed attributes.
+    data :
+        Placeholder for dataset view array data fields.
     dimension :
         Placeholder proxy for dataset view dimension fields.
     variable :
@@ -139,6 +147,8 @@ class ViewField(ABC):
     --------
     AttributeField :
         Represent a placeholder for dataset view attribute fields.
+    DataField :
+        Represent a placeholder for dataset view array data fields.
     DimensionField :
         Represent a placeholder for dataset view dimension fields.
     VariableField :
@@ -222,6 +232,8 @@ class AttributeField(ViewField):
     --------
     attribute :
         Placeholder for dataset view attribute fields.
+    DataField :
+        Represent a placeholder for dataset view array data fields.
     DimensionField :
         Represent a placeholder for dataset view dimension fields.
     VariableField :
@@ -300,6 +312,8 @@ def attribute(
         Represent a placeholder for dataset view attribute fields.
     computed :
         Placeholder for computed attributes.
+    data :
+        Placeholder for dataset view array data fields.
     dimension :
         Placeholder proxy for dataset view dimension fields.
     field :
@@ -323,6 +337,8 @@ class DimensionField(ViewField):
         Placeholder proxy for dataset view dimension fields.
     AttributeField :
         Represent a placeholder for dataset view attribute fields.
+    DataField :
+        Represent a placeholder for dataset view array data fields.
     DimensionProxy :
         Proxy for dataset view dimension fields.
     VariableField :
@@ -369,6 +385,18 @@ class DimensionField(ViewField):
             ) from error
 
     def set_entry(self, entry: str) -> None:
+        """
+        Set the dimension field name.
+
+        This method is used to set the field entry name when it is not
+        provided explicitly. It does not override the existing entry
+        name.
+
+        Parameters
+        ----------
+        entry : str
+            The name of the dimension field to be copied.
+        """
         self.id = self.id or entry
 
 
@@ -458,6 +486,8 @@ attribute :
     Placeholder for dataset view attribute fields.
 computed :
     Placeholder for computed attributes.
+data :
+    Placeholder for dataset view array data fields.
 field :
     Placeholder for instance attributes.
 variable :
@@ -496,6 +526,8 @@ class VariableField(ViewField):
         Proxy for dataset view variable fields.
     AttributeField :
         Represent a placeholder for dataset view attribute fields.
+    DataField :
+        Represent a placeholder for dataset view array data fields.
     DimensionField :
         Represent a placeholder for dataset view dimension fields.
     ViewField :
@@ -765,6 +797,8 @@ def variable(name: str) -> VariableProxy:
         Placeholder for dataset view attribute fields.
     computed :
         Placeholder for computed attributes.
+    data :
+        Placeholder for dataset view array data fields.
     dimension :
         Placeholder proxy for dataset view dimension fields.
     field :
@@ -775,3 +809,106 @@ def variable(name: str) -> VariableProxy:
         Proxy for dataset view variable fields.
     """
     return VariableProxy(name)
+
+
+class DataField(VariableField):
+    """
+    Represent a placeholder for dataset view array data fields.
+
+    Mark attributes that will be copied from existing variables in the
+    dataset to the instance with some optional filtering and conversion.
+
+    See Also
+    --------
+    variable :
+        Placeholder proxy for dataset view variable fields.
+    VariableProxy :
+        Proxy for dataset view variable fields.
+    AttributeField :
+        Represent a placeholder for dataset view attribute fields.
+    DimensionField :
+        Represent a placeholder for dataset view dimension fields.
+    VariableField :
+        Represent a placeholder for dataset view variable fields.
+    ViewField :
+        Abstract base class for dataset view field placeholders.
+    """
+
+    def __init__(
+        self,
+        id: str | None,
+        filter: FilterFn | None,
+        convert: ConvertFn | None,
+    ) -> None:
+        """
+        Initialize the variable data field.
+
+        Parameters
+        ----------
+        id : str
+            The name of the variable to be copied.
+        filter : FilterFn
+            The filter function to be applied to the variable entry.
+        convert : ConvertFn
+            The conversion function to be applied to the
+            variable entry value.
+        """
+        super().__init__(id, "array:data", filter, convert)
+
+    def set_entry(self, entry: str) -> None:
+        """
+        Set the variable field name.
+
+        This method is used to set the field entry name when it is not
+        provided explicitly. It does not override the existing entry
+        name.
+
+        Parameters
+        ----------
+        entry : str
+            The name of the variable field to be copied.
+        """
+        self.id = self.id or entry
+
+
+def data(
+    id: str | None = None,
+    *,
+    filter: FilterFn | None = None,
+    convert: ConvertFn | None = None,
+) -> Any:
+    """
+    Placeholder for dataset view array data fields.
+
+    Parameters
+    ----------
+    entry : str
+        The name of the variable entry to be copied, choose: 'data'
+        (default), 'mask', or 'fill_value'.
+    filter : FilterFn
+        The filter function to be applied to the variable entry.
+    convert : ConvertFn
+        The conversion function to be applied to the variable entry
+        value.
+
+    Returns
+    -------
+    Any
+        An instance of 'DataField(id, filter, convert)'.
+
+    See Also
+    --------
+    attribute :
+        Placeholder for dataset view attribute fields.
+    computed :
+        Placeholder for computed attributes.
+    dimension :
+        Placeholder proxy for dataset view dimension fields.
+    field :
+        Placeholder for instance attributes.
+    variable :
+        Placeholder proxy for dataset view variable fields.
+    DataField :
+        Represent a placeholder for dataset view array data fields.
+    """
+    return DataField(id, filter, convert)

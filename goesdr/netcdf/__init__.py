@@ -16,6 +16,7 @@ from .class_help import HasStrHelp
 from .fields import (
     attribute,
     computed,
+    data,
     dimension,
     field,
     variable,
@@ -25,6 +26,7 @@ from .view import DatasetView
 __all__ = [
     "attribute",
     "computed",
+    "data",
     "DatasetView",
     "dimension",
     "field",
