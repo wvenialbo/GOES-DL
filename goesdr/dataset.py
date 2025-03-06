@@ -94,5 +94,5 @@ class GOESDatasetInfo(DatasetView):
     time_coverage_end: str
     timeline_id: str
     production_data_source: str
-    y: int = dimension()
-    x: int = dimension()
+    y: int = dimension.size()
+    x: int = dimension.size()
