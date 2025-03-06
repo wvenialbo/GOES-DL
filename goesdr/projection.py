@@ -22,9 +22,9 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float32, float64, meshgrid
 from numpy.typing import NDArray
 
-from .netcdf import DatasetView, computed, make_variable, variable
+from .netcdf import DatasetView, computed, data, variable
 
-imager_proj = make_variable("goes_imager_projection")
+imager_proj = variable("goes_imager_projection")
 
 
 class GOESOrbitGeometry(DatasetView):
@@ -58,9 +58,9 @@ class GOESOrbitGeometry(DatasetView):
     """
 
     # Information about the projection
-    longitude_of_projection_origin: float64 = imager_proj()
-    perspective_point_height: float64 = imager_proj()
-    sweep_angle_axis: str = imager_proj()
+    longitude_of_projection_origin: float64 = imager_proj.attribute()
+    perspective_point_height: float64 = imager_proj.attribute()
+    sweep_angle_axis: str = imager_proj.attribute()
 
 
 class GOESGlobe(DatasetView):
@@ -93,9 +93,9 @@ class GOESGlobe(DatasetView):
     """
 
     # Information about the globe
-    semi_major_axis: float64 = imager_proj()
-    semi_minor_axis: float64 = imager_proj()
-    inverse_flattening: float64 = imager_proj()
+    semi_major_axis: float64 = imager_proj.attribute()
+    semi_minor_axis: float64 = imager_proj.attribute()
+    inverse_flattening: float64 = imager_proj.attribute()
 
 
 class GOESProjection(GOESOrbitGeometry, GOESGlobe):
@@ -190,8 +190,8 @@ class GOESABIFixedGridArray(DatasetView):
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
-    x: NDArray[float64] = variable(convert=to_float64)
-    y: NDArray[float64] = variable(convert=to_float64)
+    x: NDArray[float64] = data(convert=to_float64)
+    y: NDArray[float64] = data(convert=to_float64)
 
 
 class GOESABIFixedGrid(DatasetView):
@@ -231,8 +231,8 @@ class GOESABIFixedGrid(DatasetView):
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
-    x_coordinate_1d: NDArray[float32] = variable("x")
-    y_coordinate_1d: NDArray[float32] = variable("y")
+    x_coordinate_1d: NDArray[float32] = data("x")
+    y_coordinate_1d: NDArray[float32] = data("y")
     x_coordinate_2d: NDArray[float32] = computed()
     y_coordinate_2d: NDArray[float32] = computed()
 
