@@ -14,28 +14,21 @@ variables present in the provided NetCDF data object.
 from . import fields
 from .class_help import HasStrHelp
 from .fields import (
+    attribute,
     computed,
     dimension,
     field,
-    indexed,
-    make_variable,
-    record,
-    scalar,
     variable,
 )
-from .fragment import DataFragment, netcdf_fragment
+from .view import DataFragment
 
 __all__ = [
+    "attribute",
     "computed",
     "DataFragment",
     "dimension",
     "field",
     "fields",
     "HasStrHelp",
-    "indexed",
-    "make_variable",
-    "netcdf_fragment",
-    "record",
-    "scalar",
     "variable",
 ]
