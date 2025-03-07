@@ -136,9 +136,9 @@ class ViewField(ABC):
 
     Attributes
     ----------
-    id : str
+    id : str | None
         The name of the field to be copied.
-    entry : str
+    entry : str | None
         The name of the field entry to be copied.
     convert : ConvertFn
         The conversion function to be applied to the field entry value.
@@ -170,11 +170,11 @@ class ViewField(ABC):
 
         Parameters
         ----------
-        id : str
+        id : str | None
             The name of the field to be copied.
-        entry : str
+        entry : str | None
             The name of the field entry to be copied.
-        convert : ConvertFn
+        convert : ConvertFn | None
             The conversion function to be applied to the field entry
             value, default to the identity function.
         """
@@ -248,9 +248,9 @@ class AttributeField(ViewField):
 
         Parameters
         ----------
-        entry : str
+        entry : str | None
             The name of the attribute to be copied.
-        convert : ConvertFn
+        convert : ConvertFn | None
             The conversion function to be applied to the attribute
             value, default to the identity function.
 
@@ -287,9 +287,9 @@ def attribute(
 
     Parameters
     ----------
-    entry : str
+    entry : str | None, optional
         The name of the attribute to be copied.
-    convert : ConvertFn
+    convert : ConvertFn | None, optional
         The conversion function to be applied to the attribute value,
         default to the identity function.
 
@@ -355,11 +355,11 @@ class DimensionField(ViewField):
 
         Parameters
         ----------
-        id : str
+        id : str | None
             The name of the dimension to be copied.
-        entry : str
+        entry : str | None
             The name of the dimension entry to be copied.
-        convert : ConvertFn
+        convert : ConvertFn | None
             The conversion function to be applied to the dimension entry
             value, default to the identity function.
         """
@@ -406,7 +406,7 @@ class DimensionProxy:
 
     Attributes
     ----------
-    id : str
+    id : str | None
         The name of the dimension to be copied.
 
     See Also
@@ -425,7 +425,7 @@ class DimensionProxy:
 
         Parameters
         ----------
-        id : str
+        id : str | None
             The name of the dimension to be copied.
         """
         self.id = id
@@ -439,7 +439,7 @@ class DimensionProxy:
 
         Parameters
         ----------
-        convert : ConvertFn
+        convert : ConvertFn | None, optional
             The conversion function to be applied to the dimension name,
             default to the identity function.
 
@@ -456,7 +456,7 @@ class DimensionProxy:
 
         Parameters
         ----------
-        convert : ConvertFn
+        convert : ConvertFn | None, optional
             The conversion function to be applied to the dimension size,
             default to the identity function.
 
@@ -548,13 +548,13 @@ class VariableField(ViewField):
 
         Parameters
         ----------
-        id : str
+        id : str | None
             The name of the variable to be copied.
-        entry : str
+        entry : str | None
             The name of the variable entry to be copied.
-        filter : FilterFn
+        filter : FilterFn | None
             The filter function to be applied to the variable entry.
-        convert : ConvertFn
+        convert : ConvertFn | None
             The conversion function to be applied to the
             variable entry value.
         """
@@ -649,12 +649,12 @@ class VariableProxy:
 
         Parameters
         ----------
-        entry : str
+        entry : str | None, optional
             The name of the variable entry to be copied, choose: 'data'
             (default), 'mask', or 'fill_value'.
-        filter : FilterFn
+        filter : FilterFn | None, optional
             The filter function to be applied to the variable entry.
-        convert : ConvertFn
+        convert : ConvertFn | None, optional
             The conversion function to be applied to the variable entry
             value.
 
@@ -683,9 +683,9 @@ class VariableProxy:
 
         Parameters
         ----------
-        entry : str
+        entry : str | None, optional
             The name of the attribute to be copied.
-        convert : ConvertFn
+        convert : ConvertFn | None, optional
             The conversion function to be applied to the
             attribute value.
 
@@ -705,7 +705,7 @@ class VariableProxy:
 
         Parameters
         ----------
-        convert : ConvertFn
+        convert : ConvertFn | None, optional
             The conversion function to be applied to the variable value.
 
         Returns
@@ -733,10 +733,10 @@ class VariableProxy:
         ----------
         index : int
             The index of the variable array to be copied.
-        entry : str
+        entry : str | None, optional
             The name of the variable entry to be copied, choose: 'data'
             (default) or 'mask'.
-        convert : ConvertFn
+        convert : ConvertFn | None, optional
             The conversion function to be applied to the variable entry
             value.
 
@@ -763,6 +763,16 @@ class VariableProxy:
 def variable(name: str) -> VariableProxy:
     """
     Placeholder proxy for dataset view variable fields.
+
+    Parameters
+    ----------
+    name : str
+        The name of the variable to be copied.
+
+    Returns
+    -------
+    VariableProxy
+        An instance of 'VariableProxy(name)'.
 
     Examples
     --------
@@ -845,15 +855,15 @@ class DataField(VariableField):
 
         Parameters
         ----------
-        id : str
+        id : str | None
             The name of the variable to be copied.
-        filter : FilterFn
+        filter : FilterFn | None
             The filter function to be applied to the variable entry.
-        convert : ConvertFn
+        convert : ConvertFn | None
             The conversion function to be applied to the
             variable entry value.
         """
-        super().__init__(id, "array:data", filter, convert)
+        super().__init__(id, DATA, filter, convert)
 
     def set_entry(self, entry: str) -> None:
         """
@@ -882,12 +892,12 @@ def data(
 
     Parameters
     ----------
-    entry : str
+    id : str | None, optional
         The name of the variable entry to be copied, choose: 'data'
         (default), 'mask', or 'fill_value'.
-    filter : FilterFn
+    filter : FilterFn | None, optional
         The filter function to be applied to the variable entry.
-    convert : ConvertFn
+    convert : ConvertFn | None, optional
         The conversion function to be applied to the variable entry
         value.
 
