@@ -18,11 +18,10 @@ GOESABIFixedGrid
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 """
 
-from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import float32, float64, meshgrid
+from numpy import float32, float64
 from numpy.typing import NDArray
 
-from .netcdf import DatasetView, computed, data, variable
+from .netcdf import DatasetView, data, variable
 
 imager_proj = variable("goes_imager_projection")
 
@@ -157,7 +156,7 @@ def to_float64(array: NDArray[float32]) -> NDArray[float64]:
     return array.astype(float64)
 
 
-class GOESABIFixedGridArray(DatasetView):
+class GOESABIFixedGrid(DatasetView):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 

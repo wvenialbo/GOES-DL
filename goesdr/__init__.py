@@ -18,7 +18,6 @@ from .geodetic import (
 from .image import GOESImage, GOESImageMetadata
 from .projection import (
     GOESABIFixedGrid,
-    GOESABIFixedGridArray,
     GOESGlobe,
     GOESOrbitGeometry,
     GOESProjection,
@@ -26,7 +25,7 @@ from .projection import (
 
 __all__ = [
     "GOESABIFixedGrid",
-    "GOESABIFixedGridArray",
+    "GOESABIFixedGrid",
     "GOESDatasetInfo",
     "GOESGeodeticGrid",
     "GOESGlobe",
