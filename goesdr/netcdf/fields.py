@@ -5,7 +5,6 @@ from typing import Any
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import ndarray
 from numpy.ma import MaskedArray
-from numpy.typing import NDArray
 
 ConvertFn = Callable[..., Any] | type
 FilterFn = Callable[..., Any]
@@ -766,69 +765,6 @@ class VariableProxy:
         """
         return self.array("mask", filter=filter, convert=convert)
 
-    def scalar(self, *, convert: ConvertFn | None = None) -> Any:
-        """
-        Placeholder for dataset view variable scalar field.
-
-        This effectively retrieves the first element of the variable
-        array, by calling to 'indexed(0, "data", convert)'.
-
-        Parameters
-        ----------
-        convert : ConvertFn | None, optional
-            The conversion function to be applied to the variable value.
-
-        Returns
-        -------
-        Any
-            The instance of 'VariableField' returned by 'indexed(0,
-            "data", convert)'.
-        """
-        return self.indexed(0, "data", convert=convert)
-
-    def indexed(
-        self,
-        index: int,
-        entry: str | None = None,
-        *,
-        convert: ConvertFn | None = None,
-    ) -> Any:
-        """
-        Placeholder for dataset view variable indexed field.
-
-        This effectively retrieves the first element of the variable
-        array, by calling to 'array(entry, filter=*, convert=convert)'.
-
-        Parameters
-        ----------
-        index : int
-            The index of the variable array to be copied.
-        entry : str | None, optional
-            The name of the variable entry to be copied, choose: 'data'
-            (default) or 'mask'.
-        convert : ConvertFn | None, optional
-            The conversion function to be applied to the variable entry
-            value.
-
-        Returns
-        -------
-        Any
-            The instance of 'VariableField' returned by 'array(entry,
-            filter=*, convert=convert)'.
-
-        Raises
-        ------
-        ValueError
-            If the entry is not valid or unknown.
-        """
-        if entry not in {"data", "mask", None}:
-            raise ValueError("Invalid 'entry', choose: 'data' or 'mask'")
-
-        def filter_(x: NDArray[Any]) -> Any:
-            return x.ravel()[index]
-
-        return self.array(entry, filter=filter_, convert=convert)
-
 
 def variable(name: str) -> VariableProxy:
     """
@@ -963,8 +899,7 @@ def data(
     Parameters
     ----------
     id : str | None, optional
-        The name of the variable entry to be copied, choose: 'data'
-        (default), 'mask', or 'fill_value'.
+        The name of the variable.
     filter : FilterFn | None, optional
         The filter function to be applied to the variable entry.
     convert : ConvertFn | None, optional
@@ -992,3 +927,34 @@ def data(
         Represent a placeholder for dataset view array data fields.
     """
     return DataField(id, filter, convert)
+
+
+def scalar(id: str | None = None, *, convert: ConvertFn | None = None) -> Any:
+    """
+    Placeholder for dataset view variable scalar field.
+
+    This effectively retrieves the first element of the variable
+    array.
+
+    Parameters
+    ----------
+    id : str | None, optional
+        The name of the variable.
+    convert : ConvertFn | None, optional
+        The conversion function to be applied to the variable entry
+        value.
+
+    Returns
+    -------
+    Any
+        The instance of 'VariableField' returned by 'array("data",
+        filter=*, convert=*)'.
+    """
+
+    def filter_(x: Any) -> Any:
+        return x[0]
+
+    def convert_(x: Any) -> Any:
+        return convert(x[0]) if convert else x[0]
+
+    return data(id, filter=filter_, convert=convert_)

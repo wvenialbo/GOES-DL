@@ -19,6 +19,7 @@ from .fields import (
     data,
     dimension,
     field,
+    scalar,
     variable,
 )
 from .view import DatasetView
@@ -32,5 +33,6 @@ __all__ = [
     "field",
     "fields",
     "HasStrHelp",
+    "scalar",
     "variable",
 ]
