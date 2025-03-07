@@ -70,9 +70,9 @@ def calculate_latlon_grid_cartopy(
         globe=globe_geos,
     )
 
-    plate_carree = ccrs.PlateCarree(globe=globe_geos)
+    plate_carree_proj = ccrs.PlateCarree(globe=globe_geos)
 
-    points = plate_carree.transform_points(geos_proj, x_m, y_m)
+    points = plate_carree_proj.transform_points(geos_proj, x_m, y_m)
 
     abi_lon: ArrayFloat64 = points[..., 0]
     abi_lat: ArrayFloat64 = points[..., 1]
