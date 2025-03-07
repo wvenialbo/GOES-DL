@@ -650,8 +650,8 @@ class VariableProxy:
         Parameters
         ----------
         entry : str | None, optional
-            The name of the variable entry to be copied, choose: 'data'
-            (default), 'mask', or 'fill_value'.
+            The name of the variable entry to be copied, choose: 'data',
+            'mask', 'fill_value', or '*' (default).
         filter : FilterFn | None, optional
             The filter function to be applied to the variable entry.
         convert : ConvertFn | None, optional
@@ -668,7 +668,7 @@ class VariableProxy:
         ValueError
             If the entry is not valid or unknown.
         """
-        if entry not in {"*", "data", "mask", "flll_value", None}:
+        if entry not in {"*", "data", "mask", "fill_value", None}:
             raise ValueError(
                 "Invalid 'entry', choose: '*', 'data', 'mask', or 'fill_value'"
             )
