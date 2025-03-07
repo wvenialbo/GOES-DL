@@ -80,7 +80,7 @@ def help_str(this: Any, root: type = object, indent: str = "    ") -> str:
     ----------
     this : Any
         An instance of a class.
-    root : type
+    root : type, optional
         The root class from which to extract attributes.
     indent : str, optional
         The indentation string, by default four spaces.
