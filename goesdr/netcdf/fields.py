@@ -952,7 +952,7 @@ def scalar(id: str | None = None, *, convert: ConvertFn | None = None) -> Any:
     """
 
     def filter_(x: Any) -> Any:
-        return x[0]
+        return x[:1]
 
     def convert_(x: Any) -> Any:
         return convert(x[0]) if convert else x[0]
