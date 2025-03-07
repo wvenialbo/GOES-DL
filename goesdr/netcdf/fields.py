@@ -931,7 +931,7 @@ def data(
 
 def scalar(id: str | None = None, *, convert: ConvertFn | None = None) -> Any:
     """
-    Placeholder for dataset view variable scalar field.
+    Placeholder for dataset view scalar variable field.
 
     This effectively retrieves the first element of the variable
     array.
@@ -947,8 +947,8 @@ def scalar(id: str | None = None, *, convert: ConvertFn | None = None) -> Any:
     Returns
     -------
     Any
-        The instance of 'VariableField' returned by 'array("data",
-        filter=*, convert=*)'.
+        The instance of 'VariableField' returned by 'data(id,
+        filter=*, convert=convert)'.
     """
 
     def filter_(x: Any) -> Any:
