@@ -12,8 +12,13 @@ See [2]_, GOES-R Product User Guide (PUG) Volume 5 (L2 products) Section
 
 Functions
 ---------
-calculate_latlon_noaa
-    Calculate latitude and longitude grids using NOAA's algorithm.
+calculate_latlon_grid_cartopy
+    Calculate latitude and longitude grids using the cartopy package.
+calculate_latlon_grid_goesdr
+    Calculate latitude and longitude grids using an optimized version of
+    classic's algorithm.
+calculate_latlon_grid_pyproj
+    Calculate latitude and longitude grids using the pyproj package.
 
 References
 ----------
@@ -32,11 +37,11 @@ References
 """
 
 from .grid_cartopy import calculate_latlon_grid_cartopy
-from .grid_opti import calculate_latlon_grid_opti
+from .grid_goesdr import calculate_latlon_grid_goesdr
 from .grid_pyproj import calculate_latlon_grid_pyproj
 
 __all__ = [
     "calculate_latlon_grid_cartopy",
-    "calculate_latlon_grid_opti",
+    "calculate_latlon_grid_goesdr",
     "calculate_latlon_grid_pyproj",
 ]
