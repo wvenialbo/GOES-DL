@@ -702,6 +702,22 @@ class VariableProxy:
         filter: FilterFn | None = None,
         convert: ConvertFn | None = None,
     ) -> Any:
+        """
+        Placeholder for the data component of array variable field.
+
+        Parameters
+        ----------
+        filter : FilterFn | None, optional
+            The filter function to be applied to the variable entry.
+        convert : ConvertFn | None, optional
+            The conversion function to be applied to the variable entry
+            value.
+
+        Returns
+        -------
+        Any
+            An instance of 'VariableField(id, "data", filter, convert)'.
+        """
         return self.array("data", filter=filter, convert=convert)
 
     def fill_value(
@@ -709,6 +725,21 @@ class VariableProxy:
         *,
         convert: ConvertFn | None = None,
     ) -> Any:
+        """
+        Placeholder for the fil value component of array variable field.
+
+        Parameters
+        ----------
+        convert : ConvertFn | None, optional
+            The conversion function to be applied to the variable entry
+            value.
+
+        Returns
+        -------
+        Any
+            An instance of 'VariableField(id, "fill_value", filter,
+            convert)'.
+        """
         return self.array("fill_value", filter=None, convert=convert)
 
     def mask(
@@ -717,6 +748,22 @@ class VariableProxy:
         filter: FilterFn | None = None,
         convert: ConvertFn | None = None,
     ) -> Any:
+        """
+        Placeholder for the mask component of array variable field.
+
+        Parameters
+        ----------
+        filter : FilterFn | None, optional
+            The filter function to be applied to the variable entry.
+        convert : ConvertFn | None, optional
+            The conversion function to be applied to the variable entry
+            value.
+
+        Returns
+        -------
+        Any
+            An instance of 'VariableField(id, "mask", filter, convert)'.
+        """
         return self.array("mask", filter=filter, convert=convert)
 
     def scalar(self, *, convert: ConvertFn | None = None) -> Any:
