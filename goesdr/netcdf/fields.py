@@ -672,7 +672,7 @@ class VariableProxy:
             raise ValueError(
                 "Invalid 'entry', choose: '*', 'data', 'mask', or 'fill_value'"
             )
-        entry = f"array:{entry or "data"}"
+        entry = f"array:{entry or "*"}"
         return VariableField(self.id, entry, filter, convert)
 
     def attribute(
@@ -695,6 +695,29 @@ class VariableProxy:
             An instance of 'VariableField(id, entry, None, convert)'.
         """
         return VariableField(self.id, entry, None, convert)
+
+    def data(
+        self,
+        *,
+        filter: FilterFn | None = None,
+        convert: ConvertFn | None = None,
+    ) -> Any:
+        return self.array("data", filter=filter, convert=convert)
+
+    def fill_value(
+        self,
+        *,
+        convert: ConvertFn | None = None,
+    ) -> Any:
+        return self.array("fill_value", filter=None, convert=convert)
+
+    def mask(
+        self,
+        *,
+        filter: FilterFn | None = None,
+        convert: ConvertFn | None = None,
+    ) -> Any:
+        return self.array("mask", filter=filter, convert=convert)
 
     def scalar(self, *, convert: ConvertFn | None = None) -> Any:
         """
