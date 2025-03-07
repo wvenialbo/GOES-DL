@@ -57,7 +57,7 @@ def calculate_latlon_grid_cartopy(
 
     x_m, y_m = meshgrid(x_m, y_m)
 
-    globe = ccrs.Globe(
+    globe_geos = ccrs.Globe(
         ellipse=None,
         semimajor_axis=projection_info.semi_major_axis,
         semiminor_axis=projection_info.semi_minor_axis,
@@ -67,12 +67,10 @@ def calculate_latlon_grid_cartopy(
         satellite_height=projection_info.perspective_point_height,
         central_longitude=projection_info.longitude_of_projection_origin,
         sweep_axis=projection_info.sweep_angle_axis,
-        globe=globe,
+        globe=globe_geos,
     )
 
-    globe_grs80 = ccrs.Globe(ellipse="GRS80")
-
-    plate_carree = ccrs.PlateCarree(globe=globe_grs80)
+    plate_carree = ccrs.PlateCarree(globe=globe_geos)
 
     points = plate_carree.transform_points(geos_proj, x_m, y_m)
 
