@@ -162,7 +162,12 @@ def make_common_mask(
 
 def calculate_pixel_edges(centers: ArrayFloat64) -> ArrayFloat64:
     """
-    Calculate pixel edges coordinates from center coordinates.
+    Calculate the coordinates of the edges of the pixels.
+
+    Given the coordinates of the center of pixels, calculate the
+    coordinates of the edges of the pixels using linear interpolation,
+    i.e. the midpoints between the centers. For the first and last
+    elements, the edges are calculated using linear extrapolation.
 
     Parameters
     ----------
