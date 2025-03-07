@@ -15,7 +15,7 @@ GOESImageMetadata
 from numpy import bool_, float32, int8, int16, int32, uint16
 from numpy.typing import NDArray
 
-from .netcdf import DatasetView, variable
+from .netcdf import DatasetView, scalar, variable
 
 cmip = variable("CMI")
 
@@ -41,8 +41,8 @@ class GOESImage(DatasetView):
         The fill value used for missing or invalid data points.
     """
 
-    band_id: int32 = cmip.scalar()
-    band_wavelength: float32 = cmip.scalar()
+    band_id: int32 = scalar()
+    band_wavelength: float32 = scalar()
 
     data: NDArray[float32] = cmip.array()
     mask: NDArray[bool_] = cmip.array(entry="mask")
