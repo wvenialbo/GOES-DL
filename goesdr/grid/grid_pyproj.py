@@ -10,8 +10,6 @@ Functions
 ---------
 calculate_latlon_grid_pyproj
     Calculate latitude and longitude grids using the pyproj package.
-calculate_latlon_grid_pyproj_deprecated
-    Calculate latitude and longitude grids using the pyproj package.
 """
 
 from numpy import float32, meshgrid
