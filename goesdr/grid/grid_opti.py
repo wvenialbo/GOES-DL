@@ -16,12 +16,12 @@ calculate_latlon_opti
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import cos, float32, meshgrid, sin
 
-from ..projection import GOESABIFixedGridArray, GOESProjection
+from ..projection import GOESABIFixedGrid, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
 from .grid_helper import calculate_pixel_edges, compute_latlon_grid
 
 
-def calculate_latlon_grid_opti(
+def calculate_latlon_grid_goesdr(
     record: Dataset, corners: bool, step: tuple[int, int] | None
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
@@ -83,7 +83,7 @@ def calculate_latlon_grid_opti(
     r_eq = projection_info.semi_major_axis
     r_pol = projection_info.semi_minor_axis
 
-    grid_data = GOESABIFixedGridArray(record)
+    grid_data = GOESABIFixedGrid(record)
 
     x_r = grid_data.x
     y_r = grid_data.y
