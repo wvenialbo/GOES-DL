@@ -18,9 +18,9 @@ GOESABIFixedGrid
     Represent GOES-R series satellite ABI Fixed Grid projection data.
 """
 
-from numpy import float32, float64
-from numpy.typing import NDArray
+from numpy import float64
 
+from .array import ArrayFloat32, ArrayFloat64
 from .netcdf import DatasetView, data, variable
 
 imager_proj = variable("goes_imager_projection")
@@ -97,18 +97,18 @@ class GOESGlobe(DatasetView):
     inverse_flattening: float64 = imager_proj.attribute()
 
 
-def to_float64(array: NDArray[float32]) -> NDArray[float64]:
+def to_float64(array: ArrayFloat32) -> ArrayFloat64:
     """
     Convert a float32 array to a float64 array.
 
     Parameters
     ----------
-    array : NDArray[float32]
+    array : ArrayFloat32
         The float32 array to convert.
 
     Returns
     -------
-    NDArray[float64]
+    ArrayFloat64
         The float64 array.
     """
     return array.astype(float64)
@@ -131,9 +131,9 @@ class GOESABIFixedGrid(DatasetView):
 
     Attributes
     ----------
-    x_coordinate_1d : NDArray[float32]
+    x_coordinate_1d : ArrayFloat32
         1D array of E/W scanning angles in radians.
-    y_coordinate_1d : NDArray[float32]
+    y_coordinate_1d : ArrayFloat32
         1D array of N/S elevation angles in radians.
 
     References
@@ -147,8 +147,8 @@ class GOESABIFixedGrid(DatasetView):
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
-    x: NDArray[float64] = data(convert=to_float64)
-    y: NDArray[float64] = data(convert=to_float64)
+    x: ArrayFloat64 = data(convert=to_float64)
+    y: ArrayFloat64 = data(convert=to_float64)
 
 
 class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
