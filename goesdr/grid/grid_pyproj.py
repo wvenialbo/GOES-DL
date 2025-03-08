@@ -15,7 +15,7 @@ calculate_latlon_grid_pyproj
 from numpy import float32, meshgrid
 
 from ..array import ArrayFloat32, ArrayFloat64
-from .helper import make_consistent
+from .helpers import make_consistent
 from .parameters import ProjectionParameters
 
 

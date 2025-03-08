@@ -26,7 +26,7 @@ from numpy import (
 )
 
 from ..array import ArrayFloat32, ArrayFloat64
-from .helper import make_common_mask
+from .helpers import make_common_mask
 from .parameters import ProjectionParameters
 
 

@@ -46,7 +46,7 @@ References
 from .grid_cartopy import calculate_latlon_grid_cartopy
 from .grid_goesdr import calculate_latlon_grid_goesdr
 from .grid_pyproj import calculate_latlon_grid_pyproj
-from .helper import calculate_pixel_edges
+from .helpers import calculate_pixel_edges
 from .parameters import ProjectionParameters
 
 __all__ = [
