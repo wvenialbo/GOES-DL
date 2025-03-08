@@ -38,7 +38,7 @@ class GOESOrbitGeometry(DatasetView):
     Attributes
     ----------
     longitude_of_projection_origin : np.float64
-        The longitude of the ideal satellite sub-point, in East degrees.
+        The longitude of the ideal satellite sub-point in East degrees.
     perspective_point_height : np.float64
         The height of the perspective point, or the height above the
         Earth's surface the ideal satellite sub-point, in meters.
@@ -74,9 +74,9 @@ class GOESGlobe(DatasetView):
     Attributes
     ----------
     semi_major_axis : np.float64
-        The semi-major axis of the globe.
+        The semi-major axis of the globe in meters.
     semi_minor_axis : np.float64
-        The semi-minor axis of the globe.
+        The semi-minor axis of the globe in meters.
     inverse_flattening : np.float64
         The inverse flattening of the globe.
 
@@ -167,7 +167,7 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
     Properties
     ----------
     orbital_radius : np.float64
-        The orbital radius of the GOES satellite.
+        The orbital radius of the GOES satellite in meters.
 
     References
     ----------
@@ -183,11 +183,11 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
     @property
     def orbital_radius(self) -> float64:
         """
-        Calculate the orbital radius of the GOES satellite.
+        Calculate the orbital radius of the GOES satellite in meters.
 
         Returns
         -------
         np.float64
-            The orbital radius of the GOES satellite.
+            The orbital radius of the GOES satellite in meters.
         """
         return self.perspective_point_height + self.semi_major_axis
