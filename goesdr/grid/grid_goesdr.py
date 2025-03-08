@@ -25,8 +25,8 @@ from numpy import (
     sqrt,
 )
 
+from ..array import ArrayFloat32, ArrayFloat64
 from ..projection import GOESABIFixedGrid, GOESProjection
-from .array import ArrayFloat32, ArrayFloat64
 from .helper import make_common_mask
 
 

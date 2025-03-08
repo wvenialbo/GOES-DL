@@ -22,7 +22,7 @@ from numpy import (
     where,
 )
 
-from .array import ArrayFloat64
+from ..array import ArrayFloat64
 
 
 def make_consistent(

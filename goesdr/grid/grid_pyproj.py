@@ -14,8 +14,8 @@ calculate_latlon_grid_pyproj
 
 from numpy import float32, meshgrid
 
+from ..array import ArrayFloat32, ArrayFloat64
 from ..projection import GOESABIFixedGrid, GOESProjection
-from .array import ArrayFloat32, ArrayFloat64
 from .helper import make_consistent
 
 
