@@ -97,48 +97,6 @@ class GOESGlobe(DatasetView):
     inverse_flattening: float64 = imager_proj.attribute()
 
 
-class GOESProjection(GOESOrbitGeometry, GOESGlobe):
-    """
-    Represent GOES-R series satellite projection information.
-
-    The GOES Imager Projection, also called ABI Fixed Grid Projection,
-    is a map projection relative to the GOES satellite point of view.
-    Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
-
-    Note
-    ----
-    For information on GOES Imager Projection, see [1]_ and Section
-    4.2.8 of [2]_
-
-    Properties
-    ----------
-    orbital_radius : np.float64
-        The orbital radius of the GOES satellite.
-
-    References
-    ----------
-    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
-        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
-        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
-    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
-        (PUG), Volume 5: Level 2+ Products", Version 2.4,
-        NASA/NOAA/NESDIS, 2022.
-        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
-    """
-
-    @property
-    def orbital_radius(self) -> float64:
-        """
-        Calculate the orbital radius of the GOES satellite.
-
-        Returns
-        -------
-        np.float64
-            The orbital radius of the GOES satellite.
-        """
-        return self.perspective_point_height + self.semi_major_axis
-
-
 def to_float64(array: NDArray[float32]) -> NDArray[float64]:
     """
     Convert a float32 array to a float64 array.
@@ -191,3 +149,45 @@ class GOESABIFixedGrid(DatasetView):
 
     x: NDArray[float64] = data(convert=to_float64)
     y: NDArray[float64] = data(convert=to_float64)
+
+
+class GOESProjection(GOESOrbitGeometry, GOESGlobe):
+    """
+    Represent GOES-R series satellite projection information.
+
+    The GOES Imager Projection, also called ABI Fixed Grid Projection,
+    is a map projection relative to the GOES satellite point of view.
+    Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
+
+    Note
+    ----
+    For information on GOES Imager Projection, see [1]_ and Section
+    4.2.8 of [2]_
+
+    Properties
+    ----------
+    orbital_radius : np.float64
+        The orbital radius of the GOES satellite.
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
+    """
+
+    @property
+    def orbital_radius(self) -> float64:
+        """
+        Calculate the orbital radius of the GOES satellite.
+
+        Returns
+        -------
+        np.float64
+            The orbital radius of the GOES satellite.
+        """
+        return self.perspective_point_height + self.semi_major_axis
