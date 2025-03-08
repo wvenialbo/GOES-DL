@@ -27,7 +27,7 @@ from numpy import (
 
 from ..projection import GOESABIFixedGrid, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
-from .grid_helper import make_common_mask
+from .helper import make_common_mask
 
 
 def _transform_grid(

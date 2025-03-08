@@ -16,7 +16,7 @@ from numpy import float32, meshgrid
 
 from ..projection import GOESABIFixedGrid, GOESProjection
 from .array import ArrayFloat32, ArrayFloat64
-from .grid_helper import make_consistent
+from .helper import make_consistent
 
 
 def calculate_latlon_grid_cartopy(
