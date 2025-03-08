@@ -10,12 +10,10 @@ GOESOrbitGeometry
     Represent GOES-R series satellite orbit geometry information.
 GOESGlobe
     Represent GOES-R series satellite globe definition.
-GOESProjection
-    Represent GOES-R series satellite projection information.
-GOESABIFixedGridArray
-    Represent GOES-R series satellite ABI Fixed Grid projection data.
 GOESABIFixedGrid
     Represent GOES-R series satellite ABI Fixed Grid projection data.
+GOESProjection
+    Represent GOES-R series satellite projection information.
 """
 
 from numpy import float64
@@ -97,23 +95,6 @@ class GOESGlobe(DatasetView):
     inverse_flattening: float64 = imager_proj.attribute()
 
 
-def to_float64(array: ArrayFloat32) -> ArrayFloat64:
-    """
-    Convert a float32 array to a float64 array.
-
-    Parameters
-    ----------
-    array : ArrayFloat32
-        The float32 array to convert.
-
-    Returns
-    -------
-    ArrayFloat64
-        The float64 array.
-    """
-    return array.astype(float64)
-
-
 class GOESABIFixedGrid(DatasetView):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
@@ -131,9 +112,9 @@ class GOESABIFixedGrid(DatasetView):
 
     Attributes
     ----------
-    x_coordinate_1d : ArrayFloat32
+    x : ArrayFloat32
         1D array of E/W scanning angles in radians.
-    y_coordinate_1d : ArrayFloat32
+    y : ArrayFloat32
         1D array of N/S elevation angles in radians.
 
     References
@@ -147,11 +128,28 @@ class GOESABIFixedGrid(DatasetView):
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
-    x: ArrayFloat64 = data(convert=to_float64)
-    y: ArrayFloat64 = data(convert=to_float64)
+    x: ArrayFloat32 = data()
+    y: ArrayFloat32 = data()
 
 
-class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
+def to_float64(array: ArrayFloat32) -> ArrayFloat64:
+    """
+    Convert a float32 array to a float64 array.
+
+    Parameters
+    ----------
+    array : ArrayFloat32
+        The float32 array to convert.
+
+    Returns
+    -------
+    ArrayFloat64
+        The float64 array.
+    """
+    return array.astype(float64)
+
+
+class GOESProjection(GOESOrbitGeometry, GOESGlobe):
     """
     Represent GOES-R series satellite projection information.
 
@@ -164,10 +162,12 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
     For information on GOES Imager Projection, see [1]_ and Section
     4.2.8 of [2]_
 
-    Properties
+    Attributes
     ----------
-    orbital_radius : np.float64
-        The orbital radius of the GOES satellite in meters.
+    x : ArrayFloat64
+        1D array of E/W scanning angles in radians.
+    y : ArrayFloat64
+        1D array of N/S elevation angles in radians.
 
     References
     ----------
@@ -180,38 +180,6 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
-    @property
-    def orbital_radius(self) -> float64:
-        """
-        Calculate the orbital radius of the GOES satellite in meters.
-
-        Returns
-        -------
-        np.float64
-            The orbital radius of the GOES satellite in meters.
-        """
-        return self.perspective_point_height + self.semi_major_axis
-
-    @property
-    def x_m(self) -> ArrayFloat64:
-        """
-        Calculate the x-coordinate fixed grid in meters.
-
-        Returns
-        -------
-        ArrayFloat64
-            The x-coordinate fixed grid in meters.
-        """
-        return self.perspective_point_height * self.x
-
-    @property
-    def y_m(self) -> ArrayFloat64:
-        """
-        Calculate the y-coordinate fixed grid in meters.
-
-        Returns
-        -------
-        ArrayFloat64
-            The y-coordinate fixed grid in meters.
-        """
-        return self.perspective_point_height * self.y
+    # Information about the fixed grid
+    x: ArrayFloat64 = data(convert=to_float64)
+    y: ArrayFloat64 = data(convert=to_float64)
