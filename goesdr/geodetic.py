@@ -6,7 +6,7 @@ longitude grids information from GOES satellite netCDF data files.
 
 Classes
 -------
-GOESLatLonGrid
+GOESGeodeticGrid
     Hold GOES satellite precomputed latitude and longitude data.
 GOESLatLonGridData
     Represent GOES satellite precomputed latitude or longitude data.
@@ -18,26 +18,28 @@ GOESLatLonGridInfo
     Hold GOES geodetic grid dataset metadata information.
 """
 
-from typing import cast
+from re import match
+from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import errstate, float32, nan
 from numpy.ma import masked_invalid
 
+from .array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
 from .grid import (
+    ProjectionParameters,
     calculate_latlon_grid_cartopy,
-    calculate_latlon_grid_noaa,
-    calculate_latlon_grid_opti,
+    calculate_latlon_grid_goesdr,
     calculate_latlon_grid_pyproj,
+    calculate_pixel_edges,
 )
-from .grid.array import ArrayBool, ArrayFloat32, ArrayFloat64, MaskedFloat32
-from .netcdf import DatasetView, HasStrHelp, dimension, make_variable
-from .netcdf.fields import VariableType
+from .netcdf import DatasetView, HasStrHelp, dimension, variable
+from .projection import GOESProjection
 
 
 class GOESLatLonGridData:
     """
-    Represent GOES satellite precomputed latitude or longitude data.
+    Represent GOES satellite latitude or longitude grid data.
 
     Attributes
     ----------
@@ -72,12 +74,15 @@ class GOESLatLonGridData:
 def _latlon_data(
     name: str, record: Dataset, step: tuple[int, int] | None
 ) -> GOESLatLonGridData:
-    latlon: VariableType = make_variable(name, array=True)
+    latlon = variable(name)
+
+    def _subsample(x: Any) -> Any:
+        return x[:] if step is None else x[:: step[0], :: step[1]]
 
     class _GOESLatLonGridData(DatasetView):
-        data: ArrayFloat32 = latlon(step=step)
-        mask: ArrayBool = latlon(step=step)
-        fill_value: float32 = latlon()
+        data: ArrayFloat32 = latlon.data(filter=_subsample)
+        mask: ArrayBool = latlon.mask(filter=_subsample)
+        fill_value: float32 = latlon.fill_value()
 
     _GOESLatLonGridData.__module__ = GOESLatLonGridData.__module__
     _GOESLatLonGridData.__name__ = GOESLatLonGridData.__name__
@@ -119,9 +124,7 @@ class GOESLatLonGrid(HasStrHelp):
     latitude: GOESLatLonGridData
     longitude: GOESLatLonGridData
 
-    def __init__(
-        self, record: Dataset, step: int | tuple[int, int] | None = None
-    ) -> None:
+    def __init__(self, record: Dataset) -> None:
         """
         Initialize a GOESGrid object from a precomputed netCDF dataset.
 
@@ -131,11 +134,8 @@ class GOESLatLonGrid(HasStrHelp):
             The netCDF dataset containing the precomputed latitude
             and longitude grid data.
         """
-        if isinstance(step, int):
-            step = (step, step)
-
-        self.latitude = _latlon_data("latitude", record, step)
-        self.longitude = _latlon_data("longitude", record, step)
+        self.latitude = _latlon_data("latitude", record, None)
+        self.longitude = _latlon_data("longitude", record, None)
 
 
 class GOESLatLonGridMetadataType:
@@ -161,19 +161,19 @@ class GOESLatLonGridMetadataType:
 
 
 def _latlon_metadata(name: str, record: Dataset) -> GOESLatLonGridMetadataType:
-    latlon: VariableType = make_variable(name)
+    latlon = variable(name)
 
     class _GOESLatLonGridMetadata(DatasetView):
-        long_name: str = latlon()
-        valid_range: ArrayFloat64 = latlon()
-        units: str = latlon()
-        comment: str = latlon()
+        long_name: str = latlon.attribute()
+        valid_range: ArrayFloat64 = latlon.attribute()
+        units: str = latlon.attribute()
+        comment: str = latlon.attribute()
 
     _GOESLatLonGridMetadata.__module__ = GOESLatLonGridMetadataType.__module__
-    _GOESLatLonGridMetadata.__name__ = (
-        "GOESLatMetadata" if name == "latitude" else "GOESLonMetadata"
+    _GOESLatLonGridMetadata.__name__ = GOESLatLonGridMetadataType.__name__
+    _GOESLatLonGridMetadata.__qualname__ = (
+        GOESLatLonGridMetadataType.__qualname__
     )
-    _GOESLatLonGridMetadata.__qualname__ = _GOESLatLonGridMetadata.__name__
 
     metadata = _GOESLatLonGridMetadata(record)
 
@@ -221,8 +221,8 @@ class GOESLatLonGridInfo(DatasetView):
     title: str
     comment: str
     created: str
-    rows: int = dimension()
-    columns: int = dimension()
+    rows: int = dimension.size()
+    columns: int = dimension.size()
 
 
 FILL_VALUE = -999.99
@@ -230,37 +230,27 @@ FILL_VALUE = -999.99
 
 class GOESGeodeticGrid(HasStrHelp):
     """
-    Represent latitude and longitude grid data computed on the fly.
-
-    Calculate the latitude and longitude grid arrays on the fly from the
-    GOES Imager Projection information in ABI Level 2 files.
+    Hold GOES satellite geodetic grids data.
 
     Notes
     -----
     For information on GOES Imager Projection and GOES orbit geometry,
-    see [1]_ and Section 4.2. of [3]_. For a Python demonstration on
-    calculating latitude and longitude from GOES Imager Projection
-    information, see [2]_. The code snippet in this class is based on
-    the Python demonstration in [2]_.
+    see [1]_ and Section 4.2. of [2]_. GOES-R use the Geodetic Reference
+    System 1980 (GRS80).
 
     Attributes
     ----------
     latitude : GOESLatLonGridData
-        The latitude grid data.
+        The GRS80 latitude grid data.
     longitude : GOESLatLonGridData
-        The longitude grid data.
+        The GRS80 longitude grid data.
 
     References
     ----------
     .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
         Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
         https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
-    .. [2] Aerosols and Atmospheric Composition Science Team, "Python
-        Short Demo: Calculate Latitude and Longitude from GOES Imager
-        Projection (ABI Fixed Grid) Information", NOAA/NESDIS/STAR,
-        2024.
-        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/python_abi_lat_lon.php
-    .. [3] GOES-R, " GOES-R Series Product Definition and User’s Guide
+    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
         (PUG), Volume 5: Level 2+ Products", Version 2.4,
         NASA/NOAA/NESDIS, 2022.
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
@@ -270,95 +260,202 @@ class GOESGeodeticGrid(HasStrHelp):
     longitude: GOESLatLonGridData
 
     def __init__(
-        self,
-        record: Dataset,
-        algorithm: str = "opti",
-        step: int | tuple[int, int] | None = None,
+        self, latitude: GOESLatLonGridData, logitude: GOESLatLonGridData
     ) -> None:
         """
-        Initialize a GOESGeodeticGrid object.
+        Initialize a GOESGrid object from a precomputed netCDF dataset.
+
+        Parameters
+        ----------
+        latitude : GOESLatLonGridData
+            The GRS80 latitude grid data.
+        longitude : GOESLatLonGridData
+            The GRS80 longitude grid data
+        """
+        self.latitude = latitude
+        self.longitude = logitude
+
+    @classmethod
+    def calculate(
+        cls,
+        record: Dataset,
+        algorithm: str = "goesdr",
+        step: int | tuple[int, int] = 1,
+    ) -> "GOESGeodeticGrid":
+        """
+        Compute the geodetic grids and initialize a GOESGrid object.
+
+        Calculate the latitude and longitude grid arrays on the fly from
+        the GOES Imager Projection information in ABI Level 2 files.
+
+        Notes
+        -----
+        For information on GOES Imager Projection and GOES orbit
+        geometry, see [1]_ and Section 4.2. of [3]_. For a Python
+        demonstration on calculating latitude and longitude from GOES
+        Imager Projection information, see [2]_. The code snippet in
+        this class is an optimized version based on the code from [2]_.
 
         Parameters
         ----------
         record : Dataset
             The netCDF dataset containing ABI Level 2 data.
+        algorithm : str, optional
+            The algorithm to use to calculate the latitude and longitude
+            grid data. Choose 'cartopy', 'goesdr', or 'pyproj'.
+            'cartopy' or 'pyproj' requires the respective Python package
+            to be installed.  'goesdr' is the default algorithm and does
+            not require any additional packages.
+        step : int or tuple[int, int], optional
+            The step size to subsample the latitude and longitude grid
+            data. If an integer is provided, the step size is the same
+            for both rows and columns. If a tuple is provided, the first
+            value is the step size for grid rows and the second value is
+            the step size for grid columns. The default is 1.
+
+        Returns
+        -------
+        GOESLatLonGrid
+            The latitude and longitude grid data.
+
+        References
+        ----------
+        .. [1] STAR Atmospheric Composition Product Training, "GOES
+            Imager Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+            https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+        .. [2] Aerosols and Atmospheric Composition Science Team,
+            "Python Short Demo: Calculate Latitude and Longitude from
+            GOES Imager Projection (ABI Fixed Grid) Information",
+            NOAA/NESDIS/STAR, 2024.
+            https://www.star.nesdis.noaa.gov/atmospheric-composition-training/python_abi_lat_lon.php
+        .. [3] GOES-R, " GOES-R Series Product Definition and User’s
+            Guide (PUG), Volume 5: Level 2+ Products", Version 2.4,
+            NASA/NOAA/NESDIS, 2022.
+            https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
         """
-        corners: bool = False
-        has_option = False
+        algorithm, corners = cls._parse_algorithm(algorithm)
 
-        if "[center]" in algorithm:
-            has_option = True
-            algorithm = algorithm.replace("[center]", "")
-        elif "[corner]" in algorithm:
-            corners = has_option = True
-            algorithm = algorithm.replace("[corner]", "")
+        step = cls._parse_step(step)
 
-        if has_option and algorithm == "precomputed":
-            raise ValueError(
-                "Algorithm 'precomputed' cannot be used with options."
-            )
+        abi_lat, abi_lon = cls._initialize_calculated(
+            record, algorithm, corners, step
+        )
 
+        return GOESGeodeticGrid(abi_lat, abi_lon)
+
+    @staticmethod
+    def from_file(
+        record: Dataset, step: int | tuple[int, int] | None = None
+    ) -> "GOESGeodeticGrid":
+        """
+        Initialize a GOESGrid object from a precomputed netCDF dataset.
+
+        Notes
+        -----
+        For information on GOES Imager Projection and GOES orbit
+        geometry, see [1]_ and Section 4.2. of [2]_. For information on
+        getting the precomputed latitude and longitude grids dataset,
+        see [1]_.
+
+        Parameters
+        ----------
+        record : Dataset
+            The netCDF dataset containing precomputed latitude and
+            longitude grid data.
+        step : int or tuple[int, int], optional
+            The step size to subsample the latitude and longitude grid
+            data. If an integer is provided, the step size is the same
+            for both rows and columns. If a tuple is provided, the first
+            value is the step size for grid rows and the second value is
+            the step size for grid columns. The default is None.
+
+        Returns
+        -------
+        GOESLatLonGrid
+            The latitude and longitude grid data.
+
+        References
+        ----------
+        .. [1] STAR Atmospheric Composition Product Training, "GOES
+            Imager Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+            https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+        .. [2] GOES-R, " GOES-R Series Product Definition and User’s
+            Guide (PUG), Volume 5: Level 2+ Products", Version 2.4,
+            NASA/NOAA/NESDIS, 2022.
+            https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
+        """
         if isinstance(step, int):
             step = (step, step)
 
-        if algorithm == "precomputed":
-            abi_lat, abi_lon = self._initialize_precomputed(record, step)
-        else:
-            abi_lat, abi_lon = self._initialize_calculated(
-                record, algorithm, corners, step
-            )
-
-        self.latitude = abi_lat
-        self.longitude = abi_lon
-
-    @staticmethod
-    def _initialize_precomputed(
-        record: Dataset, step: tuple[int, int] | None
-    ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
         abi_lat = _latlon_data("latitude", record, step)
         abi_lon = _latlon_data("longitude", record, step)
 
         abi_lat.data[abi_lat.mask] = nan
         abi_lon.data[abi_lon.mask] = nan
 
-        return abi_lat, abi_lon
+        return GOESGeodeticGrid(abi_lat, abi_lon)
 
+    @classmethod
     def _initialize_calculated(
-        self,
+        cls,
         record: Dataset,
         algorithm: str,
         corners: bool,
-        step: tuple[int, int] | None,
+        step: tuple[int, int],
     ) -> tuple[GOESLatLonGridData, GOESLatLonGridData]:
-        lat, lon = self._initialize_latlon_grid(
-            record, algorithm, corners, step
+        projection_info = GOESProjection(record)
+
+        if corners:
+            x_r = calculate_pixel_edges(projection_info.x)
+            y_r = calculate_pixel_edges(projection_info.y)
+        else:
+            x_r = projection_info.x
+            y_r = projection_info.y
+
+        if step[0] > 1:
+            y_r = y_r[:: step[0]]
+
+        if step[1] > 1:
+            x_r = x_r[:: step[1]]
+
+        orbit_parameters = (
+            projection_info.longitude_of_projection_origin,
+            projection_info.perspective_point_height,
+            projection_info.sweep_angle_axis,
         )
+        globe_parameters = (
+            projection_info.semi_major_axis,
+            projection_info.semi_minor_axis,
+            projection_info.inverse_flattening,
+        )
+        xy_grid = (x_r, y_r)
+
+        parameters = ProjectionParameters(
+            orbit_parameters, globe_parameters, xy_grid
+        )
+
+        lat, lon = cls._calculate_latlon_grid(parameters, algorithm)
 
         abi_lat = GOESLatLonGridData(lat)
         abi_lon = GOESLatLonGridData(lon)
 
         return abi_lat, abi_lon
 
-    @classmethod
-    def _initialize_latlon_grid(
-        cls,
-        record: Dataset,
+    @staticmethod
+    def _calculate_latlon_grid(
+        parameters: ProjectionParameters,
         algorithm: str,
-        corners: bool,
-        step: tuple[int, int] | None,
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
         # Ignore numpy errors for `sqrt` of negative number; reference
         # [2] states that this "occurs for GOES-16 ABI CONUS sector
-        # data", however I found it also occurs for Full Disd sector.
+        # data", however I found it also occurs for Full Disk sector.
         with errstate(invalid="ignore"):
-            if algorithm == "noaa":
-                lat, lon = calculate_latlon_grid_noaa(record, corners, step)
-            elif algorithm == "opti":
-                lat, lon = calculate_latlon_grid_opti(record, corners, step)
+            if algorithm == "goesdr":
+                lat, lon = calculate_latlon_grid_goesdr(parameters)
             elif algorithm == "pyproj":
-                lat, lon = calculate_latlon_grid_pyproj(record, corners, step)
+                lat, lon = calculate_latlon_grid_pyproj(parameters)
             elif algorithm == "cartopy":
-                lat, lon = calculate_latlon_grid_cartopy(record, corners, step)
+                lat, lon = calculate_latlon_grid_cartopy(parameters)
             else:
                 raise ValueError(
                     f"Invalid algorithm '{algorithm}'. Expected pattern: "
@@ -376,3 +473,46 @@ class GOESGeodeticGrid(HasStrHelp):
         longitude.fill_value = FILL_VALUE
 
         return latitude, longitude
+
+    @staticmethod
+    def _parse_algorithm(algorithm: str) -> tuple[str, bool]:
+        pattern = r"^(\w+)(?:\[(\w+)\])?$"
+        match_ = match(pattern, algorithm)
+
+        if not match_:
+            raise ValueError(
+                f"Invalid algorithm '{algorithm}'. Expected pattern: "
+                "'<algorithm>' or '<algorithm>[<option>]'. "
+                "Choose 'cartopy', 'goesdr' (default), or 'pyproj' for "
+                "'<algorithm>'. Choose 'center' (default) or 'corner' "
+                "for '<option>'."
+            )
+
+        name = match_[1]
+
+        if name not in {"cartopy", "goesdr", "pyproj"}:
+            raise ValueError(
+                f"Invalid algorithm '{name}'. Choose 'cartopy', 'goesdr', "
+                "or 'pyproj'."
+            )
+
+        option = match_[2]
+
+        if option not in {None, "center", "corner"}:
+            raise ValueError(
+                f"Invalid option '{option}'. Choose 'center' or 'corner'."
+            )
+
+        corner: bool = option == "corner"
+
+        return name, corner
+
+    @staticmethod
+    def _parse_step(step: int | tuple[int, int]) -> tuple[int, int]:
+        if isinstance(step, int):
+            step = (step, step)
+
+        if step[0] <= 0 or step[1] <= 0:
+            raise ValueError(f"Step size must be greater than 0, got {step}.")
+
+        return step
