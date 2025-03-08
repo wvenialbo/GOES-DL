@@ -39,9 +39,11 @@ References
 from .grid_cartopy import calculate_latlon_grid_cartopy
 from .grid_goesdr import calculate_latlon_grid_goesdr
 from .grid_pyproj import calculate_latlon_grid_pyproj
+from .parameters import ProjectionParameters
 
 __all__ = [
     "calculate_latlon_grid_cartopy",
     "calculate_latlon_grid_goesdr",
     "calculate_latlon_grid_pyproj",
+    "ProjectionParameters",
 ]

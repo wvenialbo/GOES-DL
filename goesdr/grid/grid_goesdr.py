@@ -26,12 +26,12 @@ from numpy import (
 )
 
 from ..array import ArrayFloat32, ArrayFloat64
-from ..projection import GOESProjection
 from .helper import make_common_mask
+from .parameters import ProjectionParameters
 
 
 def calculate_latlon_grid_goesdr(
-    projection_info: GOESProjection,
+    projection_info: ProjectionParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids.
@@ -52,7 +52,7 @@ def calculate_latlon_grid_goesdr(
 
     Parameters
     ----------
-    projection_info : GOESProjection
+    projection_info : ProjectionParameters
         Object containing the satellite's projection information and
         GOES ABI fixed grid data.
 

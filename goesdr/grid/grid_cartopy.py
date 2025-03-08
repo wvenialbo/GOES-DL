@@ -15,12 +15,12 @@ calculate_latlon_grid_cartopy
 from numpy import float32, meshgrid
 
 from ..array import ArrayFloat32, ArrayFloat64
-from ..projection import GOESProjection
 from .helper import make_consistent
+from .parameters import ProjectionParameters
 
 
 def calculate_latlon_grid_cartopy(
-    projection_info: GOESProjection,
+    projection_info: ProjectionParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using the cartopy package.
@@ -33,7 +33,7 @@ def calculate_latlon_grid_cartopy(
 
     Parameters:
     -----------
-    projection_info : GOESProjection
+    projection_info : ProjectionParameters
         Object containing the satellite's projection information and
         GOES ABI fixed grid data.
 
