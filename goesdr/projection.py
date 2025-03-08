@@ -191,3 +191,27 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
             The orbital radius of the GOES satellite in meters.
         """
         return self.perspective_point_height + self.semi_major_axis
+
+    @property
+    def x_m(self) -> ArrayFloat64:
+        """
+        Calculate the x-coordinate fixed grid in meters.
+
+        Returns
+        -------
+        ArrayFloat64
+            The x-coordinate fixed grid in meters.
+        """
+        return self.perspective_point_height * self.x
+
+    @property
+    def y_m(self) -> ArrayFloat64:
+        """
+        Calculate the y-coordinate fixed grid in meters.
+
+        Returns
+        -------
+        ArrayFloat64
+            The y-coordinate fixed grid in meters.
+        """
+        return self.perspective_point_height * self.y
