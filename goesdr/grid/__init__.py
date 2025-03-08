@@ -10,6 +10,11 @@ Notes
 See [2]_, GOES-R Product User Guide (PUG) Volume 5 (L2 products) Section
 4.2.8 for details & example of calculations.
 
+Classes
+-------
+ProjectionParameters
+    Class to store GOES ABI fixed grid projection parameters.
+
 Functions
 ---------
 calculate_latlon_grid_cartopy
@@ -19,6 +24,8 @@ calculate_latlon_grid_goesdr
     classic's algorithm.
 calculate_latlon_grid_pyproj
     Calculate latitude and longitude grids using the pyproj package.
+calculate_pixel_edges
+    Calculate the pixel edges of the GOES ABI fixed grid.
 
 References
 ----------
@@ -39,11 +46,13 @@ References
 from .grid_cartopy import calculate_latlon_grid_cartopy
 from .grid_goesdr import calculate_latlon_grid_goesdr
 from .grid_pyproj import calculate_latlon_grid_pyproj
+from .helper import calculate_pixel_edges
 from .parameters import ProjectionParameters
 
 __all__ = [
     "calculate_latlon_grid_cartopy",
     "calculate_latlon_grid_goesdr",
     "calculate_latlon_grid_pyproj",
+    "calculate_pixel_edges",
     "ProjectionParameters",
 ]
