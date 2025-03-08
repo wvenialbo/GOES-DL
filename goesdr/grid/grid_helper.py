@@ -79,13 +79,13 @@ def make_common_mask(
     Returns
     -------
     tuple[ArrayFloat64, ArrayFloat64]
-        A tuple containing the consistent latitude and longitude grid
-        data.
+        A tuple containing consistently masked latitude and longitude
+        grid data.
     """
-    is_valid = ~(isnan(abi_lat) | isnan(abi_lon))
+    is_nan = isnan(abi_lat) | isnan(abi_lon)
 
-    abi_lat = where(is_valid, abi_lat, nan)
-    abi_lon = where(is_valid, abi_lon, nan)
+    abi_lat = where(is_nan, nan, abi_lat)
+    abi_lon = where(is_nan, nan, abi_lon)
 
     return abi_lat, abi_lon
 
