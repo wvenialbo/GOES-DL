@@ -30,7 +30,7 @@ from .array import ArrayFloat32, ArrayFloat64
 from .grid_helper import make_common_mask
 
 
-def compute_latlon_grid(
+def _transform_grid(
     params: tuple[float64, float64, float64],
     sin_xy: tuple[ArrayFloat64, ArrayFloat64],
     cos_xy: tuple[ArrayFloat64, ArrayFloat64],
@@ -169,7 +169,7 @@ def calculate_latlon_grid_goesdr(
     sin_x, sin_y = meshgrid(sin_x, sin_y)
     cos_x, cos_y = meshgrid(cos_x, cos_y)
 
-    lat, lon = compute_latlon_grid(
+    lat, lon = _transform_grid(
         (r_orb, r_eq, r_pol),
         (sin_x, sin_y),
         (cos_x, cos_y),
