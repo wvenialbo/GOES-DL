@@ -151,7 +151,7 @@ class GOESABIFixedGrid(DatasetView):
     y: NDArray[float64] = data(convert=to_float64)
 
 
-class GOESProjection(GOESOrbitGeometry, GOESGlobe):
+class GOESProjection(GOESOrbitGeometry, GOESGlobe, GOESABIFixedGrid):
     """
     Represent GOES-R series satellite projection information.
 
