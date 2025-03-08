@@ -53,9 +53,15 @@ class ProjectionParameters:
         Parameters
         ----------
         orbit_parameters : tuple[float64, float64, str]
-            The parameters of the orbit geometry and satellite attitude.
+            The parameters of the orbit geometry and satellite attitude:
+            - The longitude of the projection origin in East degrees.
+            - The height of the perspective point in meters.
+            - The axis of the sweep.
         globe_parameters : tuple[float64, float64, float64]
-            The parameters of the reference ellipsoid.
+            The parameters of the reference ellipsoid:
+            - The semi-major axis of the globe in meters.
+            - The semi-minor axis of the globe in meters.
+            - The inverse flattening of the globe.
         xy_grid : tuple[ArrayFloat64, ArrayFloat64]
             The x and y grid data.
         """
