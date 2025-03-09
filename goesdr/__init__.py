@@ -6,40 +6,14 @@ GOES satellite netCDF data files. It uses the `netCDF4` package to read
 the data files and the netcdf subpackage to extract the information.
 """
 
+from . import grid
 from . import netcdf
-from .dataset import GOESDatasetInfo
-from .geodetic import (
-    GOESGeodeticGrid,
-    GOESLatLonGrid,
-    GOESLatLonGridData,
-    GOESLatLonGridInfo,
-    GOESLatLonGridMetadata,
-)
-from .image import GOESImage, GOESImageMetadata
-from .projection import (
-    GOESABIFixedGrid,
-    GOESGlobe,
-    GOESOrbitGeometry,
-    GOESProjection,
-)
 
 __all__ = [
-    "GOESABIFixedGrid",
-    "GOESABIFixedGrid",
-    "GOESDatasetInfo",
-    "GOESGeodeticGrid",
-    "GOESGlobe",
-    "GOESImage",
-    "GOESImageMetadata",
-    "GOESLatLonGrid",
-    "GOESLatLonGridData",
-    "GOESLatLonGridInfo",
-    "GOESLatLonGridMetadata",
-    "GOESOrbitGeometry",
-    "GOESProjection",
+    "grid",
     "netcdf",
 ]
 
-__package_id__ = "GOES-DR"
+__package_id__ = "GOES-CORE"
 __package_name__ = f"{__package_id__} — GOES Satellite Imagery Dataset Reader"
-__version__ = "v0.1-rc1"
+__version__ = "v0.0-rc0"
