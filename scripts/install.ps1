@@ -26,9 +26,11 @@ python -m pip --version
 
 # Install the project development requirements.dev
 
-$requirements_dev = 'requirements.dev'
+$requirements_dev = 'requirements-dev.txt'
 
-python -m pip install --upgrade -r $requirements_dev
+if (Test-Path -Path $requirements_dev) {
+    python -m pip install --upgrade -r $requirements_dev
+}
 
 # Install the project requirements.txt, if it exists
 

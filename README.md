@@ -1,7 +1,15 @@
-# GOES-DL — GOES Dataset Downloader
+# GOES-DL — GOES Satellite Imagery Dataset Downloader
 
+[![AutoPEP](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-autopep.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-autopep.yml)
 [![Bandit](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml)
+[![Black](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-black.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-black.yml)
+[![DocSig](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-docsig.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-docsig.yml)
+[![Flake8](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-flake.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-flake.yml)
+[![ISort](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-isort.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-isort.yml)
 [![MyPy](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-mypy.yml)
+[![PyCodeStyle](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pycodestyle.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pycodestyle.yml)
+[![PyDocLint](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydoclint.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydoclint.yml)
+[![PyDocStyle](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydocstyle.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pydocstyle.yml)
 [![PyFlakes](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pyflakes.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pyflakes.yml)
 [![Pylint](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pylint.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-pylint.yml)
 [![Ruff](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-ruff.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-ruff.yml)
@@ -16,8 +24,8 @@ GOES, and the National Oceanic and Atmospheric Administration (NOAA) operates
 them &#91;[6](#hist)&#93;.*
 
 **GOES-DL** is an open-source Python package that simplifies the process of
-downloading satellite imagery datasets from various NOAA archives. The package
-supports both second and fourth-generation GOES satellite data
+downloading satellite imagery datasets from various NOAA archives. This toolkit
+supports second, third and fourth-generation GOES satellite data
 &#91;[4](#goesi),[7](#goesr)&#93;, as well as the Gridded Satellite B1
 (GridSat-B1) Climate Data Record &#91;[3](#gridb1)&#93;. GOES-DL provides an
 easy-to-use interface to access data for scientific analysis, research, and
@@ -29,9 +37,9 @@ other applications.
   real-time and archived data from NOAA's Amazon Web Services (AWS) cloud
   archive.
 
-- **Gridded Satellite Data from GOES 2nd Generation (GridSat-GOES)**: Download
-  data from NOAA's National Centers for Environmental Information (NCEI)
-  archive.
+- **Gridded Satellite Data from GOES 2nd and 3rd Generation (GridSat-GOES)**:
+  Download data from NOAA's National Centers for Environmental Information
+  (NCEI) archive.
 
 - **Gridded Satellite Data from ISCCP B1 (GridSat-B1)**: Fetch historical
   climate data from both NOAA's AWS archive and the NCEI archive.
@@ -44,29 +52,33 @@ other applications.
 
 ## Supported Datasets
 
-1. **GOES 2nd Generation (GOES-8 to GOES-15)**: Also known as the I to P
+1. **GOES 2nd Generation (GOES-8 to GOES-12)**: Also known as the I to M
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
 
-2. **GOES 4th Generation (GOES-16 to GOES-18)**: Also known as the R to U
+2. **GOES 3rd Generation (GOES-13 to GOES-15)**: Also known as the N to P
+   Series, these datasets provide environmental monitoring and meteorological
+   data for the Western Hemisphere &#91;[4](#goesi)&#93;.
+
+3. **GOES 4th Generation (GOES-16 to GOES-18)**: Also known as the R to U
    Series, these satellites offer advanced imagery and atmospheric measurements
    with better spatial, spectral, and temporal resolution &#91;[7](#goesr)&#93;.
 
-3. **GridSat-B1 Climate Data Record (Version 2)**: Gridded satellite imagery
+4. **GridSat-B1 Climate Data Record (Version 2)**: Gridded satellite imagery
    for climate research, containing global infrared window, visible, and water
    vapor data over long time periods &#91;[3](#gridb1)&#93;.
 
 Refer to [Gridded Satellite GOES (GridSat-GOES) East and West Full Disk and
-CONUS Coverage, Version 1][1] and [NOAA Climate Data Record (CDR) of Gridded
+CONUS Coverage, Version 1][52] and [NOAA Climate Data Record (CDR) of Gridded
 Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
-Temperature, Version 2][5] for more information on the data format and details
+Temperature, Version 2][53] for more information on the data format and details
 of the content.
 
 See [NOAA Geostationary Operational Environmental Satellites (GOES) 16, 17 &
-18][2] and [NOAA GOES on AWS (CICS)][3] for information on the GOES-R Series
+18][11] and [NOAA GOES on AWS (CICS)][12] for information on the GOES-R Series
 data available from NOAA on AWS. You can find much more detailed information
 about GOES-R Series data from NOAA's [Geostationary Operational Environmental
-Satellites - R Series][4].
+Satellites - R Series][0].
 
 ## Installation
 
@@ -76,6 +88,12 @@ To install **GOES-DL**, use `pip`:
 pip install goes-dl
 ```
 
+To update **GOES-DL**, use:
+
+```bash
+pip install --upgrade goes-dl
+```
+
 ## Usage
 
 Below are examples of how to use the GOES-DL package to download data from each
@@ -83,7 +101,7 @@ of the supported sources. You will find more examples in the
 [examples](https://github.com/wvenialbo/GOES-DL/tree/main/examples) directory
 of the repository.
 
-### 1. Download GOES 2nd Generation Data (from NOAA's NCEI archive)
+### 1. Download GOES 2nd and 3rd Generation Data (from NOAA's NCEI archive)
 
 ```python
 # Import the locator and datasource according to your desired product
@@ -262,7 +280,8 @@ The general workflow for downloading data using **GOES-DL** is as follows:
    It is initialized with the datasource and locator objects, as well as the
    date format to be used in the download process.
 
-The Downloader.get_files method accepts the following parameters:
+The `Downloader.download_files` and `Downloader.list_files` method accepts the
+following parameters:
 
 - **start_time**: A string specifying the starting date for the dataset to be
   downloaded.
@@ -271,8 +290,12 @@ The Downloader.get_files method accepts the following parameters:
   downloaded.
 
 The default date format is the ISO 8601 format with timezone information
-(`"%Y-%m-%dT%H:%M%z"`). The date format can be changed by passing the desired
+(`"%Y-%m-%dT%H:%M:%S%z"`). The date format can be changed by passing the desired
 format to the downloader object during initialization.
+
+The `Downloader.get_files` method accepts a list of strings with the paths of
+the files to be downloaded. This method is useful when you want to download only
+a subset of the files listed by the `Downloader.list_files` method.
 
 ## Data Sources
 
@@ -281,6 +304,37 @@ format to the downloader object during initialization.
    Information.
 2. **NOAA AWS Cloud Archive**: GOES-16 to GOES-18 data and GridSat-B1 Climate
    Data Record are accessible via the NOAA archive hosted on AWS.
+
+## Project description
+
+Tool package to download GOES (Geostationary Operational Environmental
+Satellite) 2nd and 3rd generation (GOES-8 to GOES-15) data from NOAA's NCEI
+archive, 4th Generation (GOES-16 to GOES-18) data from NOAA's archive on AWS,
+and Gridded Satellite B1 (GridSat-B1) Climate Data Record, Version 2, from
+NOAA's AWS and NCEI archives using Python.
+
+**Keywords:**
+[goes](https://github.com/topics/goes),
+[satellite](https://github.com/topics/satellite),
+[satellite-dataset](https://github.com/topics/satellite-dataset),
+[satellite-imagery](https://github.com/topics/satellite-imagery),
+[satellite-imagery-analysis](https://github.com/topics/satellite-imagery-analysis),
+[satellite-imagery-python](https://github.com/topics/satellite-imagery-python),
+[satellite-data](https://github.com/topics/satellite-data),
+[noaa](https://github.com/topics/noaa),
+[noaa-satellite](https://github.com/topics/noaa-satellite),
+[ncei](https://github.com/topics/ncei),
+[unidata](https://github.com/topics/unidata),
+[unidata-netcdf](https://github.com/topics/unidata-netcdf),
+[netcdf](https://github.com/topics/netcdf),
+[netcdf4](https://github.com/topics/netcdf4),
+[aws](https://github.com/topics/aws),
+[open-data](https://github.com/topics/open-data),
+[open-source](https://github.com/topics/open-source),
+[open-datasets](https://github.com/topics/open-datasets),
+[downloader](https://github.com/topics/downloader),
+[download](https://github.com/topics/download),
+[xarray](https://github.com/topics/xarray)
 
 ## Contributing
 
@@ -294,7 +348,7 @@ Please make sure to include tests for any new functionality.
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
 - [requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
   library for Python.
 - [boto3](https://pypi.org/project/boto3): AWS SDK for Python.
@@ -313,10 +367,24 @@ This package relies on data provided by NOAA’s NCEI and NOAA’s archive on AW
 When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
-> Villamayor-Venialbo, W. (2024): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.1.1)* [Software]. GitHub.
+> Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
+> GOES and GridSat-B1 satellite data (Version 0.1-rc4)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
+
+### Credits for GOES-R Series Data
+
+**Dataset Citation:**
+
+For Cloud and Moisture Imagery Products (CMIP), please cite the following:
+
+> GOES-R Algorithm Working Group, and GOES-R Series Program (2017): NOAA GOES-R
+> Series Advanced Baseline Imager (ABI) Level 2 Cloud and Moisture Imagery
+> Products (CMIP). *[indicate subset used]*. *NOAA National Centers for
+> Environmental Information*, [doi:10.7289/V5736P36][51], *[access date]*.
+
+For other products, please, visit [NOAA National Centers for Environmental
+Information][10].
 
 ### Credits for GridSat-GOES/CONUS
 
@@ -324,8 +392,7 @@ package as:
 
 > Knapp, K. R. (2017): Gridded Satellite GOES Coverage Data (GridSat-GOES),
 > *[indicate subset used]*. *NOAA National Centers for Environmental
-> Information* [doi:10.7289/V5HM56GM](https://doi.org/10.7289/V5HM56GM),
-> *[indicate access date]*.
+> Information*, [doi:10.7289/V5HM56GM][52], *[indicate access date]*.
 
 Please cite the following article when using GridSat-GOES/CONUS data in any
 publication:
@@ -342,8 +409,7 @@ publication:
 > Knapp, K. R.; NOAA CDR Program; (2014): NOAA Climate Data Record (CDR) of
 > Gridded Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
 > Temperature, Version 2, *[indicate subset used]*. *NOAA National Centers for
-> Environmental Information*.
-> [doi:10.7289/V59P2ZKR](https://doi.org/10.7289/V59P2ZKR), *[indicate access
+> Environmental Information*, [doi:10.7289/V59P2ZKR][53], *[indicate access
 > date]*.
 
 Please cite the following article when using GridSat-B1 data in any publication:
@@ -373,11 +439,13 @@ gmail.com](mailto:wvenialbo@gmail.com).
 
 ## Similar Projects
 
-- [Brian Blaylock's goes2go](https://github.com/blaylockbk/goes2go): Download
-  and process GOES-16 and GOES-17 data from NOAA's archive on AWS using Python.
-  ([readthedocs](https://goes2go.readthedocs.io/))
-- [Joao Henry's GOES](https://github.com/joaohenry23/GOES): Python package to
-  download and manipulate GOES-16/17/18 data.
+- [Brian Blaylock's goes2go][22]: Download and process GOES-16 and GOES-17 data
+  from NOAA's archive on AWS using Python.  ([readthedocs][31])
+- [Joao Henry's GOES][23]: Python package to download and manipulate
+  GOES-16/17/18 data.
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
 
 ## References
 
@@ -394,35 +462,48 @@ gmail.com](mailto:wvenialbo@gmail.com).
 3. Knapp, K. R; NOAA CDR Program; (2014): NOAA Climate Data Record (CDR) of
    Gridded Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
    Temperature, Version 2. *NOAA National Centers for Environmental
-   Information*, [doi:10.7289/V59P2ZKR](https://doi.org/10.7289/V59P2ZKR).<a
+   Information*, [doi:10.7289/V59P2ZKR][53].<a
    name="gridb1"></a>
 4. Knapp, K. R; (2017): Gridded Satellite GOES Coverage Data (GridSat-GOES).
    *NOAA National Centers for Environmental Information*.
-   [doi:10.7289/V5HM56GM](https://doi.org/10.7289/V5HM56GM).<a name="goesi"></a>
+   [doi:10.7289/V5HM56GM][52].<a name="goesi"></a>
 5. Knapp, K. R. and Wilkins, S. L.; (2018): Gridded Satellite (GridSat) GOES and
    CONUS data, *Earth System Science Data*, 10(3), 1417–1425,
    [doi:10.5194/essd-10-1417-2018](https://doi.org/10.5194/essd-10-1417-2018).
-6. GOES History. *GOES-R Website*, https://www.goes-r.gov/mission/history.html,
-   retrieved on 2024.<a name="hist"></a>
+6. GOES History. *GOES-R Website*,
+   [https://www.goes-r.gov/mission/history.html][1], retrieved on 2024.<a
+   name="hist"></a>
 7. GOES-R Series Data Products. *GOES-R Website*,
-   https://www.goes-r.gov/products/overview.html, retrieved on 2024.<a
+   [https://www.goes-r.gov/products/overview.html][2], retrieved on 2024.<a
    name="goesr"></a>
 8. NOAA Big Data Program, *NOAA Open Data Dissemination Program*,
-   https://github.com/NOAA-Big-Data-Program/bdp-data-docs, retrieved on 2024.
+   [https://github.com/NOAA-Big-Data-Program/bdp-data-docs][21], retrieved on
+   2024.
 9. Beginner’s Guide to GOES-R Series Data: How to acquire, analyze, and
    visualize GOES-R Series data, *Resources compiled by GOES-R Product Readiness
    and Operations*, Satellite Products and Services Division, National Oceanic
-   and Atmospheric Administration.
-   [PDF](https://www.goes-r.gov/downloads/resources/documents/Beginners_Guide_to_GOES-R_Series_Data.pdf)
-   Last Updated on May 23, 2024, retrieved on 2024.
+   and Atmospheric Administration.  [PDF][42]. Last Updated on May 23, 2024,
+   retrieved on 2024.
 10. GOES-R Series Data Book, *GOES-R Series Program Office*, Goddard Space
-    Flight Center, National Aeronautics and Space Administration.
-    [PDF](https://www.goes-r.gov/downloads/resources/documents/GOES-RSeriesDataBook.pdf),
+    Flight Center, National Aeronautics and Space Administration. [PDF][41],
     retrieved on 2024.
 
-[0]: hidden_references:
-[1]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00993
-[2]: https://registry.opendata.aws/noaa-goes/
-[3]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
-[4]: https://www.goes-r.gov/
-[5]: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00829
+<!-- markdownlint-restore -->
+
+<!-- hidden-references: named links -->
+
+[0]: https://www.goes-r.gov/
+[1]: https://www.goes-r.gov/mission/history.html
+[2]: https://www.goes-r.gov/products/overview.html
+[10]: https://www.ncei.noaa.gov/
+[11]: https://registry.opendata.aws/noaa-goes/
+[12]: https://docs.opendata.aws/noaa-goes16/cics-readme.html
+[21]: https://github.com/NOAA-Big-Data-Program/bdp-data-docs
+[22]: https://github.com/blaylockbk/goes2go
+[23]: https://github.com/joaohenry23/GOES
+[31]: https://goes2go.readthedocs.io/
+[41]: https://www.goes-r.gov/downloads/resources/documents/GOES-RSeriesDataBook.pdf
+[42]: https://www.goes-r.gov/downloads/resources/documents/Beginners_Guide_to_GOES-R_Series_Data.pdf
+[51]: https://doi.org/10.7289/V5736P36
+[52]: https://doi.org/10.7289/V5HM56GM
+[53]: https://doi.org/10.7289/V59P2ZKR

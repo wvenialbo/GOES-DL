@@ -4,6 +4,14 @@
 
 $venv = '.venv'
 
-if (-not $env:VIRTUAL_ENV) {
+if ($env:VIRTUAL_ENV) {
+    deactivate
+}
+
+if (Test-Path -Path $venv) {
     & $venv/Scripts/Activate.ps1
+}
+else {
+    Write-Warning "no virtual environment found!"
+    Write-Host ""
 }

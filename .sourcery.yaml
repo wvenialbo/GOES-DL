@@ -70,5 +70,5 @@ rule_settings:
 #   no_ssl_verify: false
 
 coding_assistant:
-  project_description: 'GOES Satellite Imagery Downloader'
+  project_description: 'GOES-DL — GOES Satellite Imagery Dataset Downloader'
   enabled: true

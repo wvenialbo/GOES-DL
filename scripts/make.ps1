@@ -4,19 +4,8 @@
 
 $venv = '.venv'
 
-# Set the list of development tool packages to install
-
-$devs = 'bandit', 'ruff', 'mypy', 'pyflakes', 'isort', 'pylint', `
-    'eradicate', 'black', 'pycodestyle', 'autopep8', 'pydocstyle', `
-    'pydoclint', 'pydoctest', 'docsig', 'flake8', 'pep8-naming', `
-    'flake8-bugbear', 'flake8-pyproject', 'flake8-builtins', `
-    'flake8-annotations', 'flake8-comprehensions', 'darglint2', `
-    'flake8-pytest-style', 'pytest', 'pytest-cov', 'pytest-mock', `
-    'pytest-xdist', 'coverage', 'pyinstrument', 'jupyterlab', `
-    'types-requests', 'boto3-stubs[s3]'
-
-$tool = 'pip', 'setuptools', 'build', 'wheel', 'pip-tools', 'twine', `
-    'findpydeps'
+$tool = 'pip', 'pip-tools', 'findpydeps', 'setuptools', 'build', 'wheel', `
+        'twine', 'pyinstaller', 'pyinstaller_versionfile'
 
 # Activate the environment if it is not active, and upgrade tools
 
@@ -25,30 +14,41 @@ $isVirtualEnvActive = $true
 if (-not $env:VIRTUAL_ENV) {
     $isVirtualEnvActive = $false
     & $venv/Scripts/Activate.ps1
+    if (-not $env:VIRTUAL_ENV) {
+        exit 1
+    }
 }
 
 python -m pip install --upgrade $tool
 
 # Display the version of python and pip
 
+py -0
 python --version
 python -m pip --version
 
+# Save th list of devtime packages to install in 'requirements-dev.in'
+
+$reqdevi = 'requirements-dev.in'
+$reqdevo = 'requirements-dev.txt'
+
+# Compile the 'requirements-dev.in' to 'requirements-dev.txt'
+
+if (Test-Path -Path $reqdevi) {
+    python -m piptools compile --upgrade --output-file $reqdevo $reqdevi
+}
+
 # Save th list of packages to install in 'requirements.in'
 
-$reqi = 'requirements.in'
-$reqs = 'requirements.dev'
+$reqdepi = 'requirements.in'
+$reqdepo = 'requirements.txt'
 
-$devs | Set-Content -Path $reqi
-$deps | Add-Content -Path $reqi
+# Compile the 'requirements.in' to 'requirements.txt'
 
-# Compile the 'requirements.in' to 'requirements.dev'
+if (Test-Path -Path $reqdepi) {
+    python -m piptools compile --upgrade --output-file $reqdepo $reqdepi
+}
 
-python -m piptools compile --upgrade --output-file $reqs $reqi
-
-# Clean up auxiliary files and deactivate the environment if it was not active
-
-Remove-Item $reqi
 
 if (-not $isVirtualEnvActive) {
     deactivate
