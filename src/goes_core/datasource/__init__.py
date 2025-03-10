@@ -19,11 +19,11 @@ DatasourceLocal
     A datasource object for a local directory.
 """
 
-from .datasource import Datasource as Datasource
-from .datasource_aws import DatasourceAWS as DatasourceAWS
-from .datasource_cache import DatasourceCache as DatasourceCache
-from .datasource_local import DatasourceLocal as DatasourceLocal
-from .datasource_ncei import DatasourceNCEI as DatasourceNCEI
+from .datasource import Datasource
+from .datasource_aws import DatasourceAWS
+from .datasource_cache import DatasourceCache
+from .datasource_local import DatasourceLocal
+from .datasource_ncei import DatasourceNCEI
 
 __all__ = [
     "Datasource",
