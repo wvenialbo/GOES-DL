@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.in
     - name: Analysing the code with bandit
       run: |
-        bandit "./src/goesdl" --recursive
+        bandit "./src/goes_core" --recursive

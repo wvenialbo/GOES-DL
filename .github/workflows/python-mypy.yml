@@ -26,4 +26,4 @@ jobs:
         pip install --upgrade boto3-stubs[s3]
     - name: Analysing the code with mypy
       run: |
-        mypy "./src/goesdl"
+        mypy "./src/goes_core"

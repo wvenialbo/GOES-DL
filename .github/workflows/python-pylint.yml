@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.in
     - name: Analysing the code with pylint
       run: |
-        pylint "./src/goesdl"
+        pylint "./src/goes_core"

@@ -22,4 +22,4 @@ jobs:
         pip install -r requirements.in
     - name: Analysing the code with pycodestyle
       run: |
-        pycodestyle "./src/goesdl" --show-source --show-pep8
+        pycodestyle "./src/goes_core" --show-source --show-pep8

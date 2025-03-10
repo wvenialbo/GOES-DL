@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with bandit
         run: |
-          bandit "./src/goesdl" --recursive
+          bandit "./src/goes_core" --recursive
 
   ruff:
     name: Linting with Ruff
@@ -43,7 +43,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with ruff
         run: |
-          ruff check "./src/goesdl"
+          ruff check "./src/goes_core"
 
   mypy:
     name: Type checking with MyPy
@@ -68,7 +68,7 @@ jobs:
           pip install --upgrade boto3-stubs[s3]
       - name: Analysing the code with mypy
         run: |
-          mypy "./src/goesdl"
+          mypy "./src/goes_core"
 
   pyflakes:
     name: Linting with PyFlakes
@@ -89,7 +89,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with pyflakes
         run: |
-          pyflakes "./src/goesdl"
+          pyflakes "./src/goes_core"
 
   isort:
     name: Import format checking with ISort
@@ -110,7 +110,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with isort
         run: |
-          isort "./src/goesdl" --check --diff
+          isort "./src/goes_core" --check --diff
 
   pylint:
     name: Linting with Pylint
@@ -131,7 +131,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with pylint
         run: |
-          pylint "./src/goesdl"
+          pylint "./src/goes_core"
 
   black:
     name: Code format checking with Black
@@ -152,7 +152,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with black
         run: |
-          black "./src/goesdl" --check
+          black "./src/goes_core" --check
 
   pycodestyle:
     name: Code format checking with PyCodeStyle
@@ -173,7 +173,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with pycodestyle
         run: |
-          pycodestyle "./src/goesdl" --show-source --show-pep8
+          pycodestyle "./src/goes_core" --show-source --show-pep8
 
   autopep:
     name: Code format checking with AutoPEP8
@@ -194,7 +194,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with autopep8
         run: |
-          autopep8 "./src/goesdl" --recursive --jobs 0 --diff --aggressive
+          autopep8 "./src/goes_core" --recursive --jobs 0 --diff --aggressive
 
   pydocstyle:
     name: Documentation linting with PyDocStyle
@@ -215,7 +215,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with pydocstyle
         run: |
-          pydocstyle "./src/goesdl"
+          pydocstyle "./src/goes_core"
 
   pydoclint:
     name: Documentation linting with PyDocLint
@@ -236,7 +236,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with pydoclint
         run: |
-          pydoclint "./src/goesdl"
+          pydoclint "./src/goes_core"
 
   docsig:
     name: Document method signature checking with DocSig
@@ -257,7 +257,7 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with docsig
         run: |
-          docsig "./src/goesdl"
+          docsig "./src/goes_core"
 
   flake:
     name: Linting and style checking with Flake8
@@ -285,4 +285,4 @@ jobs:
           pip install -r requirements.in
       - name: Analysing the code with flake8
         run: |
-          flake8 "./src/goesdl"
+          flake8 "./src/goes_core"
