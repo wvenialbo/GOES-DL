@@ -1,0 +1,16 @@
+Environment installation pipeline
+=================================
+init.ps1        # Initialize/update the project environment
+make.ps1        # Create the project's requirements.txt and requirements-dev.txt
+install.ps1     # Install the project's requirements.txt and requirements-dev.txt
+deploy.ps1      # Install the project locally in editable mode
+
+
+Environment management and maintenance
+======================================
+activate.ps1    # Activate the project environment
+deactivate      # Deactivate the project environment
+find-deps.ps1   # Find the project dependencies and create requirements-deps.txt
+build.ps1       # Build a release package for deployment
+compile.ps1     # Build a release executable for deployment
+cleanup.ps1     # Clean the project environment (remove all installed packages)
