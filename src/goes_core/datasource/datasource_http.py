@@ -20,7 +20,7 @@ from .datasource_cache import DatasourceCache
 HTTP_STATUS_OK = 200
 
 
-class DatasourceHTTP(DatasourceBase):
+class DatasourceNCEI(DatasourceBase):
     """
     Handle HTTP-based data sources.
 
