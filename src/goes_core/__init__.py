@@ -7,7 +7,7 @@ and `boto3` packages to download the files and the `netCDF4` package to
 read the data files.
 """
 
-from . import dataset, datasource, downloader
+from . import dataset, datasource, downloader, grid, netcdf
 from .dataset import ProductLocator
 from .datasource import (
     Datasource,
@@ -28,6 +28,8 @@ __all__ = [
     "DatasourceNCEI",
     "downloader",
     "Downloader",
+    "grid",
+    "netcdf",
     "ProductLocator",
 ]
 
