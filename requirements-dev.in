@@ -1,0 +1,49 @@
+# Linters, static type checkers and formatters
+autopep8
+bandit
+black
+darglint2
+eradicate
+flake8
+flake8-annotations
+flake8-bugbear
+flake8-builtins
+flake8-comprehensions
+flake8-pyproject
+flake8-pytest-style
+isort
+mypy
+pep8-naming
+pycodestyle
+pyflakes
+pyinstrument
+pylint
+ruff
+
+# Documentation checkers
+docsig
+pydoclint
+pydocstyle
+
+# Documentation generators
+sphinx
+sphinx-autodoc-typehints
+sphinx-rtd-theme
+sphinxcontrib-spelling
+sphinxcontrib-trio
+sphinxcontrib-websupport
+
+# Extended type-stubs
+boto3-stubs[s3]
+types-requests
+
+# Testing
+coverage[toml]
+pydoctest
+pytest
+pytest-cov
+pytest-mock
+pytest-xdist
+
+# Prototyping and interactive development
+jupyterlab
