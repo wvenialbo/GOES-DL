@@ -3,27 +3,25 @@
 
   # The PyPI classifiers for your project
   classifiers = [
-    "Development Status :: 4 - Beta",
-    "Development Status :: 5 - Production/Stable",
-    "Environment :: Console",
-    "Framework :: Flake8",
-    "Framework :: MkDocs",
-    "Framework :: Sphinx :: Extension",
-    "Framework :: Sphinx :: Theme",
-    "Framework :: Sphinx",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
-    "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Education",
     "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
     "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Utilities",
   ]
 
@@ -31,24 +29,29 @@
   dependencies = ["boto3~=1.37.2", "netcdf4~=1.7.2", "requests~=2.32.3"]
 
   # The description for your project
-  description = "GOES-CORE — Satellite Imagery Dataset Handling Fundations"
+  description = "GOES-CORE — Satellite Imagery Dataset Handling Foundations"
 
   dynamic = ["version"]
 
   # The keywords for your project
   keywords = [
+    "climate",
     "GOES",
     "GOES-R",
     "GridSat",
     "GridSat-B1",
     "GridSat-GOES/CONUS",
     "atmospheric science",
+    "data",
     "dataset",
     "downloader",
     "environmental data",
     "meteorology",
     "multi-source",
+    "netcdf",
+    "oceanography",
     "satellite imagery",
+    "science",
     "severe weather",
   ]
 
@@ -80,14 +83,14 @@
       version = { attr = "goes_core.__version__" }
 
     [tool.setuptools.package-data]
-      goesdl = ["py.typed"]
+      goes_core = ["py.typed"]
 
     [tool.setuptools.packages.find]
       where = ["src"]
 
   [tool.poetry]
     authors     = ["Waldemar Villamayor-Venialbo <wvenialbo@fpuna.edu.py>"]
-    description = "GOES-CORE — Satellite Imagery Dataset Handling Fundations"
+    description = "GOES-CORE — Satellite Imagery Dataset Handling Foundations"
     license     = "MIT"
     name        = "goes-core"
     packages    = [{ include = "goescore" }, { include = "goescore/py.typed" }]
