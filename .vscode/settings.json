@@ -1,0 +1,532 @@
+{
+    // Python editor settings
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.convertImportFormat": "explicit",
+            "source.fixAll": "explicit",
+            "source.fixAll.isort": "explicit",
+            "source.fixAll.ruff": "explicit",
+            "source.fixall.pylance": "explicit",
+            "source.organizeImports": "explicit",
+            "source.organizeImports.ruff": "never",
+            "source.unusedImports": "explicit",
+        },
+        "editor.colorDecorators": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnPaste": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnType": false,
+        "editor.rulers": [
+            72, // docstrings
+            79, // code
+        ],
+    },
+    // General editor settings
+    "editor.accessibilitySupport": "off",
+    "editor.acceptSuggestionOnEnter": "smart",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.inlineSuggest.enabled": true,
+    "editor.insertSpaces": true,
+    "editor.lineHeight": 0,
+    "editor.quickSuggestions": {
+        "comments": "on",
+        "other": "on",
+        "strings": "on",
+    },
+    "editor.rulers": [
+        79,
+        80,
+    ],
+    "editor.suggest.insertMode": "replace",
+    "editor.tabSize": 4,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": "text.notes.info",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#17a2b8",
+                },
+            },
+            {
+                "scope": "text.notes.success",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#28a745",
+                },
+            },
+            {
+                "scope": "text.notes.warning",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#ffc107",
+                },
+            },
+            {
+                "scope": "text.notes.danger",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#dc3545",
+                },
+            },
+        ],
+    },
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 5000,
+    "files.eol": "\n",
+    "window.zoomLevel": -1,
+    // Python linting tools settings
+    "flake8.importStrategy": "fromEnvironment",
+    "flake8.interpreter": [
+        "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+    ],
+    "flake8.args": [
+        "--allow-init-docstring=false",
+        // "--per-file-ignores=__init__.py:F401",
+        // "--extend-ignore=D100,D101,D102,D103,D104,D105,D107,E203,N802,N803,N806,S101,S301,S311,S403",
+    ],
+    "bandit.importStrategy": "fromEnvironment",
+    "mypy-type-checker.args": [
+        "--check-untyped-defs",
+        "--follow-imports=silent",
+        "--ignore-missing-imports",
+        "--no-pretty",
+        "--show-column-numbers",
+    ],
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "pylint.importStrategy": "fromEnvironment",
+    "pylint.enabled": true,
+    "pylint.severity": {
+        "convention": "Warning",
+        "error": "Error",
+        "fatal": "Error",
+        "refactor": "Hint",
+        "warning": "Warning",
+        "undefined-variable": "Warning",
+    },
+    "pylint.args": [
+        // "--disabe=C0116",
+    ],
+    "pydoctest.workingDirectory": ".",
+    // Python formatting tools settings
+    "autopep8.args": [
+        "--max-line-length=79",
+    ],
+    "autopep8.importStrategy": "fromEnvironment",
+    "black-formatter.args": [
+        "--line-length=79",
+    ],
+    "black-formatter.importStrategy": "fromEnvironment",
+    "yapf.args": [
+        "--style={based_on_style: google, column_limit: 79, indent_width: 4}",
+    ],
+    "yapf.importStrategy": "fromEnvironment",
+    "isort.importStrategy": "fromEnvironment",
+    "isort.args": [
+        "--profile",
+        "black",
+    ],
+    "isort.check": true,
+    "ruff.fixAll": true,
+    "ruff.importStrategy": "fromEnvironment",
+    "ruff.organizeImports": false,
+    // General formatting tools settings
+    "betterAlign.indentBase": "activeline",
+    "betterAlign.surroundSpace": {
+        "arrow": [
+            1,
+            1,
+        ],
+        "assignment": [
+            1,
+            1,
+        ],
+        "colon": [
+            0,
+            1,
+        ],
+        "comment": 2,
+    },
+    // Python analysis tools settings
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.enableSyncServer": false,
+    "python.analysis.fixAll": [
+        // "source.convertImportFormat",
+        "source.unusedImports",
+    ],
+    "python.analysis.importFormat": "relative",
+    "python.analysis.indexing": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.pytestParameters": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.analysis.persistAllIndices": true,
+    "python.analysis.supportDocstringTemplate": true,
+    "python.analysis.typeEvaluation.strictDictionaryInference": true,
+    "python.analysis.typeEvaluation.strictListInference": true,
+    "python.analysis.typeEvaluation.enableReachabilityAnalysis": true,
+    "python.analysis.typeEvaluation.deprecateTypingAliases": true,
+    "python.analysis.typeEvaluation.strictSetInference": true,
+    "python.analysis.aiCodeActions": {
+        "enabled": true,
+        "useAICompletion": true,
+        "useAITypeChecking": true,
+    },
+    "python.analysis.includeAliasesFromUserFiles": true,
+    "python.analysis.inlayHints.callArgumentNames": "all",
+    "python.languageServer": "Pylance",
+    // Python testing tools settings
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "test_*.py",
+    ],
+    "python.testing.unittestEnabled": true,
+    "testing.showCoverageInExplorer": true,
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true,
+    "coverage-gutters.showGutterCoverage": false,
+    "coverage-gutters.coverageReportFileName": "./htmlcov/index.html",
+    "coverage-gutters.coverageBaseDir": "./",
+    // Python debugging tools settings
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.executeInFileDir": true,
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell",
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe",
+            ],
+            "args": [],
+            "icon": "terminal-cmd",
+        },
+        "Git Bash": {
+            "source": "Git Bash",
+        },
+        "Windows PowerShell": {
+            "path": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        }
+    },
+    // Python general tools settings
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv",
+    "python.globalModuleInstallation": false,
+    // JSON editor settings
+    "[json]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always",
+        },
+        "editor.colorDecorators": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[jsonc]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always",
+        },
+        "editor.colorDecorators": true,
+        "editor.defaultFormatter": "vscode.json-language-features",
+    },
+    "[toml]": {},
+    "evenBetterToml.formatter.alignComments": true,
+    "evenBetterToml.formatter.alignEntries": true,
+    "evenBetterToml.formatter.allowedBlankLines": 1,
+    "evenBetterToml.formatter.arrayAutoExpand": true,
+    "evenBetterToml.formatter.arrayTrailingComma": true,
+    "evenBetterToml.formatter.columnWidth": 120,
+    "evenBetterToml.formatter.indentEntries": true,
+    "evenBetterToml.formatter.indentString": "  ",
+    "evenBetterToml.formatter.indentTables": true,
+    "evenBetterToml.formatter.inlineTableExpand": true,
+    "evenBetterToml.formatter.reorderArrays": false,
+    "evenBetterToml.formatter.reorderKeys": false,
+    "evenBetterToml.formatter.trailingNewline": true,
+    "evenBetterToml.semanticTokens": true,
+    // MarkDown editor settings
+    "[markdown]": {
+        "editor.defaultFormatter": "vscode.markdown-language-features",
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "other": "on",
+            "strings": "off",
+        },
+    },
+    // GIT (version control) tools settings
+    "[git-commit]": {
+        "editor.rulers": [
+            50,
+            72,
+        ],
+    },
+    "git.autofetch": true,
+    "git.enableSmartCommit": true,
+    "git.pruneOnFetch": true,
+    "gitCommitMessageEditor.intelliSense.completion.scopes": [
+        {
+            "scope": "base",
+            "description": "Base subpackage modules (lowest)",
+        },
+        {
+            "scope": "core",
+            "description": "Core subpackage modules (hight)",
+        },
+        {
+            "scope": "ide",
+            "description": "IDE Environment settings",
+        },
+        {
+            "scope": "tests",
+            "description": "Unit test modules",
+        },
+        {
+            "scope": "main",
+            "description": "Main application package (highest)",
+        },
+        {
+            "scope": "goes-dl",
+            "description": "Main application package (highest)",
+        },
+        {
+            "scope": "utils",
+            "description": "Utils subpackage modules (low)",
+        },
+        {
+            "scope": "product",
+            "description": "Product level subpackage modules (mid)",
+        },
+        {
+            "scope": "datasource",
+            "description": "Datasource level subpackage modules (mid)",
+        },
+        {
+            "scope": "dataset",
+            "description": "Dataset level subpackage modules (mid)",
+        },
+        {
+            "scope": "downloader",
+            "description": "Downloader level subpackage modules (mid)",
+        },
+    ],
+    // AI assistance tools settings
+    "github.copilot.advanced": {},
+    "github.copilot.chat.codeGeneration.instructions": [
+        {
+            "text": "In Python always generate NumPy style docstrings (numpydoc).",
+        }
+    ],
+    "github.copilot.chat.fixTestFailure.enabled": true,
+    "github.copilot.chat.scopeSelection": true,
+    "github.copilot.chat.search.semanticTextResults": true,
+    "github.copilot.chat.useProjectTemplates": true,
+    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.editor.enableCodeActions": true,
+    "github.copilot.renameSuggestions.triggerAutomatically": true,
+    "github.copilot.enable": {
+        "*": true,
+        "css": true,
+        "html": true,
+        "javascript": true,
+        "json": true,
+        "json5": true,
+        "jsonc": true,
+        "markdown": true,
+        "plaintext": true,
+        "python": true,
+        "scminput": true,
+        "toml": true,
+        "yaml": true,
+    },
+    "vsintellicode.python.completionsEnabled": true,
+    "vsintellicode.java.completionsEnabled": false,
+    "vsintellicode.sql.completionsEnabled": false,
+    "vsintellicode.typescript.completionsEnabled": false,
+    // Productivity tools settings
+    "diffEditor.diffAlgorithm": "advanced",
+    "diffEditor.wordWrap": "off",
+    "meld-diff.diffCommand": "WinMergeU.exe",
+    "editor.minimap.maxColumn": 80,
+    "editor.minimap.renderCharacters": true,
+    "editor.minimap.showSlider": "always",
+    "editor.showFoldingControls": "mouseover",
+    "files.exclude": {
+        "*.coverage": true,
+        "**/*.egg-info": true,
+        "**/__pycache__": true,
+        "**/.git": true,
+        "**/.github": true,
+        "**/.idea": true,
+        "**/.ipynb_checkpoints": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/.venv": true,
+        "**/.vscode": true,
+        "**/htmlcov": true,
+        "**/node_modules": true,
+        ".deepsource.toml": true,
+        ".sourcery.yaml": true,
+        "pydoctest.json": true,
+        "build": true,
+        "coverage.xml": true,
+        "dist": true,
+    },
+    "rewrap.autoWrap.enabled": true,
+    "rewrap.doubleSentenceSpacing": true,
+    "todo-tree.general.tags": [
+        "BUG",
+        "FIXME",
+        "NOTE",
+        "TODO",
+        "[ ]",
+        "[x]",
+        "pyright",
+        "pylint",
+        "type: ignore",
+        "HACK",
+        "WARNING",
+        "XXX",
+    ],
+    "todo-tree.general.tagGroups": {
+        "ERROR": [
+            "BUG", // There is a problem here: must be fixed later on
+            "FIXME", // Something that's not implemented completely correctly: should be fixed later on
+        ],
+        "TAG": [
+            "pyright", // Pylance/pyright inline setting tag
+            "pylint", // Pylint inline setting tag
+            "type: ignore", // Pylance/pyright type ignoring tag
+        ],
+        "REMARK": [
+            "NOTE", // Description of how the code works or a remark on something when it isn't self evident
+            "TODO", // No problem, but additional code needs to be written: something that should be done later on, usually when you are skipping something
+            "[ ]", // Clear check mark
+            "[x]", // Marked check mark
+        ],
+        "WARN": [
+            "HACK", // Not very well written or malformed code to circumvent a problem/bug: something that's implemented as a work around
+            "WARNING", // Highlighting a possible problem spot
+            "XXX", // Something you're not sure about, a question, warning about possible pitfalls
+        ]
+    },
+    "workbench.editor.decorations.colors": true,
+    "workbench.startupEditor": "welcomePage",
+    // Grammar/Spelling checking tools settings
+    "cSpell.language": "en-GB,en-US,en,scientific-terms-us,es-ES,es,la",
+    "cSpell.enableFiletypes": [
+        "json",
+        "json5",
+        "jsonc",
+        "python",
+        "toml",
+        "yaml",
+    ],
+    "cSpell.ignoreWords": [
+        "ABID",
+        "abidc",
+        "ABIDP",
+        "ABIM",
+        "ABIP",
+        "ABIPM",
+        "ABIPP",
+        "abstractproperty",
+        "ACHA",
+        "ACHP",
+        "ACHT",
+        "ACTP",
+        "AICE",
+        "argparse",
+        "asdict",
+        "booleaness",
+        "boto",
+        "botocore",
+        "builtins",
+        "classmethod",
+        "classmethod",
+        "CMIP",
+        "contextlib",
+        "contextmanager",
+        "DMWV",
+        "docparams",
+        "docstrings",
+        "excepthook",
+        "globbing",
+        "GOESR",
+        "GOESRS",
+        "GOESRSCMI",
+        "GOESRSMCMI",
+        "GRIDCAT",
+        "hhmm",
+        "htmlcov",
+        "gaierror",
+        "inlinevar",
+        "ipynb",
+        "IRWVP",
+        "ISCCP",
+        "isort",
+        "ixin",
+        "KHTML",
+        "LCFA",
+        "levelname",
+        "levelno",
+        "LVMP",
+        "LVTP",
+        "MCMI",
+        "MCMIP",
+        "metaclass",
+        "msvs",
+        "mymodule",
+        "mypackage",
+        "mypy",
+        "NETCDF",
+        "noqa",
+        "nosec",
+        "numpy",
+        "optparse",
+        "ORIGID",
+        "overgeneral",
+        "paren",
+        "parseable",
+        "pygtk",
+        "pylint",
+        "referer",
+        "regexes",
+        "rgxs",
+        "RRQPE",
+        "setuptools",
+        "typealias",
+        "typecheck",
+        "typevar",
+        "venv",
+    ],
+    "cSpell.userWords": [
+        "GitHub",
+        "GOES",
+        "GridSat",
+        "MeteoSat",
+        "MODIS",
+        "NCEI",
+        "NOAA",
+        "Posix",
+        "Venialbo",
+        "Villamayor",
+    ],
+    "cSpell.words": [
+        "datasources",
+        "multiband",
+        "positionals",
+        "subclassing",
+    ],
+    // VSCode specifics settings
+    "json.schemaDownload.enable": true,
+    // End of settings.json
+}

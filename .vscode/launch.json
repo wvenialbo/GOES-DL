@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        // Test "webservice" command
+        {
+            "name": "Command: 'goes-dl --test'",
+            "args": [
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "${workspaceFolderBasename}.test",
+            "module": "test",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off"
+            ]
+        },
+    ],
+}
