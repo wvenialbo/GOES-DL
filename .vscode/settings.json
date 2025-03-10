@@ -91,8 +91,7 @@
     "mypy-type-checker.args": [
         "--check-untyped-defs",
         "--follow-imports=skip",
-        "--ignore-missing-imports",
-        "--show-column-numbers"
+        "--ignore-missing-imports"
     ],
     "mypy-type-checker.importStrategy": "fromEnvironment",
     "pylint.importStrategy": "fromEnvironment",
