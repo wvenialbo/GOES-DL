@@ -29,4 +29,4 @@ jobs:
         pip install -r requirements.in
     - name: Analysing the code with flake8
       run: |
-        flake8 "./src/goesdl"
+        flake8 "./src/goes_core"
