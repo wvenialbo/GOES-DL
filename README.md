@@ -100,6 +100,25 @@ pip install --upgrade goes-core
 See the [GOES-DL][25] satellite imagery data processing package and similar
 projects for real world examples.
 
+## Origin and Relationship to GOES-DL and GOES-DR
+
+**GOES-CORE** was created by excerpting core functionalities from the earlier
+projects [GOES-DL][25] (GOES Dataset Downloader) and [GOES-DR] (GOES Dataset
+Reader).  These projects were restructured to consolidate shared code into
+**GOES-CORE**, which now serves as a foundational library.
+
+Specifically:
+
+- **GOES-DL** now depends on **GOES-CORE** to provide the fundamental dataset
+  downloading and data handling functionalities that were originally part of
+  **GOES-DL**.
+- **GOES-DR** has been archived. The remaining functionalities of **GOES-DR**,
+  after the core code extraction, have been merged into **GOES-DL**.
+
+This restructuring allows for a more modular and maintainable codebase, with
+**GOES-CORE** providing the essential building blocks for various GOES and
+other meteorological and climate data processing tools.
+
 ## Contributing
 
 Contributions to **GOES-CORE** are welcome! If you would like to contribute,
