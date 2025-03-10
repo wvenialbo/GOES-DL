@@ -22,7 +22,7 @@ DatasourceLocal
 from .datasource import Datasource as Datasource
 from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
-from .datasource_http import DatasourceNCEI as DatasourceNCEI
+from .datasource_ncei import DatasourceNCEI as DatasourceNCEI
 from .datasource_local import DatasourceLocal as DatasourceLocal
 
 __all__ = [
