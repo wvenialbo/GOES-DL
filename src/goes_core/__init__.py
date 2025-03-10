@@ -7,6 +7,26 @@ and `boto3` packages to download the files and the `netCDF4` package to
 read the data files.
 """
 
+from .dataset import ProductLocator
+from .datasource import (
+    Datasource,
+    DatasourceAWS,
+    DatasourceCache,
+    DatasourceLocal,
+    DatasourceNCEI,
+)
+from .downloader import Downloader
+
+__all__ = [
+    "Datasource",
+    "DatasourceAWS",
+    "DatasourceCache",
+    "DatasourceLocal",
+    "DatasourceNCEI",
+    "Downloader",
+    "ProductLocator",
+]
+
 __package_id__ = "GOES-CORE"
 __package_name__ = (
     f"{__package_id__} — GOES Satellite Dataset Access Core Functionality"
