@@ -57,6 +57,7 @@ def calculate_latlon_grid_cartopy(
         ellipse=None,
         semimajor_axis=projection_info.semi_major_axis,
         semiminor_axis=projection_info.semi_minor_axis,
+        inverse_flattening=projection_info.inverse_flattening,
     )
 
     geos_proj = ccrs.Geostationary(
