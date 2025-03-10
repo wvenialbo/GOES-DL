@@ -60,6 +60,7 @@ def calculate_latlon_grid_pyproj(
         sweep=projection_info.sweep_angle_axis,
         a=projection_info.semi_major_axis,
         b=projection_info.semi_minor_axis,
+        rf=projection_info.inverse_flattening,
     )
 
     abi_lon: ArrayFloat64
@@ -69,7 +70,12 @@ def calculate_latlon_grid_pyproj(
 
     # The above is equivalent to the following:
     #
-    # plate_carree_proj = Proj(proj="latlong", datum="WGS84")
+    # plate_carree_proj = Proj(
+    #     proj="latlong",
+    #     a=projection_info.semi_major_axis,
+    #     b=projection_info.semi_minor_axis,
+    #     rf=projection_info.inverse_flattening,
+    # )
     # transformer = Transformer.from_proj(geos_proj, plate_carree_proj)
     #
     # abi_lon, abi_lat = transformer.transform(x_m, y_m)
