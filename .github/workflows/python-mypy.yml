@@ -1,0 +1,29 @@
+name: MyPy
+
+on: [workflow_dispatch]
+
+jobs:
+  mypy:
+    name: Type checking with MyPy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade mypy
+        pip install -r requirements.in
+    - name: Install mypy type stubs
+      run: |
+        pip install --upgrade types-requests
+        pip install --upgrade boto3-stubs[s3]
+    - name: Analysing the code with mypy
+      run: |
+        mypy "./src/goesdl"
