@@ -90,10 +90,9 @@
     "bandit.importStrategy": "fromEnvironment",
     "mypy-type-checker.args": [
         "--check-untyped-defs",
-        "--follow-imports=silent",
+        "--follow-imports=skip",
         "--ignore-missing-imports",
-        "--no-pretty",
-        "--show-column-numbers",
+        "--show-column-numbers"
     ],
     "mypy-type-checker.importStrategy": "fromEnvironment",
     "pylint.importStrategy": "fromEnvironment",
