@@ -93,7 +93,7 @@
     description = "GOES-CORE — Satellite Imagery Dataset Handling Foundations"
     license     = "MIT"
     name        = "goes-core"
-    packages    = [{ include = "goescore" }, { include = "goescore/py.typed" }]
+    packages    = [{ include = "goes_core" }, { include = "goes_core/py.typed" }]
     readme      = "README.md"
     version     = "v0.0-rc0"
 
@@ -126,8 +126,8 @@
     max-line-length = 79
     per-file-ignores = [
       "__init__.py:F401",
-      "./src/goescore/typing/__init__.py:A005",
-      "./src/goescore/utils/headers.py:DAR201",
+      "./src/goes_core/typing/__init__.py:A005",
+      "./src/goes_core/utils/headers.py:DAR201",
     ]
     strictness = "full"
     allow-init-docstring = true
