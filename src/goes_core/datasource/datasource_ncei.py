@@ -1,8 +1,8 @@
 """
-Provide the DatasourceHTTP class for handling HTTP-based data sources.
+Provide the DatasourceNCEI class for handling NCEI Archive repositories.
 
 Classes:
-    DatasourceHTTP: Handle HTTP-based data sources.
+    DatasourceNCEI: Handle NCEI Archive HTTP-based repositories.
 """
 
 import re
@@ -22,10 +22,11 @@ HTTP_STATUS_OK = 200
 
 class DatasourceNCEI(DatasourceBase):
     """
-    Handle HTTP-based data sources.
+    Handle NCEI Archive HTTP-based repositories.
 
-    Provide methods to interact with HTTP folders and files, either
-    through a base URL or a `ProductLocator` object.
+    Provide methods to interact with NCEI Direct Download HTTP servers's
+    folders and files, either through a base URL or a `ProductLocator`
+    object.
 
     Methods
     -------
@@ -42,15 +43,16 @@ class DatasourceNCEI(DatasourceBase):
         cache: float | DatasourceCache | None = None,
     ) -> None:
         """
-        Initialize the DatasourceHTTP object.
+        Initialize the DatasourceNCEI object.
 
         Parameters
         ----------
         locator : str | ProductLocator
-            The base URL of a HTTP-based data sources or a
+            The base URL of a NCEI Archive's dataset repository or a
             `ProductLocator` object.
         cache : float | DatasourceCache | None, optional
-            The cache expiration time in seconds, by default None.
+            The cache expiration time in seconds or a `DatasourceCache`
+            object, by default None.
 
         Raises
         ------
