@@ -7,7 +7,7 @@ $venv = '.venv'
 $project = $args[0]
 
 if (-not $project) {
-    $project = './src/goescore'
+    $project = './src/goes_core'
 }
 
 $isFolder = Test-Path -Type Container -LiteralPath $project
