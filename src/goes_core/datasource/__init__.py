@@ -22,13 +22,13 @@ DatasourceLocal
 from .datasource import Datasource as Datasource
 from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
-from .datasource_ncei import DatasourceNCEI as DatasourceNCEI
 from .datasource_local import DatasourceLocal as DatasourceLocal
+from .datasource_ncei import DatasourceNCEI as DatasourceNCEI
 
 __all__ = [
     "Datasource",
     "DatasourceAWS",
     "DatasourceCache",
-    "DatasourceNCEI",
     "DatasourceLocal",
+    "DatasourceNCEI",
 ]
