@@ -424,6 +424,27 @@ class AzimuthalEquidistantParameters:
         return width * deg_to_m, height * deg_to_m
 
     @property
+    def extent(self) -> tuple[float64, float64, float64, float64]:
+        """
+        Calculate the extent of the projection.
+
+        Returns
+        -------
+        tuple[float64, float64, float64, float64]
+            The extent of the projection in kilometers.
+            - The minimum x-coordinate.
+            - The maximum x-coordinate.
+            - The minimum y-coordinate.
+            - The maximum y-coordinate.
+        """
+        return (
+            self.x[0] / 1000.0,
+            self.x[-2] / 1000.0,
+            self.y[0] / 1000.0,
+            self.y[-1] / 1000.0,
+        )
+
+    @property
     def x_km(self) -> ArrayFloat64:
         """
         Calculate the x-coordinate fixed grid in kilometers.
