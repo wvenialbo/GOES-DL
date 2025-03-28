@@ -49,10 +49,6 @@ def calculate_latlon_grid_cartopy(
             "The 'cartopy' package is required for this functionality."
         ) from error
 
-    x_m: ArrayFloat64
-    y_m: ArrayFloat64
-    x_m, y_m = meshgrid(projection_info.x_m, projection_info.y_m)
-
     globe_geos = ccrs.Globe(
         ellipse=None,
         semimajor_axis=projection_info.globe.semi_major_axis,
@@ -68,6 +64,10 @@ def calculate_latlon_grid_cartopy(
     )
 
     plate_carree_proj = ccrs.PlateCarree(globe=globe_geos)
+
+    x_m: ArrayFloat64
+    y_m: ArrayFloat64
+    x_m, y_m = meshgrid(projection_info.x_m, projection_info.y_m)
 
     points = plate_carree_proj.transform_points(geos_proj, x_m, y_m)
 

@@ -49,10 +49,6 @@ def calculate_latlon_grid_pyproj(
             "The 'pyproj' package is required for this functionality."
         ) from error
 
-    x_m: ArrayFloat64
-    y_m: ArrayFloat64
-    x_m, y_m = meshgrid(projection_info.x_m, projection_info.y_m)
-
     geos_proj = Proj(
         proj="geos",
         h=projection_info.orbit.perspective_point_height,
@@ -63,9 +59,12 @@ def calculate_latlon_grid_pyproj(
         rf=projection_info.globe.inverse_flattening,
     )
 
+    x_m: ArrayFloat64
+    y_m: ArrayFloat64
+    x_m, y_m = meshgrid(projection_info.x_m, projection_info.y_m)
+
     abi_lon: ArrayFloat64
     abi_lat: ArrayFloat64
-
     abi_lon, abi_lat = geos_proj(x_m, y_m, inverse=True)
 
     # The above is equivalent to the following:
