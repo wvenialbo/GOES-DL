@@ -27,11 +27,11 @@ from numpy import (
 
 from ..array import ArrayFloat32, ArrayFloat64
 from .helpers import make_common_mask
-from .parameters import ProjectionParameters
+from .parameters import GeostationaryParameters
 
 
 def calculate_latlon_grid_goesdr(
-    projection_info: ProjectionParameters,
+    projection_info: GeostationaryParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids.
@@ -79,11 +79,11 @@ def calculate_latlon_grid_goesdr(
     # Reorganize operations to leverage NumPy vectorization,
     # reducing redundant computations. This yields ~6x performance
     # improvement over the baseline implementation from [2].
-    lambda_0 = projection_info.longitude_of_projection_origin
+    lambda_0 = projection_info.orbit.longitude_of_projection_origin
 
     r_orb = projection_info.orbital_radius
-    r_eq = projection_info.semi_major_axis
-    r_pol = projection_info.semi_minor_axis
+    r_eq = projection_info.globe.semi_major_axis
+    r_pol = projection_info.globe.semi_minor_axis
 
     x_r = projection_info.x
     y_r = projection_info.y

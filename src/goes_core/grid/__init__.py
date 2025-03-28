@@ -47,12 +47,12 @@ from .grid_cartopy import calculate_latlon_grid_cartopy
 from .grid_goesdr import calculate_latlon_grid_goesdr
 from .grid_pyproj import calculate_latlon_grid_pyproj
 from .helpers import calculate_pixel_edges
-from .parameters import ProjectionParameters
+from .parameters import GeostationaryParameters
 
 __all__ = [
     "calculate_latlon_grid_cartopy",
     "calculate_latlon_grid_goesdr",
     "calculate_latlon_grid_pyproj",
     "calculate_pixel_edges",
-    "ProjectionParameters",
+    "GeostationaryParameters",
 ]

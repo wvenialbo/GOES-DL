@@ -16,11 +16,11 @@ from numpy import float32, meshgrid
 
 from ..array import ArrayFloat32, ArrayFloat64
 from .helpers import make_consistent
-from .parameters import ProjectionParameters
+from .parameters import GeostationaryParameters
 
 
 def calculate_latlon_grid_pyproj(
-    projection_info: ProjectionParameters,
+    projection_info: GeostationaryParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using the pyproj package.
@@ -55,12 +55,12 @@ def calculate_latlon_grid_pyproj(
 
     geos_proj = Proj(
         proj="geos",
-        h=projection_info.perspective_point_height,
-        lon_0=projection_info.longitude_of_projection_origin,
-        sweep=projection_info.sweep_angle_axis,
-        a=projection_info.semi_major_axis,
-        b=projection_info.semi_minor_axis,
-        rf=projection_info.inverse_flattening,
+        h=projection_info.orbit.perspective_point_height,
+        lon_0=projection_info.orbit.longitude_of_projection_origin,
+        sweep=projection_info.orbit.sweep_angle_axis,
+        a=projection_info.globe.semi_major_axis,
+        b=projection_info.globe.semi_minor_axis,
+        rf=projection_info.globe.inverse_flattening,
     )
 
     abi_lon: ArrayFloat64
@@ -72,9 +72,9 @@ def calculate_latlon_grid_pyproj(
     #
     # plate_carree_proj = Proj(
     #     proj="latlong",
-    #     a=projection_info.semi_major_axis,
-    #     b=projection_info.semi_minor_axis,
-    #     rf=projection_info.inverse_flattening,
+    #     a=projection_info.globe.semi_major_axis,
+    #     b=projection_info.globe.semi_minor_axis,
+    #     rf=projection_info.globe.inverse_flattening,
     # )
     # transformer = Transformer.from_proj(geos_proj, plate_carree_proj)
     #
