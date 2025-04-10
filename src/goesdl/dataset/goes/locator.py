@@ -106,7 +106,7 @@ class GOESProductLocator(ProductLocatorGG):
     # Satellites in the GOES-R Series are identified by the following
     # IDs:
     AVAILABLE_ORIGINS: dict[str, str] = {
-        f"G{idn:02d}": f"goes{idn:02d}" for idn in range(16, 19)
+        f"G{idn:02d}": f"goes{idn:02d}" for idn in range(16, 20)
     }
 
     # Supported instruments from the GOES-R series:

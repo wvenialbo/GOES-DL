@@ -33,7 +33,7 @@ test_goes()
 from goesdl.dataset.goes import GOESProductLocatorABIPP as ProductLocatorGOES
 from goesdl.dataset.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
 from goesdl.dataset.gridsat import GridSatProductLocatorGC as ProductLocatorGC
-from goesdl.datasource import DatasourceAWS, DatasourceHTTP, DatasourceLocal
+from goesdl.datasource import DatasourceAWS, DatasourceLocal, DatasourceNCEI
 from goesdl.downloader import Downloader
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M%z"
@@ -102,7 +102,7 @@ def test_gridsat_http() -> tuple[list[str], list[str]]:
         A tuple of lists of downloaded files.
     """
     pd = ProductLocatorB1()
-    ds = DatasourceHTTP(pd)
+    ds = DatasourceNCEI(pd)
 
     dl = Downloader(
         datasource=ds,
@@ -127,7 +127,7 @@ def test_gridsat_goes() -> list[str]:
         The list of downloaded files.
     """
     pd = ProductLocatorGC("F", "G12")
-    ds = DatasourceHTTP(pd)
+    ds = DatasourceNCEI(pd)
 
     dl = Downloader(
         datasource=ds,
