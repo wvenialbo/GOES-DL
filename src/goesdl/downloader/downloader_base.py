@@ -22,6 +22,7 @@ from .constants import (
     TIME_TOLERANCE_DEFAULT,
     TIME_TOLERANCE_MAX,
     TIME_TOLERANCE_MIN,
+    TIME_TOLERANCE_SINGLE,
     DownloadStatus,
 )
 
@@ -242,19 +243,25 @@ class DownloaderBase:
         if not start_time:
             raise ValueError("start_time must be provided")
 
+        time_tolerance = self.time_tolerance
+
         datetime_ini = datetime.strptime(start_time, self.date_format)
 
         if end_time:
             datetime_fin = datetime.strptime(end_time, self.date_format)
         else:
+            time_tolerance = max(time_tolerance, TIME_TOLERANCE_SINGLE)
             datetime_fin = datetime_ini
 
         # Sometimes the files have a date and time with some seconds
         # sooner or later to the user required times. To overcome this
         # issue, we subtract and add 60 seconds to the initial and final
-        # datetimes, respectively.
-        datetime_ini -= timedelta(seconds=self.time_tolerance)
-        datetime_fin += timedelta(seconds=self.time_tolerance)
+        # datetimes, respectively.  For single instant downloading, a
+        # special value `TIME_TOLERANCE_SINGLE` will be used as the
+        # minimum tolerance in order to seek for the latest dataset for
+        # the given instant.
+        datetime_ini -= timedelta(seconds=time_tolerance)
+        datetime_fin += timedelta(seconds=time_tolerance)
 
         return datetime_ini, datetime_fin
 
