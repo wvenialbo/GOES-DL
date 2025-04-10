@@ -114,14 +114,14 @@ of the repository.
 ```python
 # Import the locator and datasource according to your desired product
 from goesdl.dataset.gridsat import GridSatProductLocatorGC
-from goesdl.datasource import DatasourceHTTP
+from goesdl.datasource import DatasourceNCEI
 from goesdl.downloader import Downloader
 
 # Initialize the product locator for GridSat-GOES (GOES-12, Full Disk)
 locator = GridSatProductLocatorGC("F", "G12")
 
 # GridSat-GOES data is available in HTTP from NCEI's archive
-datasource = DatasourceHTTP(locator)
+datasource = DatasourceNCEI(locator)
 
 # Initialize the downloader with the locator and datasource
 downloader = Downloader(
@@ -227,7 +227,7 @@ files2 = downloader.download_files(
 ```python
 # Import the locator and datasource according to your desired product
 from goesdl.dataset.gridsat import GridSatProductLocatorB1
-from goesdl.datasource import DatasourceHTTP
+from goesdl.datasource import DatasourceNCEI
 from goesdl.downloader import Downloader
 
 # Initialize the product locator for GridSat-B1
@@ -239,7 +239,7 @@ locator = GridSatProductLocatorB1()
 # datasource to HTTP. If a file is not found in the local repository, it
 # will be downloaded from the remote datasource. In all previous examples,
 # if a file was already downloaded, it will not be downloaded again.
-datasource = DatasourceHTTP(locator)
+datasource = DatasourceNCEI(locator)
 
 # Initialize the downloader with the locator and datasource
 downloader = Downloader(
