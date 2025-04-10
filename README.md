@@ -31,6 +31,14 @@ supports second, third and fourth-generation GOES satellite data
 easy-to-use interface to access data for scientific analysis, research, and
 other applications.
 
+**Attention GOES-16 Data Users! (updated on 4/7/2025):**
+
+On April 7, 2025 at 15:10 UTC, the GOES-19 satellite was declared the
+Operational GOES-East satellite. Shortly following the transition of GOES-19 to
+GOES-East, all data distribution from GOES-16 will be turned off. GOES-16 will
+commence drifting to the storage location at 104.7°W. All GOES-19 data are
+available back to beta product declaration dates.
+
 ## Key Features
 
 - **Real-time GOES 4th Generation Satellite Data (GOES Series R)**: Access
