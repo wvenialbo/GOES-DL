@@ -76,7 +76,7 @@
     name        = "goes-dl"
     packages    = [{ include = "goesdl" }, { include = "goesdl/py.typed" }]
     readme      = "README.md"
-    version     = "v0.1-rc4"
+    version     = "v0.1-rc5"
 
     [tool.poetry.dependencies]
       boto3    = "~1.37.2"
