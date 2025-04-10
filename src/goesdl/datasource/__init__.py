@@ -13,7 +13,7 @@ DatasourceAWS
     A datasource object for an AWS S3 bucket.
 DatasourceCache
     A datasource object that caches the files.
-DatasourceHTTP
+DatasourceNCEI
     A datasource object for an HTTP server.
 DatasourceLocal
     A datasource object for a local directory.
@@ -22,13 +22,13 @@ DatasourceLocal
 from .datasource import Datasource as Datasource
 from .datasource_aws import DatasourceAWS as DatasourceAWS
 from .datasource_cache import DatasourceCache as DatasourceCache
-from .datasource_http import DatasourceHTTP as DatasourceHTTP
 from .datasource_local import DatasourceLocal as DatasourceLocal
+from .datasource_ncei import DatasourceNCEI as DatasourceNCEI
 
 __all__ = [
     "Datasource",
     "DatasourceAWS",
     "DatasourceCache",
-    "DatasourceHTTP",
+    "DatasourceNCEI",
     "DatasourceLocal",
 ]
