@@ -27,7 +27,7 @@ from .constants import (
 )
 
 
-@dataclass(eq=False, frozen=True)
+@dataclass(eq=False)
 class DownloaderBase:
     """
     Represent a downloader object.
@@ -65,6 +65,8 @@ class DownloaderBase:
     date_format: str = ISO_TIMESTAMP_FORMAT
     time_tolerance: int = TIME_TOLERANCE_DEFAULT
     show_progress: bool = True
+
+    _single: bool = False
 
     def __post_init__(self) -> None:
         """
@@ -248,8 +250,10 @@ class DownloaderBase:
         datetime_ini = datetime.strptime(start_time, self.date_format)
 
         if end_time:
+            self._single = False
             datetime_fin = datetime.strptime(end_time, self.date_format)
         else:
+            self._single = True
             time_tolerance = max(time_tolerance, TIME_TOLERANCE_SINGLE)
             datetime_fin = datetime_ini
 
@@ -275,9 +279,14 @@ class DownloaderBase:
 
         files = self._retrieve_directory_content(paths)
 
-        return self._filter_directory_content(
+        content = self._filter_directory_content(
             datetime_ini, datetime_fin, files
         )
+
+        if self._single and len(content) > 1:
+            content = [content[-1]]
+
+        return content
 
     def _has_item(self, file_path: str) -> bool:
         return self.repository.is_file(file_path)
