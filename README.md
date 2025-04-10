@@ -317,9 +317,9 @@ a subset of the files listed by the `Downloader.list_files` method.
 
 Tool package to download GOES (Geostationary Operational Environmental
 Satellite) 2nd and 3rd generation (GOES-8 to GOES-15) data from NOAA's NCEI
-archive, 4th Generation (GOES-16 to GOES-18) data from NOAA's archive on AWS,
+archive, 4th Generation (GOES-16 to GOES-19) data from NOAA's archive on AWS,
 and Gridded Satellite B1 (GridSat-B1) Climate Data Record, Version 2, from
-NOAA's AWS and NCEI archives using Python.
+NOAA's AWS or NCEI archives using Python.
 
 **Keywords:**
 [goes](https://github.com/topics/goes),
@@ -376,7 +376,7 @@ When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
 > Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.1-rc4)* [Software]. GitHub.
+> GOES and GridSat-B1 satellite data (Version 0.1-rc5)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 
