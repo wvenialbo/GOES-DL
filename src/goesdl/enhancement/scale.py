@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+from pathlib import Path
 from typing import Literal
 
 import matplotlib.pyplot as plt
@@ -62,6 +64,35 @@ class EnhancementScale:
         self.cnorm = self._create_colorbar_norm(
             self.extent, self.ncolors, mode
         )
+
+    @classmethod
+    def from_colormap(
+        cls,
+        name: str,
+        cmap_names: str | Sequence[str],
+        keypoints: Sequence[float],
+        offset: float = 0.0,
+        ncolors: int = 256,
+        nticks: int = 16,
+        mode: ExtendMode = "neither",
+    ) -> "EnhancementScale":
+        cmap = EnhancementColormap(name, cmap_names, keypoints)
+
+        return cls(cmap, offset, ncolors, nticks, mode)
+
+    @classmethod
+    def from_file(
+        cls,
+        palette_path: str | Path,
+        stretching_path: str | Path = "",
+        offset: float = 0.0,
+        ncolors: int = 256,
+        nticks: int = 16,
+        mode: ExtendMode = "neither",
+    ) -> "EnhancementScale":
+        table = EnhacementTable.from_file(palette_path, stretching_path)
+
+        return cls(table, offset, ncolors, nticks, mode)
 
     def ticks(self, nticks: int = 16, step: int = 0) -> None:
         refs = ColorbarTicks(self.extent, nticks, step)
