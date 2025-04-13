@@ -27,28 +27,36 @@ class EnhancementScale:
     extent: DomainData
     name: str
     ncolors: int
+    offset: float
 
     def __init__(
         self,
         specs: EnhacementTable | EnhancementColormap,
+        offset: float,
         ncolors: int = 256,
         nticks: int = 16,
         mode: ExtendMode = "neither",
     ) -> None:
         if isinstance(specs, EnhacementTable):
-            cmap, cnorm = self._create_from_table(specs, ncolors, mode)
+            cmap, cnorm = self._create_from_table(specs, offset, ncolors, mode)
         else:
-            cmap, cnorm = self._create_from_colormap(specs, ncolors, mode)
+            cmap, cnorm = self._create_from_colormap(
+                specs, offset, ncolors, mode
+            )
 
-        refs = ColorbarTicks(specs.extent, nticks, step=0)
+        domain = self._actual_range(specs.domain, offset)
+        extent = self._actual_range(specs.extent, offset)
+
+        refs = ColorbarTicks(extent, nticks, step=0)
 
         self.cmap = cmap
         self.cnorm = cnorm
         self.cticks = refs.cticks
-        self.domain = specs.domain
-        self.extent = specs.extent
+        self.domain = domain
+        self.extent = extent
         self.name = specs.name
         self.ncolors = ncolors
+        self.offset = offset
 
     def extend(self, mode: ExtendMode = "neither") -> None:
         self.cnorm = self._create_colorbar_norm(
@@ -58,6 +66,10 @@ class EnhancementScale:
     def ticks(self, nticks: int = 16, step: int = 0) -> None:
         refs = ColorbarTicks(self.extent, nticks, step)
         self.cticks = refs.cticks
+
+    @staticmethod
+    def _actual_range(extent: DomainData, offset: float) -> DomainData:
+        return extent[0] + offset, extent[1] + offset
 
     @classmethod
     def _create_colorbar_norm(
@@ -92,11 +104,17 @@ class EnhancementScale:
         return BoundaryNorm(levels, ncolors=ncolors, clip=True, extend=mode)
 
     def _create_from_colormap(
-        self, colormap: EnhancementColormap, ncolors: int, mode: ExtendMode
+        self,
+        colormap: EnhancementColormap,
+        offset: float,
+        ncolors: int,
+        mode: ExtendMode,
     ) -> tuple[LinearSegmentedColormap, BoundaryNorm]:
-        cnorm = self._create_colorbar_norm(colormap.extent, ncolors, mode)
+        extent = self._actual_range(colormap.extent, offset)
 
-        tmin, tmax = colormap.extent
+        cnorm = self._create_colorbar_norm(extent, ncolors, mode)
+
+        tmin, tmax = extent
         total_range = tmax - tmin
 
         all_colors: list[NDArray[np.float64]] = []
@@ -130,9 +148,15 @@ class EnhancementScale:
         return cmap, cnorm
 
     def _create_from_table(
-        self, table: EnhacementTable, ncolors: int, mode: ExtendMode
+        self,
+        table: EnhacementTable,
+        offset: float,
+        ncolors: int,
+        mode: ExtendMode,
     ) -> tuple[LinearSegmentedColormap, BoundaryNorm]:
-        cnorm = self._create_colorbar_norm(table.extent, ncolors, mode)
+        extent = self._actual_range(table.extent, offset)
+
+        cnorm = self._create_colorbar_norm(extent, ncolors, mode)
 
         cmap = LinearSegmentedColormap(
             table.name, table.color_table, N=ncolors
