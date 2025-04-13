@@ -101,26 +101,6 @@ class EnhacementPalette:
 
         return cls(name, items, extent)
 
-    def reverse(self) -> "EnhacementPalette":
-        """
-        Reverse the color table.
-
-        Returns
-        -------
-        EnhacementPalette
-            A new instance of the EnhacementPalette class with the color
-            table reversed.
-        """
-        table = [(1.0 - x, b, g, r) for x, b, g, r in self.table]
-        table.reverse()
-
-        stock = self.stock.copy()
-        stock[0], stock[1] = stock[1], stock[0]
-
-        name = self.name[:-2] if self.name.endswith("_r") else f"{self.name}_r"
-
-        return EnhacementPalette(name, (table, stock), self.extent)
-
     def save_to_file(
         self, path: str | Path, name: str = "", rgb: bool = False
     ) -> None:

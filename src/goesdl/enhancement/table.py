@@ -141,21 +141,6 @@ class EnhacementTable:
 
         return cls(stretching, palette)
 
-    def reverse(self) -> "EnhacementTable":
-        """
-        Reverse the color enhancement table.
-
-        Returns
-        -------
-        EnhacementTable
-            A new instance of the EnhacementTable class with the color
-            enhancement table reversed.
-        """
-        stretching = self.stretching.reverse()
-        palette = self.palette.reverse()
-
-        return EnhacementTable(stretching, palette)
-
     @staticmethod
     def _interp_color(x: float, color_data: PaletteData) -> ColorEntry:
         x_pal, b_pal, g_pal, r_pal = zip(*color_data)

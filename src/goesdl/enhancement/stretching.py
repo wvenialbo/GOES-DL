@@ -136,23 +136,6 @@ class EnhacementStretching:
 
         return cls(name, table, scale_domain, palette_extent)
 
-    def reverse(self) -> "EnhacementStretching":
-        """
-        Reverse the enhancement stretching table.
-
-        Returns
-        -------
-        EnhacementStretching
-            A new instance of the EnhacementStretching class with the
-            stretching table reversed.
-        """
-        table = [(1.0 - x, 1.0 - y) for x, y in self.table]
-        table.reverse()
-
-        name = self.name[:-2] if self.name.endswith("_r") else f"{self.name}_r"
-
-        return EnhacementStretching(name, table, self.domain, self.extent)
-
     def save_to_file(self, path: str | Path, name: str = "") -> None:
         """
         Save the enhancement stretching table to a file.
