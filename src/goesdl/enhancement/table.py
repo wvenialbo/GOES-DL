@@ -92,8 +92,8 @@ class EnhacementTable:
 
         vmin = (vmin - tmin) / trange
         vmax = (vmax - tmin) / trange
-        cmin = self._interp_color(vmin)
-        cmax = self._interp_color(vmax)
+        cmin = self._interp_color(vmin, self.color_data)
+        cmax = self._interp_color(vmax, self.color_data)
 
         sub_palette: PaletteData = [cmin]
         for entry in self.color_data:
@@ -156,8 +156,9 @@ class EnhacementTable:
 
         return EnhacementTable(stretching, palette)
 
-    def _interp_color(self, x: float) -> ColorEntry:
-        x_pal, b_pal, g_pal, r_pal = zip(*self.color_data)
+    @staticmethod
+    def _interp_color(x: float, color_data: PaletteData) -> ColorEntry:
+        x_pal, b_pal, g_pal, r_pal = zip(*color_data)
 
         # Linear interpolation between the two points
         b, g, r = (
