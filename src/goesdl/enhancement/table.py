@@ -192,7 +192,7 @@ class EnhacementTable:
         if i + 1 < len(self.palette):
             x1, b1, g1, r1 = self.palette[i + 1]
         else:
-            x1, b1, g1, r1 = x0 + 1, b0, g0, r0
+            return x0, b0, g0, r0
 
         # Linear interpolation between the two points
         b, g, r = (
