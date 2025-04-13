@@ -156,6 +156,18 @@ class EnhacementTable:
 
         return EnhacementTable(stretching, palette)
 
+    def _interp_color(self, x: float) -> ColorEntry:
+        x_pal, b_pal, g_pal, r_pal = zip(*self.color_data)
+
+        # Linear interpolation between the two points
+        b, g, r = (
+            interp(x, x_pal, b_pal),
+            interp(x, x_pal, g_pal),
+            interp(x, x_pal, r_pal),
+        )
+
+        return x, b, g, r
+
     @staticmethod
     def _make_colortable(table: PaletteData) -> PaletteTable:
         blue: list[ColorSegment] = []
@@ -180,17 +192,20 @@ class EnhacementTable:
             "blue": blue,
         }
 
-    def _interp_color(self, x: float) -> ColorEntry:
-        x_pal, b_pal, g_pal, r_pal = zip(*self.color_data)
+    @staticmethod
+    def _make_stock(palette: EnhacementPalette) -> ColorStock:
+        bg, fg, nn = palette.stock
+        return {"background": bg, "foreground": fg, "nan": nn}
 
-        # Linear interpolation between the two points
-        b, g, r = (
-            interp(x, x_pal, b_pal),
-            interp(x, x_pal, g_pal),
-            interp(x, x_pal, r_pal),
-        )
-
-        return x, b, g, r
+    @staticmethod
+    def _normalize_palette(
+        vmin: float, vmax: float, sub_palette: PaletteData
+    ) -> None:
+        vrange = vmax - vmin
+        for i, entry in enumerate(sub_palette):
+            x, b, g, r = entry
+            x = (x - vmin) / vrange
+            sub_palette[i] = x, b, g, r
 
     @staticmethod
     def _stretch_palette(
@@ -206,21 +221,6 @@ class EnhacementTable:
             linearized_table.append((y, b, g, r))
 
         return linearized_table
-
-    @staticmethod
-    def _make_stock(palette: EnhacementPalette) -> ColorStock:
-        bg, fg, nn = palette.stock
-        return {"background": bg, "foreground": fg, "nan": nn}
-
-    @staticmethod
-    def _normalize_palette(
-        vmin: float, vmax: float, sub_palette: PaletteData
-    ) -> None:
-        vrange = vmax - vmin
-        for i, entry in enumerate(sub_palette):
-            x, b, g, r = entry
-            x = (x - vmin) / vrange
-            sub_palette[i] = x, b, g, r
 
     @property
     def domain(self) -> DomainData:
