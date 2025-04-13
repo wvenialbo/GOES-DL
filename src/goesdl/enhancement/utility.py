@@ -94,10 +94,10 @@ def interpc(x: float, xp: Sequence[float], yp: Sequence[float]) -> float:
     float
         The interpolated value.
     """
-    if x < xp[0]:
+    if x <= xp[0]:
         return yp[0]
 
-    return yp[-1] if x > xp[-1] else _interp(x, xp, yp)
+    return yp[-1] if x >= xp[-1] else _interp(x, xp, yp)
 
 
 def interpx(x: float, xp: Sequence[float], yp: Sequence[float]) -> float:
@@ -127,4 +127,4 @@ def interpx(x: float, xp: Sequence[float], yp: Sequence[float]) -> float:
     if x > xp[-1]:
         return _interpv(x, xp[-2], xp[-1], yp[-2], yp[-1])
 
-    return _interp(x, xp, yp)
+    return interp(x, xp, yp)
