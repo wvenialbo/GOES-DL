@@ -12,6 +12,6 @@ RGBValue = tuple[float, float, float]
 ValueTables = tuple[list[float], ...]
 
 ColorTable = list[RGBValue]
-PaletteTable = list[ColorEntry]
-PaletteItem = tuple[PaletteTable, ColorTable]
+PaletteData = list[ColorEntry]
+PaletteItem = tuple[PaletteData, ColorTable]
 StretchingTable = list[tuple[float, float]]

@@ -6,8 +6,8 @@ from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_TABLE
 from .shared import (
     ColorEntry,
     DomainData,
+    PaletteData,
     PaletteItem,
-    PaletteTable,
     RGBValue,
     ValueTables,
 )
@@ -49,7 +49,7 @@ class eu_utility(clr_utility):
         cls,
         path: str | Path,
         name: str,
-        table: PaletteTable,
+        table: PaletteData,
         extent: DomainData,
         rgb: bool = False,
     ) -> None:
@@ -86,7 +86,7 @@ class eu_utility(clr_utility):
     def _create_color_table(
         cls,
         lines: list[str],
-        table: PaletteTable,
+        table: PaletteData,
         extent: DomainData,
         rgb: bool,
     ) -> None:
