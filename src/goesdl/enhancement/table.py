@@ -108,30 +108,28 @@ class EnhacementTable:
 
     @classmethod
     def from_file(
-        cls, stretching_path: str | Path, palette_path: str | Path = ""
+        cls, palette_path: str | Path, stretching_path: str | Path = ""
     ) -> "EnhacementTable":
         """
         Create an EnhacementTable instance from files.
 
         Parameters
         ----------
-        stretching_path : str or Path
-            Path to the file containing the enhancement stretching data.
         palette_path : str or Path
             Path to the file containing the enhancement palette data.
+        stretching_path : str or Path
+            Path to the file containing the enhancement stretching data.
 
         Returns
         -------
         EnhacementTable
             An instance of the EnhacementTable class.
         """
-        stretching = None
-        if not palette_path:
-            palette_path = stretching_path
-        else:
-            stretching = EnhacementStretching.from_file(stretching_path)
-
         palette = EnhacementPalette.from_file(palette_path)
+
+        stretching = None
+        if stretching_path:
+            stretching = EnhacementStretching.from_file(stretching_path)
 
         if not stretching:
             table = [(0.0, 0.0), (1.0, 1.0)]
