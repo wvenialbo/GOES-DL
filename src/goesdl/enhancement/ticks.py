@@ -1,5 +1,7 @@
 from .shared import DomainData
 
+MIN_TICKS = 5
+
 
 class ColorbarTicks:
 
@@ -28,9 +30,9 @@ class ColorbarTicks:
         """
         tmin, tmax = extent
 
-        if step < 5:
+        if step < MIN_TICKS:
             step = self._find_tick_step(
-                tmin, tmax, max_ticks=nticks, min_step=5
+                tmin, tmax, max_ticks=nticks, min_step=MIN_TICKS
             )
 
         cbmin = self._find_tick_min(tmin, step)
