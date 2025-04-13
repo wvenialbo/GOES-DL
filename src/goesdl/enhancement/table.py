@@ -135,7 +135,7 @@ class EnhacementTable:
             stretching = EnhacementStretching.from_file(stretching_path)
 
         if not stretching:
-            table = [(0.0, 0.0), (1.0, 1.0)]
+            table = [(x, x) for x, _, _, _ in palette.table]
             scale_domain, palette_extent = palette.extent, palette.extent
             stretching = EnhacementStretching(
                 "", table, scale_domain, palette_extent
@@ -202,9 +202,11 @@ class EnhacementTable:
         x_stretch: tuple[float]
         y_stretch: tuple[float]
         y_stretch, x_stretch = zip(*stretching.table)
+        print(y_stretch, x_stretch)
 
         linearized_table: PaletteData = []
         for x, b, g, r in palette.table:
+            print(x)
             y = interpx(x, x_stretch, y_stretch)
             linearized_table.append((y, b, g, r))
 
