@@ -57,11 +57,11 @@ class EnhacementTable:
     stock: ColorStock
     color_table: PaletteTable
     color_data: PaletteData
-    stretching: EnhacementStretching
     palette: EnhacementPalette
+    stretching: EnhacementStretching
 
     def __init__(
-        self, stretching: EnhacementStretching, palette: EnhacementPalette
+        self, palette: EnhacementPalette, stretching: EnhacementStretching
     ) -> None:
         self.name = palette.name
         if stretching.name:
@@ -142,7 +142,7 @@ class EnhacementTable:
                 "", table, scale_domain, palette_extent
             )
 
-        return cls(stretching, palette)
+        return cls(palette, stretching)
 
     @staticmethod
     def _interp_color(x: float, color_data: PaletteData) -> ColorEntry:
