@@ -4,15 +4,17 @@ creating and manipulating color enhancement tables.
 """
 
 from pathlib import Path
+from typing import Literal
 
 from .palette import EnhacementPalette
 from .shared import ColorEntry, DomainData, PaletteData, RGBValue
 from .stretching import EnhacementStretching
 from .utility import interp, interpx
 
+ColorKey = Literal["red", "green", "blue", "alpha"]
 ColorSegment = tuple[float, float, float]
 ColorStock = dict[str, RGBValue]
-PaletteTable = dict[str, list[ColorSegment]]
+PaletteTable = dict[ColorKey, list[ColorSegment]]
 
 
 class EnhacementTable:
