@@ -317,6 +317,10 @@
             "scope": "downloader",
             "description": "Downloader level subpackage modules (mid)",
         },
+        {
+            "scope": "enhancement",
+            "description": "Color enhancement utility subpackage modules (mid)",
+        },
     ],
     // AI assistance tools settings
     "github.copilot.advanced": {},
