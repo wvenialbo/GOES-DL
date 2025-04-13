@@ -16,7 +16,6 @@ class EnhancementColormap:
         name: str,
         cmap_names: str | Sequence[str],
         keypoints: Sequence[float],
-        ncolors: int,
     ) -> None:
         if isinstance(cmap_names, str):
             cmap_names = [cmap_names]
