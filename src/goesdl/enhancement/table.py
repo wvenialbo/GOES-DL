@@ -8,12 +8,11 @@ from pathlib import Path
 from typing import Literal
 
 from .palette import EnhacementPalette
-from .shared import ColorEntry, DomainData, PaletteData, RGBValue
+from .shared import ColorEntry, ColorSegment, DomainData, PaletteData, RGBValue
 from .stretching import EnhacementStretching
 from .utility import interp, interpx
 
 ColorKey = Literal["red", "green", "blue", "alpha"]
-ColorSegment = tuple[float, ...]
 ColorStock = dict[str, RGBValue]
 PaletteTable = dict[ColorKey, Sequence[ColorSegment]]
 

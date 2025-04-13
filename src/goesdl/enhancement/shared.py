@@ -6,6 +6,7 @@ enhancement color tables, as well as reverse and manipulate color maps.
 """
 
 ColorEntry = tuple[float, float, float, float]
+ColorSegment = tuple[float, ...]
 DomainData = tuple[float, float]
 
 CMYKValue = ColorEntry

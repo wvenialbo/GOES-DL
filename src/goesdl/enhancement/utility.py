@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-from .table import ColorSegment
+from .shared import ColorSegment
 
 
 def compress_color_data(
