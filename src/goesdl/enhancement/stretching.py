@@ -60,20 +60,19 @@ class EnhacementStretching:
 
     name: str
     domain: DomainData
-    domain_y: DomainData
+    extent: DomainData
     table: StretchingTable
 
     def __init__(
         self,
         name: str,
         table: StretchingTable,
-        domains: tuple[DomainData, DomainData],
+        scale_domain: DomainData,
+        palette_extent: DomainData,
     ) -> None:
-        domain_x, domain_y = domains
-
         self.name = name
-        self.domain = domain_x
-        self.domain_y = domain_y
+        self.domain = scale_domain
+        self.extent = palette_extent
         self.table = table
 
     @classmethod
@@ -133,9 +132,9 @@ class EnhacementStretching:
 
         table, name = cls._parse_table(lines)
 
-        domains = cls._normalize_table(table)
+        scale_domain, palette_extent = cls._normalize_table(table)
 
-        return cls(name, table, domains)
+        return cls(name, table, scale_domain, palette_extent)
 
     def reverse(self) -> "EnhacementStretching":
         """
@@ -152,7 +151,7 @@ class EnhacementStretching:
 
         name = self.name[:-2] if self.name.endswith("_r") else f"{self.name}_r"
 
-        return EnhacementStretching(name, table, (self.domain, self.domain_y))
+        return EnhacementStretching(name, table, self.domain, self.extent)
 
     def save_to_file(self, path: str | Path, name: str = "") -> None:
         """
@@ -170,7 +169,7 @@ class EnhacementStretching:
         if not name and self.name != UNNAMED_TABLE:
             name = self.name
 
-        self.create_file(path, name, self.table, self.domain, self.domain_y)
+        self.create_file(path, name, self.table, self.domain, self.extent)
 
     @staticmethod
     def _add_stretching_table_header(lines: list[str], name: str) -> None:

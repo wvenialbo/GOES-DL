@@ -133,8 +133,10 @@ class EnhacementTable:
 
         if not stretching:
             table = [(0.0, 0.0), (1.0, 1.0)]
-            domains = palette.extent, palette.extent
-            stretching = EnhacementStretching("", table, domains)
+            scale_domain, palette_extent = palette.extent, palette.extent
+            stretching = EnhacementStretching(
+                "", table, scale_domain, palette_extent
+            )
 
         return cls(stretching, palette)
 
