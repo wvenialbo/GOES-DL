@@ -32,7 +32,7 @@ class EnhancementScale:
     def __init__(
         self,
         specs: EnhacementTable | EnhancementColormap,
-        offset: float,
+        offset: float = 0.0,
         ncolors: int = 256,
         nticks: int = 16,
         mode: ExtendMode = "neither",
