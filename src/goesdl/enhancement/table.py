@@ -202,11 +202,9 @@ class EnhacementTable:
         x_stretch: tuple[float]
         y_stretch: tuple[float]
         y_stretch, x_stretch = zip(*stretching.table)
-        print(y_stretch, x_stretch)
 
         linearized_table: PaletteData = []
         for x, b, g, r in palette.table:
-            print(x)
             y = interpx(x, x_stretch, y_stretch)
             linearized_table.append((y, b, g, r))
 
