@@ -3,6 +3,7 @@ Provide the EnhacementTable class and related utilities for
 creating and manipulating color enhancement tables.
 """
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
 
@@ -12,9 +13,9 @@ from .stretching import EnhacementStretching
 from .utility import interp, interpx
 
 ColorKey = Literal["red", "green", "blue", "alpha"]
-ColorSegment = tuple[float, float, float]
+ColorSegment = tuple[float, ...]
 ColorStock = dict[str, RGBValue]
-PaletteTable = dict[ColorKey, list[ColorSegment]]
+PaletteTable = dict[ColorKey, Sequence[ColorSegment]]
 
 
 class EnhacementTable:
