@@ -8,6 +8,7 @@ from pathlib import Path
 from .palette import EnhacementPalette
 from .shared import ColorEntry, DomainData, PaletteTable, RGBValue
 from .stretching import EnhacementStretching
+from .utility import interp, interpx
 
 ColorSegment = tuple[float, float, float]
 ColorStock = dict[str, RGBValue]
@@ -64,7 +65,7 @@ class EnhacementTable:
         self.extent = palette.extent
 
         self.stock = self._make_stock(palette)
-        self.palette = self._linearize_palette(stretching, palette)
+        self.palette = self._stretch_palette(stretching, palette)
         self.table = self._make_colortable(self.palette)
 
         self.stretching_data = stretching
@@ -180,56 +181,29 @@ class EnhacementTable:
         }
 
     def _interp_color(self, x: float) -> ColorEntry:
-        if x < self.palette[0][0] or x > self.palette[-1][0]:
-            raise ValueError("Value out of range")
-
-        # Find the indices of the two closest points in x
-        i = 0
-        while i < len(self.palette) - 1 and x >= self.palette[i + 1][0]:
-            i += 1
-
-        x0, b0, g0, r0 = self.palette[i]
-        if i + 1 < len(self.palette):
-            x1, b1, g1, r1 = self.palette[i + 1]
-        else:
-            return x0, b0, g0, r0
+        x_pal, b_pal, g_pal, r_pal = zip(*self.palette)
 
         # Linear interpolation between the two points
         b, g, r = (
-            self._interp_value(x, x0, x1, b0, b1),
-            self._interp_value(x, x0, x1, g0, g1),
-            self._interp_value(x, x0, x1, r0, r1),
+            interp(x, x_pal, b_pal),
+            interp(x, x_pal, g_pal),
+            interp(x, x_pal, r_pal),
         )
 
         return x, b, g, r
 
     @staticmethod
-    def _interp_value(
-        x: float, x0: float, x1: float, y0: float, y1: float
-    ) -> float:
-        slope = (y1 - y0) / (x1 - x0)
-        return y0 + slope * (x - x0)
-
-    @staticmethod
-    def _linearize_palette(
+    def _stretch_palette(
         stretching: EnhacementStretching, palette: EnhacementPalette
     ) -> PaletteTable:
-        x: tuple[float]
-        y: tuple[float]
-        y, x = zip(*stretching.table)
+        x_stretch: tuple[float]
+        y_stretch: tuple[float]
+        y_stretch, x_stretch = zip(*stretching.table)
+
         linearized_table: PaletteTable = []
-        for x_i, b, g, r in palette.table:
-            # Find the indices of the two closest points in x
-            i = 0
-            while i < len(x) - 1 and x_i > x[i + 1]:
-                i += 1
-
-            # Linear interpolation between the two points
-            slope = (y[i + 1] - y[i]) / (x[i + 1] - x[i])
-            y_new = y[i] + slope * (x_i - x[i])
-
-            print(y[i], y_new)
-            linearized_table.append((y_new, b, g, r))
+        for x, b, g, r in palette.table:
+            y = interpx(x, x_stretch, y_stretch)
+            linearized_table.append((y, b, g, r))
 
         return linearized_table
 
