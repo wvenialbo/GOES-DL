@@ -1,2 +1,4 @@
 boto3
+numpy
+matplotlib
 requests
