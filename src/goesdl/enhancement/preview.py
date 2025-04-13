@@ -18,10 +18,14 @@ def show_colormap(
 
     plt.title(scale.name)
 
-    im = ax.imshow(data, aspect="auto", cmap=scale.cmap, norm=scale.cnorm)
+    tmin, tmax = scale.extent
+    im = ax.imshow(data, aspect="auto", cmap=scale.cmap, vmin=tmin, vmax=tmax)
 
     cbar = fig.colorbar(im, orientation="horizontal")
     cbar_ref = ColorbarTicks(scale.domain, nticks, 0)
     cbar.set_ticks(cbar_ref.cticks)
+
+    # Note: Alternatively `norm=scale.cnorm` can be passed to imshow and
+    # `cbar.ax.minorticks_off()` is used to inhibit the minor ticks.
 
     plt.show()
