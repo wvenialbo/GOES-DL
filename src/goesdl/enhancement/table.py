@@ -6,13 +6,13 @@ creating and manipulating color enhancement tables.
 from pathlib import Path
 
 from .palette import EnhacementPalette
-from .shared import ColorEntry, DomainData, PaletteTable, RGBValue
+from .shared import ColorEntry, DomainData, PaletteData, RGBValue
 from .stretching import EnhacementStretching
 from .utility import interp, interpx
 
 ColorSegment = tuple[float, float, float]
 ColorStock = dict[str, RGBValue]
-PaletteData = dict[str, list[ColorSegment]]
+PaletteTable = dict[str, list[ColorSegment]]
 
 
 class EnhacementTable:
@@ -24,16 +24,21 @@ class EnhacementTable:
 
     Attributes
     ----------
-    domain : DomainData
-        The input domain containing the minimum and maximum input values.
-    extent : DomainData
-        The palette domain containing the minimum and maximum values.
+    name : str
+        The name or identifier of the enhancement table.
     stock : ColorStock
         The stock color values.
     table : PaletteData
         The palette data containing color segments.
     palette : PaletteTable
         The palette table containing color entries.
+
+    Properties
+    ----------
+    domain : DomainData
+        The input domain containing the minimum and maximum input values.
+    extent : DomainData
+        The palette domain containing the minimum and maximum values.
 
     Methods
     -------
@@ -46,13 +51,11 @@ class EnhacementTable:
     """
 
     name: str
-    domain: DomainData
-    extent: DomainData
     stock: ColorStock
-    table: PaletteData
-    palette: PaletteTable
-    stretching_data: EnhacementStretching
-    palette_data: EnhacementPalette
+    color_table: PaletteTable
+    color_data: PaletteData
+    stretching: EnhacementStretching
+    palette: EnhacementPalette
 
     def __init__(
         self, stretching: EnhacementStretching, palette: EnhacementPalette
@@ -61,17 +64,14 @@ class EnhacementTable:
         if stretching.name:
             self.name = f"{self.name} > {stretching.name}"
 
-        self.domain = stretching.domain
-        self.extent = palette.extent
-
         self.stock = self._make_stock(palette)
-        self.palette = self._stretch_palette(stretching, palette)
-        self.table = self._make_colortable(self.palette)
+        self.color_data = self._stretch_palette(stretching, palette)
+        self.color_table = self._make_colortable(self.color_data)
 
-        self.stretching_data = stretching
-        self.palette_data = palette
+        self.stretching = stretching
+        self.palette = palette
 
-    def extract(self, vmin: float, vmax: float) -> PaletteData:
+    def extract(self, vmin: float, vmax: float) -> PaletteTable:
         """
         Extract a sub-palette from the color enhancement table.
 
@@ -87,7 +87,7 @@ class EnhacementTable:
         PaletteData
             The extracted sub-palette data.
         """
-        tmin, tmax = self.domain
+        tmin, tmax = self.stretching.domain
         trange = tmax - tmin
 
         vmin = (vmin - tmin) / trange
@@ -95,8 +95,8 @@ class EnhacementTable:
         cmin = self._interp_color(vmin)
         cmax = self._interp_color(vmax)
 
-        sub_palette: PaletteTable = [cmin]
-        for entry in self.palette:
+        sub_palette: PaletteData = [cmin]
+        for entry in self.color_data:
             if entry[0] <= cmin[0] or entry[0] >= cmax[0]:
                 continue
             sub_palette.append(entry)
@@ -151,13 +151,13 @@ class EnhacementTable:
             A new instance of the EnhacementTable class with the color
             enhancement table reversed.
         """
-        stretching = self.stretching_data.reverse()
-        palette = self.palette_data.reverse()
+        stretching = self.stretching.reverse()
+        palette = self.palette.reverse()
 
         return EnhacementTable(stretching, palette)
 
     @staticmethod
-    def _make_colortable(table: PaletteTable) -> PaletteData:
+    def _make_colortable(table: PaletteData) -> PaletteTable:
         blue: list[ColorSegment] = []
         green: list[ColorSegment] = []
         red: list[ColorSegment] = []
@@ -181,7 +181,7 @@ class EnhacementTable:
         }
 
     def _interp_color(self, x: float) -> ColorEntry:
-        x_pal, b_pal, g_pal, r_pal = zip(*self.palette)
+        x_pal, b_pal, g_pal, r_pal = zip(*self.color_data)
 
         # Linear interpolation between the two points
         b, g, r = (
@@ -195,12 +195,12 @@ class EnhacementTable:
     @staticmethod
     def _stretch_palette(
         stretching: EnhacementStretching, palette: EnhacementPalette
-    ) -> PaletteTable:
+    ) -> PaletteData:
         x_stretch: tuple[float]
         y_stretch: tuple[float]
         y_stretch, x_stretch = zip(*stretching.table)
 
-        linearized_table: PaletteTable = []
+        linearized_table: PaletteData = []
         for x, b, g, r in palette.table:
             y = interpx(x, x_stretch, y_stretch)
             linearized_table.append((y, b, g, r))
@@ -214,10 +214,18 @@ class EnhacementTable:
 
     @staticmethod
     def _normalize_palette(
-        vmin: float, vmax: float, sub_palette: PaletteTable
+        vmin: float, vmax: float, sub_palette: PaletteData
     ) -> None:
         vrange = vmax - vmin
         for i, entry in enumerate(sub_palette):
             x, b, g, r = entry
             x = (x - vmin) / vrange
             sub_palette[i] = x, b, g, r
+
+    @property
+    def domain(self) -> DomainData:
+        return self.stretching.domain
+
+    @property
+    def extent(self) -> DomainData:
+        return self.palette.extent
