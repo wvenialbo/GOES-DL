@@ -5,7 +5,9 @@ from .scale import EnhancementScale
 from .ticks import ColorbarTicks
 
 
-def show_colormap(scale: EnhancementScale, offset: float = 0.0) -> None:
+def show_colormap(
+    scale: EnhancementScale, offset: float = 0.0, nticks: int = 14
+) -> None:
     # Example data
     vmin, vmax = scale.domain
     vmin, vmax = vmin + offset, vmax + offset
@@ -19,7 +21,7 @@ def show_colormap(scale: EnhancementScale, offset: float = 0.0) -> None:
     im = ax.imshow(data, aspect="auto", cmap=scale.cmap, norm=scale.cnorm)
 
     cbar = fig.colorbar(im, orientation="horizontal")
-    cbar_ref = ColorbarTicks(scale.domain, 14, 0)
+    cbar_ref = ColorbarTicks(scale.domain, nticks, 0)
     cbar.set_ticks(cbar_ref.cticks)
 
     plt.show()
