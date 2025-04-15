@@ -11,7 +11,7 @@ from collections.abc import Iterable
 from datetime import datetime, timezone
 from re import Match, findall, fullmatch
 
-from ..locator import ProductLocator
+from .locator import ProductLocator
 
 
 class ProductLocatorGG(ProductLocator):
