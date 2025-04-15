@@ -30,11 +30,11 @@ test_goes()
     Test the downloader object with GOES-16 data and AWS datasource.
 """
 
+from goesdl.datasource import DatasourceAWS, DatasourceLocal, DatasourceNCEI
+from goesdl.downloader import Downloader
 from goesdl.goesr import GOESProductLocatorABIPP as ProductLocatorGOES
 from goesdl.gridsat import GridSatProductLocatorB1 as ProductLocatorB1
 from goesdl.gridsat import GridSatProductLocatorGC as ProductLocatorGC
-from goesdl.datasource import DatasourceAWS, DatasourceLocal, DatasourceNCEI
-from goesdl.downloader import Downloader
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M%z"
 
@@ -54,7 +54,7 @@ def test(dl: Downloader, start: str, end: str = "") -> list[str]:
         The downloader object to test.
     start : str
         The start date of the download range.
-    end : str
+    end : str, optional
         The end date of the download range, if any. The default is "".
 
     Returns
