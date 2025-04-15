@@ -323,6 +323,9 @@
         },
         {
             "scope": "geodesy"
+        },
+        {
+            "scope": "netcdf"
         }
     ],
     // AI assistance tools settings
