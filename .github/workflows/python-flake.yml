@@ -26,7 +26,7 @@ jobs:
         pip install --upgrade flake8-annotations
         pip install --upgrade flake8-comprehensions
         pip install --upgrade darglint2
-        pip install -r requirements.txt
+        pip install -r requirements.in
     - name: Analysing the code with flake8
       run: |
         flake8 "./src/goesdl"
