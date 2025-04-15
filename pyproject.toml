@@ -187,7 +187,11 @@
 
       # List of plugins (as comma separated values of python module names) to load,
       # usually to register additional checkers.
-      load-plugins = ["pylint.extensions.docparams", "pylint.extensions.magic_value", "pylint.extensions.no_self_use"]
+      load-plugins = [
+        "pylint.extensions.docparams",
+        "pylint.extensions.magic_value",
+        "pylint.extensions.no_self_use",
+      ]
 
       # Pickle collected data for later comparisons.
       persistent = true
@@ -198,7 +202,7 @@
 
       # Minimum Python version to use for version dependent checks. Will default to the
       # version used to run pylint.
-      py-version = "3.13"
+      py-version = "3.10"
 
       # Discover python modules and packages in the file system subtree.
       # recursive =
@@ -346,11 +350,24 @@
       # check-protected-access-in-special-methods =
 
       # List of method names used to declare (i.e. assign) instance attributes.
-      defining-attr-methods = ["__init__", "__new__", "__post_init__", "asyncSetUp", "setUp"]
+      defining-attr-methods = [
+        "__init__",
+        "__new__",
+        "__post_init__",
+        "asyncSetUp",
+        "setUp",
+      ]
 
       # List of member names, which should be excluded from the protected access
       # warning.
-      exclude-protected = ["_asdict", "_fields", "_make", "_replace", "_source", "os._exit"]
+      exclude-protected = [
+        "_asdict",
+        "_fields",
+        "_make",
+        "_replace",
+        "_source",
+        "os._exit",
+      ]
 
       # List of valid names for the first argument in a class method.
       valid-classmethod-first-arg = ["cls"]
@@ -387,7 +404,7 @@
       max-parents = 7
 
       # Maximum number of positional arguments for function / method.
-      # TODO: Restore this to its default value: 5. Increased this limit 8.
+      # TODO: Restore this to its default value: 5.
       max-positional-arguments = 8
 
       # Maximum number of public methods for a class (see R0904).
@@ -486,7 +503,13 @@
     [tool.pylint."messages control"]
       # Only show warnings with the listed confidence levels. Leave empty to show all.
       # Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED.
-      confidence = ["CONTROL_FLOW", "HIGH", "INFERENCE", "INFERENCE_FAILURE", "UNDEFINED"]
+      confidence = [
+        "CONTROL_FLOW",
+        "HIGH",
+        "INFERENCE",
+        "INFERENCE_FAILURE",
+        "UNDEFINED",
+      ]
 
       # Disable the message, report, category or checker with the given id(s). You can
       # either give multiple identifiers separated by comma (,) or put this option
@@ -508,7 +531,7 @@
         "use-implicit-booleaness-not-comparison-to-zero",
         "use-symbolic-message-instead",
         "useless-suppression",
-        # temporary disable (avoid complaint about TODOs)
+        # TODO: Remove this (temporarily avoid complaint about TODOs)
         "fixme",
       ]
 
@@ -670,7 +693,12 @@
       # List of class names for which member attributes should not be checked (useful
       # for classes with dynamically set attributes). This supports the use of
       # qualified names.
-      ignored-classes = ["_thread._local", "argparse.Namespace", "optparse.Values", "thread._local"]
+      ignored-classes = [
+        "_thread._local",
+        "argparse.Namespace",
+        "optparse.Values",
+        "thread._local",
+      ]
 
       # Show a hint with possible names when a member name was not found. The aspect of
       # finding the hint is based on edit distance.
@@ -717,7 +745,13 @@
 
       # List of qualified module names which can have objects that can redefine
       # builtins.
-      redefining-builtins-modules = ["builtins", "future.builtins", "io", "past.builtins", "six.moves"]
+      redefining-builtins-modules = [
+        "builtins",
+        "future.builtins",
+        "io",
+        "past.builtins",
+        "six.moves",
+      ]
 
   [tool.mypy]
     # Introduce stricter options
