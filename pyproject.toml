@@ -24,7 +24,7 @@
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Utilities",
   ]
-  dependencies = ["boto3~=1.37.2", "matplotlib~=3.10.1", "numpy~=2.2.4", "requests~=2.32.3"]
+  dependencies = ["boto3~=1.37.34", "matplotlib~=3.10.1", "netCDF4~=1.7.2", "numpy~=2.2.4", "requests~=2.32.3"]
   description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
   dynamic = ["version"]
   keywords = [
@@ -79,10 +79,11 @@
     version     = "v0.1-rc5"
 
     [tool.poetry.dependencies]
-      boto3      = "~1.37.2"
+      boto3      = "~1.37.34"
       matplotlib = "~3.10.1"
+      netCDF4    = "~1.7.2"
       numpy      = "~2.2.4"
-      python     = "^3.9"
+      python     = "^3.10"
       requests   = "~2.32.3"
 
   [tool.black]

@@ -1,4 +1,5 @@
 boto3
-numpy
 matplotlib
+netCDF4
+numpy
 requests
