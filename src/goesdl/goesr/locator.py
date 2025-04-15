@@ -9,7 +9,7 @@ Classes:
 from datetime import datetime, timedelta
 from typing import ClassVar
 
-from ..base import ProductLocatorGG
+from ..dataset.base import ProductLocatorGG
 from .constants import (
     GOESR_FILE_DATE_FORMAT,
     GOESR_FILE_DATE_PATTERN,
