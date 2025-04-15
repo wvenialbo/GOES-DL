@@ -49,9 +49,9 @@ class RectangularExtent:
         return self.domain
 
     @property
-    def lon_limits(self) -> CoordLimits:
+    def lon_bounds(self) -> CoordLimits:
         return self.domain[:2]
 
     @property
-    def lat_limits(self) -> CoordLimits:
+    def lat_bounds(self) -> CoordLimits:
         return self.domain[2:]
