@@ -26,7 +26,7 @@ class GSLatLonGridData(HasStrHelp):
     @staticmethod
     def _extract(record: Dataset, step: int | None) -> "GSLatLonGridData":
         def _subsample(x: Any) -> Any:
-            return x[:] if step is None else x[:: step[0], :: step[1]]
+            return x[:] if step is None else x[::step]
 
         class _LatLonData(DatasetView):
             lon: ArrayFloat32 = variable("lon").data(filter=_subsample)
