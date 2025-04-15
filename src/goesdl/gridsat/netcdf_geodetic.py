@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import flatnonzero
+from numpy import concatenate, flatnonzero
 
 from ..geodesy import RectangularExtent
 from ..netcdf import DatasetView, HasStrHelp, variable
@@ -22,23 +23,14 @@ class GSLatLonGridData(HasStrHelp):
         record: Dataset,
         extent: RectangularExtent | None = None,
         delta: int = 5,
+        corners: bool = False,
     ) -> None:
-        step = delta if extent else None
-        data = self._extract(record, step, None, None)
-
         if extent:
-            lon_limits = self._find_limits(data.lon, extent.lon_bounds, delta)
-            lat_limits = self._find_limits(data.lat, extent.lat_bounds, delta)
-            data = self._extract(record, None, lon_limits, lat_limits)
-            lon_limits = self._find_limits(
-                data.lon, extent.lon_bounds, 1, lon_limits[0]
-            )
-            lat_limits = self._find_limits(
-                data.lat, extent.lat_bounds, 1, lat_limits[0]
+            data, lon_limits, lat_limits = self._slice(
+                record, extent, delta, corners
             )
         else:
-            lon_limits = 0, data.lon.size - 1
-            lat_limits = 0, data.lat.size - 1
+            data, lon_limits, lat_limits = self._full(record, corners)
 
         self.lon = data.lon
         self.lat = data.lat
@@ -52,17 +44,47 @@ class GSLatLonGridData(HasStrHelp):
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
     ) -> "GSLatLonGridData":
-        def _sublon(x: Any) -> Any:
-            begin, end = lon_limits or (None, None)
-            return x[begin:end:step] if step else x[begin:end]
+        def subsample(limits) -> Callable[[Any], Any]:
+            def closure(x: Any) -> Any:
+                begin, end = limits or (None, None)
+                skip = step or None
+                return x[begin:end:skip]
 
-        def _sublat(x: Any) -> Any:
-            begin, end = lat_limits or (None, None)
-            return x[begin:end:step] if step else x[begin:end]
+            return closure
 
         class _LatLonData(DatasetView):
-            lon: ArrayFloat32 = variable("lon").data(filter=_sublon)
-            lat: ArrayFloat32 = variable("lat").data(filter=_sublat)
+            lon: ArrayFloat32 = variable("lon").data(
+                filter=subsample(lon_limits)
+            )
+            lat: ArrayFloat32 = variable("lat").data(
+                filter=subsample(lat_limits)
+            )
+
+        data = _LatLonData(record)
+
+        return cast(GSLatLonGridData, data)
+
+    @staticmethod
+    def _extract_bounds(
+        record: Dataset,
+        lon_limits: LimitType | None,
+        lat_limits: LimitType | None,
+    ) -> "GSLatLonGridData":
+        def subsample(limits) -> Callable[[Any], Any]:
+            def closure(x: Any) -> Any:
+                begin, end = limits or (None, None)
+                coord = x[begin:end]
+                return concatenate((coord[:, 0], coord[-1:, -1]))
+
+            return closure
+
+        class _LatLonData(DatasetView):
+            lon: ArrayFloat32 = variable("lon_bounds").data(
+                filter=subsample(lon_limits)
+            )
+            lat: ArrayFloat32 = variable("lat_bounds").data(
+                filter=subsample(lat_limits)
+            )
 
         data = _LatLonData(record)
 
@@ -85,3 +107,49 @@ class GSLatLonGridData(HasStrHelp):
         max_bound = max_indices[+1] if max_indices.size > 0 else -1
 
         return int(min_bound * delta + offset), int(max_bound * delta + offset)
+
+    @classmethod
+    def _full(
+        cls,
+        record: Dataset,
+        corners: bool,
+    ) -> tuple["GSLatLonGridData", LimitType, LimitType]:
+        if corners:
+            data = cls._extract_bounds(record, None, None)
+            lon_limits = 0, data.lon.size - 1
+            lat_limits = 0, data.lat.size - 1
+        else:
+            data = cls._extract(record, None, None, None)
+            lon_limits = 0, data.lon.size
+            lat_limits = 0, data.lat.size
+
+        return data, lon_limits, lat_limits
+
+    @classmethod
+    def _slice(
+        cls,
+        record: Dataset,
+        extent: RectangularExtent,
+        delta: int,
+        corners: bool,
+    ) -> tuple["GSLatLonGridData", LimitType, LimitType]:
+        data = cls._extract(record, delta, None, None)
+
+        lon_limits = cls._find_limits(data.lon, extent.lon_bounds, delta)
+        lat_limits = cls._find_limits(data.lat, extent.lat_bounds, delta)
+
+        data = cls._extract(record, None, lon_limits, lat_limits)
+
+        lon_limits = cls._find_limits(
+            data.lon, extent.lon_bounds, 1, lon_limits[0]
+        )
+        lat_limits = cls._find_limits(
+            data.lat, extent.lat_bounds, 1, lat_limits[0]
+        )
+
+        if corners:
+            data = cls._extract_bounds(record, lon_limits, lat_limits)
+        else:
+            data = cls._extract(record, None, lon_limits, lat_limits)
+
+        return data, lon_limits, lat_limits
