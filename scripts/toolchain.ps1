@@ -49,7 +49,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 
 Write-Host "--- Running mypy {<file>|<dir>}"
-mypy $project
+mypy $project --check-untyped-defs --ignore-missing-imports
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE

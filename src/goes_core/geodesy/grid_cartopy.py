@@ -16,11 +16,11 @@ from numpy import float32, meshgrid
 
 from ..array import ArrayFloat32, ArrayFloat64
 from .helpers import make_consistent
-from .parameters import ProjectionParameters
+from .parameters import GeostationaryParameters
 
 
 def calculate_latlon_grid_cartopy(
-    projection_info: ProjectionParameters,
+    projection_info: GeostationaryParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
     Calculate latitude and longitude grids using the cartopy package.
@@ -49,25 +49,25 @@ def calculate_latlon_grid_cartopy(
             "The 'cartopy' package is required for this functionality."
         ) from error
 
-    x_m: ArrayFloat64
-    y_m: ArrayFloat64
-    x_m, y_m = meshgrid(projection_info.x_m, projection_info.y_m)
-
     globe_geos = ccrs.Globe(
         ellipse=None,
-        semimajor_axis=projection_info.semi_major_axis,
-        semiminor_axis=projection_info.semi_minor_axis,
-        inverse_flattening=projection_info.inverse_flattening,
+        semimajor_axis=projection_info.globe.semi_major_axis,
+        semiminor_axis=projection_info.globe.semi_minor_axis,
+        inverse_flattening=projection_info.globe.inverse_flattening,
     )
 
     geos_proj = ccrs.Geostationary(
-        satellite_height=projection_info.perspective_point_height,
-        central_longitude=projection_info.longitude_of_projection_origin,
-        sweep_axis=projection_info.sweep_angle_axis,
+        satellite_height=projection_info.orbit.perspective_point_height,
+        central_longitude=projection_info.orbit.longitude_of_projection_origin,
+        sweep_axis=projection_info.orbit.sweep_angle_axis,
         globe=globe_geos,
     )
 
     plate_carree_proj = ccrs.PlateCarree(globe=globe_geos)
+
+    x_m: ArrayFloat64
+    y_m: ArrayFloat64
+    x_m, y_m = meshgrid(projection_info.x_m, projection_info.y_m)
 
     points = plate_carree_proj.transform_points(geos_proj, x_m, y_m)
 

@@ -671,7 +671,7 @@ class VariableProxy:
             raise ValueError(
                 "Invalid 'entry', choose: '*', 'data', 'mask', or 'fill_value'"
             )
-        entry = f"array:{entry or "*"}"
+        entry = f"array:{entry or '*'}"
         return VariableField(self.id, entry, filter, convert)
 
     def attribute(
