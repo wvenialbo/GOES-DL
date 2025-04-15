@@ -17,8 +17,12 @@ from .datasource import (
     DatasourceNCEI,
 )
 from .downloader import Downloader
+from .info import __package_id__, __package_name__, __version__
 
 __all__ = [
+    "__package_id__",
+    "__package_name__",
+    "__version__",
     "dataset",
     "datasource",
     "Datasource",
@@ -32,9 +36,3 @@ __all__ = [
     "netcdf",
     "ProductLocator",
 ]
-
-__package_id__ = "GOES-CORE"
-__package_name__ = (
-    f"{__package_id__} — GOES Satellite Dataset Access Core Functionality"
-)
-__version__ = "v0.0-rc0"
