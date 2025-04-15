@@ -6,6 +6,6 @@ Classes:
     imagery datasets.
 """
 
-from .locator import ProductLocator as ProductLocator
+from .locator import ProductLocator
 
 __all__ = ["ProductLocator"]

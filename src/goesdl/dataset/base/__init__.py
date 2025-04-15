@@ -6,6 +6,6 @@ Classes:
       product locator.
 """
 
-from .locator_gg import ProductLocatorGG as ProductLocatorGG
+from .locator_gg import ProductLocatorGG
 
 __all__ = ["ProductLocatorGG"]
