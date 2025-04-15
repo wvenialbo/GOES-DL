@@ -25,7 +25,7 @@ from numpy import (
     sqrt,
 )
 
-from ..array import ArrayFloat32, ArrayFloat64
+from ..utils.array import ArrayFloat32, ArrayFloat64
 from .helpers import make_common_mask
 from .parameters import GeostationaryParameters
 

@@ -1,6 +1,6 @@
 from numpy import ceil, float64, linspace, pi
 
-from ..array import ArrayFloat64
+from ..utils.array import ArrayFloat64
 
 
 class GlobeParameters:

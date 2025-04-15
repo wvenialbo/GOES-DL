@@ -14,7 +14,7 @@ calculate_latlon_grid_cartopy
 
 from numpy import float32, meshgrid
 
-from ..array import ArrayFloat32, ArrayFloat64
+from ..utils.array import ArrayFloat32, ArrayFloat64
 from .helpers import make_consistent
 from .parameters import GeostationaryParameters
 
