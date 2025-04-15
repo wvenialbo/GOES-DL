@@ -2,6 +2,7 @@ from math import degrees
 from typing import Generator, Literal, cast
 
 CoordDomain = tuple[float, float, float, float]
+CoordLimits = tuple[float, float]
 ExtentType = tuple[float, float]
 CenterType = tuple[float, float]
 
@@ -46,3 +47,11 @@ class RectangularExtent:
     @property
     def limits(self) -> CoordDomain:
         return self.domain
+
+    @property
+    def lon_limits(self) -> CoordLimits:
+        return self.domain[:2]
+
+    @property
+    def lat_limits(self) -> CoordLimits:
+        return self.domain[2:]
