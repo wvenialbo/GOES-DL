@@ -10,6 +10,6 @@ Downloader
     Abstract a downloader object.
 """
 
-from .downloader import Downloader as Downloader
+from .downloader import Downloader
 
 __all__ = ["Downloader"]

@@ -10,7 +10,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 
-from ..base import ProductLocatorGG
+from ..dataset import ProductLocatorGG
 from .constants import GRIDSAT_FILE_SUFFIX
 
 

@@ -31,9 +31,9 @@ supports second, third and fourth-generation GOES satellite data
 easy-to-use interface to access data for scientific analysis, research, and
 other applications.
 
-**Attention GOES-16 Data Users! (updated on 4/7/2025):**
-
-On April 7, 2025 at 15:10 UTC, the GOES-19 satellite was declared the
+> **Attention GOES-16 Data Users! (updated on 4/7/2025):**
+>
+> On April 7, 2025 at 15:10 UTC, the GOES-19 satellite was declared the
 Operational GOES-East satellite. Shortly following the transition of GOES-19 to
 GOES-East, all data distribution from GOES-16 will be turned off. GOES-16 will
 commence drifting to the storage location at 104.7°W. All GOES-19 data are
@@ -53,10 +53,15 @@ available back to beta product declaration dates.
   climate data from both NOAA's AWS archive and the NCEI archive.
 
 - Seamless integration of different data sources into a unified download
-  process.
+  process, providing fundamental functionalities for meteorological satellite
+  dataset handling.
 
 - High-level API that abstracts away the complexity of data access from NOAA
-  archives.
+  archives provides the foundations for streamlining the process of downloading
+  satellite dataset imagery.
+
+- Efficient extraction of data segments directly from NetCDF4 files streamlines
+  the process of reading Level 2 GOES-R Series en GridSat satellite imagery.
 
 ## Supported Datasets
 
@@ -68,7 +73,7 @@ available back to beta product declaration dates.
    Series, these datasets provide environmental monitoring and meteorological
    data for the Western Hemisphere &#91;[4](#goesi)&#93;.
 
-3. **GOES 4th Generation (GOES-16 to GOES-18)**: Also known as the R to U
+3. **GOES 4th Generation (GOES-16 to GOES-19)**: Also known as the R to U
    Series, these satellites offer advanced imagery and atmospheric measurements
    with better spatial, spectral, and temporal resolution &#91;[7](#goesr)&#93;.
 
@@ -82,11 +87,11 @@ Satellite Data from ISCCP B1 (GridSat-B1) Infrared Channel Brightness
 Temperature, Version 2][53] for more information on the data format and details
 of the content.
 
-See [NOAA Geostationary Operational Environmental Satellites (GOES) 16, 17 &
-18][11] and [NOAA GOES on AWS (CICS)][12] for information on the GOES-R Series
-data available from NOAA on AWS. You can find much more detailed information
-about GOES-R Series data from NOAA's [Geostationary Operational Environmental
-Satellites - R Series][0].
+See [NOAA Geostationary Operational Environmental Satellites (GOES) 16, 17, 18
+& 19][11] and [NOAA GOES on AWS (CICS)][12] for information on the GOES-R
+Series data available from NOAA on AWS. You can find much more detailed
+information about GOES-R Series data from NOAA's [Geostationary Operational
+Environmental Satellites - R Series][0].
 
 ## Installation
 
@@ -113,7 +118,7 @@ of the repository.
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.gridsat import GridSatProductLocatorGC
+from goesdl.gridsat import GridSatProductLocatorGC
 from goesdl.datasource import DatasourceNCEI
 from goesdl.downloader import Downloader
 
@@ -148,7 +153,7 @@ files2 = downloader.download_files(
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.goes import GOESProductLocatorABIPP
+from goesdl.goesr import GOESProductLocatorABIPP
 from goesdl.datasource import DatasourceAWS
 from goesdl.downloader import Downloader
 
@@ -189,7 +194,7 @@ downloader.get_files(file_list)
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.gridsat import GridSatProductLocatorB1
+from goesdl.gridsat import GridSatProductLocatorB1
 from goesdl.datasource import DatasourceAWS
 from goesdl.downloader import Downloader
 
@@ -226,7 +231,7 @@ files2 = downloader.download_files(
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.gridsat import GridSatProductLocatorB1
+from goesdl.gridsat import GridSatProductLocatorB1
 from goesdl.datasource import DatasourceNCEI
 from goesdl.downloader import Downloader
 
@@ -310,16 +315,15 @@ a subset of the files listed by the `Downloader.list_files` method.
 1. **NOAA NCEI Archive**: GridSat-B1 Climate Data Record and GOES-8 to GOES-15
    data is available through NOAA’s National Centers for Environmental
    Information.
-2. **NOAA AWS Cloud Archive**: GOES-16 to GOES-18 data and GridSat-B1 Climate
+2. **NOAA AWS Cloud Archive**: GOES-16 to GOES-19 data and GridSat-B1 Climate
    Data Record are accessible via the NOAA archive hosted on AWS.
 
 ## Project description
 
-Tool package to download GOES (Geostationary Operational Environmental
-Satellite) 2nd and 3rd generation (GOES-8 to GOES-15) data from NOAA's NCEI
-archive, 4th Generation (GOES-16 to GOES-18) data from NOAA's archive on AWS,
-and Gridded Satellite B1 (GridSat-B1) Climate Data Record, Version 2, from
-NOAA's AWS and NCEI archives using Python.
+Tool package to download and read Geostationary Operational Environmental
+Satellite 2nd, 3rd and 4th Generation (GOES-8 to GOES-19) and Gridded Satellite
+(GridSat-B1 and GridSat-GOES) imagery datasets from NOAA's AWS and NCEI cloud
+repositories using Python.
 
 **Keywords:**
 [goes](https://github.com/topics/goes),
@@ -356,10 +360,22 @@ Please make sure to include tests for any new functionality.
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.10+
+- [boto3](https://pypi.org/project/boto3): AWS SDK for Python.
+- [matplotlib](https://pypi.org/project/matplotlib/): Python plotting package.
+- [netCDF4](https://pypi.org/project/netCDF4/): Provides an object-oriented
+  python interface to the netCDF version 4 library.
+- [numpy](https://pypi.org/project/numpy/): Fundamental package for array
+  computing in Python.
 - [requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
   library for Python.
-- [boto3](https://pypi.org/project/boto3): AWS SDK for Python.
+
+### Optional
+
+- [cartopy](https://pypi.org/project/Cartopy/): A Python library for
+  cartographic visualizations with Matplotlib.
+- [pyproj](https://pypi.org/project/pyproj/): Python interface to PROJ
+  (cartographic projections and coordinate transformations library).
 
 ## License
 
@@ -376,7 +392,7 @@ When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
 > Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.1-rc4)* [Software]. GitHub.
+> GOES and GridSat-B1 satellite data (Version 0.1-rc5)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 

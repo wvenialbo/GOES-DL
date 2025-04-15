@@ -1,7 +1,16 @@
-"""Provide functionality for downloading GOES and GridSat datasets."""
+"""
+Provide functionality for accessing GOES-R Series and GridSat datasets.
 
-__package_id__ = "GOES-DL"
-__package_name__ = (
-    f"{__package_id__} — GOES Satellite Imagery Dataset Downloader"
-)
-__version__ = "v0.1-rc5"
+This package provides classes to download and extract information from
+GOES-R Series and GridSat netCDF data files. It uses the `requests`
+and `boto3` packages to download the files and the `netCDF4` package to
+read the data files.
+"""
+
+from .info import __package_id__, __package_name__, __version__
+
+__all__ = [
+    "__package_id__",
+    "__package_name__",
+    "__version__",
+]

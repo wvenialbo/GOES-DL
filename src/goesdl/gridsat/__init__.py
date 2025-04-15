@@ -6,7 +6,7 @@ Classes:
     - GridSatProductLocatorGC: Locator for GC products.
 """
 
-from .locator_b1 import GridSatProductLocatorB1 as GridSatProductLocatorB1
-from .locator_gc import GridSatProductLocatorGC as GridSatProductLocatorGC
+from .locator_b1 import GridSatProductLocatorB1
+from .locator_gc import GridSatProductLocatorGC
 
 __all__ = ["GridSatProductLocatorB1", "GridSatProductLocatorGC"]

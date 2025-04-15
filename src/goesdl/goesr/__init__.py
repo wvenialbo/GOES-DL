@@ -21,18 +21,21 @@ Classes:
     - GOESProductLocatorRad: ABI Radiance Product (Rad).
 """
 
-from .locator_abi import GOESProductLocatorABI as GOESProductLocatorABI
-from .locator_dc import GOESProductLocatorABIDC as GOESProductLocatorABIDC
-from .locator_dc import GOESProductLocatorDMW as GOESProductLocatorDMW
-from .locator_dc import GOESProductLocatorDMWV as GOESProductLocatorDMWV
-from .locator_dp import GOESProductLocatorABIDP as GOESProductLocatorABIDP
-from .locator_glm import GOESProductLocatorGLM as GOESProductLocatorGLM
-from .locator_lp import GOESProductLocatorLCFA as GOESProductLocatorLCFA
-from .locator_pm import GOESProductLocatorABIPM as GOESProductLocatorABIPM
-from .locator_pm import GOESProductLocatorMCMIP as GOESProductLocatorMCMIP
-from .locator_pp import GOESProductLocatorABIPP as GOESProductLocatorABIPP
-from .locator_pp import GOESProductLocatorCMIP as GOESProductLocatorCMIP
-from .locator_pp import GOESProductLocatorRad as GOESProductLocatorRad
+from .locator_abi import GOESProductLocatorABI
+from .locator_dc import (
+    GOESProductLocatorABIDC,
+    GOESProductLocatorDMW,
+    GOESProductLocatorDMWV,
+)
+from .locator_dp import GOESProductLocatorABIDP
+from .locator_glm import GOESProductLocatorGLM
+from .locator_lp import GOESProductLocatorLCFA
+from .locator_pm import GOESProductLocatorABIPM, GOESProductLocatorMCMIP
+from .locator_pp import (
+    GOESProductLocatorABIPP,
+    GOESProductLocatorCMIP,
+    GOESProductLocatorRad,
+)
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
 GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC

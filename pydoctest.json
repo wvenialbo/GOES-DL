@@ -1,4 +1,7 @@
 {
+  "exclude_classes": ["_*"],
+  "exclude_functions": ["_*"],
+  "exclude_methods": ["_*"],
   "fail_on_missing_docstring": true,
   "fail_on_missing_summary": true,
   "fail_on_raises_section": true,
