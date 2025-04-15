@@ -275,52 +275,55 @@
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
             "scope": "base",
-            "description": "Base subpackage modules (lowest)",
+            "description": "Base subpackage modules (lowest)"
         },
         {
             "scope": "core",
-            "description": "Core subpackage modules (hight)",
+            "description": "Core subpackage modules (hight)"
         },
         {
             "scope": "ide",
-            "description": "IDE Environment settings",
+            "description": "IDE Environment settings"
         },
         {
             "scope": "tests",
-            "description": "Unit test modules",
+            "description": "Unit test modules"
         },
         {
             "scope": "main",
-            "description": "Main application package (highest)",
+            "description": "Main application package (highest)"
         },
         {
             "scope": "goes-dl",
-            "description": "Main application package (highest)",
+            "description": "Main application package (highest)"
         },
         {
             "scope": "utils",
-            "description": "Utils subpackage modules (low)",
+            "description": "Utils subpackage modules (low)"
         },
         {
             "scope": "product",
-            "description": "Product level subpackage modules (mid)",
+            "description": "Product level subpackage modules (mid)"
         },
         {
             "scope": "datasource",
-            "description": "Datasource level subpackage modules (mid)",
+            "description": "Datasource level subpackage modules (mid)"
         },
         {
             "scope": "dataset",
-            "description": "Dataset level subpackage modules (mid)",
+            "description": "Dataset level subpackage modules (mid)"
         },
         {
             "scope": "downloader",
-            "description": "Downloader level subpackage modules (mid)",
+            "description": "Downloader level subpackage modules (mid)"
         },
         {
             "scope": "enhancement",
-            "description": "Color enhancement utility subpackage modules (mid)",
+            "description": "Color enhancement utility subpackage modules (mid)"
         },
+        {
+            "scope": "geodesy"
+        }
     ],
     // AI assistance tools settings
     "github.copilot.advanced": {},
