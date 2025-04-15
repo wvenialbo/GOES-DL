@@ -118,7 +118,7 @@ of the repository.
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.gridsat import GridSatProductLocatorGC
+from goesdl.gridsat import GridSatProductLocatorGC
 from goesdl.datasource import DatasourceNCEI
 from goesdl.downloader import Downloader
 
@@ -153,7 +153,7 @@ files2 = downloader.download_files(
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.goes import GOESProductLocatorABIPP
+from goesdl.goesr import GOESProductLocatorABIPP
 from goesdl.datasource import DatasourceAWS
 from goesdl.downloader import Downloader
 
@@ -194,7 +194,7 @@ downloader.get_files(file_list)
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.gridsat import GridSatProductLocatorB1
+from goesdl.gridsat import GridSatProductLocatorB1
 from goesdl.datasource import DatasourceAWS
 from goesdl.downloader import Downloader
 
@@ -231,7 +231,7 @@ files2 = downloader.download_files(
 
 ```python
 # Import the locator and datasource according to your desired product
-from goesdl.dataset.gridsat import GridSatProductLocatorB1
+from goesdl.gridsat import GridSatProductLocatorB1
 from goesdl.datasource import DatasourceNCEI
 from goesdl.downloader import Downloader
 
