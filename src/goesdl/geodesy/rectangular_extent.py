@@ -6,7 +6,7 @@ ExtentType = tuple[float, float]
 CenterType = tuple[float, float]
 
 
-class RectangularDomain:
+class RectangularExtent:
 
     domain: CoordDomain
 
@@ -19,7 +19,7 @@ class RectangularDomain:
         extent: ExtentType,
         center_deg: CenterType,
         units: Literal["arcsec", "arcmin", "deg", "rad"] = "deg",
-    ) -> "RectangularDomain":
+    ) -> "RectangularExtent":
         extent_deg: ExtentType | Generator[float]
         if units == "arcsec":
             extent_deg = (value / 3600.0 for value in extent)
@@ -44,5 +44,5 @@ class RectangularDomain:
         return cls(cast(CoordDomain, domain))
 
     @property
-    def extent(self) -> CoordDomain:
+    def limits(self) -> CoordDomain:
         return self.domain
