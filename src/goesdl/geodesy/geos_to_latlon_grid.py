@@ -18,7 +18,7 @@ from ..utils.array import ArrayFloat32
 from .geos_to_latlon_grid_cartopy import geos_to_latlon_grid_cartopy
 from .geos_to_latlon_grid_goesdl import geos_to_latlon_grid_goesdl
 from .geos_to_latlon_grid_pyproj import geos_to_latlon_grid_pyproj
-from .parameters import GeostationaryParameters
+from .geostationary_parameters import GeostationaryParameters
 
 
 def geos_to_latlon_grid(

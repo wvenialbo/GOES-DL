@@ -49,8 +49,8 @@ from .geos_to_latlon_grid import geos_to_latlon_grid
 from .geos_to_latlon_grid_cartopy import geos_to_latlon_grid_cartopy
 from .geos_to_latlon_grid_goesdl import geos_to_latlon_grid_goesdl
 from .geos_to_latlon_grid_pyproj import geos_to_latlon_grid_pyproj
+from .geostationary_parameters import GeostationaryParameters
 from .helpers import calculate_pixel_edges
-from .parameters import GeostationaryParameters
 
 __all__ = [
     "geos_to_latlon_grid",

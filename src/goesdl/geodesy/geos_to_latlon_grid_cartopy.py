@@ -16,7 +16,7 @@ from numpy import float32, meshgrid
 
 from ..utils.array import ArrayFloat32, ArrayFloat64
 from .helpers import make_consistent
-from .parameters import GeostationaryParameters
+from .geostationary_parameters import GeostationaryParameters
 
 
 def geos_to_latlon_grid_cartopy(
