@@ -8,7 +8,7 @@ for details & example of calculations.
 
 Functions
 ---------
-calculate_latlon_grid_goesdr
+calculate_latlon_grid_goesdl
     Calculate latitude and longitude grids using an optimized version of
     classic's algorithm.
 """
@@ -30,7 +30,7 @@ from .helpers import make_common_mask
 from .parameters import GeostationaryParameters
 
 
-def calculate_latlon_grid_goesdr(
+def geos_to_latlon_grid_goesdl(
     projection_info: GeostationaryParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """

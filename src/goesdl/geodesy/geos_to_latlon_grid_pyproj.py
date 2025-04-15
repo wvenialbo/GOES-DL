@@ -19,7 +19,7 @@ from .helpers import make_consistent
 from .parameters import GeostationaryParameters
 
 
-def calculate_latlon_grid_pyproj(
+def geos_to_latlon_grid_pyproj(
     projection_info: GeostationaryParameters,
 ) -> tuple[ArrayFloat32, ArrayFloat32]:
     """
