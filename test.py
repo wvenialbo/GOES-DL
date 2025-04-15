@@ -126,7 +126,7 @@ def test_gridsat_goes() -> list[str]:
     list[str]
         The list of downloaded files.
     """
-    pd = ProductLocatorGC("F", "G12")
+    pd = ProductLocatorGC("F", ["G11", "G12"])
     ds = DatasourceNCEI(pd)
 
     dl = Downloader(
@@ -136,7 +136,7 @@ def test_gridsat_goes() -> list[str]:
         date_format=DATE_FORMAT,
     )
 
-    return test(dl, "2008-11-09T14:00Z")
+    return test(dl, "2007-09-02T18:00Z")
 
 
 def test_goes1() -> list[str]:
