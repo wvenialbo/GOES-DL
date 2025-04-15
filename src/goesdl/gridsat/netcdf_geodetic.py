@@ -7,14 +7,15 @@ from ..geodesy import RectangularExtent
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..utils.array import ArrayFloat32
 
-LimitType = tuple[int, int, int, int]
+LimitType = tuple[int, int]
 
 
 class GSLatLonGridData(HasStrHelp):
     lon: ArrayFloat32
     lat: ArrayFloat32
 
-    limits: LimitType
+    lon_limits: LimitType
+    lat_limits: LimitType
 
     def __init__(
         self,
@@ -23,12 +24,12 @@ class GSLatLonGridData(HasStrHelp):
         delta: int = 5,
     ) -> None:
         step = delta if extent else None
-        data = self._extract(record, step, None)
+        data = self._extract(record, step, None, None)
 
         if extent:
             lon_limits = self._find_limits(data.lon, extent.lon_bounds, delta)
             lat_limits = self._find_limits(data.lat, extent.lat_bounds, delta)
-            data = self._extract(record, None, lon_limits + lat_limits)
+            data = self._extract(record, None, lon_limits, lat_limits)
             lon_limits = self._find_limits(
                 data.lon, extent.lon_bounds, 1, lon_limits[0]
             )
@@ -41,18 +42,22 @@ class GSLatLonGridData(HasStrHelp):
 
         self.lon = data.lon
         self.lat = data.lat
-        self.limits = lon_limits + lat_limits
+        self.lon_limits = lon_limits
+        self.lat_limits = lat_limits
 
     @staticmethod
     def _extract(
-        record: Dataset, step: int | None, limits: LimitType | None
+        record: Dataset,
+        step: int | None,
+        lon_limits: LimitType | None,
+        lat_limits: LimitType | None,
     ) -> "GSLatLonGridData":
         def _sublon(x: Any) -> Any:
-            begin, end = limits[:2] if limits else (None, None)
+            begin, end = lon_limits or (None, None)
             return x[begin:end:step] if step else x[begin:end]
 
         def _sublat(x: Any) -> Any:
-            begin, end = limits[2:] if limits else (None, None)
+            begin, end = lat_limits or (None, None)
             return x[begin:end:step] if step else x[begin:end]
 
         class _LatLonData(DatasetView):
@@ -69,7 +74,7 @@ class GSLatLonGridData(HasStrHelp):
         min_max: tuple[float, float],
         delta: int,
         offset: int = 0,
-    ) -> tuple[int, int]:
+    ) -> LimitType:
         min_value, max_value = min_max
 
         min_indices = flatnonzero(coord < min_value)
