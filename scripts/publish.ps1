@@ -2,18 +2,22 @@
 ## Upload package to PyPI
 ##
 
-$venv = '.venv'
+$venv = ".venv"
+$dist = "dist/"
 
-$release = $args[0]
-$usage = "Usage: publish.ps1 dist/release"
+$usage = "Usage: publish.ps1 v1.0-rc1"
 
-if (-not $release) {
+if (-not $args[0]) {
     Write-Host $usage
     Write-Host ""
     exit
 }
 
-$isFolder = Test-Path -Type Container -LiteralPath $project
+$release = $dist + $args[0]
+
+mkdir $release
+Move-Item -Path $dist"*.gz" -Destination $release
+Move-Item -Path $dist"*.whl" -Destination $release
 
 # Activate the environment if it is not active
 
