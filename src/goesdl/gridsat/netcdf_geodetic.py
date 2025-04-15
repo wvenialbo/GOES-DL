@@ -11,7 +11,7 @@ from ..utils.array import ArrayFloat32
 LimitType = tuple[int, int]
 
 
-class GSLatLonGridData(HasStrHelp):
+class GSLatLonGrid(HasStrHelp):
     lon: ArrayFloat32
     lat: ArrayFloat32
 
@@ -43,7 +43,7 @@ class GSLatLonGridData(HasStrHelp):
         step: int | None,
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
-    ) -> "GSLatLonGridData":
+    ) -> "GSLatLonGrid":
         def subsample(limits) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
@@ -62,14 +62,14 @@ class GSLatLonGridData(HasStrHelp):
 
         data = _LatLonData(record)
 
-        return cast(GSLatLonGridData, data)
+        return cast(GSLatLonGrid, data)
 
     @staticmethod
     def _extract_bounds(
         record: Dataset,
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
-    ) -> "GSLatLonGridData":
+    ) -> "GSLatLonGrid":
         def subsample(limits) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
@@ -88,7 +88,7 @@ class GSLatLonGridData(HasStrHelp):
 
         data = _LatLonData(record)
 
-        return cast(GSLatLonGridData, data)
+        return cast(GSLatLonGrid, data)
 
     @staticmethod
     def _find_limits(
@@ -113,7 +113,7 @@ class GSLatLonGridData(HasStrHelp):
         cls,
         record: Dataset,
         corners: bool,
-    ) -> tuple["GSLatLonGridData", LimitType, LimitType]:
+    ) -> tuple["GSLatLonGrid", LimitType, LimitType]:
         if corners:
             data = cls._extract_bounds(record, None, None)
             lon_limits = 0, data.lon.size - 1
@@ -132,7 +132,7 @@ class GSLatLonGridData(HasStrHelp):
         extent: RectangularExtent,
         delta: int,
         corners: bool,
-    ) -> tuple["GSLatLonGridData", LimitType, LimitType]:
+    ) -> tuple["GSLatLonGrid", LimitType, LimitType]:
         data = cls._extract(record, delta, None, None)
 
         lon_limits = cls._find_limits(data.lon, extent.lon_bounds, delta)
