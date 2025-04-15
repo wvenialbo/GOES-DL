@@ -8,5 +8,10 @@ Classes:
 
 from .locator_b1 import GridSatProductLocatorB1
 from .locator_gc import GridSatProductLocatorGC
+from .netcdf_geodetic import GSLatLonGridData
 
-__all__ = ["GridSatProductLocatorB1", "GridSatProductLocatorGC"]
+__all__ = [
+    "GridSatProductLocatorB1",
+    "GridSatProductLocatorGC",
+    "GSLatLonGridData",
+]
