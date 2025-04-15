@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import concatenate, flatnonzero
+from numpy import concatenate, flatnonzero, meshgrid
 
 from ..geodesy import RectangularExtent
 from ..netcdf import DatasetView, HasStrHelp, variable
@@ -32,8 +32,8 @@ class GSLatLonGridData(HasStrHelp):
         else:
             data, lon_limits, lat_limits = self._full(record, corners)
 
-        self.lon = data.lon
-        self.lat = data.lat
+        self.lon, self.lat = meshgrid(data.lon, data.lat)
+
         self.lon_limits = lon_limits
         self.lat_limits = lat_limits
 
