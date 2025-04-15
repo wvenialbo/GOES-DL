@@ -19,6 +19,8 @@ TIME_TOLERANCE_MAX : int
     The upper limit for the time tolerance.
 TIME_TOLERANCE_MIN : int
     The lower limit for the time tolerance.
+TIME_TOLERANCE_SINGLE : int
+    The time tolerance value for sigle file downloading.
 """
 
 from enum import Enum
@@ -29,6 +31,7 @@ ISO_TIMESTAMP_FORMAT: str = "%Y-%m-%dT%H:%M:%S%z"
 TIME_TOLERANCE_DEFAULT: int = 60
 TIME_TOLERANCE_MAX: int = 300
 TIME_TOLERANCE_MIN: int = 30
+TIME_TOLERANCE_SINGLE: int = 600
 
 
 class DownloadStatus(Enum):
