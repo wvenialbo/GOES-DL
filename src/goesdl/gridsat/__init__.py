@@ -10,10 +10,12 @@ from .locator_b1 import GridSatProductLocatorB1
 from .locator_gc import GridSatProductLocatorGC
 from .netcdf_geodetic import GSLatLonGrid
 from .netcdf_image import GSImage
+from .netcdf_time import GSTimeGrid
 
 __all__ = [
     "GridSatProductLocatorB1",
     "GridSatProductLocatorGC",
-    "GSLatLonGrid",
     "GSImage",
+    "GSLatLonGrid",
+    "GSTimeGrid",
 ]
