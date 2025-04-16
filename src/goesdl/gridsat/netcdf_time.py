@@ -99,8 +99,8 @@ class GSTimeGrid(HasStrHelp):
     @staticmethod
     def _extract_timedata(
         record: Dataset,
-        lon_limits: LimitType | None,
-        lat_limits: LimitType | None,
+        lon_limits: LimitType,
+        lat_limits: LimitType,
     ) -> "GSTimeData":
         def slice(x: Any) -> Any:
             min_lon, max_lon = lon_limits
