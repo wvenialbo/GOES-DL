@@ -38,8 +38,8 @@ class GSImage(HasStrHelp):
     def _extract_image(
         record: Dataset,
         channel: str,
-        lon_limits: LimitType | None,
-        lat_limits: LimitType | None,
+        lon_limits: LimitType,
+        lat_limits: LimitType,
     ) -> "GSImageData":
         def slice(x: Any) -> Any:
             min_lon, max_lon = lon_limits
@@ -74,11 +74,11 @@ class GSImage(HasStrHelp):
 
     @property
     def image(self) -> ArrayFloat32:
-        return self.raster.data
+        return cast(ArrayFloat32, self.raster.data)
 
     @property
     def mask(self) -> ArrayBool:
-        return self.raster.mask
+        return cast(ArrayBool, self.raster.mask)
 
     @property
     def region(self) -> RectangularRegion:
