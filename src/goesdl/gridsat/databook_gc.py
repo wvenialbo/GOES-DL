@@ -1,25 +1,30 @@
 import math
 
-# Dataset summary
-
-gridsat_abstract_gc = (
-    "This product is referred to as GridSat-GOES/CONUS. The resolution "
-    "of the grid is 1/24th of a degree, or 0.04167 degrees, equivalent "
-    "to 4.63 km at the Equator, latitude and longitude, yielding 24 "
-    "pixels per degree."
-)
-
 # Spatial resolution (GRS80 ellipsoid)
 
 GRS80_EQUATORIAL_RADIUS_M = 6378137.0
 GRS80_INVERSE_FLATTENING = 298.257223563
 GRS80_EQUATORIAL_PERIMETER_M = 2.0 * math.pi * GRS80_EQUATORIAL_RADIUS_M
 DEG_TO_KM = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
-SPATIAL_RESOLUTION_DEG = 1.0 / 24.0
+PIXELS_PER_DEGREE = 25.0
+SPATIAL_RESOLUTION_DEG = 1.0 / PIXELS_PER_DEGREE
 SPATIAL_RESOLUTION_KM = SPATIAL_RESOLUTION_DEG * DEG_TO_KM
 
 geospatial_resolution_deg = SPATIAL_RESOLUTION_DEG, SPATIAL_RESOLUTION_DEG
 geospatial_resolution_km = SPATIAL_RESOLUTION_KM, SPATIAL_RESOLUTION_KM
+
+# Dataset abstract
+
+ppd = int(PIXELS_PER_DEGREE)
+dpc = SPATIAL_RESOLUTION_DEG
+kpc = SPATIAL_RESOLUTION_KM
+
+gridsat_abstract_gc = (
+    "This product is referred to as GridSat-GOES/CONUS. The resolution "
+    f"of the grid is 1/{ppd}th of a degree, or {dpc:.2f} degrees, "
+    f"equivalent to {kpc:.2f} km at the Equator, latitude and "
+    f"longitude, yielding {ppd} pixels per degree."
+)
 
 # Long platform name
 
