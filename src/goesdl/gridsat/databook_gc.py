@@ -174,7 +174,7 @@ measurement_range_upper_bound = {
 
 # Nominal square IGFOV at nadir in km
 
-nominal_square_igfov_at_nadir_in = {
+square_igfov_at_nadir_in = {
     1: 1.0,
     2: 4.0,
     3: 8.0,
@@ -182,7 +182,7 @@ nominal_square_igfov_at_nadir_in = {
     5: 4.0,
 }
 
-nominal_square_igfov_at_nadir_op = {
+square_igfov_at_nadir_op = {
     1: 1.0,
     2: 4.0,
     3: 4.0,
@@ -190,13 +190,13 @@ nominal_square_igfov_at_nadir_op = {
     5: 4.0,
 }
 
-nominal_square_igfov_at_nadir = {
-    "G08": nominal_square_igfov_at_nadir_in,
-    "G09": nominal_square_igfov_at_nadir_in,
-    "G10": nominal_square_igfov_at_nadir_in,
-    "G11": nominal_square_igfov_at_nadir_in,
-    "G12": nominal_square_igfov_at_nadir_in,
-    "G13": nominal_square_igfov_at_nadir_in,
-    "G14": nominal_square_igfov_at_nadir_op,
-    "G15": nominal_square_igfov_at_nadir_op,
+square_igfov_at_nadir = {
+    "G08": square_igfov_at_nadir_in,
+    "G09": square_igfov_at_nadir_in,
+    "G10": square_igfov_at_nadir_in,
+    "G11": square_igfov_at_nadir_in,
+    "G12": square_igfov_at_nadir_in,
+    "G13": square_igfov_at_nadir_in,
+    "G14": square_igfov_at_nadir_op,
+    "G15": square_igfov_at_nadir_op,
 }
