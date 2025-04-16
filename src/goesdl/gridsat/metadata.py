@@ -1,7 +1,7 @@
 from typing import Any
 
 from ..netcdf import HasStrHelp
-from ..utils.array import ArrayFloat32
+from ..utils.array import ArrayFloat32, ArrayInt8
 
 NA = "not available"
 
@@ -57,3 +57,7 @@ class TimeMetadata(CoordinateMetadata):
         super().__init__(metadata)
 
         self.calendar = getattr(metadata, "calendar", NA)
+
+
+class DeltaTimeMetadata(MeasurementMetadata):
+    range: ArrayInt8
