@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import concatenate, flatnonzero, meshgrid
+from numpy import concatenate, flatnonzero, float32, meshgrid
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, attribute, variable
@@ -20,14 +20,14 @@ class GSLatLonData(HasStrHelp):
 
 class GeodeticSummary(DatasetView):
 
-    geospatial_lat_min: float = attribute()
-    geospatial_lat_max: float = attribute()
+    geospatial_lat_min: float32 = attribute()
+    geospatial_lat_max: float32 = attribute()
     geospatial_lat_units: str = attribute()
-    geospatial_lat_resolution: float = attribute()
-    geospatial_lon_min: float = attribute()
-    geospatial_lon_max: float = attribute()
+    geospatial_lat_resolution: float32 = attribute()
+    geospatial_lon_min: float32 = attribute()
+    geospatial_lon_max: float32 = attribute()
     geospatial_lon_units: str = attribute()
-    geospatial_lon_resolution: str = attribute()
+    geospatial_lon_resolution: float32 = attribute()
 
 
 class GSLatLonGrid(HasStrHelp):
