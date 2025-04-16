@@ -10,6 +10,7 @@ from ..utils.array import ArrayFloat32
 from .metadata import CoordinateMetadata, VariableMetadata
 
 LimitType = tuple[int, int]
+MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 
 
 class GSLatLonData(HasStrHelp):
@@ -27,7 +28,7 @@ class GSLatLonGrid(HasStrHelp):
     lon_limits: LimitType
     lat_limits: LimitType
 
-    metadata: dict[str, CoordinateMetadata | VariableMetadata]
+    metadata: MetadataType
 
     def __init__(
         self,
@@ -60,7 +61,7 @@ class GSLatLonGrid(HasStrHelp):
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
     ) -> "GSLatLonData":
-        def subsample(limits) -> Callable[[Any], Any]:
+        def subsample(limits: LimitType | None) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
                 skip = step or None
@@ -86,7 +87,7 @@ class GSLatLonGrid(HasStrHelp):
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
     ) -> "GSLatLonData":
-        def subsample(limits) -> Callable[[Any], Any]:
+        def subsample(limits: LimitType | None) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
                 coord = x[begin:end]
@@ -195,7 +196,7 @@ class GSLatLonGrid(HasStrHelp):
         return data, lon_limits, lat_limits
 
     @classmethod
-    def _get_metadata(cls, record: Dataset) -> dict[str, CoordinateMetadata]:
+    def _get_metadata(cls, record: Dataset) -> MetadataType:
         return {
             "lon": cls._extract_metadata(record, "lon"),
             "lat": cls._extract_metadata(record, "lat"),
