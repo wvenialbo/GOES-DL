@@ -22,20 +22,22 @@ class GSImage(HasStrHelp):
 
     metadata: MeasurementMetadata
 
-    def __init__(self, record: Dataset, name: str, grid: GSLatLonGrid) -> None:
+    def __init__(
+        self, record: Dataset, channel: str, grid: GSLatLonGrid
+    ) -> None:
         data = self._extract_image(
-            record, name, grid.lon_limits, grid.lat_limits
+            record, channel, grid.lon_limits, grid.lat_limits
         )
 
         self.grid = grid
         self.raster = data.raster
 
-        self.metadata = self._extract_metadata(record, name)
+        self.metadata = self._extract_metadata(record, channel)
 
     @staticmethod
     def _extract_image(
         record: Dataset,
-        name: str,
+        channel: str,
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
     ) -> "GSImageData":
@@ -45,7 +47,7 @@ class GSImage(HasStrHelp):
             return x[0, min_lat:max_lat, min_lon:max_lon]
 
         class _GSImageData(DatasetView):
-            raster: MaskedFloat32 = variable(name).array(filter=slice)
+            raster: MaskedFloat32 = variable(channel).array(filter=slice)
 
         data = _GSImageData(record)
 
