@@ -17,6 +17,9 @@ class GSLatLonData(HasStrHelp):
 
 
 class GSLatLonGrid(HasStrHelp):
+
+    extent: RectangularExtent
+
     lon: ArrayFloat32
     lat: ArrayFloat32
 
@@ -35,7 +38,10 @@ class GSLatLonGrid(HasStrHelp):
                 record, extent, delta, corners
             )
         else:
+            extent = self._extract_extent(record)
             data, lon_limits, lat_limits = self._full(record, corners)
+
+        self.extent = extent
 
         self.lon, self.lat = meshgrid(data.lon, data.lat)
 
@@ -94,6 +100,22 @@ class GSLatLonGrid(HasStrHelp):
         data = _LatLonData(record)
 
         return cast(GSLatLonData, data)
+
+    @staticmethod
+    def _extract_extent(record: Dataset) -> RectangularExtent:
+        def subsample(x: Any) -> Any:
+            skip = x.shape[0] - 1
+            return x[::skip]
+
+        class _LatLonData(DatasetView):
+            lon: ArrayFloat32 = variable("lon").data(filter=subsample)
+            lat: ArrayFloat32 = variable("lat").data(filter=subsample)
+
+        data = _LatLonData(record)
+
+        domain = (data.lon[0], data.lon[-1], data.lat[0], data.lat[-1])
+
+        return RectangularExtent(domain)
 
     @staticmethod
     def _find_limits(
