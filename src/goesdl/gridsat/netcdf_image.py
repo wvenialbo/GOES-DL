@@ -5,7 +5,7 @@ from numpy import nan
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
-from ..utils.array import ArrayFloat32, MaskedFloat32
+from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .netcdf_geodetic import GSLatLonGrid, LimitType
 
 
@@ -53,7 +53,7 @@ class GSImage(HasStrHelp):
         return self.raster.data
 
     @property
-    def mask(self) -> ArrayFloat32:
+    def mask(self) -> ArrayBool:
         return self.raster.mask
 
     @property
