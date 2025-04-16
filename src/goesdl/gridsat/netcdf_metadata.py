@@ -10,6 +10,7 @@ from .databook_gc import (
     abstract_gridsat_gc,
     channel_correspondence,
     channel_description_gc,
+    dataset_name_gridsat_gc,
     geospatial_resolution_deg,
     geospatial_resolution_km,
     measurement_range_lower_bound,
@@ -26,6 +27,7 @@ NAN_TUPLE = math.nan, math.nan
 
 class DatabookMetadata(HasStrHelp):
 
+    dataset: str = NA
     abstract: str = NA
     description: str = NA
     channel_id: str = NA
@@ -42,6 +44,7 @@ class DatabookMetadata(HasStrHelp):
         origin = platform_gridsat_gc[platform]
         channel_orig = channel_correspondence[origin][channel]
 
+        self.dataset = dataset_name_gridsat_gc
         self.abstract = abstract_gridsat_gc
 
         if channel_orig == 0:

@@ -1,5 +1,9 @@
 import math
 
+# Dataset name
+
+dataset_name_gridsat_gc: str = "GridSat-GOES"
+
 # Spatial resolution (GRS80 ellipsoid)
 
 GRS80_EQUATORIAL_RADIUS_M = 6378137.0
@@ -20,10 +24,10 @@ dpc = SPATIAL_RESOLUTION_DEG
 kpc = SPATIAL_RESOLUTION_KM
 
 abstract_gridsat_gc = (
-    "This product is referred to as GridSat-GOES/CONUS. The resolution "
-    f"of the grid is 1/{ppd}th of a degree, or {dpc:.2f} degrees, "
-    f"equivalent to {kpc:.2f} km at the Equator, latitude and "
-    f"longitude, yielding {ppd} pixels per degree."
+    f"This product is referred to as {dataset_name_gridsat_gc}. The "
+    f"resolution of the grid is 1/{ppd}th of a degree, or {dpc:.2f} "
+    f"degrees, equivalent to {kpc:.2f} km at the Equator, latitude "
+    f"and longitude, yielding {ppd} pixels per degree."
 )
 
 # Long platform name
