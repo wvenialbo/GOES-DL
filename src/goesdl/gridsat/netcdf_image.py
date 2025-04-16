@@ -6,6 +6,7 @@ from numpy import nan
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
+from .metadata import MeasurementMetadata
 from .netcdf_geodetic import GSLatLonGrid, LimitType
 
 
@@ -19,6 +20,8 @@ class GSImage(HasStrHelp):
     grid: GSLatLonGrid
     raster: MaskedFloat32
 
+    metadata: MeasurementMetadata
+
     def __init__(self, record: Dataset, name: str, grid: GSLatLonGrid) -> None:
         data = self._extract_image(
             record, name, grid.lon_limits, grid.lat_limits
@@ -26,6 +29,8 @@ class GSImage(HasStrHelp):
 
         self.grid = grid
         self.raster = data.raster
+
+        self.metadata = self._extract_metadata(record, name)
 
     @staticmethod
     def _extract_image(
@@ -47,6 +52,23 @@ class GSImage(HasStrHelp):
         data.raster.data[data.raster.mask] = nan
 
         return cast(GSImageData, data)
+
+    @staticmethod
+    def _extract_metadata(record: Dataset, name: str) -> MeasurementMetadata:
+        coordinate = variable(name)
+
+        class _ImageMetata(DatasetView):
+            long_name: str = coordinate.attribute()
+            standard_name: str = coordinate.attribute()
+            units: str = coordinate.attribute()
+            content_type: str = coordinate.attribute("coverage_content_type")
+            coordinates: str = coordinate.attribute()
+            actual_range: ArrayFloat32 = coordinate.attribute()
+            shape: tuple[int] = coordinate.attribute()
+
+        metadata = _ImageMetata(record)
+
+        return MeasurementMetadata(metadata)
 
     @property
     def image(self) -> ArrayFloat32:
