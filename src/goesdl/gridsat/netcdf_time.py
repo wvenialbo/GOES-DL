@@ -131,22 +131,24 @@ class GSTimeGrid(HasStrHelp):
     @property
     def time(self) -> ArrayFloat64:
         # (in seconds since 1970-01-01 UTC)
-        return (
+        actual_time: ArrayFloat64 = (
             self.optimal_time * SECONDS_IN_DAY
             + self.delta_time.data * SECONDS_IN_MINUTE
         )
+        return actual_time
 
     @property
     def time_bounds(self) -> ArrayFloat64:
         # (in seconds since 1970-01-01 UTC)
-        return (
+        actual_time_bounds: ArrayFloat64 = (
             self.optimal_time_bounds[:, newaxis].T * SECONDS_IN_DAY
             + self.delta_time.data * SECONDS_IN_MINUTE
         )
+        return actual_time_bounds
 
     @property
     def mask(self) -> ArrayBool:
-        return self.delta_time.mask
+        return cast(ArrayBool, self.delta_time.mask)
 
     @property
     def region(self) -> RectangularRegion:
