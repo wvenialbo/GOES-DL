@@ -57,5 +57,3 @@ class TimeMetadata(CoordinateMetadata):
         super().__init__(metadata)
 
         self.calendar = getattr(metadata, "calendar", NA)
-
-    MeasurementMetadata
