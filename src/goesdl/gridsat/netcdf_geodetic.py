@@ -7,6 +7,7 @@ from numpy import concatenate, flatnonzero, meshgrid
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..utils.array import ArrayFloat32
+from .metadata import CoordinateMetadata
 
 LimitType = tuple[int, int]
 
@@ -25,6 +26,8 @@ class GSLatLonGrid(HasStrHelp):
 
     lon_limits: LimitType
     lat_limits: LimitType
+
+    metadata: dict[str, CoordinateMetadata]
 
     def __init__(
         self,
@@ -47,6 +50,8 @@ class GSLatLonGrid(HasStrHelp):
 
         self.lon_limits = lon_limits
         self.lat_limits = lat_limits
+
+        self.metadata = self._get_metadata(record)
 
     @staticmethod
     def _extract(
@@ -100,6 +105,22 @@ class GSLatLonGrid(HasStrHelp):
         data = _LatLonData(record)
 
         return cast(GSLatLonData, data)
+
+    @staticmethod
+    def _extract_metadata(record: Dataset, name: str) -> CoordinateMetadata:
+        coordinate = variable(name)
+
+        class _LatLonMetata(DatasetView):
+            long_name: str = coordinate.attribute()
+            standard_name: str = coordinate.attribute()
+            units: str = coordinate.attribute()
+            content_type: str = coordinate.attribute("coverage_content_type")
+            axis: str = coordinate.attribute()
+            shape: tuple[int] = coordinate.attribute()
+
+        metadata = _LatLonMetata(record)
+
+        return CoordinateMetadata(metadata)
 
     @staticmethod
     def _extract_region(record: Dataset) -> RectangularRegion:
@@ -156,6 +177,13 @@ class GSLatLonGrid(HasStrHelp):
             lat_limits = 0, data.lat.size
 
         return data, lon_limits, lat_limits
+
+    @classmethod
+    def _get_metadata(cls, record: Dataset) -> dict[str, CoordinateMetadata]:
+        return {
+            "lon": cls._extract_metadata(record, "lon"),
+            "lat": cls._extract_metadata(record, "lat"),
+        }
 
     @classmethod
     def _slice(
