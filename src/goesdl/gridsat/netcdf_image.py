@@ -3,8 +3,9 @@ from typing import Any, cast
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import nan
 
+from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
-from ..utils.array import MaskedFloat32
+from ..utils.array import ArrayFloat32, MaskedFloat32
 from .netcdf_geodetic import GSLatLonGrid, LimitType
 
 
@@ -46,3 +47,15 @@ class GSImage(HasStrHelp):
         data.image.data[data.image.mask] = nan
 
         return cast(GSImageData, data)
+
+    @property
+    def data(self) -> ArrayFloat32:
+        return self.image.data
+
+    @property
+    def mask(self) -> ArrayFloat32:
+        return self.image.mask
+
+    @property
+    def region(self) -> RectangularRegion:
+        return self.grid.region
