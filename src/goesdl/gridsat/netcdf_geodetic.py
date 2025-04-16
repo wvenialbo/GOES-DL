@@ -18,7 +18,7 @@ class GSLatLonData(HasStrHelp):
 
 class GSLatLonGrid(HasStrHelp):
 
-    extent: RectangularRegion
+    region: RectangularRegion
 
     lon: ArrayFloat32
     lat: ArrayFloat32
@@ -29,19 +29,19 @@ class GSLatLonGrid(HasStrHelp):
     def __init__(
         self,
         record: Dataset,
-        extent: RectangularRegion | None = None,
+        region: RectangularRegion | None = None,
         delta: int = 5,
         corners: bool = False,
     ) -> None:
-        if extent:
+        if region:
             data, lon_limits, lat_limits = self._slice(
-                record, extent, delta, corners
+                record, region, delta, corners
             )
         else:
-            extent = self._extract_extent(record)
+            region = self._extract_region(record)
             data, lon_limits, lat_limits = self._full(record, corners)
 
-        self.extent = extent
+        self.region = region
 
         self.lon, self.lat = meshgrid(data.lon, data.lat)
 
@@ -102,7 +102,7 @@ class GSLatLonGrid(HasStrHelp):
         return cast(GSLatLonData, data)
 
     @staticmethod
-    def _extract_extent(record: Dataset) -> RectangularRegion:
+    def _extract_region(record: Dataset) -> RectangularRegion:
         def subsample(x: Any) -> Any:
             skip = x.shape[0] - 1
             return x[::skip]
@@ -156,22 +156,22 @@ class GSLatLonGrid(HasStrHelp):
     def _slice(
         cls,
         record: Dataset,
-        extent: RectangularRegion,
+        region: RectangularRegion,
         delta: int,
         corners: bool,
     ) -> tuple["GSLatLonData", LimitType, LimitType]:
         data = cls._extract(record, delta, None, None)
 
-        lon_limits = cls._find_limits(data.lon, extent.lon_bounds, delta)
-        lat_limits = cls._find_limits(data.lat, extent.lat_bounds, delta)
+        lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta)
+        lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta)
 
         data = cls._extract(record, None, lon_limits, lat_limits)
 
         lon_limits = cls._find_limits(
-            data.lon, extent.lon_bounds, 1, lon_limits[0]
+            data.lon, region.lon_bounds, 1, lon_limits[0]
         )
         lat_limits = cls._find_limits(
-            data.lat, extent.lat_bounds, 1, lat_limits[0]
+            data.lat, region.lat_bounds, 1, lat_limits[0]
         )
 
         if corners:
