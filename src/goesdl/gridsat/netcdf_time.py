@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import float64, nan, newaxis
+from numpy import datetime64, float64, nan, newaxis
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, scalar, variable
@@ -11,6 +12,8 @@ from .netcdf_geodetic import GSLatLonGrid, LimitType
 
 SECONDS_IN_DAY = 86400
 SECONDS_IN_MINUTE = 60
+
+NOT_A_DATETIME = cast(datetime, datetime64("NaT"))
 
 MetadataType = TimeMetadata | DeltaTimeMetadata | VariableMetadata
 
@@ -153,3 +156,25 @@ class GSTimeGrid(HasStrHelp):
     @property
     def region(self) -> RectangularRegion:
         return self.grid.region
+
+
+class GSCoverageTime(HasStrHelp):
+
+    datetime_start: datetime = NOT_A_DATETIME
+    datetime_end: datetime = NOT_A_DATETIME
+
+    def __init__(self, record: Dataset) -> None:
+        datetime_start = getattr(record, "time_coverage_start", "")
+        datetime_end = getattr(record, "time_coverage_end", "")
+
+        if datetime_start and datetime_end:
+            self.datetime_start = datetime.fromisoformat(datetime_start)
+            self.datetime_end = datetime.fromisoformat(datetime_end)
+
+    @property
+    def timestamp_start(self) -> float:
+        return self.datetime_start.timestamp()
+
+    @property
+    def timestamp_end(self) -> float:
+        return self.datetime_end.timestamp()
