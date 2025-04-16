@@ -55,16 +55,16 @@ class GSImage(HasStrHelp):
 
     @staticmethod
     def _extract_metadata(record: Dataset, name: str) -> MeasurementMetadata:
-        coordinate = variable(name)
+        measurement = variable(name)
 
         class _ImageMetata(DatasetView):
-            long_name: str = coordinate.attribute()
-            standard_name: str = coordinate.attribute()
-            units: str = coordinate.attribute()
-            content_type: str = coordinate.attribute("coverage_content_type")
-            coordinates: str = coordinate.attribute()
-            range: ArrayFloat32 = coordinate.attribute("actual_range")
-            shape: tuple[int] = coordinate.attribute()
+            long_name: str = measurement.attribute()
+            standard_name: str = measurement.attribute()
+            units: str = measurement.attribute()
+            content_type: str = measurement.attribute("coverage_content_type")
+            coordinates: str = measurement.attribute()
+            range: ArrayFloat32 = measurement.attribute("actual_range")
+            shape: tuple[int] = measurement.attribute()
 
         metadata = _ImageMetata(record)
 
