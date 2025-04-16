@@ -19,7 +19,7 @@ ppd = int(PIXELS_PER_DEGREE)
 dpc = SPATIAL_RESOLUTION_DEG
 kpc = SPATIAL_RESOLUTION_KM
 
-gridsat_abstract_gc = (
+abstract_gridsat_gc = (
     "This product is referred to as GridSat-GOES/CONUS. The resolution "
     f"of the grid is 1/{ppd}th of a degree, or {dpc:.2f} degrees, "
     f"equivalent to {kpc:.2f} km at the Equator, latitude and "
@@ -28,7 +28,7 @@ gridsat_abstract_gc = (
 
 # Long platform name
 
-gridsat_platform_gc = {f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)}
+platform_gridsat_gc = {f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)}
 
 # Channel description
 
