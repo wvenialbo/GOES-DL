@@ -5,11 +5,14 @@ from numpy import float64, nan, newaxis
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, scalar, variable
-from ..utils.array import ArrayBool, ArrayFloat64, MaskedFloat32
+from ..utils.array import ArrayBool, ArrayFloat64, ArrayInt8, MaskedFloat32
+from .metadata import DeltaTimeMetadata, TimeMetadata, VariableMetadata
 from .netcdf_geodetic import GSLatLonGrid, LimitType
 
 SECONDS_IN_DAY = 86400
 SECONDS_IN_MINUTE = 60
+
+MetadataType = TimeMetadata | DeltaTimeMetadata | VariableMetadata
 
 
 class GSTimeData(HasStrHelp):
@@ -32,8 +35,10 @@ class GSTimeGrid(HasStrHelp):
     # Optimal-time-bounds (in days since 1970-01-01 UTC).
     optimal_time_bounds: ArrayFloat64
 
+    metadata: dict[str, MetadataType]
+
     def __init__(self, record: Dataset, grid: GSLatLonGrid) -> None:
-        data = self._extract_image(record, grid.lon_limits, grid.lat_limits)
+        data = self._extract_timedata(record, grid.lon_limits, grid.lat_limits)
 
         self.grid = grid
 
@@ -41,8 +46,58 @@ class GSTimeGrid(HasStrHelp):
         self.optimal_time = data.optimal_time
         self.optimal_time_bounds = data.optimal_time_bounds
 
+        self.metadata = self._get_metadata(record)
+
     @staticmethod
-    def _extract_image(
+    def _extract_bounds_metadata(record: Dataset) -> VariableMetadata:
+        coordinate = variable("time_bounds")
+
+        class _TimeMetata(DatasetView):
+            long_name: str = coordinate.attribute()
+            comment: str = coordinate.attribute()
+            units: str = coordinate.attribute()
+            shape: tuple[int] = coordinate.attribute()
+
+        metadata = _TimeMetata(record)
+
+        return VariableMetadata(metadata)
+
+    @staticmethod
+    def _extract_delta_metadata(record: Dataset) -> DeltaTimeMetadata:
+        measurement = variable("delta_time")
+
+        class _ImageMetata(DatasetView):
+            long_name: str = measurement.attribute()
+            coordinates: str = measurement.attribute()
+            units: str = measurement.attribute()
+            range: ArrayInt8 = measurement.attribute("actual_range")
+            content_type: str = measurement.attribute("coverage_content_type")
+            shape: tuple[int] = measurement.attribute()
+
+        metadata = _ImageMetata(record)
+
+        return DeltaTimeMetadata(metadata)
+
+    @staticmethod
+    def _extract_time_metadata(record: Dataset) -> TimeMetadata:
+        coordinate = variable("time")
+
+        class _LatLonMetata(DatasetView):
+            long_name: str = coordinate.attribute()
+            comment: str = coordinate.attribute()
+            standard_name: str = coordinate.attribute()
+            units: str = coordinate.attribute()
+            axis: str = coordinate.attribute()
+            calendar: str = coordinate.attribute()
+            content_type: str = coordinate.attribute("coverage_content_type")
+            shape: tuple[int] = coordinate.attribute()
+
+        metadata = _LatLonMetata(record)
+
+        return TimeMetadata(metadata)
+
+    @staticmethod
+    def _extract_timedata(
         record: Dataset,
         lon_limits: LimitType | None,
         lat_limits: LimitType | None,
@@ -64,6 +119,14 @@ class GSTimeGrid(HasStrHelp):
         data.delta_time.data[data.delta_time.mask] = nan
 
         return cast(GSTimeData, data)
+
+    @classmethod
+    def _get_metadata(cls, record: Dataset) -> dict[str, MetadataType]:
+        return {
+            "delta_time": cls._extract_delta_metadata(record),
+            "time": cls._extract_time_metadata(record),
+            "time_bounds": cls._extract_bounds_metadata(record),
+        }
 
     @property
     def time(self) -> ArrayFloat64:
