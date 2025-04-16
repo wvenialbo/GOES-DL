@@ -113,7 +113,12 @@ class GSLatLonGrid(HasStrHelp):
 
         data = _LatLonData(record)
 
-        domain = (data.lon[0], data.lon[-1], data.lat[0], data.lat[-1])
+        domain = (
+            float(data.lon[0]),
+            float(data.lon[-1]),
+            float(data.lat[0]),
+            float(data.lat[-1]),
+        )
 
         return RectangularRegion(domain)
 
