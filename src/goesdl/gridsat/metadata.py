@@ -2,8 +2,7 @@ from typing import Any
 
 from ..netcdf import HasStrHelp
 from ..utils.array import ArrayFloat32, ArrayInt8
-
-NA = "not available"
+from .constants import NA
 
 
 class VariableMetadata(HasStrHelp):
