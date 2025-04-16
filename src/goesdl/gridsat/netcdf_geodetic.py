@@ -5,7 +5,7 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import concatenate, flatnonzero, meshgrid
 
 from ..geodesy import RectangularRegion
-from ..netcdf import DatasetView, HasStrHelp, variable
+from ..netcdf import DatasetView, HasStrHelp, attribute, variable
 from ..utils.array import ArrayFloat32
 from .metadata import CoordinateMetadata, VariableMetadata
 
@@ -16,6 +16,18 @@ MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 class GSLatLonData(HasStrHelp):
     lon: ArrayFloat32
     lat: ArrayFloat32
+
+
+class GeodeticSummary(DatasetView):
+
+    geospatial_lat_min: float = attribute()
+    geospatial_lat_max: float = attribute()
+    geospatial_lat_units: str = attribute()
+    geospatial_lat_resolution: float = attribute()
+    geospatial_lon_min: float = attribute()
+    geospatial_lon_max: float = attribute()
+    geospatial_lon_units: str = attribute()
+    geospatial_lon_resolution: str = attribute()
 
 
 class GSLatLonGrid(HasStrHelp):
@@ -29,6 +41,8 @@ class GSLatLonGrid(HasStrHelp):
     lat_limits: LimitType
 
     metadata: MetadataType
+
+    summary: GeodeticSummary
 
     def __init__(
         self,
@@ -53,6 +67,8 @@ class GSLatLonGrid(HasStrHelp):
         self.lat_limits = lat_limits
 
         self.metadata = self._get_metadata(record)
+
+        self.summary = GeodeticSummary(record)
 
     @staticmethod
     def _extract(
