@@ -3,37 +3,59 @@ from typing import Any
 from ..netcdf import HasStrHelp
 from ..utils.array import ArrayFloat32
 
+NA = "not available"
+
 
 class VariableMetadata(HasStrHelp):
     long_name: str
     standard_name: str
+    comment: str
     units: str
-    content_type: str
     shape: tuple[int, ...]
 
     def __init__(self, metadata: Any) -> None:
-        self.long_name = metadata.long_name
-        self.standard_name = metadata.standard_name
-        self.units = metadata.units
-        self.content_type = metadata.content_type
-        self.shape = metadata.shape
+        self.long_name = getattr(metadata, "long_name", NA)
+        self.standard_name = getattr(metadata, "standard_name", NA)
+        self.comment = getattr(metadata, "comment", NA)
+        self.units = getattr(metadata, "units", NA)
+        self.shape = getattr(metadata, "shape", NA)
 
 
-class CoordinateMetadata(VariableMetadata):
+class ContentMetadata(VariableMetadata):
+    content_type: str
+
+    def __init__(self, metadata: Any) -> None:
+        super().__init__(metadata)
+
+        self.content_type = getattr(metadata, "content_type", NA)
+
+
+class CoordinateMetadata(ContentMetadata):
     axis: str
 
     def __init__(self, metadata: Any) -> None:
         super().__init__(metadata)
 
-        self.axis = metadata.axis
+        self.axis = getattr(metadata, "axis", NA)
 
 
-class MeasurementMetadata(VariableMetadata):
+class MeasurementMetadata(ContentMetadata):
     coordinates: str
-    actual_range: ArrayFloat32
+    range: ArrayFloat32
 
     def __init__(self, metadata: Any) -> None:
         super().__init__(metadata)
 
-        self.coordinates = metadata.coordinates
-        self.actual_range = metadata.actual_range
+        self.coordinates = getattr(metadata, "coordinates", NA)
+        self.range = getattr(metadata, "range", NA)
+
+
+class TimeMetadata(CoordinateMetadata):
+    calendar: str
+
+    def __init__(self, metadata: Any) -> None:
+        super().__init__(metadata)
+
+        self.calendar = getattr(metadata, "calendar", NA)
+
+    MeasurementMetadata
