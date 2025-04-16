@@ -21,6 +21,10 @@ SPATIAL_RESOLUTION_KM = SPATIAL_RESOLUTION_DEG * DEG_TO_KM
 geospatial_resolution_deg = SPATIAL_RESOLUTION_DEG, SPATIAL_RESOLUTION_DEG
 geospatial_resolution_km = SPATIAL_RESOLUTION_KM, SPATIAL_RESOLUTION_KM
 
+# Long platform name
+
+gridsat_platform_gc = {f"G{id:0>2}": f"GOES-{id}" for id in range(8, 16)}
+
 # Channel description
 
 channel_description_gc = {
