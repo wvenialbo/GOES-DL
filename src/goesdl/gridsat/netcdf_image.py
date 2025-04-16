@@ -63,7 +63,7 @@ class GSImage(HasStrHelp):
             units: str = coordinate.attribute()
             content_type: str = coordinate.attribute("coverage_content_type")
             coordinates: str = coordinate.attribute()
-            actual_range: ArrayFloat32 = coordinate.attribute()
+            range: ArrayFloat32 = coordinate.attribute("actual_range")
             shape: tuple[int] = coordinate.attribute()
 
         metadata = _ImageMetata(record)
