@@ -2,7 +2,7 @@ import math
 
 # Dataset summary
 
-summary = (
+gridsat_summary_gc = (
     "This product is referred to as GridSat-GOES/CONUS. The resolution "
     "of the grid is 1/24th of a degree, or 0.04167 degrees, equivalent "
     "to 4.63 km at the Equator, latitude and longitude, yielding 24 "
