@@ -8,7 +8,7 @@ ExtentType = tuple[float, float]
 CenterType = tuple[float, float]
 
 
-class RectangularExtent:
+class RectangularRegion:
 
     domain: CoordDomain
 
@@ -21,7 +21,7 @@ class RectangularExtent:
         extent: ExtentType,
         center_deg: CenterType,
         units: Literal["arcsec", "arcmin", "deg", "rad"] = "deg",
-    ) -> "RectangularExtent":
+    ) -> "RectangularRegion":
         extent_deg: ExtentType | Generator[float]
         if units == "arcsec":
             extent_deg = (value / 3600.0 for value in extent)

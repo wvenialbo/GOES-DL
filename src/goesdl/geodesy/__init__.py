@@ -51,7 +51,7 @@ from .geos_to_latlon_grid_goesdl import geos_to_latlon_grid_goesdl
 from .geos_to_latlon_grid_pyproj import geos_to_latlon_grid_pyproj
 from .geostationary_parameters import GeostationaryParameters
 from .helpers import calculate_pixel_edges
-from .rectangular_extent import RectangularExtent
+from .rectangular_extent import RectangularRegion
 
 __all__ = [
     "geos_to_latlon_grid",
@@ -60,5 +60,5 @@ __all__ = [
     "geos_to_latlon_grid_pyproj",
     "calculate_pixel_edges",
     "GeostationaryParameters",
-    "RectangularExtent",
+    "RectangularRegion",
 ]

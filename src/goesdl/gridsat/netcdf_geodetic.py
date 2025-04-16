@@ -4,7 +4,7 @@ from typing import Any, cast
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import concatenate, flatnonzero, meshgrid
 
-from ..geodesy import RectangularExtent
+from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..utils.array import ArrayFloat32
 
@@ -18,7 +18,7 @@ class GSLatLonData(HasStrHelp):
 
 class GSLatLonGrid(HasStrHelp):
 
-    extent: RectangularExtent
+    extent: RectangularRegion
 
     lon: ArrayFloat32
     lat: ArrayFloat32
@@ -29,7 +29,7 @@ class GSLatLonGrid(HasStrHelp):
     def __init__(
         self,
         record: Dataset,
-        extent: RectangularExtent | None = None,
+        extent: RectangularRegion | None = None,
         delta: int = 5,
         corners: bool = False,
     ) -> None:
@@ -102,7 +102,7 @@ class GSLatLonGrid(HasStrHelp):
         return cast(GSLatLonData, data)
 
     @staticmethod
-    def _extract_extent(record: Dataset) -> RectangularExtent:
+    def _extract_extent(record: Dataset) -> RectangularRegion:
         def subsample(x: Any) -> Any:
             skip = x.shape[0] - 1
             return x[::skip]
@@ -115,7 +115,7 @@ class GSLatLonGrid(HasStrHelp):
 
         domain = (data.lon[0], data.lon[-1], data.lat[0], data.lat[-1])
 
-        return RectangularExtent(domain)
+        return RectangularRegion(domain)
 
     @staticmethod
     def _find_limits(
@@ -156,7 +156,7 @@ class GSLatLonGrid(HasStrHelp):
     def _slice(
         cls,
         record: Dataset,
-        extent: RectangularExtent,
+        extent: RectangularRegion,
         delta: int,
         corners: bool,
     ) -> tuple["GSLatLonData", LimitType, LimitType]:
