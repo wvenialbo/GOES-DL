@@ -39,7 +39,7 @@ class GSLatLonGrid(HasStrHelp):
             )
         else:
             region = self._extract_region(record)
-            data, lon_limits, lat_limits = self._full(record, corners)
+            data, lon_limits, lat_limits = self._full_frame(record, corners)
 
         self.region = region
 
@@ -136,7 +136,7 @@ class GSLatLonGrid(HasStrHelp):
         return int(min_bound * delta + offset), int(max_bound * delta + offset)
 
     @classmethod
-    def _full(
+    def _full_frame(
         cls,
         record: Dataset,
         corners: bool,
