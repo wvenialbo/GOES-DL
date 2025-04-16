@@ -28,7 +28,7 @@ gridsat_abstract_gc = (
 
 # Long platform name
 
-gridsat_platform_gc = {f"G{id:0>2}": f"GOES-{id}" for id in range(8, 16)}
+gridsat_platform_gc = {f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)}
 
 # Channel description
 
