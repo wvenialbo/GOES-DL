@@ -1,0 +1,67 @@
+--- Channel correspondence
+      ch1 ch2 ch3 ch4 ch5 ch6
+G08     1   2   3   4   5   0
+G09     1   2   3   4   5   0
+G10     1   2   3   4   5   0
+G11     1   2   3   4   5   0
+G12     1   2   5   4   0   3
+G13     1   2   5   4   0   3
+G14     1   2   5   4   0   3
+G15     1   2   5   4   0   3
+--- Wavelength range lower bound in µm
+        1       2       3       4       5
+08   0.55    3.80    6.50   10.20   11.50
+09   0.55    3.80    6.50   10.20   11.50
+10   0.55    3.80    6.50   10.20   11.50
+11   0.55    3.80    6.50   10.20   11.50
+12   0.55    3.80   13.00   10.20    5.80
+13   0.52    3.73   13.00   10.20    5.80
+14   0.52    3.73   13.00   10.20    5.80
+15   0.52    3.73   13.00   10.20    5.80
+--- Wavelength upper bound in µm
+        1       2       3       4       5
+08   0.75    4.00    7.00   11.20   12.50
+09   0.75    4.00    7.00   11.20   12.50
+10   0.75    4.00    7.00   11.20   12.50
+11   0.75    4.00    7.00   11.20   12.50
+12   0.75    4.00   13.70   11.20    7.30
+13   0.71    4.07   13.70   11.20    7.30
+14   0.71    4.07   13.70   11.20    7.30
+15   0.71    4.07   13.70   11.20    7.30
+--- Measurement range lower bound in % albedo (1) / K (2-5)
+        1   2   3   4   5
+08    1.6   4   4   4   4
+09    1.6   4   4   4   4
+10    1.6   4   4   4   4
+11    1.6   4   4   4   4
+12    1.6   4   4   4   4
+13      0   4   4   4   4
+14      0   4   4   4   4
+15      0   4   4   4   4
+--- Measurement range upper bound in % albedo (1) / K (2-5)
+        1       2       3       4       5
+08    100     320     320     320     320
+09    100     320     320     320     320
+10    100     320     320     320     320
+11    100     335     320     320     320
+12    100     335     320     320     320
+13    100     335     320     320     320
+14    100     335     320     320     320
+15    100     335     320     320     320
+--- Nominal square IGFOV at nadir in km
+    1   2   3   4   5
+08  1   4   8   4   4
+09  1   4   8   4   4
+10  1   4   8   4   4
+11  1   4   8   4   4
+12  1   4   8   4   4
+13  1   4   8   4   4
+14  1   4   4   4   4
+15  1   4   4   4   4
+--- Channel description
+ch1 Reflectance (or Scaled Radiance) for the 0.6 µm band
+ch2 Brightness Temperature of the 3.9 µm channel
+ch3 Brightness Temperature of the 6.7 µm channel
+ch4 Brightness Temperature of the 11 µm channel
+ch5 Brightness Temperature of the 12 µm channel
+ch6 Brightness Temperature of the 13 µm channel

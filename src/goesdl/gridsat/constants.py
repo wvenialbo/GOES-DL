@@ -20,3 +20,5 @@ GOES_FILE_DATE_PATTERN: str = r"\d{4}\.\d{2}\.\d{2}\.\d{4}"
 GOES_FILE_PREFIX: str = "GridSat"
 GOES_PATH_DATE_FORMAT: str = "%Y/%m"
 GOES_PRODUCT_LATEST_VERSION: str = "v01"
+
+NA = "not available"

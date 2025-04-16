@@ -1,50 +1,76 @@
+# Your project configuration
 [project]
   authors = [{ name = "Waldemar Villamayor-Venialbo", email = "wvenialbo@fpuna.edu.py" }]
+
+  # The PyPI classifiers for your project
   classifiers = [
+    "Development Status :: 3 - Alpha",
     "Development Status :: 4 - Beta",
     "Development Status :: 5 - Production/Stable",
-    "Environment :: Console",
-    "Framework :: Flake8",
-    "Framework :: MkDocs",
-    "Framework :: Sphinx :: Extension",
-    "Framework :: Sphinx :: Theme",
-    "Framework :: Sphinx",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
-    "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
+    # "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Education",
     "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
     "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Utilities",
   ]
+
+  # The dependencies for your project
   dependencies = ["boto3~=1.37.34", "matplotlib~=3.10.1", "netCDF4~=1.7.2", "numpy~=2.2.4", "requests~=2.32.3"]
-  description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
+
+  # The description for your project
+  description = "GOES-DL — GOES Satellite Imagery Dataset Accessing Toolbox"
+
+  # The version for your project (will be dynamically updated)
   dynamic = ["version"]
+
+  # The keywords for your project
   keywords = [
+    "climate",
     "GOES",
     "GOES-R",
     "GridSat",
     "GridSat-B1",
     "GridSat-GOES/CONUS",
     "atmospheric science",
+    "data",
     "dataset",
     "downloader",
     "environmental data",
+    "geodesy",
     "meteorology",
     "multi-source",
+    "netcdf",
+    "oceanography",
+    "planetary science",
     "satellite imagery",
+    "science",
     "severe weather",
   ]
-  license = { file = "LICENSE" }
+
+  # The license for your project
+  license       = "MIT"
+  license-files = ["LICENSE"]
+
+  # The name of your project on PyPI
   name = "goes-dl"
+
+  # The README file for your project
   readme = { file = "README.md", content-type = "text/markdown" }
+
+  # The minimum version of Python required to run your project
   requires-python = ">=3.10"
 
   [project.urls]
@@ -54,6 +80,7 @@
     Repository = "https://github.com/wvenialbo/GOES-DL"
     # Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
+# Your development tools configuration
 [tool]
 
   [tool.setuptools]
@@ -64,27 +91,10 @@
 
     [tool.setuptools.package-data]
       goesdl = ["py.typed"]
-      config = ["settings.json"]
+      #config = ["settings.json"]
 
     [tool.setuptools.packages.find]
       where = ["src"]
-
-  [tool.poetry]
-    authors     = ["Waldemar Villamayor-Venialbo <wvenialbo@fpuna.edu.py>"]
-    description = "GOES-DL — GOES Satellite Imagery Dataset Downloader"
-    license     = "MIT"
-    name        = "goes-dl"
-    packages    = [{ include = "goesdl" }, { include = "goesdl/py.typed" }]
-    readme      = "README.md"
-    version     = "v0.1-rc5"
-
-    [tool.poetry.dependencies]
-      boto3      = "~1.37.34"
-      matplotlib = "~3.10.1"
-      netCDF4    = "~1.7.2"
-      numpy      = "~2.2.4"
-      python     = "^3.10"
-      requests   = "~2.32.3"
 
   [tool.black]
     line-length = 79
@@ -198,7 +208,7 @@
 
       # Minimum Python version to use for version dependent checks. Will default to the
       # version used to run pylint.
-      py-version = "3.13"
+      py-version = "3.10"
 
       # Discover python modules and packages in the file system subtree.
       # recursive =
@@ -346,7 +356,7 @@
       # check-protected-access-in-special-methods =
 
       # List of method names used to declare (i.e. assign) instance attributes.
-      defining-attr-methods = ["__init__", "__new__", "__post_init__", "asyncSetUp", "setUp"]
+      defining-attr-methods = ["__init__", "__new__", "__post_init__"]
 
       # List of member names, which should be excluded from the protected access
       # warning.
@@ -387,7 +397,7 @@
       max-parents = 7
 
       # Maximum number of positional arguments for function / method.
-      # TODO: Restore this to its default value: 5. Increased this limit 8.
+      # TODO: Restore this to its default value: 5.
       max-positional-arguments = 8
 
       # Maximum number of public methods for a class (see R0904).
@@ -508,7 +518,7 @@
         "use-implicit-booleaness-not-comparison-to-zero",
         "use-symbolic-message-instead",
         "useless-suppression",
-        # temporary disable (avoid complaint about TODOs)
+        # TODO: Remove this (temporarily avoid complaint about TODOs)
         "fixme",
       ]
 
@@ -761,9 +771,6 @@
 
 [build-system]
   build-backend = "setuptools.build_meta"
-  requires      = ["setuptools-scm", "setuptools>=75.2.0"]
 
-  # build-backend = "poetry.core.masonry.api"
-  # requires      = [
-  #   "poetry-core"
-  # ]
+  # Minimum requirements for the build system to execute.
+  requires = ["setuptools-scm", "setuptools"]

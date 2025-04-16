@@ -323,6 +323,12 @@
         },
         {
             "scope": "geodesy"
+        },
+        {
+            "scope": "netcdf"
+        },
+        {
+            "scope": "gridsat"
         }
     ],
     // AI assistance tools settings

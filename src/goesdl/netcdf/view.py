@@ -33,7 +33,7 @@ class DatasetView(HasStrHelp):
     present in the provided netCDF dataset.
     """
 
-    def __init__(self, record: Dataset) -> None:
+    def __init__(self, record: Dataset, **kwargs: Any) -> None:
         """
         Initialize the DataFragment object.
 
@@ -49,10 +49,10 @@ class DatasetView(HasStrHelp):
         self._init_class_attributes(record)
         self._init_record_attributes(record)
         self._init_field_attributes(record)
-        self._perform_post_init_setup(record)
+        self._perform_post_init_setup(record, **kwargs)
         self._validate_postconditions()
 
-    def __post_init__(self, record: Dataset) -> None:
+    def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         """
         Perform post-initialization setup.
 
@@ -61,8 +61,8 @@ class DatasetView(HasStrHelp):
         setup tasks.
         """
 
-    def _perform_post_init_setup(self, record: Dataset) -> None:
-        self.__post_init__(record)
+    def _perform_post_init_setup(self, record: Dataset, **kwargs: Any) -> None:
+        self.__post_init__(record, **kwargs)
 
     def __delattr__(self, name: str) -> NoReturn:
         # Prevents deletion of attributes.
