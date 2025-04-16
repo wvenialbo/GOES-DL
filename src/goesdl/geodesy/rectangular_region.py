@@ -46,7 +46,7 @@ class RectangularRegion:
         return cls(cast(CoordDomain, domain))
 
     @property
-    def limits(self) -> CoordDomain:
+    def extent(self) -> CoordDomain:
         return self.domain
 
     @property
