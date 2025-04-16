@@ -172,6 +172,19 @@ measurement_range_upper_bound = {
     "G15": measurement_range_upper_bound_lp,
 }
 
+# Measurement units
+
+ALBEDO = "% albedo"
+KELVIN = "Kelvin"
+
+measurement_units = {
+    1: ALBEDO,
+    2: KELVIN,
+    3: KELVIN,
+    4: KELVIN,
+    5: KELVIN,
+}
+
 # Nominal square IGFOV at nadir in km
 
 square_igfov_at_nadir_in = {
