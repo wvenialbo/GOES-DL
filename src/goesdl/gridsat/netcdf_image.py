@@ -11,13 +11,13 @@ from .netcdf_geodetic import GSLatLonGrid, LimitType
 
 class GSImageData(HasStrHelp):
 
-    image: MaskedFloat32
+    raster: MaskedFloat32
 
 
 class GSImage(HasStrHelp):
 
     grid: GSLatLonGrid
-    image: MaskedFloat32
+    raster: MaskedFloat32
 
     def __init__(self, record: Dataset, name: str, grid: GSLatLonGrid) -> None:
         data = self._extract_image(
@@ -25,7 +25,7 @@ class GSImage(HasStrHelp):
         )
 
         self.grid = grid
-        self.image = data.image
+        self.raster = data.raster
 
     @staticmethod
     def _extract_image(
@@ -40,21 +40,21 @@ class GSImage(HasStrHelp):
             return x[0, min_lat:max_lat, min_lon:max_lon]
 
         class _GSImageData(DatasetView):
-            image: MaskedFloat32 = variable(name).array(filter=slice)
+            raster: MaskedFloat32 = variable(name).array(filter=slice)
 
         data = _GSImageData(record)
 
-        data.image.data[data.image.mask] = nan
+        data.raster.data[data.raster.mask] = nan
 
         return cast(GSImageData, data)
 
     @property
-    def data(self) -> ArrayFloat32:
-        return self.image.data
+    def image(self) -> ArrayFloat32:
+        return self.raster.data
 
     @property
     def mask(self) -> ArrayFloat32:
-        return self.image.mask
+        return self.raster.mask
 
     @property
     def region(self) -> RectangularRegion:
