@@ -1,5 +1,6 @@
+from collections.abc import Generator
 from math import degrees
-from typing import Generator, Literal, cast
+from typing import Literal, cast
 
 CoordDomain = tuple[float, float, float, float]
 CoordLimits = tuple[float, float]
