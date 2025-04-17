@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Any, cast
 
+from cartopy.crs import Globe, PlateCarree, Projection
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import concatenate, flatnonzero, float32, meshgrid
 
@@ -42,6 +43,8 @@ class GSLatLonGrid(HasStrHelp):
 
     metadata: MetadataType
 
+    crs: Projection
+
     summary: GeodeticSummary
 
     def __init__(
@@ -65,6 +68,12 @@ class GSLatLonGrid(HasStrHelp):
 
         self.lon_limits = lon_limits
         self.lat_limits = lat_limits
+
+        # Create the source projection (Platé-Carrée projection on GRS80 ellipsoid)
+
+        source_globe = Globe(ellipse="GRS80")
+
+        self.crs = PlateCarree(central_longitude=0.0, globe=source_globe)
 
         self.metadata = self._get_metadata(record)
 
@@ -248,3 +257,7 @@ class GSLatLonGrid(HasStrHelp):
             data = cls._extract(record, None, lon_limits, lat_limits)
 
         return data, lon_limits, lat_limits
+
+    @property
+    def globe(self) -> Globe:
+        return self.crs.globe

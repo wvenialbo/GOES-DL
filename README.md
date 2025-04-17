@@ -362,20 +362,17 @@ Please make sure to include tests for any new functionality.
 
 - Python 3.10+
 - [boto3](https://pypi.org/project/boto3): AWS SDK for Python.
+- [cartopy](https://pypi.org/project/Cartopy/): A Python library for
+  cartographic visualizations with Matplotlib.
 - [matplotlib](https://pypi.org/project/matplotlib/): Python plotting package.
 - [netCDF4](https://pypi.org/project/netCDF4/): Provides an object-oriented
   python interface to the netCDF version 4 library.
 - [numpy](https://pypi.org/project/numpy/): Fundamental package for array
   computing in Python.
-- [requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
-  library for Python.
-
-### Optional
-
-- [cartopy](https://pypi.org/project/Cartopy/): A Python library for
-  cartographic visualizations with Matplotlib.
 - [pyproj](https://pypi.org/project/pyproj/): Python interface to PROJ
   (cartographic projections and coordinate transformations library).
+- [requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
+  library for Python.
 
 ## License
 
@@ -392,7 +389,7 @@ When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
 > Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.2-rc2)* [Software]. GitHub.
+> GOES and GridSat-B1 satellite data (Version 0.2-rc3)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 

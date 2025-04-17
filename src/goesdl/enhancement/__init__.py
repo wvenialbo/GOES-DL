@@ -5,6 +5,7 @@ It includes functions to load, parse, process, and save McIDAS and GMT
 enhancement color tables, as well as reverse and manipulate color maps.
 """
 
+from .catalogue import cmap
 from .colormap import EnhancementColormap
 from .palette import EnhacementPalette
 from .preview import show_colormap
@@ -19,4 +20,5 @@ __all__ = [
     "EnhacementStretching",
     "EnhacementTable",
     "show_colormap",
+    "cmap",
 ]

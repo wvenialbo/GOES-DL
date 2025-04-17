@@ -329,6 +329,9 @@
         },
         {
             "scope": "gridsat"
+        },
+        {
+            "scope": "experimental"
         }
     ],
     // AI assistance tools settings

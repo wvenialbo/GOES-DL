@@ -94,7 +94,7 @@ class EnhancementScale:
 
         return cls(table, offset, ncolors, nticks, mode)
 
-    def ticks(self, nticks: int = 16, step: int = 0) -> None:
+    def set_ticks(self, nticks: int = 16, step: int = 0) -> None:
         refs = ColorbarTicks(self.extent, nticks, step)
         self.cticks = refs.cticks
 
