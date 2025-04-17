@@ -7,6 +7,7 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from ..netcdf import DatasetView, HasStrHelp, attribute
 from .constants import NA
 from .databook_gc import (
+    PIXELS_PER_DEGREE,
     abstract_gridsat_gc,
     channel_correspondence,
     channel_description_gc,
@@ -36,6 +37,7 @@ class DatabookMetadata(HasStrHelp):
     geospatial_resolution_km: tuple[float, float] = NAN_TUPLE
     measurement_bounds: tuple[float, float] = NAN_TUPLE
     measurement_units: str = NA
+    pixels_per_degree: int = PIXELS_PER_DEGREE
     square_fov_at_nadir: float = math.nan
     wavelength: float = math.nan
     wavelength_bounds: tuple[float, float] = NAN_TUPLE
