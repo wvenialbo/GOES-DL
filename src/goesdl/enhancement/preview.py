@@ -26,7 +26,7 @@ def show_colormap(
 
     # Create the color bar with the measurement scale
     cbar = fig.colorbar(im, orientation="horizontal")
-    
+
     cbar_ref = ColorbarTicks((tmin, tmax), nticks, 0)
     cbar.set_ticks(cbar_ref.cticks)
 
