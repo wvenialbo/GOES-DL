@@ -21,11 +21,13 @@ def show_colormap(
 
     # Plot the example data
     tmin, tmax = scale.extent
+    tmin, tmax = tmin + offset, tmax + offset
     im = ax.imshow(data, aspect="auto", cmap=scale.cmap, vmin=tmin, vmax=tmax)
 
     # Create the color bar with the measurement scale
     cbar = fig.colorbar(im, orientation="horizontal")
-    cbar_ref = ColorbarTicks(scale.domain, nticks, 0)
+    
+    cbar_ref = ColorbarTicks((tmin, tmax), nticks, 0)
     cbar.set_ticks(cbar_ref.cticks)
 
     # Note: Alternatively `norm=scale.cnorm` can be passed to imshow and
