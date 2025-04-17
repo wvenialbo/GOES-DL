@@ -7,9 +7,9 @@ from .ticks import ColorbarTicks
 
 def show_colormap(
     scale: EnhancementScale,
+    measurement: str = "",
     offset: float = 0.0,
     nticks: int = 14,
-    measurement: str = "",
 ) -> None:
     # Example data
     vmin, vmax = scale.domain
