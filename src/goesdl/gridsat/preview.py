@@ -1,8 +1,11 @@
+from typing import cast
+
 from cartopy import crs as ccrs
 from cartopy.crs import Globe, PlateCarree, Projection
 from cartopy.feature import NaturalEarthFeature
 from cartopy.mpl.ticker import LatitudeFormatter, LongitudeFormatter
 from matplotlib import pyplot as plt
+from matplotlib.collections import QuadMesh
 from matplotlib.ticker import MultipleLocator
 from netCDF4 import Dataset
 
@@ -157,7 +160,7 @@ class GSPlot:
         )
 
     def _add_colorbar(
-        self, mesh: plt.QuadMesh, fig: plt.Figure, label: str  # type: ignore
+        self, mesh: QuadMesh, fig: plt.Figure, label: str  # type: ignore
     ) -> None:
 
         # Add the colorbar
@@ -279,12 +282,13 @@ class GSPlot:
         self,
         ax: plt.Axes,  # type: ignore
         data: GSImage,
-    ) -> plt.QuadMesh:  # type: ignore
+    ) -> QuadMesh:
         # Plot the data (in `gcrs`, see definition above) with a color map from the stock
         # shading;
         #   - center:  lon.shape == image.shape => "nearest" == "auto" == None | "gouraud"
         #   - corners: lon.shape != image.shape => "flat" == "auto" == None
-        return ax.pcolormesh(
+
+        mesh = ax.pcolormesh(
             data.grid.lon,
             data.grid.lat,
             data.image,
@@ -293,3 +297,5 @@ class GSPlot:
             norm=self.enhancement.cnorm,
             transform=data.grid.crs,
         )
+
+        return cast(QuadMesh, mesh)
