@@ -6,9 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from netCDF4 import Dataset
 
-from goesdl.enhancement import catalogue
-
-from ..enhancement.scale import EnhancementScale
+from ..enhancement import EnhancementScale, cmap
 from ..geodesy import RectangularRegion
 from .netcdf_geodetic import GSLatLonGrid
 from .netcdf_image import GSImage
@@ -67,7 +65,7 @@ class GSPlot:
     crs: Projection
 
     def __init__(self) -> None:
-        self.enhancement = catalogue["IRCOLOR"]
+        self.enhancement = cmap["IRCOLOR"]
 
         # Create the target plot projection (same as above)
 

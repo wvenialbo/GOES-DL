@@ -11,4 +11,4 @@ def _ircolor() -> EnhancementScale:
     return EnhancementScale.from_colormap(cmap_name, color_maps, key_points)
 
 
-catalogue: dict[str, EnhancementScale] = {"IRCOLOR": _ircolor()}
+cmap: dict[str, EnhancementScale] = {"IRCOLOR": _ircolor()}
