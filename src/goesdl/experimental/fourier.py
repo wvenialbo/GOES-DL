@@ -1,3 +1,7 @@
+import numpy as np
+import numpy.fft as fft
+
+
 def parabolic_interpolation(power_spectrum, peak_index):
     # Cannot interpolate across edges
     if peak_index <= 0 or peak_index >= len(power_spectrum) - 1:
