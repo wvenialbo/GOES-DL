@@ -361,18 +361,18 @@ Please make sure to include tests for any new functionality.
 ## Requirements
 
 - Python 3.10+
-- [boto3](https://pypi.org/project/boto3): AWS SDK for Python.
-- [cartopy](https://pypi.org/project/cartopy/): A Python library for
+- [Boto3](https://pypi.org/project/boto3): AWS SDK for Python.
+- [Cartopy](https://pypi.org/project/cartopy/): A Python library for
   cartographic visualizations with Matplotlib.
-- [matplotlib](https://pypi.org/project/matplotlib/): Python plotting package.
+- [Matplotlib](https://pypi.org/project/matplotlib/): Python plotting package.
 - [netCDF4](https://pypi.org/project/netCDF4/): Provides an object-oriented
   python interface to the netCDF version 4 library.
-- [numpy](https://pypi.org/project/numpy/): Fundamental package for array
+- [NumPy](https://pypi.org/project/numpy/): Fundamental package for array
   computing in Python.
-- [pillow (PIL)](https://pypi.org/project/pillow/): Python Imaging Library (Fork)
-- [pyproj](https://pypi.org/project/pyproj/): Python interface to PROJ
+- [Pillow (PIL)](https://pypi.org/project/pillow/): Python Imaging Library (Fork)
+- [Pyproj](https://pypi.org/project/pyproj/): Python interface to PROJ
   (cartographic projections and coordinate transformations library).
-- [requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
+- [Requests](https://pypi.org/project/requests): A simple, yet elegant, HTTP
   library for Python.
 
 ## License
