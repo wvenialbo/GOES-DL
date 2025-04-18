@@ -6,9 +6,10 @@ from numpy import nan
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .databook_gc import channel_description_gc
+from .databook_gc import channel_correspondence, channel_description_gc
 from .metadata import MeasurementMetadata
 from .netcdf_geodetic import GSLatLonGrid, LimitType
+from .netcdf_platform import PlatformMetadata
 
 
 class GSImageData(HasStrHelp):
@@ -31,6 +32,16 @@ class GSImage(GSImageData):
             raise ValueError(
                 f"Invalid 'channel': '{channel}'; "
                 f"allowed channels are: {allowed_channels}"
+            )
+
+        # Validate channel availability for the current platform
+        pinfo = PlatformMetadata(record)
+        channel_orig = channel_correspondence[pinfo.origin][channel]
+
+        if channel_orig == 0:
+            raise ValueError(
+                f"Channel '{channel}' is not available "
+                f"for platform '{pinfo.platform}'"
             )
 
         data = self._extract_image(
