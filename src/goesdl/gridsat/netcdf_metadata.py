@@ -1,10 +1,9 @@
 import math
-from re import search
 from typing import Any
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 
-from ..netcdf import DatasetView, HasStrHelp, attribute
+from ..netcdf import HasStrHelp, attribute
 from .constants import NA
 from .databook_gc import (
     PIXELS_PER_DEGREE,
@@ -17,11 +16,12 @@ from .databook_gc import (
     measurement_range_lower_bound,
     measurement_range_upper_bound,
     measurement_units,
-    platform_gridsat_gc,
+    platform_origin_gridsat_gc,
     square_igfov_at_nadir,
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
 )
+from .netcdf_platform import PlatformMetadata
 
 NAN_TUPLE = math.nan, math.nan
 
@@ -43,7 +43,15 @@ class DatabookMetadata(HasStrHelp):
     wavelength_bounds: tuple[float, float] = NAN_TUPLE
 
     def __init__(self, channel: str, platform: str) -> None:
-        origin = platform_gridsat_gc[platform]
+        # Validate platform parameter
+        if platform not in platform_origin_gridsat_gc:
+            allowed_platforms = ", ".join(platform_origin_gridsat_gc.keys())
+            raise ValueError(
+                f"Invalid 'platform': '{platform}'; "
+                f"allowed platforms are: {allowed_platforms}"
+            )
+
+        origin = platform_origin_gridsat_gc[platform]
         channel_orig = channel_correspondence[origin][channel]
 
         self.dataset = dataset_name_gridsat_gc
@@ -78,7 +86,7 @@ class DatabookMetadata(HasStrHelp):
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
 
 
-class DatasetMetadata(DatasetView):
+class DatasetMetadata(PlatformMetadata):
 
     title: str = attribute()
     id: str = attribute()
@@ -90,7 +98,6 @@ class DatasetMetadata(DatasetView):
     project: str = attribute()
     institution: str = attribute()
     comment: str = attribute()
-    platform: str = attribute()
     instrument: str = attribute()
     keywords: str = attribute()
     platform_vocabulary: str = attribute()
@@ -107,20 +114,30 @@ class DatasetMetadata(DatasetView):
     time_coverage_end: str = attribute()
     history: str = attribute()
 
-    @property
-    def origin(self) -> str:
-        return (
-            match[0]
-            if (match := search(r"GOES-\d{1,2}", self.platform))
-            else ""
-        )
-
 
 class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
 
     def __init__(self, record: Dataset, channel: str) -> None:
+        # Validate channel parameter
+        if channel not in channel_description_gc:
+            allowed_channels = ", ".join(channel_description_gc.keys())
+            raise ValueError(
+                f"Invalid 'channel': '{channel}'; "
+                f"allowed channels are: {allowed_channels}"
+            )
+
         DatasetMetadata.__init__(self, record, channel=channel)
 
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         channel: str = kwargs["channel"]
-        DatabookMetadata.__init__(self, channel, self.origin)
+
+        channel_correspondence_map = channel_correspondence[self.origin]
+        channel_orig = channel_correspondence_map[channel]
+
+        if channel_orig == 0:
+            raise ValueError(
+                f"Channel '{channel}' is not available "
+                f"for platform '{self.platform}'"
+            )
+
+        DatabookMetadata.__init__(self, channel, self.platform)

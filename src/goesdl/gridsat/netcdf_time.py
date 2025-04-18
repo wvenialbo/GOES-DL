@@ -20,15 +20,6 @@ MetadataType = TimeMetadata | DeltaTimeMetadata | VariableMetadata
 
 class GSTimeData(HasStrHelp):
 
-    delta_time: MaskedFloat32
-    optimal_time: float64
-    optimal_time_bounds: ArrayFloat64
-
-
-class GSTimeGrid(HasStrHelp):
-
-    grid: GSLatLonGrid
-
     # Delta-time data in minutes.
     delta_time: MaskedFloat32
 
@@ -37,6 +28,11 @@ class GSTimeGrid(HasStrHelp):
 
     # Optimal-time-bounds (in days since 1970-01-01 UTC).
     optimal_time_bounds: ArrayFloat64
+
+
+class GSTimeGrid(GSTimeData):
+
+    grid: GSLatLonGrid
 
     metadata: dict[str, MetadataType]
 

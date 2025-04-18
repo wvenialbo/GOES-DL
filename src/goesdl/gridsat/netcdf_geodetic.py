@@ -31,7 +31,7 @@ class GeodeticSummary(DatasetView):
     geospatial_lon_resolution: float32 = attribute()
 
 
-class GSLatLonGrid(HasStrHelp):
+class GSLatLonGrid(GSLatLonData):
 
     region: RectangularRegion
 
@@ -54,10 +54,19 @@ class GSLatLonGrid(HasStrHelp):
         delta: int = 5,
         corners: bool = False,
     ) -> None:
+        # Validate delta parameter (subsampling increment step)
+        if not (1 <= delta <= 10):
+            raise ValueError(
+                "'delta' must be an integer between 1 and 10, inclusive"
+            )
+
+        # Extract the region of interest...
         if region:
             data, lon_limits, lat_limits = self._slice(
                 record, region, delta, corners
             )
+
+        # ...or extract the entire field of view
         else:
             region = self._extract_region(record)
             data, lon_limits, lat_limits = self._full_frame(record, corners)
@@ -69,7 +78,8 @@ class GSLatLonGrid(HasStrHelp):
         self.lon_limits = lon_limits
         self.lat_limits = lat_limits
 
-        # Create the source projection (Platé-Carrée projection on GRS80 ellipsoid)
+        # Create the source projection (Platé-Carrée projection on GRS80
+        # ellipsoid)
 
         source_globe = Globe(ellipse="GRS80")
 
@@ -177,10 +187,8 @@ class GSLatLonGrid(HasStrHelp):
         data = _LatLonData(record)
 
         domain = (
-            float(data.lon[0]),
-            float(data.lon[-1]),
-            float(data.lat[0]),
-            float(data.lat[-1]),
+            (float(data.lon[0]), float(data.lon[-1])),
+            (float(data.lat[0]), float(data.lat[-1])),
         )
 
         return RectangularRegion(domain)
@@ -242,14 +250,15 @@ class GSLatLonGrid(HasStrHelp):
         lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta)
         lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta)
 
-        data = cls._extract(record, None, lon_limits, lat_limits)
+        if delta > 1:
+            data = cls._extract(record, None, lon_limits, lat_limits)
 
-        lon_limits = cls._find_limits(
-            data.lon, region.lon_bounds, 1, lon_limits[0]
-        )
-        lat_limits = cls._find_limits(
-            data.lat, region.lat_bounds, 1, lat_limits[0]
-        )
+            lon_limits = cls._find_limits(
+                data.lon, region.lon_bounds, 1, lon_limits[0]
+            )
+            lat_limits = cls._find_limits(
+                data.lat, region.lat_bounds, 1, lat_limits[0]
+            )
 
         if corners:
             data = cls._extract_bounds(record, lon_limits, lat_limits)
