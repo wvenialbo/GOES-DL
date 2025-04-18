@@ -136,7 +136,8 @@ class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
 
         if channel_orig == 0:
             raise ValueError(
-                f"Channel '{channel}' is not available for platform '{self.platform}'"
+                f"Channel '{channel}' is not available "
+                f"for platform '{self.platform}'"
             )
 
         DatabookMetadata.__init__(self, channel, self.platform)
