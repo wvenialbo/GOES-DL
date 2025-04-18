@@ -42,9 +42,9 @@ channel_description_gc = {
     "ch1": "Reflectance (or Scaled Radiance) for the 0.6 µm band",
     "ch2": "Brightness Temperature of the 3.9 µm channel",
     "ch3": "Brightness Temperature of the 6.7 µm channel",
-    "ch4": "Brightness Temperature of the 11 µm channel",
-    "ch5": "Brightness Temperature of the 12 µm channel",
-    "ch6": "Brightness Temperature of the 13 µm channel",
+    "ch4": "Brightness Temperature of the 10.7 µm channel",
+    "ch5": "Brightness Temperature of the 12.0 µm channel",
+    "ch6": "Brightness Temperature of the 13.4 µm channel",
 }
 
 # GridSat-GOES channel to actual channel correspondence
