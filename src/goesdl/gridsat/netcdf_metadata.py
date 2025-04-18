@@ -86,7 +86,19 @@ class DatabookMetadata(HasStrHelp):
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
 
 
-class DatasetMetadata(DatasetView):
+class PlatformMetadata(DatasetView):
+    platform: str = attribute()
+
+    @property
+    def origin(self) -> str:
+        return (
+            match[0]
+            if (match := search(r"GOES-\d{1,2}", self.platform))
+            else ""
+        )
+
+
+class DatasetMetadata(PlatformMetadata):
 
     title: str = attribute()
     id: str = attribute()
@@ -98,7 +110,6 @@ class DatasetMetadata(DatasetView):
     project: str = attribute()
     institution: str = attribute()
     comment: str = attribute()
-    platform: str = attribute()
     instrument: str = attribute()
     keywords: str = attribute()
     platform_vocabulary: str = attribute()
@@ -114,14 +125,6 @@ class DatasetMetadata(DatasetView):
     time_coverage_start: str = attribute()
     time_coverage_end: str = attribute()
     history: str = attribute()
-
-    @property
-    def origin(self) -> str:
-        return (
-            match[0]
-            if (match := search(r"GOES-\d{1,2}", self.platform))
-            else ""
-        )
 
 
 class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
