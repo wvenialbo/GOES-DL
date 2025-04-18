@@ -17,7 +17,7 @@ from .databook_gc import (
     measurement_range_lower_bound,
     measurement_range_upper_bound,
     measurement_units,
-    platform_gridsat_gc,
+    platform_origin_gridsat_gc,
     square_igfov_at_nadir,
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
@@ -44,14 +44,14 @@ class DatabookMetadata(HasStrHelp):
 
     def __init__(self, channel: str, platform: str) -> None:
         # Validate platform parameter
-        if platform not in platform_gridsat_gc:
-            allowed_platforms = ", ".join(platform_gridsat_gc.keys())
+        if platform not in platform_origin_gridsat_gc:
+            allowed_platforms = ", ".join(platform_origin_gridsat_gc.keys())
             raise ValueError(
                 f"Invalid 'platform': '{platform}'; "
                 f"allowed platforms are: {allowed_platforms}"
             )
 
-        origin = platform_gridsat_gc[platform]
+        origin = platform_origin_gridsat_gc[platform]
         channel_orig = channel_correspondence[origin][channel]
 
         self.dataset = dataset_name_gridsat_gc
@@ -87,15 +87,19 @@ class DatabookMetadata(HasStrHelp):
 
 
 class PlatformMetadata(DatasetView):
-    platform: str = attribute()
+    platform_domain: str = attribute("platform")
+
+    @property
+    def platform(self) -> str:
+        return (
+            match[0]
+            if (match := search(r"GOES-\d{1,2}", self.platform_domain))
+            else ""
+        )
 
     @property
     def origin(self) -> str:
-        return (
-            match[0]
-            if (match := search(r"GOES-\d{1,2}", self.platform))
-            else ""
-        )
+        return platform_origin_gridsat_gc[self.platform]
 
 
 class DatasetMetadata(PlatformMetadata):
@@ -142,4 +146,13 @@ class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
 
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         channel: str = kwargs["channel"]
-        DatabookMetadata.__init__(self, channel, self.origin)
+
+        channel_correspondence_map = channel_correspondence[self.origin]
+        channel_orig = channel_correspondence_map[channel]
+
+        if channel_orig == 0:
+            raise ValueError(
+                f"Channel '{channel}' is not available for platform '{self.platform}'"
+            )
+
+        DatabookMetadata.__init__(self, channel, self.platform)
