@@ -322,17 +322,25 @@
             "description": "Color enhancement utility subpackage modules (mid)"
         },
         {
-            "scope": "geodesy"
+            "scope": "geodesy",
+            "description": "Geodesy utility subpackage modules (mid)"
         },
         {
-            "scope": "netcdf"
+            "scope": "netcdf",
+            "description": "NetCDF utility subpackage modules (mid)"
         },
         {
-            "scope": "gridsat"
+            "scope": "gridsat",
+            "description": "GridSat utility subpackage modules (mid)"
         },
         {
-            "scope": "experimental"
-        }
+            "scope": "experimental",
+            "description": "Experimental subpackage modules (low)"
+        },
+        {
+            "scope": "protocols",
+            "description": "Protocols subpackage modules (low)"
+        },
     ],
     // AI assistance tools settings
     "github.copilot.advanced": {},
