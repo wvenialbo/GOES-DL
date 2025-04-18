@@ -1,10 +1,9 @@
 import math
-from re import search
 from typing import Any
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 
-from ..netcdf import DatasetView, HasStrHelp, attribute
+from ..netcdf import HasStrHelp, attribute
 from .constants import NA
 from .databook_gc import (
     PIXELS_PER_DEGREE,
@@ -22,6 +21,7 @@ from .databook_gc import (
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
 )
+from .netcdf_platform import PlatformMetadata
 
 NAN_TUPLE = math.nan, math.nan
 
@@ -84,22 +84,6 @@ class DatabookMetadata(HasStrHelp):
         self.wavelength = 0.5 * (wavelength_lo + wavelength_up)
 
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
-
-
-class PlatformMetadata(DatasetView):
-    platform_domain: str = attribute("platform")
-
-    @property
-    def platform(self) -> str:
-        return (
-            match[0]
-            if (match := search(r"GOES-\d{1,2}", self.platform_domain))
-            else ""
-        )
-
-    @property
-    def origin(self) -> str:
-        return platform_origin_gridsat_gc[self.platform]
 
 
 class DatasetMetadata(PlatformMetadata):
