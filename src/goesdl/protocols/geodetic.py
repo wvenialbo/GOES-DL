@@ -12,8 +12,9 @@ class GeodeticRegion(Protocol):
     """
     A protocol for geodetic region of interest (ROI).
 
-    The region of interest is defined by a pair of coordinate ranges
-    (longitude and latitude).  The region is used to slice the data.
+    The region of interest is defined by a pair of coordinate ranges,
+    e.g. a rectangular region defined by latitude and longitude limits.
+    The region is used to slice the data.
 
     Attributes
     ----------
