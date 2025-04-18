@@ -3,26 +3,24 @@ from typing import Literal, cast
 
 from numpy import arange, float32
 
+from ..protocols.geodetic import CoordRange, RegionDomain, RegionExtent
 from ..utils.array import ArrayFloat32
 
 CenterType = tuple[float, float]
-CoordLimits = tuple[float, float]
-CoordDomain = tuple[CoordLimits, CoordLimits]
-ExtentType = tuple[float, float, float, float]
 SizeType = tuple[float, float]
 StepType = tuple[float, float]
 
-DEFAULT_STEP = (2.0, 2.0)
+DEFAULT_STEP: StepType = (2.0, 2.0)
 
 
 class RectangularRegion:
 
-    domain: CoordDomain
+    domain: RegionDomain
 
     xticks: ArrayFloat32
     yticks: ArrayFloat32
 
-    def __init__(self, domain: CoordDomain) -> None:
+    def __init__(self, domain: RegionDomain) -> None:
         # Validate domain to ensure increasing order and non-empty ranges
         self.domain = self._validate_domain(domain)
 
@@ -56,7 +54,7 @@ class RectangularRegion:
 
     def set_ticks(
         self,
-        domain: CoordDomain | None = None,
+        domain: RegionDomain | None = None,
         step: StepType | float | int = DEFAULT_STEP,
     ) -> None:
         domain = (
@@ -90,7 +88,7 @@ class RectangularRegion:
 
     @staticmethod
     def _create_grid_ticks(
-        domain: CoordDomain, step: StepType
+        domain: RegionDomain, step: StepType
     ) -> tuple[ArrayFloat32, ArrayFloat32]:
         (lon_min, lon_max), (lat_min, lat_max) = domain
         lon_step, lat_step = step
@@ -192,7 +190,7 @@ class RectangularRegion:
         return width, height
 
     @staticmethod
-    def _validate_domain(domain: CoordDomain) -> CoordDomain:
+    def _validate_domain(domain: RegionDomain) -> RegionDomain:
         # Validate outer tuple structure
         if not (isinstance(domain, tuple) and len(domain) == 2):
             raise TypeError("'domain' must be a tuple of two 'CoordLimits'")
@@ -299,13 +297,13 @@ class RectangularRegion:
         return lon_step, lat_step
 
     @property
-    def extent(self) -> ExtentType:
+    def extent(self) -> RegionExtent:
         return self.lon_bounds + self.lat_bounds
 
     @property
-    def lat_bounds(self) -> CoordLimits:
+    def lat_bounds(self) -> CoordRange:
         return self.domain[1]
 
     @property
-    def lon_bounds(self) -> CoordLimits:
+    def lon_bounds(self) -> CoordRange:
         return self.domain[0]
