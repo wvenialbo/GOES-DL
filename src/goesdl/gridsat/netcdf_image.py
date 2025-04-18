@@ -15,10 +15,9 @@ class GSImageData(HasStrHelp):
     raster: MaskedFloat32
 
 
-class GSImage(HasStrHelp):
+class GSImage(GSImageData):
 
     grid: GSLatLonGrid
-    raster: MaskedFloat32
 
     metadata: MeasurementMetadata
 
