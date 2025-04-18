@@ -390,7 +390,7 @@ When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
 > Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.2-rc4)* [Software]. GitHub.
+> GOES and GridSat-B1 satellite data (Version 0.2-rc5)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 
