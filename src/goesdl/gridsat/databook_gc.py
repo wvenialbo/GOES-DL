@@ -34,6 +34,8 @@ abstract_gridsat_gc = (
 
 platform_gridsat_gc = {f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)}
 
+origin_gridsat_gc = {value: key for key, value in platform_gridsat_gc.items()}
+
 # Channel description
 
 channel_description_gc = {
