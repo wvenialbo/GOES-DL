@@ -23,6 +23,24 @@ class RectangularRegion:
     yticks: ArrayFloat32
 
     def __init__(self, domain: CoordDomain) -> None:
+        # Validate domain to ensure increasing order and non-empty ranges
+        if not isinstance(domain, tuple) or len(domain) != 4:
+            raise TypeError("Domain must be a tuple of four floats.")
+
+        lon_min, lon_max, lat_min, lat_max = domain
+
+        if lon_min >= lon_max:
+            raise ValueError(
+                "Longitude values in 'domain' must be in increasing "
+                "order (lon_min < lon_max)."
+            )
+
+        if lat_min >= lat_max:
+            raise ValueError(
+                "Latitude values in 'domain' must be in increasing "
+                "order (lat_min < lat_max)."
+            )
+
         self.domain = domain
 
         self.xticks, self.yticks = self._create_grid_ticks(
