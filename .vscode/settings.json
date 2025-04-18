@@ -95,6 +95,10 @@
         "--no-pretty",
         "--show-column-numbers",
     ],
+    "mypy-type-checker.ignorePatterns": [
+        "**/experimental",
+        "**/experimental/**"
+    ],
     "mypy-type-checker.importStrategy": "fromEnvironment",
     "pylint.importStrategy": "fromEnvironment",
     "pylint.enabled": true,
