@@ -54,10 +54,18 @@ class GSLatLonGrid(HasStrHelp):
         delta: int = 5,
         corners: bool = False,
     ) -> None:
+        if not (1 <= delta <= 10):
+            raise ValueError(
+                "'delta' must be an integer between 1 and 10, inclusive."
+            )
+
+        # Extract the region of interest...
         if region:
             data, lon_limits, lat_limits = self._slice(
                 record, region, delta, corners
             )
+
+        # ...or extract the entire field of view
         else:
             region = self._extract_region(record)
             data, lon_limits, lat_limits = self._full_frame(record, corners)
@@ -69,7 +77,8 @@ class GSLatLonGrid(HasStrHelp):
         self.lon_limits = lon_limits
         self.lat_limits = lat_limits
 
-        # Create the source projection (Platé-Carrée projection on GRS80 ellipsoid)
+        # Create the source projection (Platé-Carrée projection on GRS80
+        # ellipsoid)
 
         source_globe = Globe(ellipse="GRS80")
 
