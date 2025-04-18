@@ -6,6 +6,7 @@ from numpy import nan
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
+from .databook_gc import channel_description_gc
 from .metadata import MeasurementMetadata
 from .netcdf_geodetic import GSLatLonGrid, LimitType
 
@@ -24,6 +25,14 @@ class GSImage(GSImageData):
     def __init__(
         self, record: Dataset, channel: str, grid: GSLatLonGrid
     ) -> None:
+        # Validate channel parameter
+        if channel not in channel_description_gc:
+            allowed_channels = ", ".join(channel_description_gc.keys())
+            raise ValueError(
+                f"Invalid 'channel': '{channel}'; "
+                f"allowed channels are: {allowed_channels}"
+            )
+
         data = self._extract_image(
             record, channel, grid.lon_limits, grid.lat_limits
         )
