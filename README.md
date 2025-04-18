@@ -1,4 +1,4 @@
-# GOES-DL — GOES Satellite Imagery Dataset Downloader
+# GOES-DL — Satellite Imagery Dataset Accessing Toolbox
 
 [![AutoPEP](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-autopep.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-autopep.yml)
 [![Bandit](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml/badge.svg)](https://github.com/wvenialbo/GOES-DL/actions/workflows/python-bandit.yml)
