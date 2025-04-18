@@ -275,7 +275,7 @@
     "evenBetterToml.semanticTokens": true,
     // MarkDown editor settings
     "[markdown]": {
-        "editor.defaultFormatter": "vscode.markdown-language-features",
+        "editor.defaultFormatter": "yzhang.markdown-all-in-one",
         "editor.quickSuggestions": {
             "comments": "off",
             "other": "on",
