@@ -55,7 +55,7 @@ class GSLatLonGrid(GSLatLonData):
         corners: bool = False,
     ) -> None:
         # Validate delta parameter (subsampling increment step)
-        if not (1 <= delta <= 10):
+        if not 1 <= delta <= 10:
             raise ValueError(
                 "'delta' must be an integer between 1 and 10, inclusive"
             )
