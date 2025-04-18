@@ -32,9 +32,13 @@ abstract_gridsat_gc = (
 
 # Long platform name
 
-platform_gridsat_gc = {f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)}
+platform_origin_gridsat_gc = {
+    f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)
+}
 
-origin_gridsat_gc = {value: key for key, value in platform_gridsat_gc.items()}
+origin_platform_gridsat_gc = {
+    value: key for key, value in platform_origin_gridsat_gc.items()
+}
 
 # Channel description
 
