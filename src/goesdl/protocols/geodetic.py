@@ -1,5 +1,7 @@
 from typing import Protocol
 
+from cartopy.crs import Projection
+
 from ..utils.array import ArrayFloat32
 
 CoordRange = tuple[float, float]
@@ -76,4 +78,75 @@ class GeodeticRegion(Protocol):
     """
     The y-ticks of the region of interest. Helper for plotting.
     The y-ticks are the latitude values of the region of interest.
+    """
+
+
+class GeodeticGrid(Protocol):
+    """
+    A protocol for geodetic grid data.
+
+    Holds the grid data extracted from the satellite dataset, the region
+    of interest (ROI) to slice the data, and a projection containing the
+    original coordinate reference system (CRS) to transform the data.
+
+    Attributes
+    ----------
+    crs : Projection
+        The projection of the data. The projection is used to transform
+        the data.
+    lat : ArrayFloat32
+        A 2D array containing the sliced values of the latitude grid
+        data.
+    lat_limits : IndexRange
+        A tuple of two integers containing the indices of the minimum
+        and maximum latitude values of the grid data. The limits are
+        used to slice the data.
+    lon : ArrayFloat32
+        A 2D array containing the sliced values of the longitude grid
+        data.
+    lon_limits : IndexRange
+        A tuple of two integers containing the indices of the minimum
+        and maximum longitude values of the grid data. The limits are
+        used to slice the data.
+    region : GeodeticRegion
+        The region of interest. The region is used to find the array
+        indices to slice the data.
+    """
+
+    crs: Projection
+    """
+    The projection of the data. The projection is used to transform
+    the data.
+    """
+
+    lat: ArrayFloat32
+    """
+    A 2D array containing the sliced values of the latitude grid
+    data.
+    """
+
+    lat_limits: IndexRange
+    """
+    A tuple of two integers containing the indices of the minimum
+    and maximum latitude values of the grid data. The limits are
+    used to slice the data.
+    """
+
+    lon: ArrayFloat32
+    """
+    A 2D array containing the sliced values of the longitude grid
+    data.
+    """
+
+    lon_limits: IndexRange
+    """
+    A tuple of two integers containing the indices of the minimum
+    and maximum longitude values of the grid data. The limits are
+    used to slice the data.
+    """
+
+    region: GeodeticRegion
+    """
+    The region of interest. The region is used to find the array
+    indices to slice the data.
     """
