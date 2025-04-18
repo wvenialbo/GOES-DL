@@ -47,12 +47,12 @@ class RectangularRegion:
         x_half = 0.5 * width_deg
         y_half = 0.5 * height_deg
 
-        lons_deg = [lon_cen - x_half, lon_cen + x_half]
-        lats_deg = [lat_cen - y_half, lat_cen + y_half]
+        lons_deg = (lon_cen - x_half, lon_cen + x_half)
+        lats_deg = (lat_cen - y_half, lat_cen + y_half)
 
-        domain = tuple(lons_deg + lats_deg)
+        domain = lons_deg, lats_deg
 
-        return cls(cast(CoordDomain, domain))
+        return cls(domain)
 
     def set_ticks(
         self,
