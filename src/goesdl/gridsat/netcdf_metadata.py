@@ -1,7 +1,7 @@
 import math
 from typing import Any
 
-from netCDF4 import Dataset  # pylint: disable=no-name-in-module
+from netCDF4 import Dataset
 
 from ..netcdf import HasStrHelp, attribute
 from .constants import NA
@@ -22,6 +22,9 @@ from .databook_gc import (
     wavelength_range_upper_bound,
 )
 from .netcdf_platform import PlatformMetadata
+from .validation_gc import (
+    validate_channel,
+)  # pylint: disable=no-name-in-module
 
 NAN_TUPLE = math.nan, math.nan
 
@@ -118,26 +121,11 @@ class DatasetMetadata(PlatformMetadata):
 class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
 
     def __init__(self, record: Dataset, channel: str) -> None:
-        # Validate channel parameter
-        if channel not in channel_description_gc:
-            allowed_channels = ", ".join(channel_description_gc.keys())
-            raise ValueError(
-                f"Invalid 'channel': '{channel}'; "
-                f"allowed channels are: {allowed_channels}"
-            )
+        validate_channel(channel, record)
 
         DatasetMetadata.__init__(self, record, channel=channel)
 
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         channel: str = kwargs["channel"]
-
-        channel_correspondence_map = channel_correspondence[self.origin]
-        channel_orig = channel_correspondence_map[channel]
-
-        if channel_orig == 0:
-            raise ValueError(
-                f"Channel '{channel}' is not available "
-                f"for platform '{self.platform}'"
-            )
 
         DatabookMetadata.__init__(self, channel, self.platform)
