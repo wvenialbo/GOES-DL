@@ -138,13 +138,13 @@ class RectangularRegion:
 
         # Validate the geographical range for longitude and latitude in degrees
         # Assuming standard geographical ranges for degrees
-        if not (-180.0 <= lon_deg <= 180.0):
+        if not -180.0 <= lon_deg <= 180.0:
             raise ValueError(
                 f"Longitude ({lon_deg}) must be "
                 "between -180.0 and 180.0 degrees"
             )
 
-        if not (-90.0 <= lat_deg <= 90.0):
+        if not -90.0 <= lat_deg <= 90.0:
             raise ValueError(
                 f"Latitude ({lat_deg}) must be "
                 "between -90.0 and 90.0 degrees"
@@ -286,12 +286,12 @@ class RectangularRegion:
             ) from error
 
         # Validate positiveness
-        if lon_step > 0:
+        if lon_step <= 0:
             raise ValueError(
                 "Longitude increment in 'step' must be a positive number"
             )
 
-        if lat_step > 0:
+        if lat_step <= 0:
             raise ValueError(
                 "Latitude increment in 'step' must be a positive number"
             )
