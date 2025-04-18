@@ -7,10 +7,10 @@ from numpy import concatenate, flatnonzero, float32, meshgrid
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, attribute, variable
+from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32
 from .metadata import CoordinateMetadata, VariableMetadata
 
-LimitType = tuple[int, int]
 MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 
 
@@ -38,8 +38,8 @@ class GSLatLonGrid(GSLatLonData):
     lon: ArrayFloat32
     lat: ArrayFloat32
 
-    lon_limits: LimitType
-    lat_limits: LimitType
+    lon_limits: IndexRange
+    lat_limits: IndexRange
 
     metadata: MetadataType
 
@@ -93,10 +93,10 @@ class GSLatLonGrid(GSLatLonData):
     def _extract(
         record: Dataset,
         step: int | None,
-        lon_limits: LimitType | None,
-        lat_limits: LimitType | None,
+        lon_limits: IndexRange | None,
+        lat_limits: IndexRange | None,
     ) -> "GSLatLonData":
-        def subsample(limits: LimitType | None) -> Callable[[Any], Any]:
+        def subsample(limits: IndexRange | None) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
                 skip = step or None
@@ -119,10 +119,10 @@ class GSLatLonGrid(GSLatLonData):
     @staticmethod
     def _extract_bounds(
         record: Dataset,
-        lon_limits: LimitType | None,
-        lat_limits: LimitType | None,
+        lon_limits: IndexRange | None,
+        lat_limits: IndexRange | None,
     ) -> "GSLatLonData":
-        def subsample(limits: LimitType | None) -> Callable[[Any], Any]:
+        def subsample(limits: IndexRange | None) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
                 coord = x[begin:end]
@@ -199,7 +199,7 @@ class GSLatLonGrid(GSLatLonData):
         min_max: tuple[float, float],
         delta: int,
         offset: int = 0,
-    ) -> LimitType:
+    ) -> IndexRange:
         min_value, max_value = min_max
 
         min_indices = flatnonzero(coord < min_value)
@@ -216,7 +216,7 @@ class GSLatLonGrid(GSLatLonData):
         cls,
         record: Dataset,
         corners: bool,
-    ) -> tuple["GSLatLonData", LimitType, LimitType]:
+    ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
         if corners:
             data = cls._extract_bounds(record, None, None)
             lon_limits = 0, data.lon.size - 1
@@ -244,7 +244,7 @@ class GSLatLonGrid(GSLatLonData):
         region: RectangularRegion,
         delta: int,
         corners: bool,
-    ) -> tuple["GSLatLonData", LimitType, LimitType]:
+    ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
         data = cls._extract(record, delta, None, None)
 
         lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta)

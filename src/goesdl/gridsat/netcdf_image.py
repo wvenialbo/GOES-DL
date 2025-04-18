@@ -5,9 +5,10 @@ from numpy import nan
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
+from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .metadata import MeasurementMetadata
-from .netcdf_geodetic import GSLatLonGrid, LimitType
+from .netcdf_geodetic import GSLatLonGrid
 from .validation_gc import validate_channel
 
 
@@ -41,8 +42,8 @@ class GSImage(GSImageData):
     def _extract_image(
         record: Dataset,
         channel: str,
-        lon_limits: LimitType,
-        lat_limits: LimitType,
+        lon_limits: IndexRange,
+        lat_limits: IndexRange,
     ) -> "GSImageData":
         def slice(x: Any) -> Any:
             min_lon, max_lon = lon_limits
