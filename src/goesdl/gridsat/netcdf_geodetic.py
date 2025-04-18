@@ -56,7 +56,7 @@ class GSLatLonGrid(HasStrHelp):
     ) -> None:
         if not (1 <= delta <= 10):
             raise ValueError(
-                "'delta' must be an integer between 1 and 10, inclusive."
+                "'delta' must be an integer between 1 and 10, inclusive"
             )
 
         # Extract the region of interest...
@@ -251,14 +251,15 @@ class GSLatLonGrid(HasStrHelp):
         lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta)
         lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta)
 
-        data = cls._extract(record, None, lon_limits, lat_limits)
+        if delta > 1:
+            data = cls._extract(record, None, lon_limits, lat_limits)
 
-        lon_limits = cls._find_limits(
-            data.lon, region.lon_bounds, 1, lon_limits[0]
-        )
-        lat_limits = cls._find_limits(
-            data.lat, region.lat_bounds, 1, lat_limits[0]
-        )
+            lon_limits = cls._find_limits(
+                data.lon, region.lon_bounds, 1, lon_limits[0]
+            )
+            lat_limits = cls._find_limits(
+                data.lat, region.lat_bounds, 1, lat_limits[0]
+            )
 
         if corners:
             data = cls._extract_bounds(record, lon_limits, lat_limits)
