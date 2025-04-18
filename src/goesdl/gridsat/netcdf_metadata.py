@@ -43,6 +43,14 @@ class DatabookMetadata(HasStrHelp):
     wavelength_bounds: tuple[float, float] = NAN_TUPLE
 
     def __init__(self, channel: str, platform: str) -> None:
+        # Validate platform parameter
+        if platform not in platform_gridsat_gc:
+            allowed_platforms = ", ".join(platform_gridsat_gc.keys())
+            raise ValueError(
+                f"Invalid 'platform': '{platform}'; "
+                f"allowed platforms are: {allowed_platforms}"
+            )
+
         origin = platform_gridsat_gc[platform]
         channel_orig = channel_correspondence[origin][channel]
 
@@ -119,6 +127,14 @@ class DatasetMetadata(DatasetView):
 class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
 
     def __init__(self, record: Dataset, channel: str) -> None:
+        # Validate channel parameter
+        if channel not in channel_description_gc:
+            allowed_channels = ", ".join(channel_description_gc.keys())
+            raise ValueError(
+                f"Invalid 'channel': '{channel}'; "
+                f"allowed channels are: {allowed_channels}"
+            )
+
         DatasetMetadata.__init__(self, record, channel=channel)
 
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
