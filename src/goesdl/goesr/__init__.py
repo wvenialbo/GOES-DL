@@ -36,6 +36,7 @@ from .locator_pp import (
     GOESProductLocatorCMIP,
     GOESProductLocatorRad,
 )
+from .netcdf_dataset import GOESDatasetInfo
 from .netcdf_geodetic import GOESLatLonGrid
 from .netcdf_image import GOESImage
 
@@ -65,4 +66,5 @@ __all__ = [
     "GOESPrimaryProductLocator",
     "GOESLatLonGrid",
     "GOESImage",
+    "GOESDatasetInfo",
 ]
