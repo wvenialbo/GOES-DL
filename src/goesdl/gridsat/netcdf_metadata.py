@@ -3,7 +3,7 @@ from typing import Any
 
 from netCDF4 import Dataset
 
-from ..netcdf import HasStrHelp, attribute
+from ..netcdf import HasStrHelp
 from .constants import NA
 from .databook_gc import (
     PIXELS_PER_DEGREE,
@@ -21,10 +21,10 @@ from .databook_gc import (
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
 )
-from .netcdf_platform import PlatformMetadata
-from .validation_gc import (
+from .netcdf_dataset import DatasetMetadata
+from .validation_gc import (  # pylint: disable=no-name-in-module
     validate_channel,
-)  # pylint: disable=no-name-in-module
+)
 
 NAN_TUPLE = math.nan, math.nan
 
@@ -87,35 +87,6 @@ class DatabookMetadata(HasStrHelp):
         self.wavelength = 0.5 * (wavelength_lo + wavelength_up)
 
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
-
-
-class DatasetMetadata(PlatformMetadata):
-
-    title: str = attribute()
-    id: str = attribute()
-    summary: str = attribute()
-    conventions: str = attribute("Conventions")
-    license: str = attribute()
-    processing_level: str = attribute()
-    product_version: str = attribute()
-    project: str = attribute()
-    institution: str = attribute()
-    comment: str = attribute()
-    instrument: str = attribute()
-    keywords: str = attribute()
-    platform_vocabulary: str = attribute()
-    sensor_vocabulary: str = attribute()
-    keywords_vocabulary: str = attribute()
-    naming_authority: str = attribute()
-    standard_name_vocabulary: str = attribute()
-    metadata_link: str = attribute()
-    ncei_template_version: str = attribute()
-    date_created: str = attribute()
-    date_modified: str = attribute()
-    projection: str = attribute("Projection")
-    time_coverage_start: str = attribute()
-    time_coverage_end: str = attribute()
-    history: str = attribute()
 
 
 class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
