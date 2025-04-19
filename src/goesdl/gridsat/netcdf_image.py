@@ -63,7 +63,7 @@ class GSImage(GSImageData):
     def _extract_metadata(record: Dataset, name: str) -> MeasurementMetadata:
         measurement = variable(name)
 
-        class _ImageMetata(DatasetView):
+        class _GSImageMetadata(DatasetView):
             long_name: str = measurement.attribute()
             standard_name: str = measurement.attribute()
             units: str = measurement.attribute()
@@ -72,7 +72,7 @@ class GSImage(GSImageData):
             range: ArrayFloat32 = measurement.attribute("actual_range")
             shape: tuple[int] = measurement.attribute()
 
-        metadata = _ImageMetata(record)
+        metadata = _GSImageMetadata(record)
 
         return MeasurementMetadata(metadata)
 
