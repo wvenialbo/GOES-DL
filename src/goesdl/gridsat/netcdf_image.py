@@ -19,7 +19,7 @@ class GSImageData(HasStrHelp):
 
 class GSImage(GSImageData):
 
-    grid: GSLatLonGrid
+    _grid: GSLatLonGrid
 
     metadata: MeasurementMetadata
 
@@ -33,7 +33,7 @@ class GSImage(GSImageData):
             record, channel, grid.lon_limits, grid.lat_limits
         )
 
-        self.grid = grid
+        self._grid = grid
         self.raster = data.raster
 
         self.metadata = self._extract_metadata(record, channel)
@@ -86,4 +86,8 @@ class GSImage(GSImageData):
 
     @property
     def region(self) -> RectangularRegion:
-        return self.grid.region
+        return self._grid.region
+
+    @property
+    def grid(self) -> GSLatLonGrid:
+        return self._grid

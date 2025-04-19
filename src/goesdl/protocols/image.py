@@ -26,25 +26,28 @@ class SatImageData(Protocol):
         The defined geodetic region of interest (ROI).
     """
 
-    grid: GeodeticGrid
-    """
-    The grid data extracted from the satellite dataset.
+    @property
+    def grid(self) -> GeodeticGrid:
+        """
+        The grid data extracted from the satellite dataset.
 
-    See Also
-    --------
-    GeodeticGrid
-        The protocol for geodetic grid data.
-    """
+        See Also
+        --------
+        GeodeticGrid
+            The protocol for geodetic grid data.
+        """
 
-    image: ArrayFloat32
-    """
-    A 2D array containing the sliced values of the image data.
-    """
+    @property
+    def image(self) -> ArrayFloat32:
+        """
+        A 2D array containing the sliced values of the image data.
+        """
 
-    mask: ArrayBool
-    """
-    A 2D array containing the mask of the image data.
-    """
+    @property
+    def mask(self) -> ArrayBool:
+        """
+        A 2D array containing the mask of the image data.
+        """
 
     raster: MaskedFloat32
     """
@@ -52,12 +55,13 @@ class SatImageData(Protocol):
     from the satellite dataset.
     """
 
-    region: GeodeticRegion
-    """
-    The defined geodetic region of interest (ROI).
+    @property
+    def region(self) -> GeodeticRegion:
+        """
+        The defined geodetic region of interest (ROI).
 
-    See Also
-    --------
-    GeodeticRegion
-        The protocol for geodetic region data.
-    """
+        See Also
+        --------
+        GeodeticRegion
+            The protocol for geodetic region data.
+        """
