@@ -20,35 +20,6 @@ from ..netcdf import DatasetView, scalar, variable
 cmip = variable("CMI")
 
 
-class GOESImage(DatasetView):
-    """
-    Represent a GOES satellite image data.
-
-    Hold data for the Cloud and Moisture Imagery (CMI) bands.
-
-    Attributes
-    ----------
-    band_id : int32
-        The ID of the band.
-    band_wavelength : float32
-        The wavelength of the band.
-    data : NDArray[float32]
-        The image data.
-    mask : NDArray[bool]
-        The array containing the mask values indicating invalid data
-        points.
-    fill_value : uint16
-        The fill value used for missing or invalid data points.
-    """
-
-    band_id: int32 = scalar()
-    band_wavelength: float32 = scalar()
-
-    data: NDArray[float32] = cmip.array()
-    mask: NDArray[bool_] = cmip.array(entry="mask")
-    fill_value: uint16 = cmip.array(entry="fill_value")
-
-
 class GOESImageMetadata(DatasetView):
     """
     Represent GOES image metadata attributes.
@@ -84,3 +55,33 @@ class GOESImageMetadata(DatasetView):
     units: str = cmip.attribute()
     resolution: str = cmip.attribute()
     grid_mapping: str = cmip.attribute()
+
+    band_id: int32 = scalar()
+    band_wavelength: float32 = scalar()
+
+
+class GOESImage(DatasetView):
+    """
+    Represent a GOES satellite image data.
+
+    Hold data for the Cloud and Moisture Imagery (CMI) bands.
+
+    Attributes
+    ----------
+    band_id : int32
+        The ID of the band.
+    band_wavelength : float32
+        The wavelength of the band.
+    data : NDArray[float32]
+        The image data.
+    mask : NDArray[bool]
+        The array containing the mask values indicating invalid data
+        points.
+    fill_value : uint16
+        The fill value used for missing or invalid data points.
+    """
+
+
+    data: NDArray[float32] = cmip.array()
+    mask: NDArray[bool_] = cmip.array(entry="mask")
+    fill_value: uint16 = cmip.array(entry="fill_value")
