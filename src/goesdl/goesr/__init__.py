@@ -36,6 +36,7 @@ from .locator_pp import (
     GOESProductLocatorCMIP,
     GOESProductLocatorRad,
 )
+from .netcdf_geodetic import GOESLatLonGrid
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
 GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC
@@ -61,4 +62,5 @@ __all__ = [
     "GOESLightningMapperProductLocator",
     "GOESPrimaryMultibandProductLocator",
     "GOESPrimaryProductLocator",
+    "GOESLatLonGrid",
 ]
