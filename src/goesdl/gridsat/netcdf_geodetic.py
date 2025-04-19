@@ -75,8 +75,7 @@ class GSLatLonGrid(GSLatLonData):
 
         self.lon, self.lat = meshgrid(data.lon, data.lat)
 
-        self.lon_limits = lon_limits
-        self.lat_limits = lat_limits
+        self.lon_limits, self.lat_limits = lon_limits, lat_limits
 
         # Create the source projection (Platé-Carrée projection on GRS80
         # ellipsoid)
