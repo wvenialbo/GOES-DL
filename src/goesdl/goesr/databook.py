@@ -59,6 +59,25 @@ channel_description_goesr = {
     "CH16": "Brightness Temperature of the 13.3 µm 'CO2 longwave infrared' channel",
 }
 
+channel_correspondence_goesr = {
+    "CH1": 1,
+    "CH2": 2,
+    "CH3": 3,
+    "CH4": 4,
+    "CH5": 5,
+    "CH6": 6,
+    "CH7": 7,
+    "CH8": 8,
+    "CH9": 9,
+    "CH10": 10,
+    "CH11": 11,
+    "CH12": 12,
+    "CH13": 13,
+    "CH14": 14,
+    "CH15": 15,
+    "CH16": 16,
+}
+
 wavelength_goesr = {
     "CH1": 0.47,
     "CH2": 0.64,
