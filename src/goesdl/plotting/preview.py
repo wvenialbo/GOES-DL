@@ -7,30 +7,10 @@ from cartopy.mpl.ticker import LatitudeFormatter, LongitudeFormatter
 from matplotlib import pyplot as plt
 from matplotlib.collections import QuadMesh
 from matplotlib.ticker import MultipleLocator
-from netCDF4 import Dataset
 
 from ..enhancement import EnhancementScale, cmap
 from ..geodesy import RectangularRegion
-from .netcdf_geodetic import GSLatLonGrid
-from .netcdf_image import GSImage
-from .netcdf_metadata import GSDatasetMetadata
-from .netcdf_time import GSCoverageTime
-
-# Create the Natural Earth projection (Platé-Carrée projection on WGS84 ellipsoid)
-
-
-def read_gridsat_dataset(
-    dataframe: Dataset, channel: str, region: RectangularRegion
-) -> tuple[GSImage, GSCoverageTime, GSDatasetMetadata]:
-    grid = GSLatLonGrid(dataframe, region)  # , corners=True
-
-    data = GSImage(dataframe, channel, grid)
-
-    coverage = GSCoverageTime(dataframe)
-
-    metadata = GSDatasetMetadata(dataframe, channel)
-
-    return data, coverage, metadata
+from ..gridsat.netcdf_image import GSImage
 
 
 class GSPlotParameter:
@@ -151,7 +131,7 @@ class GSPlot:
         self.plot(image, param)
 
     def _add_admin_info(self, ax: plt.Axes) -> None:  # type: ignore
-        # Create the Natural Earth projection (Platé-Carrée projection
+        # Create the Natural Earth projection (Plate-Carrée projection
         # on WGS84 ellipsoid)
 
         natearth_globe = ccrs.Globe(ellipse="WGS84")
