@@ -257,13 +257,15 @@ class GSLatLonGrid(GSLatLonData):
         lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta, 0)
 
         if delta > 1:
+            lon_offset, lat_offset = lon_limits[0], lat_limits[0]
+
             data = cls._extract(record, None, lon_limits, lat_limits)
 
             lon_limits = cls._find_limits(
-                data.lon, region.lon_bounds, 1, lon_limits[0]
+                data.lon, region.lon_bounds, 1, lon_offset
             )
             lat_limits = cls._find_limits(
-                data.lat, region.lat_bounds, 1, lat_limits[0]
+                data.lat, region.lat_bounds, 1, lat_offset
             )
 
         if corners:
