@@ -198,7 +198,7 @@ class GSLatLonGrid(GSLatLonData):
         coord: ArrayFloat32,
         min_max: tuple[float, float],
         delta: int,
-        offset: int = 0,
+        offset: int,
     ) -> IndexRange:
         min_value, max_value = min_max
 
@@ -253,8 +253,8 @@ class GSLatLonGrid(GSLatLonData):
     ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
         data = cls._extract(record, delta, None, None)
 
-        lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta)
-        lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta)
+        lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta, 0)
+        lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta, 0)
 
         if delta > 1:
             data = cls._extract(record, None, lon_limits, lat_limits)
