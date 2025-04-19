@@ -361,6 +361,9 @@
             "scope": "protocols",
             "description": "Protocols subpackage modules (low)"
         },
+        {
+            "scope": "goesr"
+        }
     ],
     // AI assistance tools settings
     "github.copilot.advanced": {},
