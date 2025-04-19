@@ -240,3 +240,11 @@ class GOESLatLonGrid(HasStrHelp):
             lon_lat = cls._extract(record, 1, limits)
 
         return lon_lat, limits
+
+    @property
+    def globe(self) -> Globe:
+        return self.crs.globe
+
+    @property
+    def region(self) -> RectangularRegion:
+        return self._region
