@@ -26,6 +26,9 @@ from ..netcdf import DatasetView, HasStrHelp, data, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32, ArrayFloat64
 
+BoxLimits = tuple[int, int, int, int]
+
+
 imager_proj = variable("goes_imager_projection")
 
 
@@ -105,6 +108,33 @@ class GOESGlobe(DatasetView):
     inverse_flattening: float64 = imager_proj.attribute()
 
 
+class GOESImagerProjection(GOESOrbitGeometry, GOESGlobe):
+    """
+    Represent GOES-R series satellite Imager Projection information.
+
+    The GOES Imager Projection, also called the ABI Fixed Grid, is the
+    projection information included in all ABI Level 1b radiance data
+    files and most ABI Level 2 derived product data files. It is a map
+    projection based on the geostationary viewing perspective of the
+    GOES-East or GOES-West satellite.
+
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2.8 of [2]_
+
+    References
+    ----------
+    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
+        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
+        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
+    .. [2] GOES-R, "GOES-R Series Product Definition and User’s Guide
+        (PUG), Volume 5: Level 2+ Products", Version 2.4,
+        NASA/NOAA/NESDIS, 2022.
+        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
+    """
+
+
 def to_float64(array: ArrayFloat32) -> ArrayFloat64:
     """
     Convert a float32 array to a float64 array.
@@ -122,21 +152,9 @@ def to_float64(array: ArrayFloat32) -> ArrayFloat64:
     return array.astype(float64)
 
 
-class GOESABIFixedGrid(GOESOrbitGeometry, GOESGlobe):
+class GOESABIFixedGrid(GOESImagerProjection):
     """
     Represent GOES-R series satellite ABI Fixed Grid projection data.
-
-    The GOES Imager Projection, also called the ABI Fixed Grid, is the
-    projection information included in all ABI Level 1b radiance data
-    files and most ABI Level 2 derived product data files. It is a map
-    projection based on the geostationary viewing perspective of the
-    GOES-East or GOES-West satellite.
-    Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
-
-    Notes
-    -----
-    For information on GOES Imager Projection and GOES orbit geometry,
-    see [1]_ and Section 4.2.8 of [2]_
 
     Attributes
     ----------
@@ -144,16 +162,6 @@ class GOESABIFixedGrid(GOESOrbitGeometry, GOESGlobe):
         1D array of E/W scanning angles in radians.
     y : ArrayFloat64
         1D array of N/S elevation angles in radians.
-
-    References
-    ----------
-    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
-        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
-        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
-    .. [2] GOES-R, "GOES-R Series Product Definition and User’s Guide
-        (PUG), Volume 5: Level 2+ Products", Version 2.4,
-        NASA/NOAA/NESDIS, 2022.
-        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
     """
 
     # Information about the fixed grid
@@ -167,14 +175,21 @@ class GOESGeostationaryGrid(HasStrHelp):
     globe: GOESGlobe
     grid: tuple[ArrayFloat64, ArrayFloat64]
 
-    def __init__(self, record: Dataset, delta: int = 5) -> None:
+    def __init__(
+        self, record: Dataset, delta: int, limits: BoxLimits | None
+    ) -> None:
         # Validate delta parameter (subsampling increment step)
         if not 1 <= delta <= 10:
             raise ValueError(
                 "'delta' must be an integer between 1 and 10, inclusive"
             )
 
-        grid, geom, globe = self._extract_geos_grid(record, delta, None, None)
+        lon_limits = limits[:2] if limits else None
+        lat_limits = limits[2:4] if limits else None
+
+        grid, geom, globe = self._extract_geos_grid(
+            record, delta, lon_limits, lat_limits
+        )
 
         self.geometry = geom
         self.globe = globe
