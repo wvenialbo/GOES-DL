@@ -9,8 +9,7 @@ from matplotlib.collections import QuadMesh
 from matplotlib.ticker import MultipleLocator
 
 from ..enhancement import EnhancementScale, cmap
-from ..geodesy import RectangularRegion
-from ..gridsat.netcdf_image import GSImage
+from ..protocols import GeodeticRegion, SatImageData
 
 
 class GSPlotParameter:
@@ -71,7 +70,7 @@ class GSPlot:
 
     def plot(
         self,
-        image: GSImage,
+        image: SatImageData,
         param: GSPlotParameter,
         save_path: str = "",
         show: bool = True,
@@ -123,11 +122,11 @@ class GSPlot:
             plt.close()
 
     def save(
-        self, save_path: str, image: GSImage, param: GSPlotParameter
+        self, save_path: str, image: SatImageData, param: GSPlotParameter
     ) -> None:
         self.plot(image, param, save_path, False)
 
-    def show(self, image: GSImage, param: GSPlotParameter) -> None:
+    def show(self, image: SatImageData, param: GSPlotParameter) -> None:
         self.plot(image, param)
 
     def _add_admin_info(self, ax: plt.Axes) -> None:  # type: ignore
@@ -215,7 +214,7 @@ class GSPlot:
     def _add_grid(
         self,
         ax: plt.Axes,  # type: ignore
-        region: RectangularRegion,
+        region: GeodeticRegion,
         labels: tuple[str, str],
     ) -> None:
 
@@ -302,7 +301,7 @@ class GSPlot:
     def _plot_data(
         self,
         ax: plt.Axes,  # type: ignore
-        data: GSImage,
+        data: SatImageData,
     ) -> QuadMesh:
         # Plot the data (in `gcrs`, see definition above) with a color map from the stock
         # shading;
