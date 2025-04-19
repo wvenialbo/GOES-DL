@@ -202,12 +202,18 @@ class GSLatLonGrid(GSLatLonData):
     ) -> IndexRange:
         min_value, max_value = min_max
 
+        if min_value > coord[-1] or max_value < coord[0]:
+            raise ValueError(
+                "Region out of range, empty selection: "
+                f"[{min_value}, {max_value}] not in [{coord[0]}, {coord[-1]}]"
+            )
+
         min_indices = flatnonzero(coord < min_value)
         min_bound = min_indices[-1] if min_indices.size > 0 else 0
 
         max_indices = flatnonzero(coord > max_value)
         max_bound = max_indices[0] if max_indices.size > 0 else -1
-        max_bound = max_bound + 1 if max_bound >= 0 else coord.size
+        max_bound = max_bound if max_bound >= 0 else coord.size
 
         return int(min_bound * delta + offset), int(max_bound * delta + offset)
 
