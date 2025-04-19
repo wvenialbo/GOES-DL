@@ -2,7 +2,7 @@ from ..netcdf import attribute
 from .netcdf_platform import PlatformMetadata
 
 
-class DatasetMetadata(PlatformMetadata):
+class GSDatasetMetadata(PlatformMetadata):
 
     title: str = attribute()
     id: str = attribute()

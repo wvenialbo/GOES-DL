@@ -21,7 +21,7 @@ from .databook_gc import (
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
 )
-from .netcdf_dataset import DatasetMetadata
+from .netcdf_dataset import GSDatasetMetadata
 from .validation_gc import (  # pylint: disable=no-name-in-module
     validate_channel,
 )
@@ -89,12 +89,12 @@ class DatabookMetadata(HasStrHelp):
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
 
 
-class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
+class GSDatasetInfo(DatabookMetadata, GSDatasetMetadata):
 
     def __init__(self, record: Dataset, channel: str) -> None:
         validate_channel(channel, record)
 
-        DatasetMetadata.__init__(self, record, channel=channel)
+        GSDatasetMetadata.__init__(self, record, channel=channel)
 
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         channel: str = kwargs["channel"]
