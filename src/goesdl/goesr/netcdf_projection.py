@@ -16,12 +16,22 @@ GOESProjection
     Represent GOES-R series satellite projection information.
 """
 
+from collections.abc import Callable
+from typing import Any, Protocol
+
+from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float64
 
-from ..netcdf import DatasetView, data, variable
+from ..netcdf import DatasetView, HasStrHelp, data, variable
+from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32, ArrayFloat64
 
 imager_proj = variable("goes_imager_projection")
+
+
+class GeostationaryGrid(Protocol):
+    x: ArrayFloat64
+    y: ArrayFloat64
 
 
 class GOESOrbitGeometry(DatasetView):
@@ -95,43 +105,6 @@ class GOESGlobe(DatasetView):
     inverse_flattening: float64 = imager_proj.attribute()
 
 
-class GOESABIFixedGrid(DatasetView):
-    """
-    Represent GOES-R series satellite ABI Fixed Grid projection data.
-
-    The GOES Imager Projection, also called the ABI Fixed Grid, is the
-    projection information included in all ABI Level 1b radiance data
-    files and most ABI Level 2 derived product data files. It is a map
-    projection based on the geostationary viewing perspective of the
-    GOES-East or GOES-West satellite.
-
-    Notes
-    -----
-    For information on GOES Imager Projection and GOES orbit geometry,
-    see [1]_ and Section 4.2. of [2]_
-
-    Attributes
-    ----------
-    x : ArrayFloat32
-        1D array of E/W scanning angles in radians.
-    y : ArrayFloat32
-        1D array of N/S elevation angles in radians.
-
-    References
-    ----------
-    .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
-        Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
-        https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
-    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
-        (PUG), Volume 5: Level 2+ Products", Version 2.4,
-        NASA/NOAA/NESDIS, 2022.
-        https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
-    """
-
-    x: ArrayFloat32 = data()
-    y: ArrayFloat32 = data()
-
-
 def to_float64(array: ArrayFloat32) -> ArrayFloat64:
     """
     Convert a float32 array to a float64 array.
@@ -149,18 +122,21 @@ def to_float64(array: ArrayFloat32) -> ArrayFloat64:
     return array.astype(float64)
 
 
-class GOESProjection(GOESOrbitGeometry, GOESGlobe):
+class GOESABIFixedGrid(GOESOrbitGeometry, GOESGlobe):
     """
-    Represent GOES-R series satellite projection information.
+    Represent GOES-R series satellite ABI Fixed Grid projection data.
 
-    The GOES Imager Projection, also called ABI Fixed Grid Projection,
-    is a map projection relative to the GOES satellite point of view.
+    The GOES Imager Projection, also called the ABI Fixed Grid, is the
+    projection information included in all ABI Level 1b radiance data
+    files and most ABI Level 2 derived product data files. It is a map
+    projection based on the geostationary viewing perspective of the
+    GOES-East or GOES-West satellite.
     Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
 
-    Note
-    ----
-    For information on GOES Imager Projection, see [1]_ and Section
-    4.2.8 of [2]_
+    Notes
+    -----
+    For information on GOES Imager Projection and GOES orbit geometry,
+    see [1]_ and Section 4.2.8 of [2]_
 
     Attributes
     ----------
@@ -174,7 +150,7 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
     .. [1] STAR Atmospheric Composition Product Training, "GOES Imager
         Projection (ABI Fixed Grid)", NOAA/NESDIS/STAR, 2024.
         https://www.star.nesdis.noaa.gov/atmospheric-composition-training/satellite_data_goes_imager_projection.php.
-    .. [2] GOES-R, " GOES-R Series Product Definition and User’s Guide
+    .. [2] GOES-R, "GOES-R Series Product Definition and User’s Guide
         (PUG), Volume 5: Level 2+ Products", Version 2.4,
         NASA/NOAA/NESDIS, 2022.
         https://www.ospo.noaa.gov/Organization/Documents/PUG/GS%20Series%20416-R-PUG-L2%20Plus-0349%20Vol%205%20v2.4.pdf
@@ -183,3 +159,52 @@ class GOESProjection(GOESOrbitGeometry, GOESGlobe):
     # Information about the fixed grid
     x: ArrayFloat64 = data(convert=to_float64)
     y: ArrayFloat64 = data(convert=to_float64)
+
+
+class GOESGeostationaryGrid(HasStrHelp):
+
+    geometry: GOESOrbitGeometry
+    globe: GOESGlobe
+    grid: tuple[ArrayFloat64, ArrayFloat64]
+
+    def __init__(self, record: Dataset, delta: int = 5) -> None:
+        # Validate delta parameter (subsampling increment step)
+        if not 1 <= delta <= 10:
+            raise ValueError(
+                "'delta' must be an integer between 1 and 10, inclusive"
+            )
+
+        grid, geom, globe = self._extract_geos_grid(record, delta, None, None)
+
+        self.geometry = geom
+        self.globe = globe
+        self.grid = (grid.x, grid.y)
+
+    @staticmethod
+    def _extract_geos_grid(
+        record: Dataset,
+        step: int | None,
+        lon_limits: IndexRange | None,
+        lat_limits: IndexRange | None,
+    ) -> tuple[GeostationaryGrid, GOESOrbitGeometry, GOESGlobe]:
+        def subsample(limits: IndexRange | None) -> Callable[[Any], Any]:
+            def closure(x: Any) -> Any:
+                begin, end = limits or (None, None)
+                skip = step or None
+                return x[begin:end:skip]
+
+            return closure
+
+        class _FixedGrid(DatasetView):
+            x: ArrayFloat64 = variable("x").data(
+                filter=subsample(lon_limits), convert=to_float64
+            )
+            y: ArrayFloat64 = variable("y").data(
+                filter=subsample(lat_limits), convert=to_float64
+            )
+
+        grid = _FixedGrid(record)
+        geom = GOESOrbitGeometry(record)
+        globe = GOESGlobe(record)
+
+        return grid, geom, globe
