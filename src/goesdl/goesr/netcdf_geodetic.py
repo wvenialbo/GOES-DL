@@ -14,7 +14,7 @@ from ..geodesy import (
 )
 from ..netcdf import HasStrHelp
 from ..protocols.geodetic import IndexRange, RegionDomain
-from ..utils.array import ArrayFloat32, MaskedFloat32
+from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .netcdf_projection import GOESGeostationaryGrid, GOESImagerProjection
 
 BoxLimits = tuple[int, int, int, int]
@@ -26,6 +26,8 @@ class GOESLatLonGrid(HasStrHelp):
 
     lon: ArrayFloat32
     lat: ArrayFloat32
+
+    mask: ArrayBool
 
     lon_limits: IndexRange
     lat_limits: IndexRange
@@ -58,8 +60,10 @@ class GOESLatLonGrid(HasStrHelp):
         self._region = region
 
         # Units: latitude in °N (°S < 0), longitude in °E (°W < 0)
+        lon, lat = lon_lat
 
-        self.lon, self.lat = lon_lat
+        self.lon, self.lat = lon.data, lat.data
+        self.mask = lat.mask | lon.mask
 
         self.lon_limits, self.lat_limits = limits[:2], limits[2:4]
 
