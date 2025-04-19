@@ -1,8 +1,47 @@
+from typing import Protocol
+
 from numpy import float64
 
 from ..utils.array import ArrayFloat64
-from .geosproj_parameters import GeosProjParameters
-from .globe_parameters import GlobeParameters
+
+
+class GeosProjParameters(Protocol):
+    """
+    A class to store the geostationary projection parameters.
+
+    Attributes
+    ----------
+    longitude_of_projection_origin : float64
+        The longitude of the projection origin in East degrees.
+    perspective_point_height : float64
+        The height of the perspective point in meters.
+    sweep_angle_axis : str
+        The axis of the sweep angle.
+    """
+
+    # Information about the projection
+    longitude_of_projection_origin: float64
+    perspective_point_height: float64
+    sweep_angle_axis: str
+
+
+class GlobeParameters(Protocol):
+    """
+    A class to store the globe parameters.
+
+    Attributes
+    ----------
+    semi_major_axis : float64
+        The semi-major axis of the ellipsoid in meters.
+    semi_minor_axis : float64
+        The semi-minor axis of the ellipsoid in meters.
+    inverse_flattening : float64
+        The inverse flattening of the ellipsoid.
+    """
+
+    semi_major_axis: float64
+    semi_minor_axis: float64
+    inverse_flattening: float64
 
 
 class GeostationaryParameters:
