@@ -33,7 +33,7 @@ class GeodeticSummary(DatasetView):
 
 class GSLatLonGrid(GSLatLonData):
 
-    region: RectangularRegion
+    _region: RectangularRegion
 
     lon: ArrayFloat32
     lat: ArrayFloat32
@@ -71,7 +71,7 @@ class GSLatLonGrid(GSLatLonData):
             region = self._extract_region(record)
             data, lon_limits, lat_limits = self._full_frame(record, corners)
 
-        self.region = region
+        self._region = region
 
         self.lon, self.lat = meshgrid(data.lon, data.lat)
 
@@ -270,3 +270,7 @@ class GSLatLonGrid(GSLatLonData):
     @property
     def globe(self) -> Globe:
         return self.crs.globe
+
+    @property
+    def region(self) -> RectangularRegion:
+        return self._region

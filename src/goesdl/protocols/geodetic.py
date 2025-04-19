@@ -50,23 +50,26 @@ class GeodeticRegion(Protocol):
     latitude range (min_lat, max_lat).
     """
 
-    extent: RegionExtent
-    """
-    The extent of the region of interest as a tuple of (min_lon,
-    max_lon, min_lat, max_lat).
-    """
+    @property
+    def extent(self) -> RegionExtent:
+        """
+        The extent of the region of interest as a tuple of (min_lon,
+        max_lon, min_lat, max_lat).
+        """
 
-    lat_bounds: CoordRange
-    """
-    The latitude bounds of the region of interest as a tuple of
-    (min_lat, max_lat).
-    """
+    @property
+    def lat_bounds(self) -> CoordRange:
+        """
+        The latitude bounds of the region of interest as a tuple of
+        (min_lat, max_lat).
+        """
 
-    lon_bounds: CoordRange
-    """
-    The longitude bounds of the region of interest as a tuple of
-    (min_lon, max_lon).
-    """
+    @property
+    def lon_bounds(self) -> CoordRange:
+        """
+        The longitude bounds of the region of interest as a tuple of
+        (min_lon, max_lon).
+        """
 
     xticks: ArrayFloat32
     """
@@ -145,8 +148,9 @@ class GeodeticGrid(Protocol):
     used to slice the data.
     """
 
-    region: GeodeticRegion
-    """
-    The region of interest. The region is used to find the array
-    indices to slice the data.
-    """
+    @property
+    def region(self) -> GeodeticRegion:
+        """
+        The region of interest. The region is used to find the array
+        indices to slice the data.
+        """
