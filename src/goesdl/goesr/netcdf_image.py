@@ -19,10 +19,10 @@ from numpy import float32, int8, int16, int32, nan
 from numpy.typing import NDArray
 
 from ..geodesy import RectangularRegion
-from ..netcdf import DatasetView, HasStrHelp, scalar, variable
+from ..netcdf import DatasetView, HasStrHelp, computed, scalar, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .netcdf_geodetic import GOESLatLonGrid, GSLatLonGrid
+from .netcdf_geodetic import GOESLatLonGrid
 
 cmip = variable("CMI")
 
@@ -69,7 +69,12 @@ class GOESImageMetadataCMI(GOESImageMetadata):
 
     sensor_band_bit_depth: int8 = cmip.attribute()
     resolution: str = cmip.attribute()
-    range: ArrayFloat32
+    range: ArrayFloat32 = computed()
+
+    def __post_init__(self, record, **kwargs) -> None:
+        cmip = record.variables["CMI"]
+        range_ = cmip.valid_range * cmip.scale_factor + cmip.add_offset
+        object.__setattr__(self, "range", range_)
 
 
 class ImageData(Protocol):
@@ -156,5 +161,5 @@ class GOESImage(GOESImageData):
         return self._grid.region
 
     @property
-    def grid(self) -> GSLatLonGrid:
+    def grid(self) -> GOESLatLonGrid:
         return self._grid
