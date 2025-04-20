@@ -22,7 +22,7 @@ class EventTracker:
 
     def get(self, t: float) -> tuple[float, float]:
         """
-        Interpolate the latitude and longitude for a given timestamp.
+        Interpolate the longitude and latitude for a given timestamp.
 
         If the timestamp is outside the range of the track data,
         extrapolation is performed.
@@ -30,13 +30,13 @@ class EventTracker:
         Parameters
         ----------
         t : float
-            The tage timestamp for which to interpolate the latitude and
-            longitude.
+            The tage timestamp for which to interpolate the longitude
+            and latitude.
 
         Returns
         -------
         tuple[float, float]
-            A tuple containing the interpolated latitude and longitude.
+            A tuple containing the interpolated longitude and latitude.
         """
         return self._interpolate_coordinates(
             t, self.timestamps, self.longitudes, self.latitudes
@@ -110,7 +110,7 @@ class EventTracker:
         Returns
         -------
         tuple[float, float]
-            A tuple containing the interpolated latitude and longitude.
+            A tuple containing the interpolated longitude and latitude.
         """
         # Interpolate or extrapolate for the given timestamp
         lon_interp = cls._interpolate_value(t, timestamps, longitudes)
