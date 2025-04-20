@@ -99,7 +99,7 @@ class GOESImage(GOESImageData):
     metadata: GOESImageMetadata
 
     def __init__(
-        self, record: Dataset, field: str, grid: GOESLatLonGrid
+        self, record: Dataset, grid: GOESLatLonGrid, field: str = "CMI"
     ) -> None:
         # Validate channel parameter
         self._validate_field(field, record)
