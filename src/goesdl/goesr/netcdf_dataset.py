@@ -15,7 +15,7 @@ from typing import Any
 
 from netCDF4 import Dataset
 
-from ..netcdf import DatasetView, HasStrHelp, dimension
+from ..netcdf import HasStrHelp, dimension
 from .databook import (
     PIXELS_PER_DEGREE,
     abstract_goesr,
@@ -28,13 +28,14 @@ from .databook import (
     square_igfov_at_nadir_goesr,
     wavelength_goesr,
 )
+from .netcdf_platform import GOESPlatformMetadata
 
 NAN_TUPLE = math.nan, math.nan
 
 NA = "not available"
 
 
-class GOESDatasetMetadata(DatasetView):
+class GOESDatasetMetadata(GOESPlatformMetadata):
     """
     Hold GOES dataset metadata information.
 
