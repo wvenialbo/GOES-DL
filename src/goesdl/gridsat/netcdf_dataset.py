@@ -1,7 +1,7 @@
 import math
 from typing import Any
 
-from netCDF4 import Dataset  # pylint: disable=no-name-in-module
+from netCDF4 import Dataset
 
 from ..netcdf import HasStrHelp, attribute
 from .constants import NA
@@ -22,11 +22,42 @@ from .databook_gc import (
     wavelength_range_upper_bound,
 )
 from .netcdf_platform import PlatformMetadata
+from .validation_gc import validate_channel
+
+
+class GSDatasetMetadata(PlatformMetadata):
+
+    title: str = attribute()
+    id: str = attribute()
+    summary: str = attribute()
+    conventions: str = attribute("Conventions")
+    license: str = attribute()
+    processing_level: str = attribute()
+    product_version: str = attribute()
+    project: str = attribute()
+    institution: str = attribute()
+    comment: str = attribute()
+    instrument: str = attribute()
+    keywords: str = attribute()
+    platform_vocabulary: str = attribute()
+    sensor_vocabulary: str = attribute()
+    keywords_vocabulary: str = attribute()
+    naming_authority: str = attribute()
+    standard_name_vocabulary: str = attribute()
+    metadata_link: str = attribute()
+    ncei_template_version: str = attribute()
+    date_created: str = attribute()
+    date_modified: str = attribute()
+    projection: str = attribute("Projection")
+    time_coverage_start: str = attribute()
+    time_coverage_end: str = attribute()
+    history: str = attribute()
+
 
 NAN_TUPLE = math.nan, math.nan
 
 
-class DatabookMetadata(HasStrHelp):
+class GSDatabookInfo(HasStrHelp):
 
     dataset: str = NA
     abstract: str = NA
@@ -86,58 +117,14 @@ class DatabookMetadata(HasStrHelp):
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
 
 
-class DatasetMetadata(PlatformMetadata):
-
-    title: str = attribute()
-    id: str = attribute()
-    summary: str = attribute()
-    conventions: str = attribute("Conventions")
-    license: str = attribute()
-    processing_level: str = attribute()
-    product_version: str = attribute()
-    project: str = attribute()
-    institution: str = attribute()
-    comment: str = attribute()
-    instrument: str = attribute()
-    keywords: str = attribute()
-    platform_vocabulary: str = attribute()
-    sensor_vocabulary: str = attribute()
-    keywords_vocabulary: str = attribute()
-    naming_authority: str = attribute()
-    standard_name_vocabulary: str = attribute()
-    metadata_link: str = attribute()
-    ncei_template_version: str = attribute()
-    date_created: str = attribute()
-    date_modified: str = attribute()
-    projection: str = attribute("Projection")
-    time_coverage_start: str = attribute()
-    time_coverage_end: str = attribute()
-    history: str = attribute()
-
-
-class GSDatasetMetadata(DatabookMetadata, DatasetMetadata):
+class GSDatasetInfo(GSDatabookInfo, GSDatasetMetadata):
 
     def __init__(self, record: Dataset, channel: str) -> None:
-        # Validate channel parameter
-        if channel not in channel_description_gc:
-            allowed_channels = ", ".join(channel_description_gc.keys())
-            raise ValueError(
-                f"Invalid 'channel': '{channel}'; "
-                f"allowed channels are: {allowed_channels}"
-            )
+        validate_channel(channel, record)
 
-        DatasetMetadata.__init__(self, record, channel=channel)
+        GSDatasetMetadata.__init__(self, record, channel=channel)
 
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         channel: str = kwargs["channel"]
 
-        channel_correspondence_map = channel_correspondence[self.origin]
-        channel_orig = channel_correspondence_map[channel]
-
-        if channel_orig == 0:
-            raise ValueError(
-                f"Channel '{channel}' is not available "
-                f"for platform '{self.platform}'"
-            )
-
-        DatabookMetadata.__init__(self, channel, self.platform)
+        GSDatabookInfo.__init__(self, channel, self.platform)

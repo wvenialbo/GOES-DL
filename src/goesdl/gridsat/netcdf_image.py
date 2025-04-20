@@ -5,11 +5,11 @@ from numpy import nan
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
+from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .databook_gc import channel_correspondence, channel_description_gc
 from .metadata import MeasurementMetadata
-from .netcdf_geodetic import GSLatLonGrid, LimitType
-from .netcdf_platform import PlatformMetadata
+from .netcdf_geodetic import GSLatLonGrid
+from .validation_gc import validate_channel
 
 
 class GSImageData(HasStrHelp):
@@ -19,7 +19,7 @@ class GSImageData(HasStrHelp):
 
 class GSImage(GSImageData):
 
-    grid: GSLatLonGrid
+    _grid: GSLatLonGrid
 
     metadata: MeasurementMetadata
 
@@ -27,28 +27,13 @@ class GSImage(GSImageData):
         self, record: Dataset, channel: str, grid: GSLatLonGrid
     ) -> None:
         # Validate channel parameter
-        if channel not in channel_description_gc:
-            allowed_channels = ", ".join(channel_description_gc.keys())
-            raise ValueError(
-                f"Invalid 'channel': '{channel}'; "
-                f"allowed channels are: {allowed_channels}"
-            )
-
-        # Validate channel availability for the current platform
-        pinfo = PlatformMetadata(record)
-        channel_orig = channel_correspondence[pinfo.origin][channel]
-
-        if channel_orig == 0:
-            raise ValueError(
-                f"Channel '{channel}' is not available "
-                f"for platform '{pinfo.platform}'"
-            )
+        validate_channel(channel, record)
 
         data = self._extract_image(
             record, channel, grid.lon_limits, grid.lat_limits
         )
 
-        self.grid = grid
+        self._grid = grid
         self.raster = data.raster
 
         self.metadata = self._extract_metadata(record, channel)
@@ -57,8 +42,8 @@ class GSImage(GSImageData):
     def _extract_image(
         record: Dataset,
         channel: str,
-        lon_limits: LimitType,
-        lat_limits: LimitType,
+        lon_limits: IndexRange,
+        lat_limits: IndexRange,
     ) -> "GSImageData":
         def slice(x: Any) -> Any:
             min_lon, max_lon = lon_limits
@@ -78,7 +63,7 @@ class GSImage(GSImageData):
     def _extract_metadata(record: Dataset, name: str) -> MeasurementMetadata:
         measurement = variable(name)
 
-        class _ImageMetata(DatasetView):
+        class _GSImageMetadata(DatasetView):
             long_name: str = measurement.attribute()
             standard_name: str = measurement.attribute()
             units: str = measurement.attribute()
@@ -87,7 +72,7 @@ class GSImage(GSImageData):
             range: ArrayFloat32 = measurement.attribute("actual_range")
             shape: tuple[int] = measurement.attribute()
 
-        metadata = _ImageMetata(record)
+        metadata = _GSImageMetadata(record)
 
         return MeasurementMetadata(metadata)
 
@@ -101,4 +86,8 @@ class GSImage(GSImageData):
 
     @property
     def region(self) -> RectangularRegion:
-        return self.grid.region
+        return self._grid.region
+
+    @property
+    def grid(self) -> GSLatLonGrid:
+        return self._grid

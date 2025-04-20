@@ -10,10 +10,31 @@ GOESDatasetInfo
     Represent GOES dataset metadata attributes.
 """
 
-from ..netcdf import DatasetView, dimension
+import math
+from typing import Any
+
+from netCDF4 import Dataset
+
+from ..netcdf import DatasetView, HasStrHelp, dimension
+from .databook import (
+    PIXELS_PER_DEGREE,
+    abstract_goesr,
+    channel_correspondence_goesr,
+    channel_description_goesr,
+    dataset_name_goesr,
+    geospatial_resolution_deg,
+    geospatial_resolution_km,
+    origin_platform_goesr,
+    square_igfov_at_nadir_goesr,
+    wavelength_goesr,
+)
+
+NAN_TUPLE = math.nan, math.nan
+
+NA = "not available"
 
 
-class GOESDatasetInfo(DatasetView):
+class GOESDatasetMetadata(DatasetView):
     """
     Hold GOES dataset metadata information.
 
@@ -96,3 +117,65 @@ class GOESDatasetInfo(DatasetView):
     production_data_source: str
     y: int = dimension.size()
     x: int = dimension.size()
+
+
+class GOESDatabookInfo(HasStrHelp):
+
+    dataset: str = NA
+    abstract: str = NA
+    description: str = NA
+    channel_id: str = NA
+    channel: str = NA
+    geospatial_resolution_deg: tuple[float, float] = NAN_TUPLE
+    geospatial_resolution_km: tuple[float, float] = NAN_TUPLE
+    pixels_per_degree: int = PIXELS_PER_DEGREE
+    square_fov_at_nadir: float = math.nan
+    wavelength: float = math.nan
+
+    def __init__(self, channel: str, origin: str) -> None:
+        # Validate origin parameter
+        if origin not in origin_platform_goesr:
+            allowed_origins = ", ".join(origin_platform_goesr.keys())
+            raise ValueError(
+                f"Invalid 'origin': '{origin}'; "
+                f"allowed origins are: {allowed_origins}"
+            )
+
+        self.dataset = dataset_name_goesr
+        self.abstract = abstract_goesr
+
+        self.description = channel_description_goesr[channel]
+
+        self.channel_id = channel
+        channel_orig = channel_correspondence_goesr[channel]
+        self.channel = f"Channel {channel_orig}"
+
+        self.geospatial_resolution_deg = geospatial_resolution_deg
+        self.geospatial_resolution_km = geospatial_resolution_km
+
+        self.square_fov_at_nadir = square_igfov_at_nadir_goesr[channel]
+
+        self.wavelength = wavelength_goesr[channel]
+
+
+class GOESDatasetInfo(GOESDatabookInfo, GOESDatasetMetadata):
+
+    def __init__(self, record: Dataset, channel: str) -> None:
+        self._validate_channel(channel)
+
+        GOESDatasetMetadata.__init__(self, record, channel=channel)
+
+    def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
+        channel: str = kwargs["channel"]
+
+        GOESDatabookInfo.__init__(self, channel, self.platform)
+
+    @staticmethod
+    def _validate_channel(channel: str) -> None:
+        # Validate field id
+        if channel not in channel_correspondence_goesr:
+            allowed_channels = ", ".join(channel_correspondence_goesr.keys())
+            raise ValueError(
+                f"Invalid 'channel': '{channel}'; "
+                f"allowed channels are: {allowed_channels}"
+            )

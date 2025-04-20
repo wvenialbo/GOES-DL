@@ -7,10 +7,10 @@ from numpy import concatenate, flatnonzero, float32, meshgrid
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, attribute, variable
+from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32
 from .metadata import CoordinateMetadata, VariableMetadata
 
-LimitType = tuple[int, int]
 MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 
 
@@ -33,13 +33,13 @@ class GeodeticSummary(DatasetView):
 
 class GSLatLonGrid(GSLatLonData):
 
-    region: RectangularRegion
+    _region: RectangularRegion
 
     lon: ArrayFloat32
     lat: ArrayFloat32
 
-    lon_limits: LimitType
-    lat_limits: LimitType
+    lon_limits: IndexRange
+    lat_limits: IndexRange
 
     metadata: MetadataType
 
@@ -71,12 +71,11 @@ class GSLatLonGrid(GSLatLonData):
             region = self._extract_region(record)
             data, lon_limits, lat_limits = self._full_frame(record, corners)
 
-        self.region = region
+        self._region = region
 
         self.lon, self.lat = meshgrid(data.lon, data.lat)
 
-        self.lon_limits = lon_limits
-        self.lat_limits = lat_limits
+        self.lon_limits, self.lat_limits = lon_limits, lat_limits
 
         # Create the source projection (Platé-Carrée projection on GRS80
         # ellipsoid)
@@ -93,10 +92,10 @@ class GSLatLonGrid(GSLatLonData):
     def _extract(
         record: Dataset,
         step: int | None,
-        lon_limits: LimitType | None,
-        lat_limits: LimitType | None,
+        lon_limits: IndexRange | None,
+        lat_limits: IndexRange | None,
     ) -> "GSLatLonData":
-        def subsample(limits: LimitType | None) -> Callable[[Any], Any]:
+        def subsample(limits: IndexRange | None) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
                 skip = step or None
@@ -119,10 +118,10 @@ class GSLatLonGrid(GSLatLonData):
     @staticmethod
     def _extract_bounds(
         record: Dataset,
-        lon_limits: LimitType | None,
-        lat_limits: LimitType | None,
+        lon_limits: IndexRange | None,
+        lat_limits: IndexRange | None,
     ) -> "GSLatLonData":
-        def subsample(limits: LimitType | None) -> Callable[[Any], Any]:
+        def subsample(limits: IndexRange | None) -> Callable[[Any], Any]:
             def closure(x: Any) -> Any:
                 begin, end = limits or (None, None)
                 coord = x[begin:end]
@@ -198,16 +197,22 @@ class GSLatLonGrid(GSLatLonData):
         coord: ArrayFloat32,
         min_max: tuple[float, float],
         delta: int,
-        offset: int = 0,
-    ) -> LimitType:
+        offset: int,
+    ) -> IndexRange:
         min_value, max_value = min_max
+
+        if min_value > coord[-1] or max_value < coord[0]:
+            raise ValueError(
+                "Region out of range, empty selection: "
+                f"[{min_value}, {max_value}] not in [{coord[0]}, {coord[-1]}]"
+            )
 
         min_indices = flatnonzero(coord < min_value)
         min_bound = min_indices[-1] if min_indices.size > 0 else 0
 
         max_indices = flatnonzero(coord > max_value)
         max_bound = max_indices[0] if max_indices.size > 0 else -1
-        max_bound = max_bound + 1 if max_bound >= 0 else coord.size
+        max_bound = max_bound if max_bound >= 0 else coord.size
 
         return int(min_bound * delta + offset), int(max_bound * delta + offset)
 
@@ -216,7 +221,7 @@ class GSLatLonGrid(GSLatLonData):
         cls,
         record: Dataset,
         corners: bool,
-    ) -> tuple["GSLatLonData", LimitType, LimitType]:
+    ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
         if corners:
             data = cls._extract_bounds(record, None, None)
             lon_limits = 0, data.lon.size - 1
@@ -244,20 +249,22 @@ class GSLatLonGrid(GSLatLonData):
         region: RectangularRegion,
         delta: int,
         corners: bool,
-    ) -> tuple["GSLatLonData", LimitType, LimitType]:
+    ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
         data = cls._extract(record, delta, None, None)
 
-        lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta)
-        lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta)
+        lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta, 0)
+        lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta, 0)
 
         if delta > 1:
+            lon_offset, lat_offset = lon_limits[0], lat_limits[0]
+
             data = cls._extract(record, None, lon_limits, lat_limits)
 
             lon_limits = cls._find_limits(
-                data.lon, region.lon_bounds, 1, lon_limits[0]
+                data.lon, region.lon_bounds, 1, lon_offset
             )
             lat_limits = cls._find_limits(
-                data.lat, region.lat_bounds, 1, lat_limits[0]
+                data.lat, region.lat_bounds, 1, lat_offset
             )
 
         if corners:
@@ -270,3 +277,7 @@ class GSLatLonGrid(GSLatLonData):
     @property
     def globe(self) -> Globe:
         return self.crs.globe
+
+    @property
+    def region(self) -> RectangularRegion:
+        return self._region

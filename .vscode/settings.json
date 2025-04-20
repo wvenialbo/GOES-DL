@@ -95,6 +95,10 @@
         "--no-pretty",
         "--show-column-numbers",
     ],
+    "mypy-type-checker.ignorePatterns": [
+        "**/experimental",
+        "**/experimental/**"
+    ],
     "mypy-type-checker.importStrategy": "fromEnvironment",
     "pylint.importStrategy": "fromEnvironment",
     "pylint.enabled": true,
@@ -154,6 +158,22 @@
     "python.analysis.autoImportCompletions": true,
     "python.analysis.completeFunctionParens": true,
     "python.analysis.enableSyncServer": false,
+    "python.analysis.exclude": [
+        "**/.venv",
+        "**/.venv/**",
+        "**/__pycache__",
+        "**/__pycache__/**",
+        "**/.mypy_cache",
+        "**/.mypy_cache/**",
+        "**/.ruff_cache",
+        "**/.ruff_cache/**",
+        "**/.pytest_cache",
+        "**/.pytest_cache/**",
+        "**/.ipynb_checkpoints",
+        "**/.ipynb_checkpoints/**",
+        "**/experimental",
+        "**/experimental/**",
+    ],
     "python.analysis.fixAll": [
         // "source.convertImportFormat",
         "source.unusedImports",
@@ -255,7 +275,7 @@
     "evenBetterToml.semanticTokens": true,
     // MarkDown editor settings
     "[markdown]": {
-        "editor.defaultFormatter": "vscode.markdown-language-features",
+        "editor.defaultFormatter": "yzhang.markdown-all-in-one",
         "editor.quickSuggestions": {
             "comments": "off",
             "other": "on",
@@ -322,16 +342,27 @@
             "description": "Color enhancement utility subpackage modules (mid)"
         },
         {
-            "scope": "geodesy"
+            "scope": "geodesy",
+            "description": "Geodesy utility subpackage modules (mid)"
         },
         {
-            "scope": "netcdf"
+            "scope": "netcdf",
+            "description": "NetCDF utility subpackage modules (mid)"
         },
         {
-            "scope": "gridsat"
+            "scope": "gridsat",
+            "description": "GridSat utility subpackage modules (mid)"
         },
         {
-            "scope": "experimental"
+            "scope": "experimental",
+            "description": "Experimental subpackage modules (low)"
+        },
+        {
+            "scope": "protocols",
+            "description": "Protocols subpackage modules (low)"
+        },
+        {
+            "scope": "goesr"
         }
     ],
     // AI assistance tools settings
@@ -341,11 +372,9 @@
             "text": "In Python always generate NumPy style docstrings (numpydoc).",
         }
     ],
-    "github.copilot.chat.fixTestFailure.enabled": true,
     "github.copilot.chat.scopeSelection": true,
     "github.copilot.chat.search.semanticTextResults": true,
     "github.copilot.chat.useProjectTemplates": true,
-    "github.copilot.editor.enableAutoCompletions": true,
     "github.copilot.editor.enableCodeActions": true,
     "github.copilot.renameSuggestions.triggerAutomatically": true,
     "github.copilot.enable": {

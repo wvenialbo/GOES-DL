@@ -6,9 +6,10 @@ from numpy import datetime64, float64, nan, newaxis
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, scalar, variable
+from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat64, ArrayInt8, MaskedFloat32
 from .metadata import DeltaTimeMetadata, TimeMetadata, VariableMetadata
-from .netcdf_geodetic import GSLatLonGrid, LimitType
+from .netcdf_geodetic import GSLatLonGrid
 
 SECONDS_IN_DAY = 86400
 SECONDS_IN_MINUTE = 60
@@ -98,8 +99,8 @@ class GSTimeGrid(GSTimeData):
     @staticmethod
     def _extract_timedata(
         record: Dataset,
-        lon_limits: LimitType,
-        lat_limits: LimitType,
+        lon_limits: IndexRange,
+        lat_limits: IndexRange,
     ) -> "GSTimeData":
         def slice(x: Any) -> Any:
             min_lon, max_lon = lon_limits

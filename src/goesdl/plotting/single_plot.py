@@ -7,30 +7,9 @@ from cartopy.mpl.ticker import LatitudeFormatter, LongitudeFormatter
 from matplotlib import pyplot as plt
 from matplotlib.collections import QuadMesh
 from matplotlib.ticker import MultipleLocator
-from netCDF4 import Dataset
 
 from ..enhancement import EnhancementScale, cmap
-from ..geodesy import RectangularRegion
-from .netcdf_geodetic import GSLatLonGrid
-from .netcdf_image import GSImage
-from .netcdf_metadata import GSDatasetMetadata
-from .netcdf_time import GSCoverageTime
-
-# Create the Natural Earth projection (Platé-Carrée projection on WGS84 ellipsoid)
-
-
-def read_gridsat_dataset(
-    dataframe: Dataset, channel: str, region: RectangularRegion
-) -> tuple[GSImage, GSCoverageTime, GSDatasetMetadata]:
-    grid = GSLatLonGrid(dataframe, region)  # , corners=True
-
-    data = GSImage(dataframe, channel, grid)
-
-    coverage = GSCoverageTime(dataframe)
-
-    metadata = GSDatasetMetadata(dataframe, channel)
-
-    return data, coverage, metadata
+from ..protocols import GeodeticRegion, SatImageData
 
 
 class GSPlotParameter:
@@ -38,6 +17,17 @@ class GSPlotParameter:
     title: str | tuple[str, str] = ""
     axis_label: tuple[str, str] = "", ""
     cbar_label: str = ""
+
+    fig_width_px = 712
+    fig_height_px = 800
+    top_margin_px = 50
+    bottom_margin_px = 150
+    left_margin_px = 88
+    right_margin_px = 24
+    cbar_bottom_px = 64
+    cbar_height_px = 16
+    watermark_bottom_px = 7
+    fig_dpi = 200
 
     def __init__(
         self,
@@ -52,14 +42,16 @@ class GSPlotParameter:
 
 class GSPlot:
 
-    # The figure dimensions (in inches)
-    fig_size: tuple[float, float] = 4.0, 4.0
-
-    # The figure resolution (in number of dots per inch)
+    # The figure/image resolution (in number of dots per inch)
     fig_dpi: int = 200
 
-    # The image output resolution (in number of dots per inch)
-    img_dpi: int = 200
+    # The figure dimensions (in inches)
+    fig_size: tuple[float, float] = 2.0, 2.0
+
+    axes_box: tuple[float, float, float, float] = 0.0, 0.0, 0.0, 0.0
+    cbar_box: tuple[float, float, float, float] = 0.0, 0.0, 0.0, 0.0
+    plot_edges: tuple[float, float, float, float] = 0.0, 0.0, 0.0, 0.0
+    watermark_loc: tuple[float, float] = 0.0, 0.0
 
     near_earth_scale: str = "10m"
 
@@ -78,16 +70,27 @@ class GSPlot:
 
     def plot(
         self,
-        image: GSImage,
+        image: SatImageData,
         param: GSPlotParameter,
         save_path: str = "",
         show: bool = True,
     ) -> None:
+        # Setup the figure and axes boxes
+        self._setup_boxes(param)
+
         # Create the figure and setup the axes
         fig = plt.figure("map", figsize=self.fig_size, dpi=self.fig_dpi)
 
         # Create the axes ith the required projection, i.e., `target_crs` (see definition above)
-        ax = fig.add_axes((0.1, 0.16, 0.80, 0.75), projection=self.crs)
+        ax = fig.add_axes(self.axes_box, projection=self.crs)
+
+        # Adjust the subplots margins
+        fig.subplots_adjust(
+            left=self.plot_edges[0],
+            bottom=self.plot_edges[1],
+            right=self.plot_edges[2],
+            top=self.plot_edges[3],
+        )
 
         self._add_grid(ax, image.region, param.axis_label)
 
@@ -105,9 +108,12 @@ class GSPlot:
 
         self._add_title(ax, param.title)
 
+        # Add a watermark to the plot
+        self._add_watermark(fig)
+
         # Save the media file (ensure the destination path does exist)
         if save_path:
-            plt.savefig(save_path, dpi=self.img_dpi, bbox_inches="tight")
+            plt.savefig(save_path, dpi=self.fig_dpi, bbox_inches=None)
 
         # Show the plot
         if show:
@@ -116,15 +122,15 @@ class GSPlot:
             plt.close()
 
     def save(
-        self, save_path: str, image: GSImage, param: GSPlotParameter
+        self, save_path: str, image: SatImageData, param: GSPlotParameter
     ) -> None:
         self.plot(image, param, save_path, False)
 
-    def show(self, image: GSImage, param: GSPlotParameter) -> None:
+    def show(self, image: SatImageData, param: GSPlotParameter) -> None:
         self.plot(image, param)
 
     def _add_admin_info(self, ax: plt.Axes) -> None:  # type: ignore
-        # Create the Natural Earth projection (Platé-Carrée projection
+        # Create the Natural Earth projection (Plate-Carrée projection
         # on WGS84 ellipsoid)
 
         natearth_globe = ccrs.Globe(ellipse="WGS84")
@@ -164,7 +170,7 @@ class GSPlot:
     ) -> None:
 
         # Add the colorbar
-        caxes = fig.add_axes([0.12, 0.05, 0.76, 0.02])
+        caxes = fig.add_axes(self.cbar_box)
         cb = plt.colorbar(
             mesh,
             ticks=self.enhancement.cticks,
@@ -179,7 +185,7 @@ class GSPlot:
         # Set the colorbar tick characteristics
         cb.ax.xaxis.set_minor_locator(minor_locator)
         cb.ax.tick_params(
-            labelsize=4,
+            labelsize=4.0,
             labelcolor="black",
             width=0.5,
             length=2.0,
@@ -189,8 +195,6 @@ class GSPlot:
         cb.ax.tick_params(axis="both", which="minor", length=1.5, width=0.4)
 
         # Set the colorbar caption
-        # f"{cmi_entity} {cmi_measure} [{cmi_units}]" -> TOA Brightness Temperature
-        # cb_label = f"{image.metadata.long_name} @ {metadata.wavelength:.1f} μm [{image.metadata.units}]"
         cb.set_label(label=label, size=5.0, color="black", weight="normal")
 
         # Set the colorbar characteristics
@@ -208,7 +212,7 @@ class GSPlot:
     def _add_grid(
         self,
         ax: plt.Axes,  # type: ignore
-        region: RectangularRegion,
+        region: GeodeticRegion,
         labels: tuple[str, str],
     ) -> None:
 
@@ -248,7 +252,7 @@ class GSPlot:
         ax.set_xlabel(
             labels[0],
             color="black",
-            fontsize=6,
+            fontsize=6.0,
             labelpad=3.0,
         )
 
@@ -258,7 +262,7 @@ class GSPlot:
         ax.set_ylabel(
             labels[1],
             color="black",
-            fontsize=6,
+            fontsize=6.0,
             labelpad=3.0,
         )
 
@@ -272,16 +276,30 @@ class GSPlot:
     ) -> None:
         # Set the title
         if isinstance(title, str):
-            plt.title(title)
+            plt.title(title, fontsize=7.0)
             return
 
         ax.set_title(title[0], fontsize=6.5, loc="left")
         ax.set_title(title[1], fontsize=6.5, loc="right")
 
+    def _add_watermark(self, fig: plt.Figure) -> None:  # type: ignore
+        fig.text(
+            self.watermark_loc[0],
+            self.watermark_loc[1],
+            "Generated by GOES-DL",
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            fontsize=4.0,
+            color="gray",
+            alpha=0.5,
+            zorder=1000,
+            transform=fig.transFigure,
+        )
+
     def _plot_data(
         self,
         ax: plt.Axes,  # type: ignore
-        data: GSImage,
+        data: SatImageData,
     ) -> QuadMesh:
         # Plot the data (in `gcrs`, see definition above) with a color map from the stock
         # shading;
@@ -299,3 +317,40 @@ class GSPlot:
         )
 
         return cast(QuadMesh, mesh)
+
+    def _setup_boxes(self, param: GSPlotParameter) -> None:
+        self.fig_dpi = param.fig_dpi
+        self.fig_size = (
+            param.fig_width_px / self.fig_dpi,
+            param.fig_height_px / self.fig_dpi,
+        )
+        self.axes_box = (
+            param.left_margin_px / param.fig_width_px,
+            param.bottom_margin_px / param.fig_height_px,
+            (param.fig_width_px - param.left_margin_px - param.right_margin_px)
+            / param.fig_width_px,
+            (
+                param.fig_height_px
+                - param.top_margin_px
+                - param.bottom_margin_px
+            )
+            / param.fig_height_px,
+        )
+        self.cbar_box = (
+            param.left_margin_px / param.fig_width_px,
+            param.cbar_bottom_px / param.fig_height_px,
+            (param.fig_width_px - param.left_margin_px - param.right_margin_px)
+            / param.fig_width_px,
+            param.cbar_height_px / param.fig_height_px,
+        )
+        self.plot_edges = (
+            param.left_margin_px / param.fig_width_px,
+            param.bottom_margin_px / param.fig_height_px,
+            (param.fig_width_px - param.right_margin_px) / param.fig_width_px,
+            (param.fig_height_px - param.top_margin_px) / param.fig_height_px,
+        )
+        self.watermark_loc = (
+            (param.fig_width_px - param.watermark_bottom_px)
+            / param.fig_width_px,
+            param.watermark_bottom_px / param.fig_height_px,
+        )
