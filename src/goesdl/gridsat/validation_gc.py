@@ -1,14 +1,11 @@
-from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-
 from .databook_gc import (
     channel_correspondence,
     channel_description_gc,
     platform_origin_gridsat_gc,
 )
-from .netcdf_platform import GSPlatformMetadata
 
 
-def validate_channel(channel: str, record: Dataset) -> None:
+def validate_channel(channel: str, origin: str) -> None:
     # Validate channel id
     if channel not in channel_description_gc:
         allowed_channels = ", ".join(channel_description_gc.keys())
@@ -18,14 +15,12 @@ def validate_channel(channel: str, record: Dataset) -> None:
         )
 
     # Validate channel availability for the current platform
-    pinfo = GSPlatformMetadata(record)
-    channel_correspondence_map = channel_correspondence[pinfo.origin]
+    channel_correspondence_map = channel_correspondence[origin]
     channel_orig = channel_correspondence_map[channel]
 
     if channel_orig == 0:
         raise ValueError(
-            f"Channel '{channel}' is not available "
-            f"for platform '{pinfo.platform}'"
+            f"Channel '{channel}' is not available for origin '{origin}'"
         )
 
 
