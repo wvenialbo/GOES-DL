@@ -3,7 +3,7 @@ from .databook import origin_platform_goesr
 
 
 class GOESPlatformMetadata(DatasetView):
-    platformID: str = attribute()
+    platformID: str = attribute("platform_ID")
 
     @property
     def platform(self) -> str:

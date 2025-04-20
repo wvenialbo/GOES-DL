@@ -99,7 +99,6 @@ class GOESDatasetMetadata(GOESPlatformMetadata):
     production_environment: str
     spatial_resolution: str
     orbital_slot: str
-    platform_ID: str  # NOSONAR
     instrument_type: str
     scene_id: str
     instrument_ID: str  # NOSONAR
