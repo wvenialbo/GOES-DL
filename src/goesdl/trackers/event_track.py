@@ -4,8 +4,9 @@ from .track_info import TrackInfo
 from .tracker_stock import (
     DEFAULT_TRACKER_ID,
     track_parsers_stock,
+    validate_supported_dataset,
 )
-from .validation import validate_dataset_file, validate_supported_dataset
+from .validation import validate_dataset_file
 
 
 class EventTrackDataset:
