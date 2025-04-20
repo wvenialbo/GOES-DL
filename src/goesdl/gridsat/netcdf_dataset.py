@@ -21,11 +21,11 @@ from .databook_gc import (
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
 )
-from .netcdf_platform import PlatformMetadata
+from .netcdf_platform import GSPlatformMetadata
 from .validation_gc import validate_channel
 
 
-class GSDatasetMetadata(PlatformMetadata):
+class GSDatasetMetadata(GSPlatformMetadata):
 
     title: str = attribute()
     id: str = attribute()
