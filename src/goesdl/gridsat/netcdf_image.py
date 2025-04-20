@@ -24,7 +24,7 @@ class GSImage(GSImageData):
     metadata: MeasurementMetadata
 
     def __init__(
-        self, record: Dataset, channel: str, grid: GSLatLonGrid
+        self, record: Dataset, grid: GSLatLonGrid, channel: str
     ) -> None:
         # Validate channel parameter
         validate_channel(channel, record)
