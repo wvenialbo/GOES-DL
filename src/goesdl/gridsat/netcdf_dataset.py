@@ -57,7 +57,7 @@ class GSDatasetMetadata(PlatformMetadata):
 NAN_TUPLE = math.nan, math.nan
 
 
-class DatabookMetadata(HasStrHelp):
+class GSDatabookInfo(HasStrHelp):
 
     dataset: str = NA
     abstract: str = NA
@@ -117,7 +117,7 @@ class DatabookMetadata(HasStrHelp):
         self.square_fov_at_nadir = square_igfov_at_nadir[origin][channel_orig]
 
 
-class GSDatasetInfo(DatabookMetadata, GSDatasetMetadata):
+class GSDatasetInfo(GSDatabookInfo, GSDatasetMetadata):
 
     def __init__(self, record: Dataset, channel: str) -> None:
         validate_channel(channel, record)
@@ -127,4 +127,4 @@ class GSDatasetInfo(DatabookMetadata, GSDatasetMetadata):
     def __post_init__(self, record: Dataset, **kwargs: Any) -> None:
         channel: str = kwargs["channel"]
 
-        DatabookMetadata.__init__(self, channel, self.platform)
+        GSDatabookInfo.__init__(self, channel, self.platform)
