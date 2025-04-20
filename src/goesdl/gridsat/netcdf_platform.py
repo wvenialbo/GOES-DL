@@ -4,7 +4,7 @@ from ..netcdf import DatasetView, attribute
 from .databook_gc import platform_origin_gridsat_gc
 
 
-class PlatformMetadata(DatasetView):
+class GSPlatformMetadata(DatasetView):
     platform_domain: str = attribute("platform")
 
     @property

@@ -1,7 +1,7 @@
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 
 from .databook_gc import channel_correspondence, channel_description_gc
-from .netcdf_platform import PlatformMetadata
+from .netcdf_platform import GSPlatformMetadata
 
 
 def validate_channel(channel: str, record: Dataset) -> None:
@@ -14,7 +14,7 @@ def validate_channel(channel: str, record: Dataset) -> None:
         )
 
     # Validate channel availability for the current platform
-    pinfo = PlatformMetadata(record)
+    pinfo = GSPlatformMetadata(record)
     channel_correspondence_map = channel_correspondence[pinfo.origin]
     channel_orig = channel_correspondence_map[channel]
 

@@ -278,6 +278,7 @@ downloader.get_files(files2_filtered)
 
 1. [Hurricane Félix — Parallax effect](https://colab.research.google.com/drive/12aH5OIRPEcaWoL9e3atYDJekZPczVca9?usp=sharing)
 2. [Storm-2012 — La tempestad en Roque Alonso](https://colab.research.google.com/drive/12aH5OIRPEcaWoL9e3atYDJekZPczVca9?usp=sharing)
+3. [MCC-2020 — A Mesoscale Convective System](https://colab.research.google.com/drive/1GngYyzRFRHx2Cte8FHNhr7Bz7x90n-0s?usp=sharing)
 
 ## Pipeline and parameters
 
@@ -396,7 +397,7 @@ When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
 > Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.2-rc6)* [Software]. GitHub.
+> GOES and GridSat-B1 satellite data (Version 0.2-rc7)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 
