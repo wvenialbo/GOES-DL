@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from .tracker_stock import track_parsers_stock
+
 
 def validate_dataset_file(path: str | Path) -> Path:
     """
@@ -29,3 +31,15 @@ def validate_dataset_file(path: str | Path) -> Path:
         raise FileNotFoundError(f"File '{path}' does not exist.")
 
     return path
+
+
+def validate_supported_dataset(dataset: str) -> str:
+    """
+    Validate the dataset name.
+
+    If the dataset is not supported, raise a ValueError.
+    """
+    if dataset not in track_parsers_stock:
+        raise ValueError(f"Dataset '{dataset}' is not supported.")
+
+    return dataset
