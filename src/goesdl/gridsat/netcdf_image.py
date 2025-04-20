@@ -7,8 +7,8 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .metadata import MeasurementMetadata
 from .netcdf_geodetic import GSLatLonGrid
+from .netcdf_metadata import MeasurementMetadata
 from .validation_gc import validate_channel
 
 

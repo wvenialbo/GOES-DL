@@ -8,8 +8,8 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, scalar, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat64, ArrayInt8, MaskedFloat32
-from .metadata import DeltaTimeMetadata, TimeMetadata, VariableMetadata
 from .netcdf_geodetic import GSLatLonGrid
+from .netcdf_metadata import DeltaTimeMetadata, TimeMetadata, VariableMetadata
 
 SECONDS_IN_DAY = 86400
 SECONDS_IN_MINUTE = 60
