@@ -112,7 +112,8 @@ pip install --upgrade goes-dl
 Below are examples of how to use the GOES-DL package to download data from each
 of the supported sources. You will find more examples in the
 [examples](https://github.com/wvenialbo/GOES-DL/tree/main/examples) directory
-of the repository.
+of the repository. Some demonstrations are also available in Google Colab, see
+below.
 
 ### 1. Download GOES 2nd and 3rd Generation Data (from NOAA's NCEI archive)
 
@@ -273,6 +274,11 @@ downloader.get_files(files2_filtered)
 # files relative to the base URL and local repository root directory.
 ```
 
+## Demos: Colab Notebooks
+
+1. [Hurricane Félix — Parallax effect](https://colab.research.google.com/drive/12aH5OIRPEcaWoL9e3atYDJekZPczVca9?usp=sharing)
+2. [Storm-2012 — La tempestad en Roque Alonso](https://colab.research.google.com/drive/12aH5OIRPEcaWoL9e3atYDJekZPczVca9?usp=sharing)
+
 ## Pipeline and parameters
 
 The general workflow for downloading data using **GOES-DL** is as follows:
@@ -390,7 +396,7 @@ When using **GOES-DL** in any research, publication or website, please cite this
 package as:
 
 > Villamayor-Venialbo, W. (2025): *GOES-DL: A Python package for downloading
-> GOES and GridSat-B1 satellite data (Version 0.2-rc5)* [Software]. GitHub.
+> GOES and GridSat-B1 satellite data (Version 0.2-rc6)* [Software]. GitHub.
 > [git:wvenialbo/GOES-DL](https://github.com/wvenialbo/GOES-DL), *[indicate
 > access date]*.
 
