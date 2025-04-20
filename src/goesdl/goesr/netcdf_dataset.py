@@ -24,7 +24,7 @@ from .databook import (
     dataset_name_goesr,
     geospatial_resolution_deg,
     geospatial_resolution_km,
-    origin_platform_goesr,
+    platform_origin_goesr,
     square_igfov_at_nadir_goesr,
     wavelength_goesr,
 )
@@ -132,13 +132,13 @@ class GOESDatabookInfo(HasStrHelp):
     square_fov_at_nadir: float = math.nan
     wavelength: float = math.nan
 
-    def __init__(self, channel: str, origin: str) -> None:
+    def __init__(self, channel: str, platform: str) -> None:
         # Validate origin parameter
-        if origin not in origin_platform_goesr:
-            allowed_origins = ", ".join(origin_platform_goesr.keys())
+        if platform not in platform_origin_goesr:
+            allowed_platforms = ", ".join(platform_origin_goesr.keys())
             raise ValueError(
-                f"Invalid 'origin': '{origin}'; "
-                f"allowed origins are: {allowed_origins}"
+                f"Invalid 'platform': '{platform}'; "
+                f"allowed platforms are: {allowed_platforms}"
             )
 
         self.dataset = dataset_name_goesr
