@@ -4,6 +4,8 @@ import cartopy.crs as ccrs
 import numpy as np
 from scipy.spatial import cKDTree
 
+from .geodesy import get_extent_metre
+
 
 def calculate_image_size(
     extent_deg,
