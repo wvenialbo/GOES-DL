@@ -221,7 +221,7 @@ measurement_range_upper_bound_lp = {
 
 # Measurement range in % albedo (1) / K (2-5)
 
-measurement_range_gc = {
+measurement_range_lower_bound_gc = {
     "G08": measurement_range_lower_bound_im,
     "G09": measurement_range_lower_bound_im,
     "G10": measurement_range_lower_bound_im,
