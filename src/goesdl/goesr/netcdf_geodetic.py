@@ -12,12 +12,17 @@ from ..geodesy import (
     calculate_pixel_edges,
     geos_to_latlon_grid_goesdl,
 )
-from ..netcdf import HasStrHelp
+from ..netcdf import DatasetView, HasStrHelp
 from ..protocols.geodetic import IndexRange, RegionDomain
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .netcdf_projection import GOESGeostationaryGrid, GOESImagerProjection
 
 BoxLimits = tuple[int, int, int, int]
+
+
+class _DatasetInfo(DatasetView):
+
+    dataset_name: str
 
 
 class GOESLatLonGrid(HasStrHelp):
@@ -48,6 +53,8 @@ class GOESLatLonGrid(HasStrHelp):
             raise ValueError(
                 "'delta' must be an integer between 1 and 10, inclusive"
             )
+
+        self._validate_grid(record)
 
         # Extract the region of interest...
         if region:
@@ -197,7 +204,7 @@ class GOESLatLonGrid(HasStrHelp):
             lon_limits = 0, mat_shape[1]
             lat_limits = 0, mat_shape[0]
 
-        return lon_lat, lon_limits, lat_limits
+        return lon_lat, (lon_limits, lat_limits)
 
     @classmethod
     def _slice(
@@ -240,6 +247,15 @@ class GOESLatLonGrid(HasStrHelp):
             lon_lat = cls._extract(record, 1, limits)
 
         return lon_lat, limits
+
+    @staticmethod
+    def _validate_grid(record: Dataset) -> None:
+        if "x" not in record.variables or "y" not in record.variables:
+            dinfo = _DatasetInfo(record)
+            raise ValueError(
+                f"The dataset '{dinfo.dataset_name}' does not contain "
+                "any geodetic grid information"
+            )
 
     @property
     def globe(self) -> Globe:
