@@ -197,7 +197,7 @@ def product_summary(dataset_name: str) -> tuple[str, str, int]:
         return "", "", 0
 
     product_scene_channel_pat = r"OR_ABI-L\db?-([^-]+)-M\d(C\d\d)?_G\d\d"
-    product_scene_pat = r"(.+)((?:M|F|C)\d?)"
+    product_scene_pat = r"(.+)([MFC]\d?)"
 
     match = search(product_scene_channel_pat, dataset_name)
 
