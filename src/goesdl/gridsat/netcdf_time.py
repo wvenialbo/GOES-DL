@@ -5,7 +5,7 @@ from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import datetime64, float64, nan, newaxis
 
 from ..geodesy import RectangularRegion
-from ..netcdf import DatasetView, HasStrHelp, scalar, variable
+from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat64, ArrayInt8, MaskedFloat32
 from .netcdf_geodetic import GSLatLonGrid
@@ -155,18 +155,14 @@ class GSTimeGrid(GSTimeData):
         return self.grid.region
 
 
-class GSCoverageTime(HasStrHelp):
+class GSCoverageTime(DatasetView):
 
-    datetime_start: datetime = NOT_A_DATETIME
-    datetime_end: datetime = NOT_A_DATETIME
-
-    def __init__(self, record: Dataset) -> None:
-        datetime_start = getattr(record, "time_coverage_start", "")
-        datetime_end = getattr(record, "time_coverage_end", "")
-
-        if datetime_start and datetime_end:
-            self.datetime_start = datetime.fromisoformat(datetime_start)
-            self.datetime_end = datetime.fromisoformat(datetime_end)
+    datetime_start: datetime = attribute(
+        "time_coverage_start", convert=datetime.fromisoformat
+    )
+    datetime_end: datetime = attribute(
+        "time_coverage_end", convert=datetime.fromisoformat
+    )
 
     @property
     def timestamp_start(self) -> float:
