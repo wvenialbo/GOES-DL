@@ -17,7 +17,7 @@ from .databook_gc import (
     measurement_units,
     platform_origin_gridsat_gc,
     spectral_units_gc,
-    square_igfov_at_nadir,
+    square_igfov_at_nadir_gc,
     wavelength_range_lower_bound,
     wavelength_range_upper_bound,
 )
@@ -252,7 +252,7 @@ class GSGeospatialInfo(HasStrHelp):
         pinfo = GSPlatformInfo(record, channel)
 
         # Get nominal square IGFOV at nadir in km
-        self.square_fov_at_nadir = square_igfov_at_nadir[pinfo.origin][
+        self.square_fov_at_nadir = square_igfov_at_nadir_gc[pinfo.origin][
             pinfo.channel_nr
         ]
 

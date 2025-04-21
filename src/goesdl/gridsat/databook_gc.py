@@ -274,7 +274,7 @@ square_igfov_at_nadir_op = {
     5: 4.0,
 }
 
-square_igfov_at_nadir = {
+square_igfov_at_nadir_gc = {
     "G08": square_igfov_at_nadir_in,
     "G09": square_igfov_at_nadir_in,
     "G10": square_igfov_at_nadir_in,
