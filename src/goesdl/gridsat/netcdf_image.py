@@ -8,8 +8,8 @@ from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .netcdf_geodetic import GSLatLonGrid
+from .netcdf_info import GSPlatformInfo
 from .netcdf_metadata import MeasurementMetadata
-from .validation_gc import validate_channel
 
 
 class GSImageData(HasStrHelp):
@@ -21,17 +21,21 @@ class GSImage(GSImageData):
 
     _grid: GSLatLonGrid
 
+    channel_id: str
+
     metadata: MeasurementMetadata
 
     def __init__(
         self, record: Dataset, grid: GSLatLonGrid, channel: str
     ) -> None:
-        # Validate channel parameter
-        validate_channel(channel, record)
+        # Get platform information (validate channel parameter)
+        pinfo = GSPlatformInfo(record, channel)
 
         data = self._extract_image(
             record, channel, grid.lon_limits, grid.lat_limits
         )
+
+        self.channel_id = pinfo.channel_id
 
         self._grid = grid
         self.raster = data.raster
