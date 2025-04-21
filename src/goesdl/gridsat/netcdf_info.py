@@ -37,7 +37,7 @@ class GSPlatformInfo(HasStrHelp):
     Attributes
     ----------
     channel_id : str
-        Channel ID (e.g. 'ch1', 'ch2', etc.)
+        Channel ID (e.g. 'ch1', 'ch2', etc.).
     platform_domain : str
         Platform domain chain.
 
@@ -59,7 +59,7 @@ class GSPlatformInfo(HasStrHelp):
 
     channel_id: str = NA
     """
-    Channel ID (e.g. 'ch1', 'ch2', etc.)
+    Channel ID (e.g. 'ch1', 'ch2', etc.).
     """
 
     platform_domain: str
