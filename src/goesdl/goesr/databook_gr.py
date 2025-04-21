@@ -13,15 +13,13 @@ GRS80_SEMI_MAJOR_AXIS = 6378137.0
 GRS80_SEMI_MINOR_AXIS = 6356752.31414
 
 GRS80_EQUATORIAL_PERIMETER_M = 2.0 * math.pi * GRS80_SEMI_MAJOR_AXIS
-GRS80_KILOMETRE_PER_DEGREE = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
+GRS80_KILOMETRES_PER_DEGREE = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
 
 
 # Dataset abstract
 
 
-def get_abstract_goesr(
-    kilometres_per_pixel: float, kilometres_per_degree: float
-) -> str:
+def get_abstract_goesr(kilometres_per_pixel: float) -> str:
     """
     The abstract for the GOES-R Series dataset.
 
@@ -29,8 +27,6 @@ def get_abstract_goesr(
     ----------
     kilometres_per_pixel : float
         The number of kilometres per pixel.
-    kilometres_per_degree : float
-        The number of kilometres per degree.
 
     Returns
     -------
@@ -39,7 +35,9 @@ def get_abstract_goesr(
     """
 
     pixels_per_kilometre = 1.0 / kilometres_per_pixel
-    pixels_per_degree = round(pixels_per_kilometre * kilometres_per_degree)
+    pixels_per_degree = round(
+        pixels_per_kilometre * GRS80_KILOMETRES_PER_DEGREE
+    )
     degrees_per_pixel = round(1.0 / pixels_per_degree, 2)
 
     return (
