@@ -2,43 +2,55 @@ import math
 
 # Dataset name
 
-dataset_name_gridsat_gc: str = "GridSat-GOES"
+dataset_name_gc: str = "GridSat-GOES"
 
 # Spatial resolution (GRS80 ellipsoid)
 
-GRS80_EQUATORIAL_RADIUS_M = 6378137.0
 GRS80_INVERSE_FLATTENING = 298.257223563
-GRS80_EQUATORIAL_PERIMETER_M = 2.0 * math.pi * GRS80_EQUATORIAL_RADIUS_M
-DEG_TO_KM = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
-PIXELS_PER_DEGREE = 25
-SPATIAL_RESOLUTION_DEG = 1.0 / PIXELS_PER_DEGREE
-SPATIAL_RESOLUTION_KM = SPATIAL_RESOLUTION_DEG * DEG_TO_KM
+GRS80_SEMI_MAJOR_AXIS = 6378137.0
+GRS80_SEMI_MINOR_AXIS = (
+    GRS80_SEMI_MAJOR_AXIS - GRS80_SEMI_MAJOR_AXIS / GRS80_INVERSE_FLATTENING
+)
 
-geospatial_resolution_deg = SPATIAL_RESOLUTION_DEG, SPATIAL_RESOLUTION_DEG
-geospatial_resolution_km = SPATIAL_RESOLUTION_KM, SPATIAL_RESOLUTION_KM
+GRS80_EQUATORIAL_PERIMETER_M = 2.0 * math.pi * GRS80_SEMI_MAJOR_AXIS
+GRS80_DEG_TO_KM = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
+
 
 # Dataset abstract
 
-ppd = PIXELS_PER_DEGREE
-dpc = SPATIAL_RESOLUTION_DEG
-kpc = SPATIAL_RESOLUTION_KM
 
-abstract_gridsat_gc = (
-    f"This product is referred to as {dataset_name_gridsat_gc}. The "
-    f"resolution of the grid is 1/{ppd}th of a degree, or {dpc:.2f} "
-    f"degrees, equivalent to {kpc:.2f} km at the Equator, latitude "
-    f"and longitude, yielding {ppd} pixels per degree."
-)
+def get_abstract_gridsat_gc(ppd: int, dpp: float, kpp: float) -> str:
+    """
+    The abstract for the GridSat-GOES dataset.
 
-# Long platform name
+    Parameters
+    ----------
+    ppd : int
+        Pixels per degree.
+    dpp : float
+        Degrees per pixel.
+    kpp : float
+        Kilometres per pixel.
+
+    Returns
+    -------
+    str
+        The abstract for the GridSat-GOES dataset.
+    """
+    return (
+        f"This product is referred to as {dataset_name_gc}. The "
+        f"resolution of the grid is 1/{ppd}th of a degree, or {dpp:.2f} "
+        f"degrees, equivalent to {kpp:.2f} km at the Equator, latitude "
+        f"and longitude, yielding {ppd} pixels per degree."
+    )
+
+
+# Platform-origin correspondence
 
 platform_origin_gridsat_gc = {
     f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)
 }
 
-origin_platform_gridsat_gc = {
-    value: key for key, value in platform_origin_gridsat_gc.items()
-}
 
 # Channel description
 
@@ -50,6 +62,7 @@ channel_description_gc = {
     "ch5": "Brightness Temperature of the 12.0 µm channel",
     "ch6": "Brightness Temperature of the 13.4 µm channel",
 }
+
 
 # GridSat-GOES channel to actual channel correspondence
 
@@ -81,6 +94,7 @@ channel_correspondence = {
     "G14": channel_correspondence_mp,
     "G15": channel_correspondence_mp,
 }
+
 
 # Wavelength range lower bound in µm
 
@@ -119,7 +133,8 @@ wavelength_range_lower_bound = {
     "G15": wavelength_range_lower_bound_np,
 }
 
-# Wavelength upper bound in µm
+
+# Wavelength range upper bound in µm
 
 wavelength_range_upper_bound_il = {
     1: 0.75,
@@ -156,6 +171,12 @@ wavelength_range_upper_bound = {
     "G15": wavelength_range_upper_bound_np,
 }
 
+
+# Spectral units
+
+spectral_units_gc = "micrometres"
+
+
 # Measurement range lower bound in % albedo (1) / K (2-5)
 
 measurement_range_lower_bound_im = {
@@ -174,16 +195,6 @@ measurement_range_lower_bound_np = {
     5: 4.0,
 }
 
-measurement_range_lower_bound = {
-    "G08": measurement_range_lower_bound_im,
-    "G09": measurement_range_lower_bound_im,
-    "G10": measurement_range_lower_bound_im,
-    "G11": measurement_range_lower_bound_im,
-    "G12": measurement_range_lower_bound_im,
-    "G13": measurement_range_lower_bound_np,
-    "G14": measurement_range_lower_bound_np,
-    "G15": measurement_range_lower_bound_np,
-}
 
 # Measurement range upper bound in % albedo (1) / K (2-5)
 
@@ -201,6 +212,20 @@ measurement_range_upper_bound_lp = {
     3: 320.0,
     4: 320.0,
     5: 320.0,
+}
+
+
+# Measurement range in % albedo (1) / K (2-5)
+
+measurement_range_gc = {
+    "G08": measurement_range_lower_bound_im,
+    "G09": measurement_range_lower_bound_im,
+    "G10": measurement_range_lower_bound_im,
+    "G11": measurement_range_lower_bound_im,
+    "G12": measurement_range_lower_bound_im,
+    "G13": measurement_range_lower_bound_np,
+    "G14": measurement_range_lower_bound_np,
+    "G15": measurement_range_lower_bound_np,
 }
 
 measurement_range_upper_bound = {
