@@ -14,7 +14,7 @@ from .databook_gc import (
     get_abstract_gridsat_gc,
     measurement_range_gc,
     measurement_range_upper_bound,
-    measurement_units,
+    measurement_units_gc,
     platform_origin_gridsat_gc,
     spectral_units_gc,
     square_igfov_at_nadir_gc,
@@ -358,7 +358,7 @@ class GSRadiometricInfo(HasStrHelp):
         self.measurement_range = measurement_lo, measurement_up
 
         # Get measurement units
-        self.measurement_units = measurement_units[channel_nr]
+        self.measurement_units = measurement_units_gc[channel_nr]
 
         # Get spectral range in micrometres
         wavelength_lo = wavelength_range_lower_bound[origin][channel_nr]

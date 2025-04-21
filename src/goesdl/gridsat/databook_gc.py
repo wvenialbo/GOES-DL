@@ -248,7 +248,7 @@ measurement_range_upper_bound = {
 ALBEDO = "% albedo"
 KELVIN = "Kelvin"
 
-measurement_units = {
+measurement_units_gc = {
     1: ALBEDO,
     2: KELVIN,
     3: KELVIN,
