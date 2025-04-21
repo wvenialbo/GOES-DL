@@ -13,35 +13,39 @@ GRS80_SEMI_MINOR_AXIS = (
 )
 
 GRS80_EQUATORIAL_PERIMETER_M = 2.0 * math.pi * GRS80_SEMI_MAJOR_AXIS
-GRS80_DEG_TO_KM = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
+GRS80_KILOMETRE_PER_DEGREE = GRS80_EQUATORIAL_PERIMETER_M / 360000.0
 
 
 # Dataset abstract
 
 
-def get_abstract_gridsat_gc(ppd: int, dpp: float, kpp: float) -> str:
+def get_abstract_gridsat_gc(kilometres_per_pixel: float) -> str:
     """
     The abstract for the GridSat-GOES dataset.
 
     Parameters
     ----------
-    ppd : int
-        Pixels per degree.
-    dpp : float
-        Degrees per pixel.
-    kpp : float
-        Kilometres per pixel.
+    kilometres_per_pixel : float
+        The number of kilometres per pixel.
 
     Returns
     -------
     str
         The abstract for the GridSat-GOES dataset.
     """
+
+    pixels_per_kilometre = 1.0 / kilometres_per_pixel
+    pixels_per_degree = round(
+        pixels_per_kilometre * GRS80_KILOMETRE_PER_DEGREE
+    )
+    degrees_per_pixel = round(1.0 / pixels_per_degree, 2)
+
     return (
-        f"This product is referred to as {dataset_name_gc}. The "
-        f"resolution of the grid is 1/{ppd}th of a degree, or {dpp:.2f} "
-        f"degrees, equivalent to {kpp:.2f} km at the Equator, latitude "
-        f"and longitude, yielding {ppd} pixels per degree."
+        f"This product is referred to as {dataset_name_gc}. "
+        f"The resolution of the grid is 1/{pixels_per_degree}th of a degree, "
+        f"or {degrees_per_pixel:.2f} degrees, equivalent "
+        f"to {kilometres_per_pixel:.2f} km at the Equator, latitude "
+        f"and longitude, yielding {pixels_per_degree} pixels per degree."
     )
 
 
