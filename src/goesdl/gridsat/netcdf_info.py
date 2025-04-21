@@ -8,7 +8,7 @@ from numpy import float32
 from ..netcdf import DatasetView, HasStrHelp, attribute
 from .constants import NA
 from .databook_gc import (
-    GRS80_KILOMETRE_PER_DEGREE,
+    GRS80_KILOMETRES_PER_DEGREE,
     channel_correspondence_gc,
     channel_description_gc,
     dataset_name_gc,
@@ -330,7 +330,7 @@ class GSGeospatialInfo(HasStrHelp):
         """
         The number of pixels per kilometre at nadir.
         """
-        return round(self.pixels_per_kilometre * GRS80_KILOMETRE_PER_DEGREE)
+        return round(self.pixels_per_kilometre * GRS80_KILOMETRES_PER_DEGREE)
 
     @property
     def pixels_per_kilometre(self) -> float:
