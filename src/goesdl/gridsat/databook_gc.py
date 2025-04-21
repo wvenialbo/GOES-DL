@@ -70,7 +70,7 @@ channel_description_gc = {
 
 # GridSat-GOES channel to actual channel correspondence
 
-channel_correspondence_il = {
+_channel_correspondence_il = {
     "ch1": 1,
     "ch2": 2,
     "ch3": 3,
@@ -79,7 +79,7 @@ channel_correspondence_il = {
     "ch6": 0,
 }
 
-channel_correspondence_mp = {
+_channel_correspondence_mp = {
     "ch1": 1,
     "ch2": 2,
     "ch3": 5,
@@ -89,20 +89,20 @@ channel_correspondence_mp = {
 }
 
 channel_correspondence_gc = {
-    "G08": channel_correspondence_il,
-    "G09": channel_correspondence_il,
-    "G10": channel_correspondence_il,
-    "G11": channel_correspondence_il,
-    "G12": channel_correspondence_mp,
-    "G13": channel_correspondence_mp,
-    "G14": channel_correspondence_mp,
-    "G15": channel_correspondence_mp,
+    "G08": _channel_correspondence_il,
+    "G09": _channel_correspondence_il,
+    "G10": _channel_correspondence_il,
+    "G11": _channel_correspondence_il,
+    "G12": _channel_correspondence_mp,
+    "G13": _channel_correspondence_mp,
+    "G14": _channel_correspondence_mp,
+    "G15": _channel_correspondence_mp,
 }
 
 
 # Wavelength range lower bound in µm
 
-wavelength_range_lower_bound_il = {
+_wavelength_range_lower_bound_il = {
     1: 0.55,
     2: 3.80,
     3: 6.50,
@@ -110,7 +110,7 @@ wavelength_range_lower_bound_il = {
     5: 11.50,
 }
 
-wavelength_range_lower_bound_m = {
+_wavelength_range_lower_bound_m = {
     1: 0.55,
     2: 3.80,
     3: 13.00,
@@ -118,7 +118,7 @@ wavelength_range_lower_bound_m = {
     5: 5.80,
 }
 
-wavelength_range_lower_bound_np = {
+_wavelength_range_lower_bound_np = {
     1: 0.52,
     2: 3.73,
     3: 13.00,
@@ -127,20 +127,20 @@ wavelength_range_lower_bound_np = {
 }
 
 wavelength_range_lower_bound = {
-    "G08": wavelength_range_lower_bound_il,
-    "G09": wavelength_range_lower_bound_il,
-    "G10": wavelength_range_lower_bound_il,
-    "G11": wavelength_range_lower_bound_il,
-    "G12": wavelength_range_lower_bound_m,
-    "G13": wavelength_range_lower_bound_np,
-    "G14": wavelength_range_lower_bound_np,
-    "G15": wavelength_range_lower_bound_np,
+    "G08": _wavelength_range_lower_bound_il,
+    "G09": _wavelength_range_lower_bound_il,
+    "G10": _wavelength_range_lower_bound_il,
+    "G11": _wavelength_range_lower_bound_il,
+    "G12": _wavelength_range_lower_bound_m,
+    "G13": _wavelength_range_lower_bound_np,
+    "G14": _wavelength_range_lower_bound_np,
+    "G15": _wavelength_range_lower_bound_np,
 }
 
 
 # Wavelength range upper bound in µm
 
-wavelength_range_upper_bound_il = {
+_wavelength_range_upper_bound_il = {
     1: 0.75,
     2: 4.00,
     3: 7.00,
@@ -148,7 +148,7 @@ wavelength_range_upper_bound_il = {
     5: 12.50,
 }
 
-wavelength_range_upper_bound_m = {
+_wavelength_range_upper_bound_m = {
     1: 0.75,
     2: 4.00,
     3: 13.70,
@@ -156,7 +156,7 @@ wavelength_range_upper_bound_m = {
     5: 7.30,
 }
 
-wavelength_range_upper_bound_np = {
+_wavelength_range_upper_bound_np = {
     1: 0.71,
     2: 4.07,
     3: 13.70,
@@ -165,14 +165,14 @@ wavelength_range_upper_bound_np = {
 }
 
 wavelength_range_upper_bound = {
-    "G08": wavelength_range_upper_bound_il,
-    "G09": wavelength_range_upper_bound_il,
-    "G10": wavelength_range_upper_bound_il,
-    "G11": wavelength_range_upper_bound_il,
-    "G12": wavelength_range_upper_bound_m,
-    "G13": wavelength_range_upper_bound_np,
-    "G14": wavelength_range_upper_bound_np,
-    "G15": wavelength_range_upper_bound_np,
+    "G08": _wavelength_range_upper_bound_il,
+    "G09": _wavelength_range_upper_bound_il,
+    "G10": _wavelength_range_upper_bound_il,
+    "G11": _wavelength_range_upper_bound_il,
+    "G12": _wavelength_range_upper_bound_m,
+    "G13": _wavelength_range_upper_bound_np,
+    "G14": _wavelength_range_upper_bound_np,
+    "G15": _wavelength_range_upper_bound_np,
 }
 
 
@@ -183,7 +183,7 @@ spectral_units_gc = "micrometres"
 
 # Measurement range lower bound in % albedo (1) / K (2-5)
 
-measurement_range_lower_bound_im = {
+_measurement_range_lower_bound_im = {
     1: 1.6,
     2: 4.0,
     3: 4.0,
@@ -191,7 +191,7 @@ measurement_range_lower_bound_im = {
     5: 4.0,
 }
 
-measurement_range_lower_bound_np = {
+_measurement_range_lower_bound_np = {
     1: 0.0,
     2: 4.0,
     3: 4.0,
@@ -202,7 +202,7 @@ measurement_range_lower_bound_np = {
 
 # Measurement range upper bound in % albedo (1) / K (2-5)
 
-measurement_range_upper_bound_ik = {
+_measurement_range_upper_bound_ik = {
     1: 100.0,
     2: 320.0,
     3: 320.0,
@@ -210,7 +210,7 @@ measurement_range_upper_bound_ik = {
     5: 320.0,
 }
 
-measurement_range_upper_bound_lp = {
+_measurement_range_upper_bound_lp = {
     1: 100.0,
     2: 335.0,
     3: 320.0,
@@ -222,25 +222,25 @@ measurement_range_upper_bound_lp = {
 # Measurement range in % albedo (1) / K (2-5)
 
 measurement_range_lower_bound_gc = {
-    "G08": measurement_range_lower_bound_im,
-    "G09": measurement_range_lower_bound_im,
-    "G10": measurement_range_lower_bound_im,
-    "G11": measurement_range_lower_bound_im,
-    "G12": measurement_range_lower_bound_im,
-    "G13": measurement_range_lower_bound_np,
-    "G14": measurement_range_lower_bound_np,
-    "G15": measurement_range_lower_bound_np,
+    "G08": _measurement_range_lower_bound_im,
+    "G09": _measurement_range_lower_bound_im,
+    "G10": _measurement_range_lower_bound_im,
+    "G11": _measurement_range_lower_bound_im,
+    "G12": _measurement_range_lower_bound_im,
+    "G13": _measurement_range_lower_bound_np,
+    "G14": _measurement_range_lower_bound_np,
+    "G15": _measurement_range_lower_bound_np,
 }
 
 measurement_range_upper_bound_gc = {
-    "G08": measurement_range_upper_bound_ik,
-    "G09": measurement_range_upper_bound_ik,
-    "G10": measurement_range_upper_bound_ik,
-    "G11": measurement_range_upper_bound_lp,
-    "G12": measurement_range_upper_bound_lp,
-    "G13": measurement_range_upper_bound_lp,
-    "G14": measurement_range_upper_bound_lp,
-    "G15": measurement_range_upper_bound_lp,
+    "G08": _measurement_range_upper_bound_ik,
+    "G09": _measurement_range_upper_bound_ik,
+    "G10": _measurement_range_upper_bound_ik,
+    "G11": _measurement_range_upper_bound_lp,
+    "G12": _measurement_range_upper_bound_lp,
+    "G13": _measurement_range_upper_bound_lp,
+    "G14": _measurement_range_upper_bound_lp,
+    "G15": _measurement_range_upper_bound_lp,
 }
 
 # Measurement units
@@ -258,7 +258,7 @@ measurement_units_gc = {
 
 # Nominal square IGFOV at nadir in km
 
-square_igfov_at_nadir_in = {
+_square_igfov_at_nadir_in = {
     1: 1.0,
     2: 4.0,
     3: 8.0,
@@ -266,7 +266,7 @@ square_igfov_at_nadir_in = {
     5: 4.0,
 }
 
-square_igfov_at_nadir_op = {
+_square_igfov_at_nadir_op = {
     1: 1.0,
     2: 4.0,
     3: 4.0,
@@ -275,12 +275,12 @@ square_igfov_at_nadir_op = {
 }
 
 square_igfov_at_nadir_gc = {
-    "G08": square_igfov_at_nadir_in,
-    "G09": square_igfov_at_nadir_in,
-    "G10": square_igfov_at_nadir_in,
-    "G11": square_igfov_at_nadir_in,
-    "G12": square_igfov_at_nadir_in,
-    "G13": square_igfov_at_nadir_in,
-    "G14": square_igfov_at_nadir_op,
-    "G15": square_igfov_at_nadir_op,
+    "G08": _square_igfov_at_nadir_in,
+    "G09": _square_igfov_at_nadir_in,
+    "G10": _square_igfov_at_nadir_in,
+    "G11": _square_igfov_at_nadir_in,
+    "G12": _square_igfov_at_nadir_in,
+    "G13": _square_igfov_at_nadir_in,
+    "G14": _square_igfov_at_nadir_op,
+    "G15": _square_igfov_at_nadir_op,
 }
