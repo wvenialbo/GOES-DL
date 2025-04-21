@@ -69,6 +69,8 @@ class GOESProductLocatorABIPP(GOESProductLocatorABI):
                 "does require channel specification"
             )
 
+        channels = self._explode_channels(channels)
+
         self._validate_channels(channels, self.AVAILABLE_CHANNELS)
 
         self._validate_product(name, self.AVAILABLE_PRODUCTS)
