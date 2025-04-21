@@ -3,10 +3,10 @@ from typing import Any, cast
 
 from cartopy.crs import Globe, PlateCarree, Projection
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import concatenate, flatnonzero, float32, meshgrid
+from numpy import concatenate, flatnonzero, meshgrid
 
 from ..geodesy import RectangularRegion
-from ..netcdf import DatasetView, HasStrHelp, attribute, variable
+from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32
 from .netcdf_metadata import CoordinateMetadata, VariableMetadata
@@ -17,18 +17,6 @@ MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 class GSLatLonData(HasStrHelp):
     lon: ArrayFloat32
     lat: ArrayFloat32
-
-
-class GeodeticSummary(DatasetView):
-
-    geospatial_lat_min: float32 = attribute()
-    geospatial_lat_max: float32 = attribute()
-    geospatial_lat_units: str = attribute()
-    geospatial_lat_resolution: float32 = attribute()
-    geospatial_lon_min: float32 = attribute()
-    geospatial_lon_max: float32 = attribute()
-    geospatial_lon_units: str = attribute()
-    geospatial_lon_resolution: float32 = attribute()
 
 
 class GSLatLonGrid(GSLatLonData):
@@ -44,8 +32,6 @@ class GSLatLonGrid(GSLatLonData):
     metadata: MetadataType
 
     crs: Projection
-
-    summary: GeodeticSummary
 
     def __init__(
         self,
@@ -85,8 +71,6 @@ class GSLatLonGrid(GSLatLonData):
         self.crs = PlateCarree(central_longitude=0.0, globe=source_globe)
 
         self.metadata = self._get_metadata(record)
-
-        self.summary = GeodeticSummary(record)
 
     @staticmethod
     def _extract(
