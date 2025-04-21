@@ -345,6 +345,7 @@ class GSRadiometricInfo(HasStrHelp):
     Class to hold dataset radiometric information.
 
     Attributes
+    ----------
     measurement_range : tuple[float, float]
         Measurement range in the original units.
     measurement_units : str
@@ -353,6 +354,7 @@ class GSRadiometricInfo(HasStrHelp):
         Spectral range in micrometres.
 
     Properties
+    ----------
     wavelength : float
         Central wavelength in micrometres.
     spectral_units : str
