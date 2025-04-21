@@ -68,6 +68,7 @@ class GOESOrbitGeometry(DatasetView):
     """
 
     # Information about the projection
+    latitude_of_projection_origin: float64 = imager_proj.attribute()
     longitude_of_projection_origin: float64 = imager_proj.attribute()
     perspective_point_height: float64 = imager_proj.attribute()
     sweep_angle_axis: str = imager_proj.attribute()
@@ -167,6 +168,9 @@ class GOESABIFixedGrid(GOESImagerProjection):
     # Information about the fixed grid
     x: ArrayFloat32 = data()
     y: ArrayFloat32 = data()
+
+    long_name: str = imager_proj.attribute()
+    grid_mapping_name: str = imager_proj.attribute()
 
 
 class GOESGeostationaryGrid(HasStrHelp):
