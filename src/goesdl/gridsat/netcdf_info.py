@@ -8,7 +8,7 @@ from ..netcdf import DatasetView, HasStrHelp, attribute
 from .constants import NA
 from .databook_gc import (
     GRS80_KILOMETRE_PER_DEGREE,
-    channel_correspondence,
+    channel_correspondence_gc,
     channel_description_gc,
     dataset_name_gc,
     get_abstract_gridsat_gc,
@@ -89,8 +89,8 @@ class GSPlatformInfo(HasStrHelp):
             )
 
         # Validate channel id
-        if self.channel_id not in channel_description_gc:
-            allowed_channels = "', '".join(channel_description_gc.keys())
+        if self.channel_id not in channel_correspondence_gc:
+            allowed_channels = "', '".join(channel_correspondence_gc.keys())
             raise ValueError(
                 f"Invalid channel: '{channel}'; "
                 f"allowed channels are: '{allowed_channels}'"
@@ -121,7 +121,7 @@ class GSPlatformInfo(HasStrHelp):
         """
         The original channel number, 0 for unsupported channels.
         """
-        return channel_correspondence[self.origin][self.channel_id]
+        return channel_correspondence_gc[self.origin][self.channel_id]
 
     @property
     def dataset(self) -> str:

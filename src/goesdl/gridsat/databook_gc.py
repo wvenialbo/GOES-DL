@@ -88,7 +88,7 @@ channel_correspondence_mp = {
     "ch6": 3,
 }
 
-channel_correspondence = {
+channel_correspondence_gc = {
     "G08": channel_correspondence_il,
     "G09": channel_correspondence_il,
     "G10": channel_correspondence_il,
