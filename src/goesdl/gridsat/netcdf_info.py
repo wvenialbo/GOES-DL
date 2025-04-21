@@ -13,7 +13,7 @@ from .databook_gc import (
     dataset_name_gc,
     get_abstract_gridsat_gc,
     measurement_range_gc,
-    measurement_range_upper_bound,
+    measurement_range_upper_bound_gc,
     measurement_units_gc,
     platform_origin_gridsat_gc,
     spectral_units_gc,
@@ -353,7 +353,7 @@ class GSRadiometricInfo(HasStrHelp):
 
         # Get measurement range in the original units
         measurement_lo = measurement_range_gc[origin][channel_nr]
-        measurement_up = measurement_range_upper_bound[origin][channel_nr]
+        measurement_up = measurement_range_upper_bound_gc[origin][channel_nr]
 
         self.measurement_range = measurement_lo, measurement_up
 

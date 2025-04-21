@@ -232,7 +232,7 @@ measurement_range_gc = {
     "G15": measurement_range_lower_bound_np,
 }
 
-measurement_range_upper_bound = {
+measurement_range_upper_bound_gc = {
     "G08": measurement_range_upper_bound_ik,
     "G09": measurement_range_upper_bound_ik,
     "G10": measurement_range_upper_bound_ik,
