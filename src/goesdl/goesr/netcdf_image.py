@@ -22,7 +22,9 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, computed, scalar, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
+from .databook_gr import product_summary
 from .netcdf_geodetic import GOESLatLonGrid
+from .netcdf_info import GOESPlatformInfo
 
 cmip = variable("CMI")
 
@@ -87,9 +89,14 @@ class GOESImageData(HasStrHelp):
     raster: MaskedFloat32
 
 
+class _DatasetInfo(DatasetView):
+
+    dataset_name: str
+
+
 class GOESImage(GOESImageData):
     """
-    Represent a GOES satellite image data.
+    Represent a GOES-R Series satellite image data.
 
     Hold data for the Cloud and Moisture Imagery (CMI) bands.
     """
@@ -99,10 +106,13 @@ class GOESImage(GOESImageData):
     metadata: GOESImageMetadata
 
     def __init__(
-        self, record: Dataset, grid: GOESLatLonGrid, field: str = "CMI"
+        self, record: Dataset, grid: GOESLatLonGrid, channel: str = ""
     ) -> None:
-        # Validate channel parameter
-        self._validate_field(field, record)
+        product_name = self._validate_product(record)
+
+        channel_id = self._validate_channel(record, channel)
+
+        field = self._validate_field(record, product_name, channel_id)
 
         data = self._extract_image(
             record, field, grid.lon_limits, grid.lat_limits
@@ -111,7 +121,7 @@ class GOESImage(GOESImageData):
         self._grid = grid
         self.raster = data.raster
 
-        if field == "CMI":
+        if field.startswith("CMI"):
             self.metadata = GOESImageMetadataCMI(record)
         else:
             self.metadata = GOESImageMetadata(record)
@@ -138,15 +148,44 @@ class GOESImage(GOESImageData):
         return data
 
     @staticmethod
-    def _validate_field(field: str, record: Dataset) -> None:
-        available_fields = {"CMI", "DQF"}
-        # Validate field id
-        if field not in available_fields:
-            allowed_fields = ", ".join(available_fields)
+    def _validate_channel(record: Dataset, channel: str) -> str:
+        pinfo = GOESPlatformInfo(record, channel)
+        return pinfo.channel_id
+
+    @staticmethod
+    def _validate_field(
+        record: Dataset, product_name: str, channel_id: str
+    ) -> str:
+        if product_name == "MCMIP":
+            field = f"CMI_{channel_id}"
+        elif product_name == "CMIP":
+            field = "CMI"
+        else:
+            field = product_name
+
+        if field not in record.variables:
+            raise ValueError(f"Field '{field}' not found in the dataset")
+
+        if record.variables[field].ndim != 2:
             raise ValueError(
-                f"Invalid 'field': '{field}'; "
-                f"allowed fields are: {allowed_fields}"
+                f"The product '{product_name}' does not containt an image"
             )
+
+        return field
+
+    @staticmethod
+    def _validate_product(record: Dataset) -> str:
+        dinfo = _DatasetInfo(record)
+
+        product_name, _, _ = product_summary(dinfo.dataset_name)
+
+        if not product_name:
+            raise ValueError(
+                f"The dataset '{dinfo.dataset_name}' does not containt"
+                "an image"
+            )
+
+        return product_name
 
     @property
     def image(self) -> ArrayFloat32:
