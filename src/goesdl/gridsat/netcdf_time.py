@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
-from numpy import datetime64, float64, nan, newaxis
+from numpy import float64, nan, newaxis
 
 from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
@@ -13,8 +13,6 @@ from .netcdf_metadata import DeltaTimeMetadata, TimeMetadata, VariableMetadata
 
 SECONDS_IN_DAY = 86400
 SECONDS_IN_MINUTE = 60
-
-NOT_A_DATETIME = cast(datetime, datetime64("NaT"))
 
 MetadataType = TimeMetadata | DeltaTimeMetadata | VariableMetadata
 
