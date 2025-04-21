@@ -119,7 +119,7 @@ class GOESProductLocatorABI(GOESProductLocator):
                     end_num = int(last_channel)
                 except ValueError as error:
                     raise ValueError(
-                        "Warning: Syntax error processing "
+                        "Syntax error processing "
                         f"channel range '{channel_item}'"
                     ) from error
                 if end_num < start_num:
