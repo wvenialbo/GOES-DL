@@ -28,7 +28,7 @@ from .databook import (
     square_igfov_at_nadir_goesr,
     wavelength_goesr,
 )
-from .netcdf_platform import GOESPlatformMetadata
+from .netcdf_info import GOESPlatformMetadata
 
 NAN_TUPLE = math.nan, math.nan
 
