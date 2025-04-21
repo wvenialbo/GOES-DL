@@ -8,7 +8,7 @@ dataset_name_goesr: str = "GOES-R Series"
 
 # Spatial resolution (GRS80 ellipsoid)
 
-GRS80_INVERSE_FLATTENING = 298.2572221
+GRS80_INVERSE_FLATTENING = 298.257222096
 GRS80_SEMI_MAJOR_AXIS = 6378137.0
 GRS80_SEMI_MINOR_AXIS = 6356752.31414
 
@@ -126,17 +126,17 @@ channel_correspondence_goesr = {
 wavelength_goesr = {
     1: 0.47,
     2: 0.64,
-    3: 0.86,
-    4: 1.37,
+    3: 0.865,
+    4: 1.378,
     5: 1.61,
-    6: 2.24,
+    6: 2.25,
     7: 3.90,
-    8: 6.20,
-    9: 6.90,
-    10: 7.30,
-    11: 8.50,
-    12: 9.60,
-    13: 10.3,
+    8: 6.185,
+    9: 6.95,
+    10: 7.34,
+    11: 8.5,
+    12: 9.61,
+    13: 10.35,
     14: 11.2,
     15: 12.3,
     16: 13.3,
