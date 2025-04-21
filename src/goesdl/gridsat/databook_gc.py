@@ -4,6 +4,7 @@ import math
 
 dataset_name_gc: str = "GridSat-GOES"
 
+
 # Spatial resolution (GRS80 ellipsoid)
 
 GRS80_INVERSE_FLATTENING = 298.257223563
@@ -53,6 +54,19 @@ def get_abstract_gridsat_gc(kilometres_per_pixel: float) -> str:
 
 platform_origin_gridsat_gc = {
     f"GOES-{id}": f"G{id:0>2}" for id in range(8, 16)
+}
+
+
+# Scene identifiers
+
+scene_id_gc: dict[str, str] = {
+    "GOES": "F",
+    "CONUS": "C",
+}
+
+scene_name_goesr: dict[str, str] = {
+    "F": "Full Disk",
+    "C": "CONUS (Contiguous United States)",
 }
 
 

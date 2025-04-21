@@ -1,4 +1,5 @@
 import math
+import re
 from re import search
 
 from netCDF4 import Dataset
@@ -16,6 +17,8 @@ from .databook_gc import (
     measurement_range_upper_bound_gc,
     measurement_units_gc,
     platform_origin_gridsat_gc,
+    scene_id_gc,
+    scene_name_goesr,
     spectral_units_gc,
     square_igfov_at_nadir_gc,
     wavelength_range_lower_bound_gc,
@@ -27,7 +30,9 @@ from .databook_gc import (
 
 class _PlatformInfo(DatasetView):
 
-    platform: str = attribute()
+    id: str
+    instrument: str
+    platform: str
 
 
 class GSPlatformInfo(HasStrHelp):
@@ -62,9 +67,19 @@ class GSPlatformInfo(HasStrHelp):
     Channel ID (e.g. 'ch1', 'ch2', etc.).
     """
 
-    platform_domain: str
+    instrument_specs: str = NA
     """
-    Platform domain chain.
+    Instrument specification.
+    """
+
+    platform_specs: str
+    """
+    Platform domain specification.
+    """
+
+    scene_id: str = NA
+    """
+    The identifier for the scene.
     """
 
     def __init__(
@@ -76,9 +91,16 @@ class GSPlatformInfo(HasStrHelp):
         # Get platform information
         pinfo = _PlatformInfo(record)
 
-        self.platform_domain = pinfo.platform
-
         self.channel_id = channel
+
+        self.instrument_specs = pinfo.instrument
+
+        self.platform_specs = pinfo.platform
+
+        if match := re.match(r"^GridSat-([A-Z]+)\.", pinfo.id):
+            self.scene_id = scene_id_gc[match[1]]
+        else:
+            self.scene_id = NA
 
         # Validate platform parameter
         if self.platform not in platform_origin_gridsat_gc:
@@ -89,8 +111,9 @@ class GSPlatformInfo(HasStrHelp):
             )
 
         # Validate channel id
-        if self.channel_id not in channel_correspondence_gc:
-            allowed_channels = "', '".join(channel_correspondence_gc.keys())
+        channel_correspondence = channel_correspondence_gc[self.origin]
+        if self.channel_id not in channel_correspondence:
+            allowed_channels = "', '".join(channel_correspondence.keys())
             raise ValueError(
                 f"Invalid channel: '{channel}'; "
                 f"allowed channels are: '{allowed_channels}'"
@@ -144,9 +167,16 @@ class GSPlatformInfo(HasStrHelp):
         """
         return (
             match[0]
-            if (match := search(r"GOES-\d{1,2}", self.platform_domain))
+            if (match := search(r"GOES-\d{1,2}", self.platform_specs))
             else NA
         )
+
+    @property
+    def scene(self) -> str:
+        """
+        The scene name (e.g. 'Full Disk', etc.).
+        """
+        return scene_name_goesr[self.scene_id]
 
 
 class _GeospatialInfo(DatasetView):
@@ -154,15 +184,15 @@ class _GeospatialInfo(DatasetView):
     geospatial_vertical_min: str
     geospatial_vertical_max: str
 
-    geospatial_lat_min: float32 = attribute()
-    geospatial_lat_max: float32 = attribute()
-    geospatial_lat_units: str = attribute()
-    geospatial_lat_resolution: float32 = attribute()
+    geospatial_lat_min: float32
+    geospatial_lat_max: float32
+    geospatial_lat_units: str
+    geospatial_lat_resolution: float32
 
-    geospatial_lon_min: float32 = attribute()
-    geospatial_lon_max: float32 = attribute()
-    geospatial_lon_units: str = attribute()
-    geospatial_lon_resolution: float32 = attribute()
+    geospatial_lon_min: float32
+    geospatial_lon_max: float32
+    geospatial_lon_units: str
+    geospatial_lon_resolution: float32
 
 
 class GSGeospatialInfo(HasStrHelp):
@@ -386,36 +416,35 @@ class _DatasetInfo(DatasetView):
     Class to hold dataset information.
     """
 
-    id: str = attribute()
-    title: str = attribute()
-    project: str = attribute()
-    instrument: str = attribute()
-    institution: str = attribute()
-    summary: str = attribute()
-    comment: str = attribute()
-    product_version: str = attribute()
-    processing_level: str = attribute()
-    license: str = attribute()
+    id: str
+    title: str
+    project: str
+    institution: str
+    summary: str
+    comment: str
+    product_version: str
+    processing_level: str
+    license: str
 
     conventions: str = attribute("Conventions")
-    keywords: str = attribute()
+    keywords: str
 
-    date_created: str = attribute()
-    date_modified: str = attribute()
+    date_created: str
+    date_modified: str
 
-    time_coverage_start: str = attribute()
-    time_coverage_end: str = attribute()
+    time_coverage_start: str
+    time_coverage_end: str
 
-    platform_vocabulary: str = attribute()
-    sensor_vocabulary: str = attribute()
-    keywords_vocabulary: str = attribute()
-    standard_name_vocabulary: str = attribute()
+    platform_vocabulary: str
+    sensor_vocabulary: str
+    keywords_vocabulary: str
+    standard_name_vocabulary: str
 
-    naming_authority: str = attribute()
-    metadata_link: str = attribute()
-    ncei_template_version: str = attribute()
+    naming_authority: str
+    metadata_link: str
+    ncei_template_version: str
 
-    history: str = attribute()
+    history: str
 
 
 class GSDatasetInfo(HasStrHelp):
@@ -443,11 +472,6 @@ class GSDatasetInfo(HasStrHelp):
     project: str = NA
     """
     The project name.
-    """
-
-    instrument: str = NA
-    """
-    The instrument name.
     """
 
     institution: str = NA
@@ -540,7 +564,6 @@ class GSDatasetInfo(HasStrHelp):
         self.id = dinfo.id
         self.title = dinfo.title
         self.project = dinfo.project
-        self.instrument = dinfo.instrument
         self.institution = dinfo.institution
         self.summary = dinfo.summary
         self.comment = dinfo.comment
