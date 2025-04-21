@@ -222,10 +222,10 @@ class GSGeospatialInfo(HasStrHelp):
 
     Properties
     ----------
-    resolution_deg : float
-        The geospatial resolution in degrees.
-    resolution_km : float
-        The resolution in kilometers per pixel at nadir.
+    degrees_per_pixel : float
+        The geospatial resolution in degrees per pixel at nadir.
+    kilometres_per_pixel : float
+        The geospatial resolution in kilometres per pixel at nadir.
     pixels_per_degree : float
         The number of pixels per degree at nadir.
     pixels_per_kilometre : float
