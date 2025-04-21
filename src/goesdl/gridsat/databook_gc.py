@@ -126,7 +126,7 @@ _wavelength_range_lower_bound_np = {
     5: 5.80,
 }
 
-wavelength_range_lower_bound = {
+wavelength_range_lower_bound_gc = {
     "G08": _wavelength_range_lower_bound_il,
     "G09": _wavelength_range_lower_bound_il,
     "G10": _wavelength_range_lower_bound_il,
@@ -164,7 +164,7 @@ _wavelength_range_upper_bound_np = {
     5: 7.30,
 }
 
-wavelength_range_upper_bound = {
+wavelength_range_upper_bound_gc = {
     "G08": _wavelength_range_upper_bound_il,
     "G09": _wavelength_range_upper_bound_il,
     "G10": _wavelength_range_upper_bound_il,
@@ -199,6 +199,17 @@ _measurement_range_lower_bound_np = {
     5: 4.0,
 }
 
+measurement_range_lower_bound_gc = {
+    "G08": _measurement_range_lower_bound_im,
+    "G09": _measurement_range_lower_bound_im,
+    "G10": _measurement_range_lower_bound_im,
+    "G11": _measurement_range_lower_bound_im,
+    "G12": _measurement_range_lower_bound_im,
+    "G13": _measurement_range_lower_bound_np,
+    "G14": _measurement_range_lower_bound_np,
+    "G15": _measurement_range_lower_bound_np,
+}
+
 
 # Measurement range upper bound in % albedo (1) / K (2-5)
 
@@ -218,20 +229,6 @@ _measurement_range_upper_bound_lp = {
     5: 320.0,
 }
 
-
-# Measurement range in % albedo (1) / K (2-5)
-
-measurement_range_lower_bound_gc = {
-    "G08": _measurement_range_lower_bound_im,
-    "G09": _measurement_range_lower_bound_im,
-    "G10": _measurement_range_lower_bound_im,
-    "G11": _measurement_range_lower_bound_im,
-    "G12": _measurement_range_lower_bound_im,
-    "G13": _measurement_range_lower_bound_np,
-    "G14": _measurement_range_lower_bound_np,
-    "G15": _measurement_range_lower_bound_np,
-}
-
 measurement_range_upper_bound_gc = {
     "G08": _measurement_range_upper_bound_ik,
     "G09": _measurement_range_upper_bound_ik,
@@ -242,6 +239,7 @@ measurement_range_upper_bound_gc = {
     "G14": _measurement_range_upper_bound_lp,
     "G15": _measurement_range_upper_bound_lp,
 }
+
 
 # Measurement units
 
@@ -255,6 +253,7 @@ measurement_units_gc = {
     4: KELVIN,
     5: KELVIN,
 }
+
 
 # Nominal square IGFOV at nadir in km
 

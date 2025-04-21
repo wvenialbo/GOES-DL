@@ -18,8 +18,8 @@ from .databook_gc import (
     platform_origin_gridsat_gc,
     spectral_units_gc,
     square_igfov_at_nadir_gc,
-    wavelength_range_lower_bound,
-    wavelength_range_upper_bound,
+    wavelength_range_lower_bound_gc,
+    wavelength_range_upper_bound_gc,
 )
 
 # Platform information
@@ -361,8 +361,8 @@ class GSRadiometricInfo(HasStrHelp):
         self.measurement_units = measurement_units_gc[channel_nr]
 
         # Get spectral range in micrometres
-        wavelength_lo = wavelength_range_lower_bound[origin][channel_nr]
-        wavelength_up = wavelength_range_upper_bound[origin][channel_nr]
+        wavelength_lo = wavelength_range_lower_bound_gc[origin][channel_nr]
+        wavelength_up = wavelength_range_upper_bound_gc[origin][channel_nr]
 
         self.spectral_range = wavelength_lo, wavelength_up
 
