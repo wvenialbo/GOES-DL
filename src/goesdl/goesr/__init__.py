@@ -39,7 +39,7 @@ from .locator_pp import (
 from .netcdf_dataset import GOESDatasetInfo
 from .netcdf_geodetic import GOESLatLonGrid
 from .netcdf_image import GOESImage
-from .netcdf_projection import GOESGlobe, GOESOrbitGeometry
+from .netcdf_projection import GOESGlobe, GOESOrbitGeometry, GOESABIFixedGrid
 from .netcdf_time import GOESCoverageTime
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
@@ -72,4 +72,5 @@ __all__ = [
     "GOESCoverageTime",
     "GOESGlobe",
     "GOESOrbitGeometry",
+    "GOESABIFixedGrid",
 ]

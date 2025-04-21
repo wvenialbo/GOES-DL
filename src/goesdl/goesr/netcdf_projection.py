@@ -158,15 +158,15 @@ class GOESABIFixedGrid(GOESImagerProjection):
 
     Attributes
     ----------
-    x : ArrayFloat64
+    x : ArrayFloat32
         1D array of E/W scanning angles in radians.
-    y : ArrayFloat64
+    y : ArrayFloat32
         1D array of N/S elevation angles in radians.
     """
 
     # Information about the fixed grid
-    x: ArrayFloat64 = data(convert=to_float64)
-    y: ArrayFloat64 = data(convert=to_float64)
+    x: ArrayFloat32 = data()
+    y: ArrayFloat32 = data()
 
 
 class GOESGeostationaryGrid(HasStrHelp):
