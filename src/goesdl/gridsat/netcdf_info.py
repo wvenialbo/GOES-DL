@@ -399,18 +399,18 @@ class GSRadiometricInfo(HasStrHelp):
         self.spectral_range = wavelength_lo, wavelength_up
 
     @property
-    def wavelength(self) -> float:
-        """
-        Central wavelength in micrometres.
-        """
-        return 0.5 * (self.spectral_range[0] + self.spectral_range[1])
-
-    @property
     def spectral_units(self) -> str:
         """
         Spectral units.
         """
         return spectral_units_gc
+
+    @property
+    def wavelength(self) -> float:
+        """
+        Central wavelength in micrometres.
+        """
+        return 0.5 * (self.spectral_range[0] + self.spectral_range[1])
 
 
 class _DatasetInfo(DatasetView):
