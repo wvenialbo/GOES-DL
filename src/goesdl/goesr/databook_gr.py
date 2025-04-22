@@ -1,5 +1,4 @@
 import math
-from re import search
 
 # Dataset name
 
@@ -165,58 +164,3 @@ square_igfov_at_nadir_goesr = {
     15: 2.0,
     16: 2.0,
 }
-
-
-def product_summary(dataset_name: str) -> tuple[str, str, int]:
-    """
-    Extract product, scene, and channel information from a dataset name.
-
-    Parses the dataset name using regular expressions to extract the
-    product, scene, and channel number.
-
-    Parameters
-    ----------
-    dataset_name : str
-        The name of the dataset.
-
-    Returns
-    -------
-    tuple[str, str, int]
-        A tuple containing the product, scene, and channel number.
-
-    Raises
-    ------
-    ValueError
-        If the dataset name is invalid or if there is a syntax error
-        processing the channel number.
-    """
-    if not dataset_name.startswith("OR_ABI"):
-        return "", "", 0
-
-    product_scene_channel_pat = r"OR_ABI-L\db?-([^-]+)-M\d(C\d\d)?_G\d\d"
-    product_scene_pat = r"(.+)([MFC]\d?)"
-
-    match = search(product_scene_channel_pat, dataset_name)
-
-    if not match:
-        raise ValueError(f"Invalid dataset name: '{dataset_name}'")
-
-    product_scene, channel = match.groups()
-
-    match = search(product_scene_pat, product_scene)
-
-    if not match:
-        raise ValueError(f"Invalid dataset name: '{dataset_name}'")
-
-    product_id, scene_id = match.groups()
-
-    channel_nr = 0
-    if channel:
-        try:
-            channel_nr = int(channel[1:])
-        except ValueError as error:
-            raise ValueError(
-                "Syntax error processing " f"channel number '{channel}'"
-            ) from error
-
-    return product_id, scene_id, channel_nr
