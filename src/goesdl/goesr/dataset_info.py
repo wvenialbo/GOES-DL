@@ -162,7 +162,7 @@ class GOESDatasetInfo(HasStrHelp):
 
     spatial_resolution: float = NAF
     """
-    The spatial resolution (square FOV at nadir) in kilometres.
+    The spatial resolution (square FOV at nadir) in kilometres per pixel.
     """
 
     radiometric_resolution: int = NAI

@@ -115,7 +115,7 @@ class DatasetInfo(Protocol):
     @property
     def spatial_resolution(self) -> float:
         """
-        The spatial resolution in kilometres.
+        The spatial resolution in kilometres per pixel at nadir.
         """
 
     @property
