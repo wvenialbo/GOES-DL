@@ -6,7 +6,7 @@ from typing import Protocol
 from netCDF4 import Dataset
 
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
-from ..utils.array import ArrayInt16
+from ..utils.array import ArrayInt16, ArrayInt32, ArrayUint16, int32
 from .databook_gr import (
     get_abstract_goesr,
     origin_platform_goesr,
@@ -23,6 +23,10 @@ def _j200_to_utc(j200_time_sec: float) -> datetime:
     j2000_epoch_utc = datetime(2000, 1, 1, 12, tzinfo=timezone.utc)
     delta_sec = timedelta(seconds=j200_time_sec)
     return j2000_epoch_utc + delta_sec
+
+
+def _to_array_int_32(array: ArrayInt16 | ArrayUint16) -> ArrayInt32:
+    return array.astype(int32)
 
 
 class _DatasetInfo(DatasetView):
@@ -265,7 +269,7 @@ class GOESDatasetInfo(HasStrHelp):
             measurement_name: str = field.attribute("long_name")
             measurement_units: str = field.attribute("units")
 
-            valid_range: ArrayInt16 = field.attribute()
+            valid_range: ArrayInt32 = field.attribute(convert=_to_array_int_32)
             scale_factor: float = field.attribute(convert=float)
             add_offset: float = field.attribute(convert=float)
 
