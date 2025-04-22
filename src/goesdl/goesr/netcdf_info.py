@@ -240,7 +240,7 @@ class GOESGeospatialInfo(HasStrHelp):
             ]
         else:
             ginfo = _GeospatialInfo(record)
-            pattern = r"(\d+\.?\d*)(\w+)"
+            pattern = r"(\d+\.?\d*)([km]+)"
             match = search(pattern, ginfo.spatial_resolution)
             if not match:
                 raise ValueError(
