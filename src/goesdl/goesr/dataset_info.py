@@ -5,7 +5,7 @@ from typing import Protocol
 
 from netCDF4 import Dataset
 
-from ..netcdf import DatasetView, HasStrHelp, attribute, variable
+from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
 from ..utils.array import ArrayInt32
 from .databook_gr import (
     get_abstract_goesr,
@@ -311,8 +311,8 @@ class GOESDatasetInfo(HasStrHelp):
         field = variable(field_id)
 
         class _FieldInfo(DatasetView):
-            band_id: int = attribute(bid_name, convert=int)
-            band_wavelength: float = attribute(bwl_name, convert=float)
+            band_id: int = scalar(bid_name, convert=int)
+            band_wavelength: float = scalar(bwl_name, convert=float)
             sensor_band_bit_depth: int = field.attribute(convert=int)
 
         return _FieldInfo(dataframe)
