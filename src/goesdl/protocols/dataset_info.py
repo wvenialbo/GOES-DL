@@ -11,15 +11,39 @@ class DatasetInfo(Protocol):
         """
 
     @property
+    def abstract(self) -> str:
+        """
+        The database abstract.
+        """
+
+    @property
     def product_name(self) -> str:
         """
         The product name.
         """
 
     @property
+    def summary(self) -> str:
+        """
+        The product summary.
+        """
+
+    @property
+    def keywords(self) -> str:
+        """
+        The product keywords.
+        """
+
+    @property
     def dataset_name(self) -> str:
         """
         The dataset name.
+        """
+
+    @property
+    def comment(self) -> str:
+        """
+        The dataset comment.
         """
 
     @property
@@ -50,18 +74,6 @@ class DatasetInfo(Protocol):
     def scene_name(self) -> str:
         """
         The scene name.
-        """
-
-    @property
-    def summary(self) -> str:
-        """
-        The product summary.
-        """
-
-    @property
-    def keywords(self) -> str:
-        """
-        The product keywords.
         """
 
     @property
