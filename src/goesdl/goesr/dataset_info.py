@@ -299,7 +299,7 @@ class GOESDatasetInfo(HasStrHelp):
             bwl_name = f"band_wavelength_{channel}"
 
         elif product_id in {"CMIP", "Rad"}:
-            field_id = "CMI"
+            field_id = "CMI" if product_id == "CMIP" else "Rad"
             bid_name = "band_id"
             bwl_name = "band_wavelength"
 
