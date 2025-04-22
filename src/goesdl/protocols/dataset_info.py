@@ -107,6 +107,12 @@ class DatasetInfo(Protocol):
         """
 
     @property
+    def wavelength_units(self) -> float:
+        """
+        The wavelength units.
+        """
+
+    @property
     def spatial_resolution(self) -> float:
         """
         The spatial resolution in kilometres.
