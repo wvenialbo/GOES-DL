@@ -142,25 +142,3 @@ wavelength_goesr = {
 # Spectral units
 
 spectral_units_goesr = "micrometres"
-
-
-# Nominal square IGFOV at nadir in km
-
-square_igfov_at_nadir_goesr = {
-    1: 1.0,
-    2: 0.5,
-    3: 1.0,
-    4: 2.0,
-    5: 1.0,
-    6: 2.0,
-    7: 2.0,
-    8: 2.0,
-    9: 2.0,
-    10: 2.0,
-    11: 2.0,
-    12: 2.0,
-    13: 2.0,
-    14: 2.0,
-    15: 2.0,
-    16: 2.0,
-}
