@@ -48,7 +48,6 @@ class _DatasetInfo(DatasetView):
     datetime_end: datetime = attribute(
         "time_coverage_end", convert=datetime.fromisoformat
     )
-    # datetime_mid: datetime = scalar("t", convert=_j200_to_utc)
 
 
 class _MeasurementInfo(Protocol):
@@ -207,7 +206,12 @@ class GOESDatasetInfo(HasStrHelp):
 
         self.coverage_start = info.datetime_start
         self.coverage_end = info.datetime_end
-        # self.coverage_time = info.datetime_mid
+
+        if coverage_time := self._get_frame_time(dataframe):
+            self.coverage_time = coverage_time
+        else:
+            delta = self.coverage_end - self.coverage_start
+            self.coverage_time = self.coverage_start + delta / 2
 
         self.spatial_resolution = kilometres_per_pixel
 
@@ -364,3 +368,15 @@ class GOESDatasetInfo(HasStrHelp):
         scale = 1.0 if units == "km" else 1.0 / 1000.0
 
         return float(units_per_pixel * scale)
+
+    @staticmethod
+    def _get_frame_time(dataframe: Dataset) -> datetime | None:
+        if "t" not in dataframe.variables:
+            return None
+
+        class _TimeInfo(DatasetView):
+            frame_time: datetime = scalar("t", convert=_j200_to_utc)
+
+        dtinfo = _TimeInfo(dataframe)
+
+        return dtinfo.frame_time
