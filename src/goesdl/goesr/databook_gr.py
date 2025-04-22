@@ -209,7 +209,7 @@ def product_summary(dataset_name: str) -> tuple[str, str, int]:
     if not match:
         raise ValueError(f"Invalid dataset name: '{dataset_name}'")
 
-    product, scene = match.groups()
+    product_id, scene_id = match.groups()
 
     channel_nr = 0
     if channel:
@@ -220,4 +220,4 @@ def product_summary(dataset_name: str) -> tuple[str, str, int]:
                 "Syntax error processing " f"channel number '{channel}'"
             ) from error
 
-    return product, scene, channel_nr
+    return product_id, scene_id, channel_nr
