@@ -42,13 +42,14 @@ class GeodeticRegion(Protocol):
         y-ticks are the latitude values of the region of interest.
     """
 
-    domain: RegionDomain
-    """
-    The domain of the region of interest as a pair of coordinate
-    ranges.  The first coordinate range is the longitude range
-    (min_lon, max_lon) and the second coordinate range is the
-    latitude range (min_lat, max_lat).
-    """
+    @property
+    def domain(self) -> RegionDomain:
+        """
+        The domain of the region of interest as a pair of coordinate
+        ranges.  The first coordinate range is the longitude range
+        (min_lon, max_lon) and the second coordinate range is the
+        latitude range (min_lat, max_lat).
+        """
 
     @property
     def extent(self) -> RegionExtent:
@@ -71,17 +72,19 @@ class GeodeticRegion(Protocol):
         (min_lon, max_lon).
         """
 
-    xticks: ArrayFloat32
-    """
-    The x-ticks of the region of interest. Helper for plotting.
-    The x-ticks are the longitude values of the region of interest.
-    """
+    @property
+    def xticks(self) -> ArrayFloat32:
+        """
+        The x-ticks of the region of interest. Helper for plotting.
+        The x-ticks are the longitude values of the region of interest.
+        """
 
-    yticks: ArrayFloat32
-    """
-    The y-ticks of the region of interest. Helper for plotting.
-    The y-ticks are the latitude values of the region of interest.
-    """
+    @property
+    def yticks(self) -> ArrayFloat32:
+        """
+        The y-ticks of the region of interest. Helper for plotting.
+        The y-ticks are the latitude values of the region of interest.
+        """
 
 
 class GeodeticGrid(Protocol):
