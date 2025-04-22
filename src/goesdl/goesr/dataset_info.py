@@ -6,7 +6,7 @@ from typing import Protocol
 from netCDF4 import Dataset
 
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
-from ..utils.array import ArrayInt32
+from ..utils.array import ArrayInt16
 from .databook_gr import (
     get_abstract_goesr,
     origin_platform_goesr,
@@ -53,7 +53,7 @@ class _MeasurementInfo(Protocol):
     measurement_name: str
     measurement_units: str
 
-    valid_range: ArrayInt32
+    valid_range: ArrayInt16
     scale_factor: float
     add_offset: float
 
@@ -264,7 +264,7 @@ class GOESDatasetInfo(HasStrHelp):
             measurement_name: str = field.attribute("long_name")
             measurement_units: str = field.attribute("units")
 
-            valid_range: ArrayInt32 = field.attribute()
+            valid_range: ArrayInt16 = field.attribute()
             scale_factor: float = field.attribute(convert=float)
             add_offset: float = field.attribute(convert=float)
 
