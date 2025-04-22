@@ -5,7 +5,7 @@ from typing import Protocol
 
 from netCDF4 import Dataset
 
-from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
+from ..netcdf import DatasetView, HasStrHelp, attribute, variable
 from ..utils.array import ArrayInt32
 from .databook_gr import (
     get_abstract_goesr,
@@ -31,7 +31,7 @@ class _DatasetInfo(DatasetView):
     title: str
     dataset_name: str
     cdm_data_type: str
-    plaform_id: str
+    plaform_id: str = attribute("platform_ID")
     orbital_slot: str
     instrument_type: str
     summary: str
@@ -44,7 +44,7 @@ class _DatasetInfo(DatasetView):
     datetime_end: datetime = attribute(
         "time_coverage_end", convert=datetime.fromisoformat
     )
-    datetime_mid: datetime = scalar("t", convert=_j200_to_utc)
+    # datetime_mid: datetime = scalar("t", convert=_j200_to_utc)
 
 
 class _MeasurementInfo(Protocol):
@@ -345,7 +345,7 @@ class GOESDatasetInfo(HasStrHelp):
         pattern = r"^(\d+\.?\d*)([km]+)"
 
         if match := search(pattern, fov_at_nadir):
-            units_per_pixel, units = match.groups()
+            value, units = match.groups()
         else:
             raise ValueError(
                 f"Unable to parse spatial resolution: '{fov_at_nadir}'"
@@ -355,6 +355,8 @@ class GOESDatasetInfo(HasStrHelp):
             raise ValueError(
                 f"Unexpected spatial resolution units: '{fov_at_nadir}'"
             )
+
+        units_per_pixel = float(value)
 
         scale = 1.0 if units == "km" else 1.0 / 1000.0
 
