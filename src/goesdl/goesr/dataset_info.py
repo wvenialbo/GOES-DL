@@ -6,6 +6,7 @@ from typing import Protocol
 from netCDF4 import Dataset
 
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
+from ..utils.array import ArrayInt32
 from .databook_gr import (
     get_abstract_goesr,
     origin_platform_goesr,
@@ -51,6 +52,10 @@ class _MeasurementInfo(Protocol):
     standard_name: str
     measurement_name: str
     measurement_units: str
+
+    valid_range: ArrayInt32
+    scale_factor: float
+    add_offset: float
 
 
 class _BandInfo(Protocol):
@@ -171,6 +176,11 @@ class GOESDatasetInfo(HasStrHelp):
     The measurement field units.
     """
 
+    valid_range: tuple[float, float] = nan, nan
+    """
+    The valid range for the measurements.
+        """
+
     def __init__(self, dataframe: Dataset, channel: str) -> None:
         info = _DatasetInfo(dataframe)
 
@@ -205,6 +215,7 @@ class GOESDatasetInfo(HasStrHelp):
             self.standard_name = NA
             self.measurement_name = NA
             self.measurement_units = NA
+            self.valid_range = nan, nan
 
             return
 
@@ -227,6 +238,10 @@ class GOESDatasetInfo(HasStrHelp):
         self.standard_name = minfo.standard_name
         self.measurement_name = minfo.measurement_name
         self.measurement_units = minfo.measurement_units
+
+        valid_range = minfo.valid_range * minfo.scale_factor + minfo.add_offset
+
+        self.valid_range = float(valid_range[0]), float(valid_range[1])
 
     @staticmethod
     def _get_field_id(product_id: str, channel: str) -> str:
@@ -252,6 +267,10 @@ class GOESDatasetInfo(HasStrHelp):
             standard_name: str = field.attribute()
             measurement_name: str = field.attribute("long_name")
             measurement_units: str = field.attribute("units")
+
+            valid_range: ArrayInt32 = field.attribute()
+            scale_factor: float = field.attribute(convert=float)
+            add_offset: float = field.attribute(convert=float)
 
         return _FieldInfo(dataframe)
 
