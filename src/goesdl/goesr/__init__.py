@@ -22,6 +22,7 @@ Classes:
 """
 
 from .dataset_info import GOESDatasetInfo
+from .dataset_time import GOESCoverageTime
 from .image import GOESImage
 from .locator_abi import GOESProductLocatorABI
 from .locator_dc import (
@@ -40,7 +41,6 @@ from .locator_pp import (
 )
 from .netcdf_geodetic import GOESLatLonGrid
 from .netcdf_projection import GOESABIFixedGrid, GOESGlobe, GOESOrbitGeometry
-from .netcdf_time import GOESCoverageTime
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
 GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC
