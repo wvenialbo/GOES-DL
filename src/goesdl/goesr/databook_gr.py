@@ -47,13 +47,9 @@ def get_abstract_goesr(kilometres_per_pixel: float) -> str:
     )
 
 
-# Platform-origin correspondence
+# Origin-platform correspondence
 
-platform_origin_goesr = {f"GOES-{id}": f"G{id:0>2}" for id in range(16, 20)}
-
-origin_platform_goesr = {
-    value: key for key, value in platform_origin_goesr.items()
-}
+origin_platform_goesr = {f"G{id:0>2}": f"GOES-{id}" for id in range(16, 20)}
 
 
 # Scene identifiers
