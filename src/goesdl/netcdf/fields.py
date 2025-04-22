@@ -955,7 +955,7 @@ def scalar(id: str | None = None, *, convert: ConvertFn | None = None) -> Any:
         return x[:1]
 
     def convert_(x: Any) -> Any:
-        value = x[0] if x.ndim > 0 else x
+        value = x[0] if x.ndim > 0 else x.item()
         return convert(value) if convert else value
 
     return data(id, filter=filter_, convert=convert_)
