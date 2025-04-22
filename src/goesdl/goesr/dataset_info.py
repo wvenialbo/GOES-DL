@@ -221,13 +221,11 @@ class GOESDatasetInfo(HasStrHelp):
 
         product_id = GOESDatasetInfo._get_product_id(info.dataset_name)
 
-        band_id, band_wavelength, radiometric_resolution = (
-            self._get_radiometric_info(dataframe, product_id, channel)
-        )
+        binfo = self._get_radiometric_info(dataframe, product_id, channel)
 
-        self.band_id = band_id
-        self.band_wavelength = band_wavelength
-        self.radiometric_resolution = radiometric_resolution
+        self.band_id = binfo.band_id
+        self.band_wavelength = binfo.band_wavelength
+        self.radiometric_resolution = binfo.sensor_band_bit_depth
 
         field_id = self._get_field_id(product_id, channel)
 
