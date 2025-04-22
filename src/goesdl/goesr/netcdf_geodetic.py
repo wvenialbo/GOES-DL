@@ -15,7 +15,7 @@ from ..geodesy import (
 from ..netcdf import DatasetView, HasStrHelp
 from ..protocols.geodetic import IndexRange, RegionDomain
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .netcdf_projection import GOESGeostationaryGrid, GOESImagerProjection
+from .projection import GOESGeostationaryGrid, GOESImagerProjection
 
 BoxLimits = tuple[int, int, int, int]
 
