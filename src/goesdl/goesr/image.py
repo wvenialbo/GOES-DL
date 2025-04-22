@@ -12,6 +12,7 @@ GOESImageMetadata
     Represent GOES image metadata attributes.
 """
 
+from re import search
 from typing import Any, Protocol, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
@@ -21,9 +22,8 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .databook_gr import product_summary
+from .databook_gr import channel_correspondence_goesr
 from .netcdf_geodetic import GOESLatLonGrid
-from .netcdf_info import GOESPlatformInfo
 
 
 class ImageData(Protocol):
@@ -38,6 +38,7 @@ class GOESImageData(HasStrHelp):
 
 class _DatasetInfo(DatasetView):
 
+    cdm_data_type: str
     dataset_name: str
 
 
@@ -53,11 +54,11 @@ class GOESImage(GOESImageData):
     def __init__(
         self, record: Dataset, grid: GOESLatLonGrid, channel: str = ""
     ) -> None:
-        product_name = self._validate_product(record)
+        product_id = self._validate_product(record)
 
-        channel_id = self._validate_channel(record, channel)
+        channel_id = self._validate_channel(product_id, channel)
 
-        field = self._validate_field(record, product_name, channel_id)
+        field = self._validate_field(record, product_id, channel_id)
 
         data = self._extract_image(
             record, field, grid.lon_limits, grid.lat_limits
@@ -88,44 +89,59 @@ class GOESImage(GOESImageData):
         return data
 
     @staticmethod
-    def _validate_channel(record: Dataset, channel: str) -> str:
-        pinfo = GOESPlatformInfo(record, channel)
-        return pinfo.channel_id
+    def _get_product_id(dataset_name: str) -> str:
+        patterns = (r"^OR_ABI-L\db?-([^-]+)", r"^([A-Za-z]+)(?:C|F|M\d?)$")
+        product_name: str = dataset_name
+        for pattern in patterns:
+            if match := search(pattern, product_name):
+                product_name = match[1]
+            else:
+                raise ValueError(f"Unexpected dataset name: '{dataset_name}'")
+        return product_name
+
+    @staticmethod
+    def _validate_channel(product_id: str, channel: str) -> str:
+        if product_id == "MCMIP" and not channel:
+            raise ValueError(
+                "Channel information is required for multi-band datasets"
+            )
+
+        if channel and channel not in channel_correspondence_goesr:
+            allowed_channels = "', '".join(channel_correspondence_goesr.keys())
+            raise ValueError(
+                f"Invalid channel: '{channel}'; "
+                f"allowed channels are: '{allowed_channels}'"
+            )
+
+        return channel
 
     @staticmethod
     def _validate_field(
-        record: Dataset, product_name: str, channel_id: str
+        record: Dataset, product_id: str, channel_id: str
     ) -> str:
-        if product_name == "MCMIP":
+        if product_id == "MCMIP":
             field = f"CMI_{channel_id}"
-        elif product_name == "CMIP":
+        elif product_id == "CMIP":
             field = "CMI"
         else:
-            field = product_name
+            field = product_id
 
         if field not in record.variables:
             raise ValueError(f"Field '{field}' not found in the dataset")
 
-        if record.variables[field].ndim != 2:
-            raise ValueError(
-                f"The product '{product_name}' does not containt an image"
-            )
-
         return field
 
-    @staticmethod
-    def _validate_product(record: Dataset) -> str:
+    @classmethod
+    def _validate_product(cls, record: Dataset) -> str:
         dinfo = _DatasetInfo(record)
 
-        product_name, _, _ = product_summary(dinfo.dataset_name)
-
-        if not product_name:
+        if dinfo.cdm_data_type != "Image":
             raise ValueError(
                 f"The dataset '{dinfo.dataset_name}' does not containt"
                 "an image"
             )
 
-        return product_name
+        return cls._get_product_id(dinfo.dataset_name)
 
     @property
     def image(self) -> ArrayFloat32:
