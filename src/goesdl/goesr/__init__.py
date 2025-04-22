@@ -38,7 +38,7 @@ from .locator_pp import (
     GOESProductLocatorRad,
 )
 from .netcdf_geodetic import GOESLatLonGrid
-from .netcdf_image import GOESImage
+from .image import GOESImage
 from .netcdf_info import (
     GOESGeospatialInfo,
     GOESPlatformInfo,
