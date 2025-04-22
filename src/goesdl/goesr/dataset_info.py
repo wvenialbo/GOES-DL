@@ -181,7 +181,7 @@ class GOESDatasetInfo(HasStrHelp):
     The valid range for the measurements.
         """
 
-    def __init__(self, dataframe: Dataset, channel: str) -> None:
+    def __init__(self, dataframe: Dataset, channel: str = "") -> None:
         info = _DatasetInfo(dataframe)
 
         kilometres_per_pixel = self._get_spatial_resolution(
