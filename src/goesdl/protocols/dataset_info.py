@@ -29,9 +29,9 @@ class DatasetInfo(Protocol):
         """
 
     @property
-    def plaform_id(self) -> str:
+    def plaform_name(self) -> str:
         """
-        The platform (satellite) identifier.
+        The platform (satellite) name.
         """
 
     @property
