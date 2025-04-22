@@ -21,6 +21,7 @@ Classes:
     - GOESProductLocatorRad: ABI Radiance Product (Rad).
 """
 
+from .dataset_info import GOESDatasetInfo
 from .locator_abi import GOESProductLocatorABI
 from .locator_dc import (
     GOESProductLocatorABIDC,
@@ -39,7 +40,6 @@ from .locator_pp import (
 from .netcdf_geodetic import GOESLatLonGrid
 from .netcdf_image import GOESImage
 from .netcdf_info import (
-    GOESDatasetInfo,
     GOESGeospatialInfo,
     GOESPlatformInfo,
     GSRadiometricInfo,
