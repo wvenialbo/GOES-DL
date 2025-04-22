@@ -241,7 +241,7 @@ class GOESDatasetInfo(HasStrHelp):
 
     @staticmethod
     def _get_field_id(product_id: str, channel: str) -> str:
-        if product_id in {"CMIP", "Rad"}:
+        if product_id == "CMIP":
             return "CMI"
 
         if product_id == "MCMIP":
