@@ -136,7 +136,7 @@ class GOESImagerProjection(GOESOrbitGeometry, GOESGlobe):
     """
 
 
-def to_float64(array: ArrayFloat32) -> ArrayFloat64:
+def _to_float64(array: ArrayFloat32) -> ArrayFloat64:
     """
     Convert a float32 array to a float64 array.
 
@@ -151,26 +151,6 @@ def to_float64(array: ArrayFloat32) -> ArrayFloat64:
         The float64 array.
     """
     return array.astype(float64)
-
-
-class GOESABIFixedGrid(GOESImagerProjection):
-    """
-    Represent GOES-R series satellite ABI Fixed Grid projection data.
-
-    Attributes
-    ----------
-    x : ArrayFloat32
-        1D array of E/W scanning angles in radians.
-    y : ArrayFloat32
-        1D array of N/S elevation angles in radians.
-    """
-
-    # Information about the fixed grid
-    x: ArrayFloat32 = data()
-    y: ArrayFloat32 = data()
-
-    long_name: str = imager_proj.attribute()
-    grid_mapping_name: str = imager_proj.attribute()
 
 
 class GOESGeostationaryGrid(HasStrHelp):
@@ -216,10 +196,10 @@ class GOESGeostationaryGrid(HasStrHelp):
 
         class _FixedGrid(DatasetView):
             x: ArrayFloat64 = variable("x").data(
-                filter=subsample(lon_limits), convert=to_float64
+                filter=subsample(lon_limits), convert=_to_float64
             )
             y: ArrayFloat64 = variable("y").data(
-                filter=subsample(lat_limits), convert=to_float64
+                filter=subsample(lat_limits), convert=_to_float64
             )
 
         grid = _FixedGrid(record)
