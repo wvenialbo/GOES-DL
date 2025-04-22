@@ -23,7 +23,7 @@ from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .databook_gr import channel_correspondence_goesr
-from .netcdf_geodetic import GOESLatLonGrid
+from .geodetic import GOESLatLonGrid
 
 
 class ImageData(Protocol):
