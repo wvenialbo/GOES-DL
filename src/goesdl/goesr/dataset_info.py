@@ -337,6 +337,8 @@ class GOESDatasetInfo(HasStrHelp):
                 pattern = r".+(M\d)"
                 if match := search(pattern, product_id):
                     scene_id = match[1]
+        else:
+            scene_id = scene_char_id
 
         return scene_name_goesr[scene_id]
 
