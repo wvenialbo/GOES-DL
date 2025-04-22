@@ -63,13 +63,8 @@ class GOESImage(GOESImageData):
             record, field, grid.lon_limits, grid.lat_limits
         )
 
-        self._grid = grid
+        self.grid = grid
         self.raster = data.raster
-
-        if field.startswith("CMI"):
-            self.metadata = GOESImageMetadataCMI(record)
-        else:
-            self.metadata = GOESImageMetadata(record)
 
     @staticmethod
     def _extract_image(
@@ -142,4 +137,4 @@ class GOESImage(GOESImageData):
 
     @property
     def region(self) -> RectangularRegion:
-        return self._grid.region
+        return self.grid.region
