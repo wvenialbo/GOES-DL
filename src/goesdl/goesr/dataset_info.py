@@ -140,7 +140,7 @@ class GOESDatasetInfo(HasStrHelp):
     The coverage end time.
     """
 
-    coverage_time: datetime
+    coverage_midpoint: datetime
     """
     The mid-point between the start and end image scan.
     """
@@ -219,10 +219,10 @@ class GOESDatasetInfo(HasStrHelp):
         self.coverage_end = info.datetime_end
 
         if coverage_time := self._get_frame_time(dataframe):
-            self.coverage_time = coverage_time
+            self.coverage_midpoint = coverage_time
         else:
             delta = self.coverage_end - self.coverage_start
-            self.coverage_time = self.coverage_start + delta / 2
+            self.coverage_midpoint = self.coverage_start + delta / 2
 
         self.spatial_resolution = kilometres_per_pixel
 

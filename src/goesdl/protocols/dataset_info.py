@@ -89,7 +89,7 @@ class DatasetInfo(Protocol):
         """
 
     @property
-    def coverage_time(self) -> datetime:
+    def coverage_midpoint(self) -> datetime:
         """
         The mid-point between the start and end image scan.
         """
