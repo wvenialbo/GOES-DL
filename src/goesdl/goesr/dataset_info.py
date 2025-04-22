@@ -203,7 +203,7 @@ class GOESDatasetInfo(HasStrHelp):
 
         self.coverage_start = info.datetime_start
         self.coverage_end = info.datetime_end
-        self.coverage_time = info.datetime_mid
+        # self.coverage_time = info.datetime_mid
 
         self.spatial_resolution = kilometres_per_pixel
 
@@ -222,9 +222,7 @@ class GOESDatasetInfo(HasStrHelp):
         product_id = GOESDatasetInfo._get_product_id(info.dataset_name)
 
         band_id, band_wavelength, radiometric_resolution = (
-            self._get_radiometric_info(
-                dataframe, info.dataset_name, info.cdm_data_type, channel
-            )
+            self._get_radiometric_info(dataframe, product_id, channel)
         )
 
         self.band_id = band_id
