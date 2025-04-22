@@ -1,0 +1,342 @@
+from datetime import datetime, timedelta, timezone
+from math import nan
+from re import search
+from typing import Protocol
+
+from netCDF4 import Dataset
+
+from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
+from .databook_gr import (
+    get_abstract_goesr,
+    origin_platform_goesr,
+    scene_id_goesr,
+    scene_name_goesr,
+)
+
+NA = "not available"
+NAI = -999
+NAF = nan
+
+
+def _j200_to_utc(j200_time_sec: float) -> datetime:
+    j2000_epoch_utc = datetime(2000, 1, 1, 12, tzinfo=timezone.utc)
+    delta_sec = timedelta(seconds=j200_time_sec)
+    return j2000_epoch_utc + delta_sec
+
+
+class _DatasetInfo(DatasetView):
+
+    project: str
+    title: str
+    dataset_name: str
+    cdm_data_type: str
+    plaform_id: str
+    orbital_slot: str
+    instrument_type: str
+    summary: str
+    keywords: str
+    spatial_resolution: str
+
+    datetime_start: datetime = attribute(
+        "time_coverage_start", convert=datetime.fromisoformat
+    )
+    datetime_end: datetime = attribute(
+        "time_coverage_end", convert=datetime.fromisoformat
+    )
+    datetime_mid: datetime = scalar("t", convert=_j200_to_utc)
+
+
+class _MeasurementInfo(Protocol):
+
+    standard_name: str
+    measurement_name: str
+    measurement_units: str
+
+
+class _BandInfo(Protocol):
+    band_id: int
+    band_wavelength: float
+    sensor_band_bit_depth: int
+
+
+class GOESDatasetInfo(HasStrHelp):
+
+    database_name: str = NA
+    """
+    The database name.
+    """
+
+    abstract: str = NA
+    """
+    The database abstract.
+    """
+
+    product_name: str = NA
+    """
+    The product name.
+    """
+
+    summary: str = NA
+    """
+    The product summary.
+    """
+
+    keywords: str = NA
+    """
+    The product keywords.
+    """
+
+    dataset_name: str = NA
+    """
+    The dataset name.
+    """
+
+    comment: str = NA
+    """
+    The dataset comment.
+    """
+
+    content_type: str = NA
+    """
+    The dataset content type.
+    """
+
+    plaform_name: str = NA
+    """
+    The platform name (e.g. 'GOES-16', 'GOES-19', etc.).
+    """
+
+    orbital_slot: str = NA
+    """
+    The orbital slot identifier.
+    """
+
+    instrument_name: str = NA
+    """
+    The instrument name.
+    """
+
+    scene_name: str = NA
+    """
+    The scene name (e.g. 'Full Disk', etc.).
+    """
+
+    coverage_start: datetime
+    """
+    The coverage start time.
+    """
+
+    coverage_end: datetime
+    """
+    The coverage end time.
+    """
+
+    coverage_time: datetime
+    """
+    The mid-point between the start and end image scan.
+    """
+
+    band_id: int = NAI
+    """
+    The band identifier.
+    """
+
+    band_wavelength: float = NAF
+    """
+    The band central wavelength.
+    """
+
+    spatial_resolution: float = NAF
+    """
+    The spatial resolution (square FOV at nadir) in kilometres.
+    """
+
+    radiometric_resolution: int = NAI
+    """
+    The radiometric resolution in bits.
+    """
+
+    standard_name: str = NA
+    """
+    The measurement field standard name.
+    """
+
+    measurement_name: str = NA
+    """
+    The measurement field name.
+    """
+
+    measurement_units: str = NA
+    """
+    The measurement field units.
+    """
+
+    def __init__(self, dataframe: Dataset, channel: str) -> None:
+        info = _DatasetInfo(dataframe)
+
+        kilometres_per_pixel = self._get_spatial_resolution(
+            info.spatial_resolution
+        )
+
+        self.database_name = info.project
+        self.abstract = get_abstract_goesr(kilometres_per_pixel)
+        self.product_name = info.title
+        self.summary = info.summary
+        self.keywords = info.keywords
+        self.dataset_name = info.dataset_name
+        self.comment = NA
+        self.content_type = info.cdm_data_type
+        self.plaform_name = self._get_platform_name(info.plaform_id)
+        self.orbital_slot = info.orbital_slot
+        self.instrument_name = info.instrument_type
+        self.scene_name = self._get_scene_name(dataframe, info.dataset_name)
+
+        self.coverage_start = info.datetime_start
+        self.coverage_end = info.datetime_end
+        self.coverage_time = info.datetime_mid
+
+        self.spatial_resolution = kilometres_per_pixel
+
+        if info.cdm_data_type != "Image":
+            self.band_id = 0
+            self.band_wavelength = nan
+            self.radiometric_resolution = 0
+
+            self.standard_name = NA
+            self.measurement_name = NA
+            self.measurement_units = NA
+
+            return
+
+        product_id = GOESDatasetInfo._get_product_id(info.dataset_name)
+
+        band_id, band_wavelength, radiometric_resolution = (
+            self._get_radiometric_info(
+                dataframe, info.dataset_name, info.cdm_data_type, channel
+            )
+        )
+
+        self.band_id = band_id
+        self.band_wavelength = band_wavelength
+        self.radiometric_resolution = radiometric_resolution
+
+        field_id = self._get_field_id(product_id, channel)
+
+        minfo = self._get_measurement_info(dataframe, field_id)
+
+        self.standard_name = minfo.standard_name
+        self.measurement_name = minfo.measurement_name
+        self.measurement_units = minfo.measurement_units
+
+    @staticmethod
+    def _get_field_id(product_id: str, channel: str) -> str:
+        if product_id in {"CMIP", "Rad"}:
+            return "CMI"
+
+        if product_id == "MCMIP":
+            if not channel:
+                raise ValueError(
+                    "Channel information is required for multi-band datasets"
+                )
+            return f"CMI_{channel}"
+
+        return product_id
+
+    @staticmethod
+    def _get_measurement_info(
+        dataframe: Dataset, field_id: str
+    ) -> _MeasurementInfo:
+        field = variable(field_id)
+
+        class _FieldInfo(DatasetView):
+            standard_name: str = field.attribute()
+            measurement_name: str = field.attribute("long_name")
+            measurement_units: str = field.attribute("units")
+
+        return _FieldInfo(dataframe)
+
+    @staticmethod
+    def _get_platform_name(plaform_id: str) -> str:
+        return origin_platform_goesr[plaform_id]
+
+    @staticmethod
+    def _get_product_id(dataset_name: str) -> str:
+        patterns = (r"^OR_ABI-L\db?-([^-]+)", r"^([A-Za-z]+)(?:C|F|M\d?)$")
+        product_name: str = dataset_name
+        for pattern in patterns:
+            if match := search(pattern, product_name):
+                product_name = match[1]
+            else:
+                raise ValueError(f"Unexpected dataset name: '{dataset_name}'")
+        return product_name
+
+    @staticmethod
+    def _get_radiometric_info(
+        dataframe: Dataset, product_id: str, channel: str
+    ) -> _BandInfo:
+        if product_id == "MCMIP":
+            if not channel:
+                raise ValueError(
+                    "Channel information is required for multi-band datasets"
+                )
+            field_id = f"CMI_{channel}"
+            bid_name = f"band_id_{channel}"
+            bwl_name = f"band_wavelength_{channel}"
+
+        elif product_id in {"CMIP", "Rad"}:
+            field_id = "CMI"
+            bid_name = "band_id"
+            bwl_name = "band_wavelength"
+
+        else:
+            raise ValueError(f"Unexpected product ID: '{product_id}'")
+
+        field = variable(field_id)
+
+        class _FieldInfo(DatasetView):
+            band_id: int = attribute(bid_name, convert=int)
+            band_wavelength: float = attribute(bwl_name, convert=float)
+            sensor_band_bit_depth: int = field.attribute(convert=int)
+
+        return _FieldInfo(dataframe)
+
+    @staticmethod
+    def _get_scene_name(dataframe: Dataset, dataset_name: str) -> str:
+        # Check for scene support
+        scene_id_attr = "scene_id"
+        if not hasattr(dataframe, scene_id_attr):
+            return NA
+
+        # Get the scene ID
+        scene_id: str = getattr(dataframe, scene_id_attr)
+        scene_char_id = scene_id_goesr[scene_id]
+
+        if scene_char_id == "M":
+            pattern = r"^OR_ABI-L\db?-([^-]+)"
+            if match := search(pattern, dataset_name):
+                product_id = match[1]
+                pattern = r".+(M\d)"
+                if match := search(pattern, product_id):
+                    scene_id = match[1]
+
+        return scene_name_goesr[scene_id]
+
+    @staticmethod
+    def _get_spatial_resolution(fov_at_nadir: str) -> float:
+        pattern = r"^(\d+\.?\d*)([km]+)"
+
+        if match := search(pattern, fov_at_nadir):
+            units_per_pixel, units = match.groups()
+        else:
+            raise ValueError(
+                f"Unable to parse spatial resolution: '{fov_at_nadir}'"
+            )
+
+        if units not in {"m", "km"}:
+            raise ValueError(
+                f"Unexpected spatial resolution units: '{fov_at_nadir}'"
+            )
+
+        scale = 1.0 if units == "km" else 1.0 / 1000.0
+
+        return float(units_per_pixel * scale)
