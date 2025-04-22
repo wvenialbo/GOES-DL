@@ -22,14 +22,14 @@ from typing import Any, Protocol
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float64
 
-from ..netcdf import DatasetView, HasStrHelp, data, variable
+from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32, ArrayFloat64
 
 BoxLimits = tuple[int, int, int, int]
 
 
-imager_proj = variable("goes_imager_projection")
+_imager_proj = variable("goes_imager_projection")
 
 
 class GeostationaryGrid(Protocol):
@@ -68,10 +68,10 @@ class GOESOrbitGeometry(DatasetView):
     """
 
     # Information about the projection
-    latitude_of_projection_origin: float64 = imager_proj.attribute()
-    longitude_of_projection_origin: float64 = imager_proj.attribute()
-    perspective_point_height: float64 = imager_proj.attribute()
-    sweep_angle_axis: str = imager_proj.attribute()
+    latitude_of_projection_origin: float64 = _imager_proj.attribute()
+    longitude_of_projection_origin: float64 = _imager_proj.attribute()
+    perspective_point_height: float64 = _imager_proj.attribute()
+    sweep_angle_axis: str = _imager_proj.attribute()
 
 
 class GOESGlobe(DatasetView):
@@ -104,9 +104,9 @@ class GOESGlobe(DatasetView):
     """
 
     # Information about the globe
-    semi_major_axis: float64 = imager_proj.attribute()
-    semi_minor_axis: float64 = imager_proj.attribute()
-    inverse_flattening: float64 = imager_proj.attribute()
+    semi_major_axis: float64 = _imager_proj.attribute()
+    semi_minor_axis: float64 = _imager_proj.attribute()
+    inverse_flattening: float64 = _imager_proj.attribute()
 
 
 class GOESImagerProjection(GOESOrbitGeometry, GOESGlobe):
