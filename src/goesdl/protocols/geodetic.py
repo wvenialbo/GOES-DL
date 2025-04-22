@@ -119,37 +119,42 @@ class GeodeticGrid(Protocol):
         indices to slice the data.
     """
 
-    crs: Projection
-    """
-    The projection of the data. The projection is used to transform
-    the data.
-    """
+    @property
+    def crs(self) -> Projection:
+        """
+        The projection of the data. The projection is used to transform
+        the data.
+        """
+ 
+    @property
+    def lat(self) -> ArrayFloat32:
+        """
+        A 2D array containing the sliced values of the latitude grid
+        data.
+        """
 
-    lat: ArrayFloat32
-    """
-    A 2D array containing the sliced values of the latitude grid
-    data.
-    """
+    @property
+    def lat_limits(self) -> IndexRange:
+        """
+        A tuple of two integers containing the indices of the minimum
+        and maximum latitude values of the grid data. The limits are
+        used to slice the data.
+        """
 
-    lat_limits: IndexRange
-    """
-    A tuple of two integers containing the indices of the minimum
-    and maximum latitude values of the grid data. The limits are
-    used to slice the data.
-    """
+    @property
+    def lon(self) -> ArrayFloat32:
+        """
+        A 2D array containing the sliced values of the longitude grid
+        data.
+        """
 
-    lon: ArrayFloat32
-    """
-    A 2D array containing the sliced values of the longitude grid
-    data.
-    """
-
-    lon_limits: IndexRange
-    """
-    A tuple of two integers containing the indices of the minimum
-    and maximum longitude values of the grid data. The limits are
-    used to slice the data.
-    """
+    @property
+    def lon_limits(self) -> IndexRange:
+        """
+        A tuple of two integers containing the indices of the minimum
+        and maximum longitude values of the grid data. The limits are
+        used to slice the data.
+        """
 
     @property
     def region(self) -> GeodeticRegion:
