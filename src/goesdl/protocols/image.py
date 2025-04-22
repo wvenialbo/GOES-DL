@@ -52,8 +52,8 @@ class SatImageData(Protocol):
     @property
     def raster(self) -> MaskedFloat32:
         """
-        A 2D array containing the masked values of the image data extracted
-        from the satellite dataset.
+        A 2D array containing the masked values of the image data
+        extracted from the satellite dataset.
         """
 
     @property
