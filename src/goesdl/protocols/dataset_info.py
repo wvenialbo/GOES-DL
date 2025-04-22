@@ -117,3 +117,21 @@ class DatasetInfo(Protocol):
         """
         The radiometric resolution in bits.
         """
+
+    @property
+    def standard_name(self) -> str:
+        """
+        The measurement field standard name.
+        """
+
+    @property
+    def measurement_name(self) -> str:
+        """
+        The measurement field name.
+        """
+
+    @property
+    def measurement_units(self) -> str:
+        """
+        The measurement field units.
+        """
