@@ -179,10 +179,15 @@ class GOESDatasetInfo(HasStrHelp):
     The measurement field units.
     """
 
-    valid_range: tuple[float, float] = nan, nan
+    valid_range: tuple[float, float] = ()
     """
     The valid range for the measurements.
-        """
+    """
+
+    shape: tuple[int, ...] = ()
+    """
+    The dimesions of the image.
+    """
 
     def __init__(self, dataframe: Dataset, channel: str = "") -> None:
         info = _DatasetInfo(dataframe)
@@ -216,14 +221,16 @@ class GOESDatasetInfo(HasStrHelp):
         self.spatial_resolution = kilometres_per_pixel
 
         if info.cdm_data_type != "Image":
-            self.band_id = 0
-            self.band_wavelength = nan
-            self.radiometric_resolution = 0
+            self.band_id = NAI
+            self.band_wavelength = NAF
+            self.radiometric_resolution = NAI
 
             self.standard_name = NA
             self.measurement_name = NA
             self.measurement_units = NA
-            self.valid_range = nan, nan
+            self.valid_range = ()
+
+            self.shape = ()
 
             return
 
@@ -236,6 +243,11 @@ class GOESDatasetInfo(HasStrHelp):
             self.band_wavelength = binfo.band_wavelength
             self.radiometric_resolution = binfo.sensor_band_bit_depth
 
+        else:
+            self.band_id = NAI
+            self.band_wavelength = NAF
+            self.radiometric_resolution = NAI
+
         field_id = self._get_field_id(product_id, channel)
 
         minfo = self._get_measurement_info(dataframe, field_id)
@@ -247,6 +259,8 @@ class GOESDatasetInfo(HasStrHelp):
         valid_range = minfo.valid_range * minfo.scale_factor + minfo.add_offset
 
         self.valid_range = float(valid_range[0]), float(valid_range[1])
+
+        self.shape = self._get_shape_info(dataframe, field_id)
 
     @staticmethod
     def _get_field_id(product_id: str, channel: str) -> str:
@@ -261,6 +275,18 @@ class GOESDatasetInfo(HasStrHelp):
             return f"CMI_{channel}"
 
         return product_id
+
+    @staticmethod
+    def _get_frame_time(dataframe: Dataset) -> datetime | None:
+        if "t" not in dataframe.variables:
+            return None
+
+        class _TimeInfo(DatasetView):
+            frame_time: datetime = scalar("t", convert=_j200_to_utc)
+
+        dtinfo = _TimeInfo(dataframe)
+
+        return dtinfo.frame_time
 
     @staticmethod
     def _get_measurement_info(
@@ -348,6 +374,17 @@ class GOESDatasetInfo(HasStrHelp):
         return scene_name_goesr[scene_id]
 
     @staticmethod
+    def _get_shape_info(dataframe: Dataset, field_id: str) -> tuple[int, ...]:
+        field = variable(field_id)
+
+        class _ShapeInfo(DatasetView):
+            shape: tuple[int] = field.attribute()
+
+        sinfo = _ShapeInfo(dataframe)
+
+        return sinfo.shape
+
+    @staticmethod
     def _get_spatial_resolution(fov_at_nadir: str) -> float:
         pattern = r"^(\d+\.?\d*)([km]+)"
 
@@ -368,15 +405,3 @@ class GOESDatasetInfo(HasStrHelp):
         scale = 1.0 if units == "km" else 1.0 / 1000.0
 
         return float(units_per_pixel * scale)
-
-    @staticmethod
-    def _get_frame_time(dataframe: Dataset) -> datetime | None:
-        if "t" not in dataframe.variables:
-            return None
-
-        class _TimeInfo(DatasetView):
-            frame_time: datetime = scalar("t", convert=_j200_to_utc)
-
-        dtinfo = _TimeInfo(dataframe)
-
-        return dtinfo.frame_time
