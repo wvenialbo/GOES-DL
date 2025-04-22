@@ -117,28 +117,6 @@ channel_correspondence_goesr = {
 }
 
 
-# Mid-channel wavelength in µm
-
-wavelength_goesr = {
-    1: 0.47,
-    2: 0.64,
-    3: 0.865,
-    4: 1.378,
-    5: 1.61,
-    6: 2.25,
-    7: 3.90,
-    8: 6.185,
-    9: 6.95,
-    10: 7.34,
-    11: 8.5,
-    12: 9.61,
-    13: 10.35,
-    14: 11.2,
-    15: 12.3,
-    16: 13.3,
-}
-
-
 # Spectral units
 
 spectral_units_goesr = "micrometres"
