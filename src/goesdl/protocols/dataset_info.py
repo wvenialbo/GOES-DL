@@ -141,3 +141,9 @@ class DatasetInfo(Protocol):
         """
         The valid range for the measurements.
         """
+
+    @property
+    def shape(self) -> tuple[int, ...]:
+        """
+        The dimesions of the image.
+        """
