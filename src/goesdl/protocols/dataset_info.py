@@ -47,9 +47,9 @@ class DatasetInfo(Protocol):
         """
 
     @property
-    def scene_id(self) -> str:
+    def scene_name(self) -> str:
         """
-        The scene identifier.
+        The scene name.
         """
 
     @property
