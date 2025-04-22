@@ -65,21 +65,21 @@ class DatasetInfo(Protocol):
         """
 
     @property
-    def datetime_start(self) -> datetime:
+    def coverage_start(self) -> datetime:
         """
         The coverage start time.
         """
 
     @property
-    def datetime_end(self) -> datetime:
+    def coverage_end(self) -> datetime:
         """
         The coverage start time.
         """
 
     @property
-    def actual_time(self) -> datetime:
+    def coverage_time(self) -> datetime:
         """
-        The image actual time.
+        The mid-point between the start and end image scan.
         """
 
     @property
