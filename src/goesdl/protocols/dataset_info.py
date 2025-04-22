@@ -107,7 +107,7 @@ class DatasetInfo(Protocol):
         """
 
     @property
-    def wavelength_units(self) -> float:
+    def wavelength_units(self) -> str:
         """
         The wavelength units.
         """
