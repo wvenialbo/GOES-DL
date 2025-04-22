@@ -8,6 +8,7 @@ from netCDF4 import Dataset
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
 from ..utils.array import ArrayInt16, ArrayInt32, ArrayUint16, int32
 from .databook_gr import (
+    channel_description_goesr,
     get_abstract_goesr,
     origin_platform_goesr,
     scene_id_goesr,
@@ -150,6 +151,11 @@ class GOESDatasetInfo(HasStrHelp):
     The band identifier.
     """
 
+    band_description: str = NA
+    """
+    The band description.
+    """
+
     band_wavelength: float = NAF
     """
     The band central wavelength.
@@ -228,6 +234,7 @@ class GOESDatasetInfo(HasStrHelp):
 
         if info.cdm_data_type != "Image":
             self.band_id = NAI
+            self.band_description = NA
             self.band_wavelength = NAF
             self.wavelength_units = NA
             self.radiometric_resolution = NAI
@@ -247,12 +254,14 @@ class GOESDatasetInfo(HasStrHelp):
             binfo = self._get_radiometric_info(dataframe, product_id, channel)
 
             self.band_id = binfo.band_id
+            self.band_description = channel_description_goesr[binfo.band_id]
             self.band_wavelength = binfo.band_wavelength
             self.wavelength_units = spectral_units_goesr
             self.radiometric_resolution = binfo.sensor_band_bit_depth
 
         else:
             self.band_id = NAI
+            self.band_description = NA
             self.band_wavelength = NAF
             self.wavelength_units = NA
             self.radiometric_resolution = NAI

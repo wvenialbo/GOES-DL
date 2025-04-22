@@ -101,6 +101,12 @@ class DatasetInfo(Protocol):
         """
 
     @property
+    def band_description(self) -> str:
+        """
+        The band description.
+        """
+
+    @property
     def band_wavelength(self) -> float:
         """
         The band central wavelength.
