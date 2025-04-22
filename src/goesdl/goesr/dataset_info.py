@@ -12,6 +12,7 @@ from .databook_gr import (
     origin_platform_goesr,
     scene_id_goesr,
     scene_name_goesr,
+    spectral_units_goesr,
 )
 
 NA = "not available"
@@ -154,6 +155,11 @@ class GOESDatasetInfo(HasStrHelp):
     The band central wavelength.
     """
 
+    wavelength_units: str = NA
+    """
+    The wavelength units.
+    """
+
     spatial_resolution: float = NAF
     """
     The spatial resolution (square FOV at nadir) in kilometres.
@@ -223,6 +229,7 @@ class GOESDatasetInfo(HasStrHelp):
         if info.cdm_data_type != "Image":
             self.band_id = NAI
             self.band_wavelength = NAF
+            self.wavelength_units = NA
             self.radiometric_resolution = NAI
 
             self.standard_name = NA
@@ -241,11 +248,13 @@ class GOESDatasetInfo(HasStrHelp):
 
             self.band_id = binfo.band_id
             self.band_wavelength = binfo.band_wavelength
+            self.wavelength_units = spectral_units_goesr
             self.radiometric_resolution = binfo.sensor_band_bit_depth
 
         else:
             self.band_id = NAI
             self.band_wavelength = NAF
+            self.wavelength_units = NA
             self.radiometric_resolution = NAI
 
         field_id = self._get_field_id(product_id, channel)
