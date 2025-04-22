@@ -135,3 +135,9 @@ class DatasetInfo(Protocol):
         """
         The measurement field units.
         """
+
+    @property
+    def valid_range(self) -> tuple[float, float]:
+        """
+        The valid range for the measurements.
+        """
