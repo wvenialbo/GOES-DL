@@ -26,9 +26,7 @@ from .databook_gr import (
     product_summary,
     scene_id_goesr,
     scene_name_goesr,
-    spectral_units_goesr,
     square_igfov_at_nadir_goesr,
-    wavelength_goesr,
 )
 
 NA = "not available"
@@ -280,43 +278,3 @@ class GOESGeospatialInfo(HasStrHelp):
         The number of pixels per kilometre at nadir.
         """
         return round(1.0 / self.kilometres_per_pixel, 2)
-
-
-class GSRadiometricInfo(HasStrHelp):
-    """
-    Class to hold dataset radiometric information.
-
-    Attributes
-    ----------
-    wavelength : float
-        Central wavelength in micrometres.
-    spectral_units : str
-        Spectral units.
-    """
-
-    spectral_units: str = NA
-    """
-    Spectral units.
-    """
-
-    wavelength: float = math.nan
-    """
-    Central wavelength in micrometres.
-    """
-
-    def __init__(self, record: Dataset, channel: str = "") -> None:
-        # Get platform information
-        pinfo = GOESPlatformInfo(record, channel)
-
-        if not pinfo.channel_nr:
-            raise ValueError(
-                "This product does not have radiometric information"
-            )
-
-        cinfo = _ChannelInfo(record)
-
-        self.spectral_units = spectral_units_goesr
-
-        self.nominal_wavelength = wavelength_goesr[pinfo.channel_nr]
-
-        self.wavelength = float(cinfo.band_wavelength)
