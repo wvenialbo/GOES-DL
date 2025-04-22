@@ -35,10 +35,9 @@ def get_abstract_goesr(kilometres_per_pixel: float) -> str:
     """
 
     pixels_per_kilometre = 1.0 / kilometres_per_pixel
-    pixels_per_degree = round(
-        pixels_per_kilometre * GRS80_KILOMETRES_PER_DEGREE
-    )
+    pixels_per_degree = pixels_per_kilometre * GRS80_KILOMETRES_PER_DEGREE
     degrees_per_pixel = round(1.0 / pixels_per_degree, 2)
+    pixels_per_degree = round(pixels_per_degree)
 
     return (
         f"This product is referred to as {dataset_name_goesr}. "
