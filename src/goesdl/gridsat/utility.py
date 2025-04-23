@@ -1,7 +1,7 @@
 from netCDF4 import Dataset
 
 from ..geodesy import RectangularRegion
-from ..gridsat.netcdf_geodetic import GSLatLonGrid
+from .geodetic import GSLatLonGrid
 from .image import GSImage
 from .time import GSCoverageTime
 from .dataset_info import GSDatasetInfo
