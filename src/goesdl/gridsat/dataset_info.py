@@ -208,7 +208,7 @@ class GSDatasetInfo(HasStrHelp):
 
         info = _DatasetInfo(dataframe)
 
-        self._validate_content_type(info)
+        self._validate_content_type(info.cdm_data_type)
 
         kilometres_per_pixel = self._get_spatial_resolution(
             info.spatial_resolution
@@ -334,9 +334,9 @@ class GSDatasetInfo(HasStrHelp):
                 f"allowed channels are: '{allowed_channels}'"
             )
 
-    def _validate_content_type(self, info: _DatasetInfo) -> None:
-        if info.cdm_data_type != "Grid":
+    def _validate_content_type(self, content_type: str) -> None:
+        if content_type != "Grid":
             raise ValueError(
                 "Unexpected content type. "
-                f"Expected 'Grid', got '{info.cdm_data_type}'"
+                f"Expected 'Grid', got '{content_type}'"
             )
