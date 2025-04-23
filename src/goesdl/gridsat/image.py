@@ -12,6 +12,12 @@ from .geodetic import GSLatLonGrid
 from .metadata import MeasurementMetadata
 
 
+class _DatasetInfo(DatasetView):
+
+    platform: str
+    cdm_data_type: str
+
+
 class GSImageData(HasStrHelp):
 
     raster: MaskedFloat32
@@ -29,6 +35,8 @@ class GSImage(GSImageData):
         self, dataframe: Dataset, grid: GSLatLonGrid, channel: str
     ) -> None:
         self._validate_channel(channel)
+
+        info = _DatasetInfo(dataframe)
 
         data = self._extract_image(
             dataframe, channel, grid.lon_limits, grid.lat_limits
