@@ -314,7 +314,7 @@ class GSDatasetInfo(HasStrHelp):
 
     @staticmethod
     def _get_scene_name(dataset_name: str) -> str:
-        pattern = r"^GOES-([CEGNOSU]+)\."
+        pattern = r"^GridSat-([CEGNOSU]+)\."
         if match := search(pattern, dataset_name):
             scene_id: str = match[1]
         else:
