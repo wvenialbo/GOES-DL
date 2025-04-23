@@ -139,7 +139,7 @@ class GSImage(GSImageData):
                 f"Expected 'Grid', got '{content_type}'"
             )
 
-        if ("t", "y", "x") != dataframe.variables[field_id].dimensions:
+        if ("time", "lat", "lon") != dataframe.variables[field_id].dimensions:
             raise ValueError(
                 f"Field '{field_id}' does not have the required dimensions"
             )
