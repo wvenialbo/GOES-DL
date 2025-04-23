@@ -58,8 +58,8 @@ class _DatasetInfo(DatasetView):
 class _MeasurementInfo(Protocol):
 
     standard_name: str
-    measurement_name: str
-    measurement_units: str
+    long_name: str
+    units: str
 
     valid_range: ArrayInt16
     scale_factor: float
@@ -195,7 +195,7 @@ class GOESDatasetInfo(HasStrHelp):
     The measurement field name.
     """
 
-    measurement_units: str = NA
+    units: str = NA
     """
     The measurement field units.
     """
@@ -263,7 +263,7 @@ class GOESDatasetInfo(HasStrHelp):
 
             self.standard_name = NA
             self.measurement_name = NA
-            self.measurement_units = NA
+            self.units = NA
             self.valid_range = ()
 
             self.shape = ()
@@ -293,8 +293,8 @@ class GOESDatasetInfo(HasStrHelp):
         minfo = self._get_measurement_info(dataframe, field_id)
 
         self.standard_name = minfo.standard_name
-        self.measurement_name = minfo.measurement_name
-        self.measurement_units = minfo.measurement_units
+        self.measurement_name = minfo.long_name
+        self.units = minfo.units
         self.remarks = NA
 
         valid_range = minfo.valid_range * minfo.scale_factor + minfo.add_offset
@@ -337,8 +337,8 @@ class GOESDatasetInfo(HasStrHelp):
 
         class _FieldInfo(DatasetView):
             standard_name: str = field.attribute()
-            measurement_name: str = field.attribute("long_name")
-            measurement_units: str = field.attribute("units")
+            long_name: str = field.attribute()
+            units: str = field.attribute()
 
             valid_range: ArrayInt32 = field.attribute(convert=_to_array_int_32)
             scale_factor: float = field.attribute(convert=float)

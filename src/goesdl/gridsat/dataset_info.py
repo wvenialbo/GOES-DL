@@ -184,7 +184,7 @@ class GOESDatasetInfo(HasStrHelp):
     The measurement field name.
     """
 
-    measurement_units: str = NA
+    units: str = NA
     """
     The measurement field units.
     """
@@ -269,7 +269,7 @@ class GOESDatasetInfo(HasStrHelp):
 
         self.standard_name = minfo.standard_name
         self.measurement_name = minfo.long_name
-        self.measurement_units = minfo.units
+        self.units = minfo.units
         self.remarks = minfo.comment
         self.valid_range = minfo.actual_range
         self.shape = minfo.shape

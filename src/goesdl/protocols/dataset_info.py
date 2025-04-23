@@ -149,7 +149,7 @@ class DatasetInfo(Protocol):
         """
 
     @property
-    def measurement_units(self) -> str:
+    def units(self) -> str:
         """
         The measurement field units.
         """
