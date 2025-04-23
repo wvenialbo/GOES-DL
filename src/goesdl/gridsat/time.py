@@ -41,6 +41,10 @@ class GSTimeGrid(GSTimeData):
     metadata: dict[str, MetadataType]
 
     def __init__(self, dataframe: Dataset, grid: GSLatLonGrid) -> None:
+        info = _DatasetInfo(dataframe)
+
+        self._validate_content_type(dataframe, info.cdm_data_type)
+
         data = self._extract_timedata(
             dataframe, grid.lon_limits, grid.lat_limits
         )
@@ -132,6 +136,14 @@ class GSTimeGrid(GSTimeData):
             "time": cls._extract_time_metadata(dataframe),
             "time_bounds": cls._extract_bounds_metadata(dataframe),
         }
+
+    @staticmethod
+    def _validate_content_type(dataframe: Dataset, content_type: str) -> None:
+        if content_type != "Grid":
+            raise ValueError(
+                "Unexpected content type. "
+                f"Expected 'Grid', got '{content_type}'"
+            )
 
     @property
     def time(self) -> ArrayFloat64:
