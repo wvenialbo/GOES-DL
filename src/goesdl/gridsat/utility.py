@@ -1,10 +1,9 @@
 from netCDF4 import Dataset
 
 from ..geodesy import RectangularRegion
+from .dataset_info import GSDatasetInfo
 from .geodetic import GSLatLonGrid
 from .image import GSImage
-from .time import GSCoverageTime
-from .dataset_info import GSDatasetInfo
 
 
 def read_gridsat_dataset(
@@ -12,13 +11,11 @@ def read_gridsat_dataset(
     channel: str,
     region: RectangularRegion,
     corners: bool = False,
-) -> tuple[GSImage, GSCoverageTime, GSDatasetInfo]:
+) -> tuple[GSImage, GSDatasetInfo]:
     grid = GSLatLonGrid(dataframe, region, corners=corners)
 
     data = GSImage(dataframe, grid, channel)
 
-    coverage = GSCoverageTime(dataframe)
-
     metadata = GSDatasetInfo(dataframe, channel)
 
-    return data, coverage, metadata
+    return data, metadata
