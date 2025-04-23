@@ -23,6 +23,12 @@ class DatasetInfo(Protocol):
         """
 
     @property
+    def product_version(self) -> str:
+        """
+        The product version.
+        """
+
+    @property
     def summary(self) -> str:
         """
         The product summary.

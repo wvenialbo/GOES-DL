@@ -43,6 +43,7 @@ class _DatasetInfo(DatasetView):
     summary: str
     keywords: str
     spatial_resolution: str
+    timeline_id: str
 
     datetime_start: datetime = attribute(
         "time_coverage_start", convert=datetime.fromisoformat
@@ -84,6 +85,11 @@ class GOESDatasetInfo(HasStrHelp):
     product_name: str = NA
     """
     The product name.
+    """
+
+    product_version: str
+    """
+    The product version.
     """
 
     summary: str = NA
@@ -212,6 +218,7 @@ class GOESDatasetInfo(HasStrHelp):
         self.database_name = info.project
         self.abstract = get_abstract_goesr(kilometres_per_pixel)
         self.product_name = info.title
+        self.product_version = info.timeline_id
         self.summary = info.summary
         self.keywords = info.keywords
         self.dataset_name = info.dataset_name
