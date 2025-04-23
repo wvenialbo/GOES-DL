@@ -26,12 +26,12 @@ class GSImage(GSImageData):
     metadata: MeasurementMetadata
 
     def __init__(
-        self, record: Dataset, grid: GSLatLonGrid, channel: str
+        self, dataframe: Dataset, grid: GSLatLonGrid, channel: str
     ) -> None:
         self._validate_channel(channel)
 
         data = self._extract_image(
-            record, channel, grid.lon_limits, grid.lat_limits
+            dataframe, channel, grid.lon_limits, grid.lat_limits
         )
 
         self.channel_id = channel
@@ -39,11 +39,11 @@ class GSImage(GSImageData):
         self._grid = grid
         self.raster = data.raster
 
-        self.metadata = self._extract_metadata(record, channel)
+        self.metadata = self._extract_metadata(dataframe, channel)
 
     @staticmethod
     def _extract_image(
-        record: Dataset,
+        dataframe: Dataset,
         channel: str,
         lon_limits: IndexRange,
         lat_limits: IndexRange,
@@ -56,14 +56,16 @@ class GSImage(GSImageData):
         class _GSImageData(DatasetView):
             raster: MaskedFloat32 = variable(channel).array(filter=slice)
 
-        data = _GSImageData(record)
+        data = _GSImageData(dataframe)
 
         data.raster.data[data.raster.mask] = nan
 
         return cast(GSImageData, data)
 
     @staticmethod
-    def _extract_metadata(record: Dataset, name: str) -> MeasurementMetadata:
+    def _extract_metadata(
+        dataframe: Dataset, name: str
+    ) -> MeasurementMetadata:
         measurement = variable(name)
 
         class _GSImageMetadata(DatasetView):
@@ -75,7 +77,7 @@ class GSImage(GSImageData):
             range: ArrayFloat32 = measurement.attribute("actual_range")
             shape: tuple[int] = measurement.attribute()
 
-        metadata = _GSImageMetadata(record)
+        metadata = _GSImageMetadata(dataframe)
 
         return MeasurementMetadata(metadata)
 
