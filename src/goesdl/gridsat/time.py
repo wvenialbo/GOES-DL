@@ -35,8 +35,10 @@ class GSTimeGrid(GSTimeData):
 
     metadata: dict[str, MetadataType]
 
-    def __init__(self, record: Dataset, grid: GSLatLonGrid) -> None:
-        data = self._extract_timedata(record, grid.lon_limits, grid.lat_limits)
+    def __init__(self, dataframe: Dataset, grid: GSLatLonGrid) -> None:
+        data = self._extract_timedata(
+            dataframe, grid.lon_limits, grid.lat_limits
+        )
 
         self.grid = grid
 
@@ -44,10 +46,10 @@ class GSTimeGrid(GSTimeData):
         self.optimal_time = data.optimal_time
         self.optimal_time_bounds = data.optimal_time_bounds
 
-        self.metadata = self._get_metadata(record)
+        self.metadata = self._get_metadata(dataframe)
 
     @staticmethod
-    def _extract_bounds_metadata(record: Dataset) -> VariableMetadata:
+    def _extract_bounds_metadata(dataframe: Dataset) -> VariableMetadata:
         coordinate = variable("time_bounds")
 
         class _TimeMetata(DatasetView):
@@ -56,12 +58,12 @@ class GSTimeGrid(GSTimeData):
             units: str = coordinate.attribute()
             shape: tuple[int] = coordinate.attribute()
 
-        metadata = _TimeMetata(record)
+        metadata = _TimeMetata(dataframe)
 
         return VariableMetadata(metadata)
 
     @staticmethod
-    def _extract_delta_metadata(record: Dataset) -> DeltaTimeMetadata:
+    def _extract_delta_metadata(dataframe: Dataset) -> DeltaTimeMetadata:
         measurement = variable("delta_time")
 
         class _ImageMetata(DatasetView):
@@ -72,12 +74,12 @@ class GSTimeGrid(GSTimeData):
             content_type: str = measurement.attribute("coverage_content_type")
             shape: tuple[int] = measurement.attribute()
 
-        metadata = _ImageMetata(record)
+        metadata = _ImageMetata(dataframe)
 
         return DeltaTimeMetadata(metadata)
 
     @staticmethod
-    def _extract_time_metadata(record: Dataset) -> TimeMetadata:
+    def _extract_time_metadata(dataframe: Dataset) -> TimeMetadata:
         coordinate = variable("time")
 
         class _LatLonMetata(DatasetView):
@@ -90,13 +92,13 @@ class GSTimeGrid(GSTimeData):
             content_type: str = coordinate.attribute("coverage_content_type")
             shape: tuple[int] = coordinate.attribute()
 
-        metadata = _LatLonMetata(record)
+        metadata = _LatLonMetata(dataframe)
 
         return TimeMetadata(metadata)
 
     @staticmethod
     def _extract_timedata(
-        record: Dataset,
+        dataframe: Dataset,
         lon_limits: IndexRange,
         lat_limits: IndexRange,
     ) -> "GSTimeData":
@@ -112,18 +114,18 @@ class GSTimeGrid(GSTimeData):
             optimal_time: float64 = scalar("time")
             optimal_time_bounds: ArrayFloat64 = variable("time_bounds").data()
 
-        data = _GSTimeData(record)
+        data = _GSTimeData(dataframe)
 
         data.delta_time.data[data.delta_time.mask] = nan
 
         return cast(GSTimeData, data)
 
     @classmethod
-    def _get_metadata(cls, record: Dataset) -> dict[str, MetadataType]:
+    def _get_metadata(cls, dataframe: Dataset) -> dict[str, MetadataType]:
         return {
-            "delta_time": cls._extract_delta_metadata(record),
-            "time": cls._extract_time_metadata(record),
-            "time_bounds": cls._extract_bounds_metadata(record),
+            "delta_time": cls._extract_delta_metadata(dataframe),
+            "time": cls._extract_time_metadata(dataframe),
+            "time_bounds": cls._extract_bounds_metadata(dataframe),
         }
 
     @property
