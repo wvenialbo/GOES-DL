@@ -61,7 +61,7 @@ scene_id_gc: dict[str, str] = {
     "CONUS": "C",
 }
 
-scene_name_goesr: dict[str, str] = {
+scene_name_gc: dict[str, str] = {
     "F": "Full Disk",
     "C": "CONUS (Contiguous United States)",
 }
