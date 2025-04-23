@@ -52,16 +52,16 @@ class GOESImage(GOESImageData):
     grid: GOESLatLonGrid
 
     def __init__(
-        self, record: Dataset, grid: GOESLatLonGrid, channel: str = ""
+        self, dataframe: Dataset, grid: GOESLatLonGrid, channel: str = ""
     ) -> None:
-        product_id = self._validate_product(record)
+        product_id = self._validate_product(dataframe)
 
         channel_id = self._validate_channel(product_id, channel)
 
-        field_id = self._validate_field(record, product_id, channel_id)
+        field_id = self._validate_field(dataframe, product_id, channel_id)
 
         data = self._extract_image(
-            record, field_id, grid.lon_limits, grid.lat_limits
+            dataframe, field_id, grid.lon_limits, grid.lat_limits
         )
 
         self.grid = grid
@@ -69,7 +69,7 @@ class GOESImage(GOESImageData):
 
     @staticmethod
     def _extract_image(
-        record: Dataset,
+        dataframe: Dataset,
         field: str,
         lon_limits: IndexRange,
         lat_limits: IndexRange,
@@ -82,7 +82,7 @@ class GOESImage(GOESImageData):
         class _GOESImageData(DatasetView):
             raster: MaskedFloat32 = variable(field).array(filter=slice)
 
-        data = _GOESImageData(record)
+        data = _GOESImageData(dataframe)
 
         data.raster.data[data.raster.mask] = nan
 
@@ -117,7 +117,7 @@ class GOESImage(GOESImageData):
 
     @staticmethod
     def _validate_field(
-        record: Dataset, product_id: str, channel_id: str
+        dataframe: Dataset, product_id: str, channel_id: str
     ) -> str:
         if product_id == "MCMIP":
             field_id = f"CMI_{channel_id}"
@@ -126,10 +126,10 @@ class GOESImage(GOESImageData):
         else:
             field_id = product_id
 
-        if field_id not in record.variables:
+        if field_id not in dataframe.variables:
             raise ValueError(f"Field '{field_id}' not found in the dataset")
 
-        if ("y", "x") != record.variables[field_id].dimensions:
+        if ("y", "x") != dataframe.variables[field_id].dimensions:
             raise ValueError(
                 f"Field '{field_id}' does not have the required dimensions"
             )
@@ -137,8 +137,8 @@ class GOESImage(GOESImageData):
         return field_id
 
     @classmethod
-    def _validate_product(cls, record: Dataset) -> str:
-        dinfo = _DatasetInfo(record)
+    def _validate_product(cls, dataframe: Dataset) -> str:
+        dinfo = _DatasetInfo(dataframe)
 
         if dinfo.cdm_data_type != "Image":
             raise ValueError(
