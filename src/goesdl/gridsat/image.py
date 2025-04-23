@@ -1,3 +1,4 @@
+from re import search
 from typing import Any, cast
 
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
@@ -90,6 +91,13 @@ class GSImage(GSImageData):
         metadata = _GSImageMetadata(dataframe)
 
         return MeasurementMetadata(metadata)
+
+    @staticmethod
+    def _get_platform_name(platform: str) -> str:
+        pattern = r"(GOES-\d+)"
+        if match := search(pattern, platform):
+            return match[1]
+        raise ValueError(f"Unexpected platform: '{platform}'")
 
     @staticmethod
     def _validate_channel(channel: str) -> None:
