@@ -17,6 +17,11 @@ SECONDS_IN_MINUTE = 60
 MetadataType = TimeMetadata | DeltaTimeMetadata | VariableMetadata
 
 
+class _DatasetInfo(DatasetView):
+
+    cdm_data_type: str
+
+
 class GSTimeData(HasStrHelp):
 
     # Delta-time data in minutes.
