@@ -51,6 +51,10 @@ class GSLatLonGrid(GSLatLonData):
                 "'delta' must be an integer between 1 and 10, inclusive"
             )
 
+        info = _DatasetInfo(dataframe)
+
+        self._validate_content_type(dataframe, info.cdm_data_type)
+
         # Extract the region of interest...
         if region:
             data, lon_limits, lat_limits = self._slice(
@@ -266,6 +270,20 @@ class GSLatLonGrid(GSLatLonData):
             data = cls._extract(dataframe, None, lon_limits, lat_limits)
 
         return data, lon_limits, lat_limits
+
+    @staticmethod
+    def _validate_content_type(dataframe: Dataset, content_type: str) -> None:
+        if content_type != "Grid":
+            raise ValueError(
+                "Unexpected content type. "
+                f"Expected 'Grid', got '{content_type}'"
+            )
+
+        for field_id in {"lat", "lon"}:
+            if (field_id,) != dataframe.variables[field_id].dimensions:
+                raise ValueError(
+                    f"Field '{field_id}' does not have the required dimensions"
+                )
 
     @property
     def globe(self) -> Globe:
