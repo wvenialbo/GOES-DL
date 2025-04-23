@@ -9,7 +9,7 @@ from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .netcdf_geodetic import GSLatLonGrid
 from .netcdf_info import GSPlatformInfo
-from .netcdf_metadata import MeasurementMetadata
+from .metadata import MeasurementMetadata
 
 
 class GSImageData(HasStrHelp):

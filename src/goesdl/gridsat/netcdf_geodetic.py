@@ -9,7 +9,7 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32
-from .netcdf_metadata import CoordinateMetadata, VariableMetadata
+from .metadata import CoordinateMetadata, VariableMetadata
 
 MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 
