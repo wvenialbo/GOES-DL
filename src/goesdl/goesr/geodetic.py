@@ -12,12 +12,17 @@ from ..geodesy import (
     calculate_pixel_edges,
     geos_to_latlon_grid_goesdl,
 )
-from ..netcdf import HasStrHelp
+from ..netcdf import DatasetView, HasStrHelp
 from ..protocols.geodetic import IndexRange, RegionDomain
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .netcdf_projection import GOESGeostationaryGrid, GOESImagerProjection
+from .projection import GOESGeostationaryGrid, GOESImagerProjection
 
 BoxLimits = tuple[int, int, int, int]
+
+
+class _DatasetInfo(DatasetView):
+
+    dataset_name: str
 
 
 class GOESLatLonGrid(HasStrHelp):
@@ -38,7 +43,7 @@ class GOESLatLonGrid(HasStrHelp):
 
     def __init__(
         self,
-        record: Dataset,
+        dataframe: Dataset,
         region: RectangularRegion | None = None,
         delta: int = 5,
         corners: bool = False,
@@ -49,12 +54,14 @@ class GOESLatLonGrid(HasStrHelp):
                 "'delta' must be an integer between 1 and 10, inclusive"
             )
 
+        self._validate_grid(dataframe)
+
         # Extract the region of interest...
         if region:
-            lon_lat, limits = self._slice(record, region, delta, corners)
+            lon_lat, limits = self._slice(dataframe, region, delta, corners)
         # ...or extract the entire field of view
         else:
-            lon_lat, limits = self._full_frame(record, corners)
+            lon_lat, limits = self._full_frame(dataframe, corners)
             region = self._extract_region(lon_lat)
 
         self._region = region
@@ -70,7 +77,7 @@ class GOESLatLonGrid(HasStrHelp):
         # Create the source projection (Geostationary projection on
         # GRS80 ellipsoid)
 
-        proj = GOESImagerProjection(record)
+        proj = GOESImagerProjection(dataframe)
 
         source_globe = Globe(
             semimajor_axis=proj.semi_major_axis,
@@ -92,21 +99,21 @@ class GOESLatLonGrid(HasStrHelp):
 
     @classmethod
     def _extract(
-        cls, record: Dataset, delta: int, limits: BoxLimits | None
+        cls, dataframe: Dataset, delta: int, limits: BoxLimits | None
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
-        return cls._extract_grid(record, delta, limits, False)
+        return cls._extract_grid(dataframe, delta, limits, False)
 
     @classmethod
     def _extract_bounds(
-        cls, record: Dataset, limits: BoxLimits | None
+        cls, dataframe: Dataset, limits: BoxLimits | None
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
-        return cls._extract_grid(record, 1, limits, True)
+        return cls._extract_grid(dataframe, 1, limits, True)
 
     @staticmethod
     def _extract_grid(
-        record: Dataset, delta: int, limits: BoxLimits | None, bounds: bool
+        dataframe: Dataset, delta: int, limits: BoxLimits | None, bounds: bool
     ) -> tuple[MaskedFloat32, MaskedFloat32]:
-        geos_grid = GOESGeostationaryGrid(record, delta, limits)
+        geos_grid = GOESGeostationaryGrid(dataframe, delta, limits)
 
         if bounds:
             x_rad, y_rad = geos_grid.grid
@@ -183,11 +190,11 @@ class GOESLatLonGrid(HasStrHelp):
     @classmethod
     def _full_frame(
         cls,
-        record: Dataset,
+        dataframe: Dataset,
         corners: bool,
     ) -> tuple[tuple[MaskedFloat32, MaskedFloat32], IndexRange, IndexRange]:
         # Extract the entire field of view
-        lon_lat = cls._extract_grid(record, 1, None, corners)
+        lon_lat = cls._extract_grid(dataframe, 1, None, corners)
 
         mat_shape = lon_lat[0].shape
         if corners:
@@ -197,24 +204,24 @@ class GOESLatLonGrid(HasStrHelp):
             lon_limits = 0, mat_shape[1]
             lat_limits = 0, mat_shape[0]
 
-        return lon_lat, lon_limits, lat_limits
+        return lon_lat, (lon_limits, lat_limits)
 
     @classmethod
     def _slice(
         cls,
-        record: Dataset,
+        dataframe: Dataset,
         region: RectangularRegion,
         delta: int,
         corners: bool,
     ) -> tuple[tuple[MaskedFloat32, MaskedFloat32], BoxLimits]:
-        lon_lat = cls._extract(record, delta, None)
+        lon_lat = cls._extract(dataframe, delta, None)
 
         limits = cls._find_limits(lon_lat, region.domain, delta, (0, 0))
 
         if delta > 1:
             x_size, y_size = (
-                record.variables["x"].size,
-                record.variables["y"].size,
+                dataframe.variables["x"].size,
+                dataframe.variables["y"].size,
             )
 
             x_min, x_max = limits[:2]
@@ -230,16 +237,25 @@ class GOESLatLonGrid(HasStrHelp):
 
             offsets = x_min, y_min
 
-            lon_lat = cls._extract(record, 1, limits)
+            lon_lat = cls._extract(dataframe, 1, limits)
 
             limits = cls._find_limits(lon_lat, region.domain, 1, offsets)
 
         if corners:
-            lon_lat = cls._extract_bounds(record, limits)
+            lon_lat = cls._extract_bounds(dataframe, limits)
         else:
-            lon_lat = cls._extract(record, 1, limits)
+            lon_lat = cls._extract(dataframe, 1, limits)
 
         return lon_lat, limits
+
+    @staticmethod
+    def _validate_grid(dataframe: Dataset) -> None:
+        if "x" not in dataframe.variables or "y" not in dataframe.variables:
+            dinfo = _DatasetInfo(dataframe)
+            raise ValueError(
+                f"The dataset '{dinfo.dataset_name}' does not contain "
+                "any geodetic grid information"
+            )
 
     @property
     def globe(self) -> Globe:

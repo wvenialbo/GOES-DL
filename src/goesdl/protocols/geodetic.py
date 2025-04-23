@@ -42,13 +42,14 @@ class GeodeticRegion(Protocol):
         y-ticks are the latitude values of the region of interest.
     """
 
-    domain: RegionDomain
-    """
-    The domain of the region of interest as a pair of coordinate
-    ranges.  The first coordinate range is the longitude range
-    (min_lon, max_lon) and the second coordinate range is the
-    latitude range (min_lat, max_lat).
-    """
+    @property
+    def domain(self) -> RegionDomain:
+        """
+        The domain of the region of interest as a pair of coordinate
+        ranges.  The first coordinate range is the longitude range
+        (min_lon, max_lon) and the second coordinate range is the
+        latitude range (min_lat, max_lat).
+        """
 
     @property
     def extent(self) -> RegionExtent:
@@ -71,17 +72,19 @@ class GeodeticRegion(Protocol):
         (min_lon, max_lon).
         """
 
-    xticks: ArrayFloat32
-    """
-    The x-ticks of the region of interest. Helper for plotting.
-    The x-ticks are the longitude values of the region of interest.
-    """
+    @property
+    def xticks(self) -> ArrayFloat32:
+        """
+        The x-ticks of the region of interest. Helper for plotting.
+        The x-ticks are the longitude values of the region of interest.
+        """
 
-    yticks: ArrayFloat32
-    """
-    The y-ticks of the region of interest. Helper for plotting.
-    The y-ticks are the latitude values of the region of interest.
-    """
+    @property
+    def yticks(self) -> ArrayFloat32:
+        """
+        The y-ticks of the region of interest. Helper for plotting.
+        The y-ticks are the latitude values of the region of interest.
+        """
 
 
 class GeodeticGrid(Protocol):
@@ -116,37 +119,42 @@ class GeodeticGrid(Protocol):
         indices to slice the data.
     """
 
-    crs: Projection
-    """
-    The projection of the data. The projection is used to transform
-    the data.
-    """
+    @property
+    def crs(self) -> Projection:
+        """
+        The projection of the data. The projection is used to transform
+        the data.
+        """
+ 
+    @property
+    def lat(self) -> ArrayFloat32:
+        """
+        A 2D array containing the sliced values of the latitude grid
+        data.
+        """
 
-    lat: ArrayFloat32
-    """
-    A 2D array containing the sliced values of the latitude grid
-    data.
-    """
+    @property
+    def lat_limits(self) -> IndexRange:
+        """
+        A tuple of two integers containing the indices of the minimum
+        and maximum latitude values of the grid data. The limits are
+        used to slice the data.
+        """
 
-    lat_limits: IndexRange
-    """
-    A tuple of two integers containing the indices of the minimum
-    and maximum latitude values of the grid data. The limits are
-    used to slice the data.
-    """
+    @property
+    def lon(self) -> ArrayFloat32:
+        """
+        A 2D array containing the sliced values of the longitude grid
+        data.
+        """
 
-    lon: ArrayFloat32
-    """
-    A 2D array containing the sliced values of the longitude grid
-    data.
-    """
-
-    lon_limits: IndexRange
-    """
-    A tuple of two integers containing the indices of the minimum
-    and maximum longitude values of the grid data. The limits are
-    used to slice the data.
-    """
+    @property
+    def lon_limits(self) -> IndexRange:
+        """
+        A tuple of two integers containing the indices of the minimum
+        and maximum longitude values of the grid data. The limits are
+        used to slice the data.
+        """
 
     @property
     def region(self) -> GeodeticRegion:

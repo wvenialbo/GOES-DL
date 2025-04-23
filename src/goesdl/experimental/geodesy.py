@@ -64,6 +64,7 @@ def get_centered_domain(extent_deg, aeqd, pc):
     transformer = Transformer.from_crs(aeqd, pc, always_xy=True)
     lons_deg, lats_deg = transformer.transform(x_coords, y_coords)
 
-    domain = [min(lons_deg), max(lons_deg), min(lats_deg), max(lats_deg)]
+    lon_bounds = min(lons_deg), max(lons_deg)
+    lat_bounds = min(lats_deg), max(lats_deg)
 
-    return domain, limits
+    return (lon_bounds, lat_bounds), limits

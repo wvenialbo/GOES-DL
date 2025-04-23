@@ -1,4 +1,4 @@
-def standard_name_to_label(standard_name):
+def standard_to_lineman_name(standard_name):
     words = standard_name.split("_")
     labels = []
     acronyms = ["TOA", "IR", "UV", "SST"]

@@ -21,6 +21,10 @@ Classes:
     - GOESProductLocatorRad: ABI Radiance Product (Rad).
 """
 
+from .dataset_info import GOESDatasetInfo
+from .dataset_time import GOESCoverageTime
+from .geodetic import GOESLatLonGrid
+from .image import GOESImage
 from .locator_abi import GOESProductLocatorABI
 from .locator_dc import (
     GOESProductLocatorABIDC,
@@ -36,10 +40,6 @@ from .locator_pp import (
     GOESProductLocatorCMIP,
     GOESProductLocatorRad,
 )
-from .netcdf_dataset import GOESDatasetInfo
-from .netcdf_geodetic import GOESLatLonGrid
-from .netcdf_image import GOESImage
-from .netcdf_time import GOESCoverageTime
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
 GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC
@@ -48,25 +48,25 @@ GOESPrimaryMultibandProductLocator = GOESProductLocatorABIPM
 GOESPrimaryProductLocator = GOESProductLocatorABIPP
 
 __all__ = [
-    "GOESProductLocatorABI",
-    "GOESProductLocatorABIDC",
-    "GOESProductLocatorDMW",
-    "GOESProductLocatorDMWV",
-    "GOESProductLocatorABIDP",
-    "GOESProductLocatorGLM",
-    "GOESProductLocatorLCFA",
-    "GOESProductLocatorABIPM",
-    "GOESProductLocatorMCMIP",
-    "GOESProductLocatorABIPP",
-    "GOESProductLocatorCMIP",
-    "GOESProductLocatorRad",
+    "GOESCoverageTime",
+    "GOESDatasetInfo",
     "GOESDerivedProductLocator",
     "GOESDerivedWithCannelProductLocator",
+    "GOESImage",
+    "GOESLatLonGrid",
     "GOESLightningMapperProductLocator",
     "GOESPrimaryMultibandProductLocator",
     "GOESPrimaryProductLocator",
-    "GOESLatLonGrid",
-    "GOESImage",
-    "GOESDatasetInfo",
-    "GOESCoverageTime",
+    "GOESProductLocatorABI",
+    "GOESProductLocatorABIDC",
+    "GOESProductLocatorABIDP",
+    "GOESProductLocatorABIPM",
+    "GOESProductLocatorABIPP",
+    "GOESProductLocatorCMIP",
+    "GOESProductLocatorDMW",
+    "GOESProductLocatorDMWV",
+    "GOESProductLocatorGLM",
+    "GOESProductLocatorLCFA",
+    "GOESProductLocatorMCMIP",
+    "GOESProductLocatorRad",
 ]

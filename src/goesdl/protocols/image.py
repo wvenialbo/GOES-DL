@@ -11,7 +11,7 @@ class SatImageData(Protocol):
     Defines the structure of the image data, including the grid data,
     image array, mask array, raster data, and region of interest (ROI).
 
-    Attributes
+    Properties
     ----------
     grid: GeodeticGrid
         The grid data extracted from the satellite dataset.
@@ -49,11 +49,12 @@ class SatImageData(Protocol):
         A 2D array containing the mask of the image data.
         """
 
-    raster: MaskedFloat32
-    """
-    A 2D array containing the masked values of the image data extracted
-    from the satellite dataset.
-    """
+    @property
+    def raster(self) -> MaskedFloat32:
+        """
+        A 2D array containing the masked values of the image data
+        extracted from the satellite dataset.
+        """
 
     @property
     def region(self) -> GeodeticRegion:

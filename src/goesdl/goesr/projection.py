@@ -22,14 +22,14 @@ from typing import Any, Protocol
 from netCDF4 import Dataset  # pylint: disable=no-name-in-module
 from numpy import float64
 
-from ..netcdf import DatasetView, HasStrHelp, data, variable
+from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32, ArrayFloat64
 
 BoxLimits = tuple[int, int, int, int]
 
 
-imager_proj = variable("goes_imager_projection")
+_imager_proj = variable("goes_imager_projection")
 
 
 class GeostationaryGrid(Protocol):
@@ -68,9 +68,10 @@ class GOESOrbitGeometry(DatasetView):
     """
 
     # Information about the projection
-    longitude_of_projection_origin: float64 = imager_proj.attribute()
-    perspective_point_height: float64 = imager_proj.attribute()
-    sweep_angle_axis: str = imager_proj.attribute()
+    latitude_of_projection_origin: float64 = _imager_proj.attribute()
+    longitude_of_projection_origin: float64 = _imager_proj.attribute()
+    perspective_point_height: float64 = _imager_proj.attribute()
+    sweep_angle_axis: str = _imager_proj.attribute()
 
 
 class GOESGlobe(DatasetView):
@@ -103,9 +104,9 @@ class GOESGlobe(DatasetView):
     """
 
     # Information about the globe
-    semi_major_axis: float64 = imager_proj.attribute()
-    semi_minor_axis: float64 = imager_proj.attribute()
-    inverse_flattening: float64 = imager_proj.attribute()
+    semi_major_axis: float64 = _imager_proj.attribute()
+    semi_minor_axis: float64 = _imager_proj.attribute()
+    inverse_flattening: float64 = _imager_proj.attribute()
 
 
 class GOESImagerProjection(GOESOrbitGeometry, GOESGlobe):
@@ -135,7 +136,7 @@ class GOESImagerProjection(GOESOrbitGeometry, GOESGlobe):
     """
 
 
-def to_float64(array: ArrayFloat32) -> ArrayFloat64:
+def _to_float64(array: ArrayFloat32) -> ArrayFloat64:
     """
     Convert a float32 array to a float64 array.
 
@@ -152,23 +153,6 @@ def to_float64(array: ArrayFloat32) -> ArrayFloat64:
     return array.astype(float64)
 
 
-class GOESABIFixedGrid(GOESImagerProjection):
-    """
-    Represent GOES-R series satellite ABI Fixed Grid projection data.
-
-    Attributes
-    ----------
-    x : ArrayFloat64
-        1D array of E/W scanning angles in radians.
-    y : ArrayFloat64
-        1D array of N/S elevation angles in radians.
-    """
-
-    # Information about the fixed grid
-    x: ArrayFloat64 = data(convert=to_float64)
-    y: ArrayFloat64 = data(convert=to_float64)
-
-
 class GOESGeostationaryGrid(HasStrHelp):
 
     geometry: GOESOrbitGeometry
@@ -176,7 +160,7 @@ class GOESGeostationaryGrid(HasStrHelp):
     grid: tuple[ArrayFloat64, ArrayFloat64]
 
     def __init__(
-        self, record: Dataset, delta: int, limits: BoxLimits | None
+        self, dataframe: Dataset, delta: int, limits: BoxLimits | None
     ) -> None:
         # Validate delta parameter (subsampling increment step)
         if not 1 <= delta <= 10:
@@ -188,7 +172,7 @@ class GOESGeostationaryGrid(HasStrHelp):
         lat_limits = limits[2:4] if limits else None
 
         grid, geom, globe = self._extract_geos_grid(
-            record, delta, lon_limits, lat_limits
+            dataframe, delta, lon_limits, lat_limits
         )
 
         self.geometry = geom
@@ -197,7 +181,7 @@ class GOESGeostationaryGrid(HasStrHelp):
 
     @staticmethod
     def _extract_geos_grid(
-        record: Dataset,
+        dataframe: Dataset,
         step: int | None,
         lon_limits: IndexRange | None,
         lat_limits: IndexRange | None,
@@ -212,14 +196,14 @@ class GOESGeostationaryGrid(HasStrHelp):
 
         class _FixedGrid(DatasetView):
             x: ArrayFloat64 = variable("x").data(
-                filter=subsample(lon_limits), convert=to_float64
+                filter=subsample(lon_limits), convert=_to_float64
             )
             y: ArrayFloat64 = variable("y").data(
-                filter=subsample(lat_limits), convert=to_float64
+                filter=subsample(lat_limits), convert=_to_float64
             )
 
-        grid = _FixedGrid(record)
-        geom = GOESOrbitGeometry(record)
-        globe = GOESGlobe(record)
+        grid = _FixedGrid(dataframe)
+        geom = GOESOrbitGeometry(dataframe)
+        globe = GOESGlobe(dataframe)
 
         return grid, geom, globe

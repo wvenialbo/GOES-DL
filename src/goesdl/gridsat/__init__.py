@@ -6,12 +6,13 @@ Classes:
     - GridSatProductLocatorGC: Locator for GC products.
 """
 
+from .dataset_info import GSDatasetInfo
+from .geodetic import GSLatLonGrid
+from .image import GSImage
 from .locator_b1 import GridSatProductLocatorB1
 from .locator_gc import GridSatProductLocatorGC
-from .netcdf_dataset import GSDatasetInfo
-from .netcdf_geodetic import GSLatLonGrid
-from .netcdf_image import GSImage
-from .netcdf_time import GSCoverageTime, GSTimeGrid
+from .projection import GSGlobe, GSOrbitGeometry
+from .time import GSCoverageTime, GSTimeGrid
 from .utility import read_gridsat_dataset
 
 __all__ = [
@@ -23,4 +24,6 @@ __all__ = [
     "GSCoverageTime",
     "GSDatasetInfo",
     "read_gridsat_dataset",
+    "GSOrbitGeometry",
+    "GSGlobe",
 ]

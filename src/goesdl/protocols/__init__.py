@@ -8,10 +8,12 @@ extracted from the satellite dataset is in the correct format
 and can be processed correctly.
 """
 
+from .dataset_info import DatasetInfo
 from .geodetic import GeodeticGrid, GeodeticRegion
 from .image import SatImageData
 
 __all__ = [
+    "DatasetInfo",
     "GeodeticGrid",
     "GeodeticRegion",
     "SatImageData",
