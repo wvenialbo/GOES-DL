@@ -2,7 +2,7 @@ import math
 
 # Dataset name
 
-dataset_name_gc: str = "GridSat-GOES"
+dataset_name_gc: str = "GridSat"
 
 
 # Spatial resolution (GRS80 ellipsoid)
