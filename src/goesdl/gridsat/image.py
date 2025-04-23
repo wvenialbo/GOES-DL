@@ -45,7 +45,8 @@ class GSImage(GSImageData):
 
         self._validate_availability(channel, info.platform)
 
-        self._validate_content_type(dataframe, info.cdm_data_type, channel)
+        self._validate_content_type(dataframe, info.cdm_data_type)
+        self._validate_dimensions(dataframe, channel)
 
         data = self._extract_image(
             dataframe, channel, grid.lon_limits, grid.lat_limits
@@ -130,15 +131,15 @@ class GSImage(GSImageData):
             )
 
     @staticmethod
-    def _validate_content_type(
-        dataframe: Dataset, content_type: str, field_id: str
-    ) -> None:
+    def _validate_content_type(dataframe: Dataset, content_type: str) -> None:
         if content_type != "Grid":
             raise ValueError(
                 "Unexpected content type. "
                 f"Expected 'Grid', got '{content_type}'"
             )
 
+    @staticmethod
+    def _validate_dimensions(dataframe: Dataset, field_id: str) -> None:
         if ("time", "lat", "lon") != dataframe.variables[field_id].dimensions:
             raise ValueError(
                 f"Field '{field_id}' does not have the required dimensions"
