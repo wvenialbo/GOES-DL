@@ -284,7 +284,7 @@ class GSDatasetInfo(HasStrHelp):
         class _IMInfo(DatasetView):
             long_name: str = image.attribute()
             units: str = image.attribute()
-            actual_range: tuple[float, float] = image.attribute(
+            actual_range: tuple[float] = image.attribute(
                 convert=_to_float_tuple
             )
             shape: tuple[int] = image.attribute()
@@ -303,7 +303,9 @@ class GSDatasetInfo(HasStrHelp):
             standard_name: str = image.attribute()
             comment: str = field(NA)
 
-        return _IRInfo(dataframe)
+        ir_info = _IRInfo(dataframe)
+
+        return cast(_ImageInfo, ir_info)
 
     @staticmethod
     def _get_platform_name(platform: str) -> str:
