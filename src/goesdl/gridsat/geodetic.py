@@ -279,10 +279,21 @@ class GSLatLonGrid(GSLatLonData):
                 f"Expected 'Grid', got '{content_type}'"
             )
 
-        for field_id in {"lat", "lon"}:
-            if (field_id,) != dataframe.variables[field_id].dimensions:
+        for field_id in {"lat", "lon", "lat_bounds", "lon_bounds"}:
+            if field_id not in dataframe.variables:
                 raise ValueError(
-                    f"Field '{field_id}' does not have the required dimensions"
+                    f"Dataset does not have the required field '{field_id}'"
+                )
+
+    @staticmethod
+    def _validate_dimensions(dataframe: Dataset) -> None:
+        fields = ("lat", "lon", "lat_bounds", "lon_bounds")
+        dims = (("lat",), ("lon",), ("lat", "nv"), ("lon", "nv"))
+        for field, dim in zip(fields, dims):
+            if dim != dataframe.variables[field].dimensions:
+                raise ValueError(
+                    f"Field '{field}' does not have "
+                    f"the required dimensions ({dim})"
                 )
 
     @property
