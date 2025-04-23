@@ -38,6 +38,8 @@ class GSImage(GSImageData):
 
         info = _DatasetInfo(dataframe)
 
+        self._validate_content_type(dataframe, info.cdm_data_type, channel)
+
         data = self._extract_image(
             dataframe, channel, grid.lon_limits, grid.lat_limits
         )
@@ -100,6 +102,20 @@ class GSImage(GSImageData):
             raise ValueError(
                 f"Invalid channel: '{channel}'; "
                 f"allowed channels are: '{allowed_channels}'"
+            )
+
+    def _validate_content_type(
+        self, dataframe: Dataset, content_type: str, field_id: str
+    ) -> None:
+        if content_type != "Grid":
+            raise ValueError(
+                "Unexpected content type. "
+                f"Expected 'Grid', got '{content_type}'"
+            )
+
+        if ("t", "y", "x") != dataframe.variables[field_id].dimensions:
+            raise ValueError(
+                f"Field '{field_id}' does not have the required dimensions"
             )
 
     @property
