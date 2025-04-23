@@ -208,11 +208,7 @@ class GSDatasetInfo(HasStrHelp):
 
         info = _DatasetInfo(dataframe)
 
-        if info.cdm_data_type != "Grid":
-            raise ValueError(
-                "Unexpected content type. "
-                f"Expected 'Grid', got '{info.cdm_data_type}'"
-            )
+        self._validate_content_type(info)
 
         kilometres_per_pixel = self._get_spatial_resolution(
             info.spatial_resolution
@@ -267,19 +263,6 @@ class GSDatasetInfo(HasStrHelp):
         self.remarks = minfo.comment
         self.valid_range = minfo.actual_range
         self.shape = minfo.shape
-
-    @staticmethod
-    def _validate_channel(channel: str) -> None:
-        if not channel:
-            raise ValueError(
-                "Channel information is required for multi-band datasets"
-            )
-        if channel not in channel_description_gc:
-            allowed_channels = "', '".join(channel_description_gc.keys())
-            raise ValueError(
-                f"Invalid channel: '{channel}'; "
-                f"allowed channels are: '{allowed_channels}'"
-            )
 
     @staticmethod
     def _get_measurement_info(dataframe: Dataset, field_id: str) -> _ImageInfo:
@@ -337,3 +320,23 @@ class GSDatasetInfo(HasStrHelp):
         pixels_per_degree = 1.0 / degrees_per_pixel
         pixels_per_kilometre = pixels_per_degree / GRS80_KILOMETRES_PER_DEGREE
         return 1.0 / pixels_per_kilometre
+
+    @staticmethod
+    def _validate_channel(channel: str) -> None:
+        if not channel:
+            raise ValueError(
+                "Channel information is required for multi-band datasets"
+            )
+        if channel not in channel_description_gc:
+            allowed_channels = "', '".join(channel_description_gc.keys())
+            raise ValueError(
+                f"Invalid channel: '{channel}'; "
+                f"allowed channels are: '{allowed_channels}'"
+            )
+
+    def _validate_content_type(self, info: _DatasetInfo) -> None:
+        if info.cdm_data_type != "Grid":
+            raise ValueError(
+                "Unexpected content type. "
+                f"Expected 'Grid', got '{info.cdm_data_type}'"
+            )
