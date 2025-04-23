@@ -17,7 +17,7 @@ from .netcdf_info import (
     GSRadiometricInfo,
 )
 from .projection import GSGlobe, GSOrbitGeometry
-from .netcdf_time import GSCoverageTime, GSTimeGrid
+from .time import GSCoverageTime, GSTimeGrid
 from .utility import read_gridsat_dataset
 
 __all__ = [
