@@ -29,7 +29,6 @@ NAF = nan
 
 class _DatasetInfo(DatasetView):
 
-    # project: str
     title: str
     platform: str
     product_version: str
