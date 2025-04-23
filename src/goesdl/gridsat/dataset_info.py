@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from math import nan
 from re import search
-from typing import Protocol
+from typing import Any, Protocol, cast
 
 from netCDF4 import Dataset
-from numpy import int32
 
-from ..netcdf import DatasetView, HasStrHelp, attribute
-from ..utils.array import ArrayInt16, ArrayInt32, ArrayUint16
+from ..netcdf import DatasetView, HasStrHelp, attribute, field, variable
 from .databook_gc import (
     GRS80_KILOMETRES_PER_DEGREE,
+    ch1_standard_name,
     channel_correspondence_gc,
     channel_description_gc,
     dataset_name_gc,
@@ -26,16 +25,6 @@ from .databook_gc import (
 NA = "not available"
 NAI = -999
 NAF = nan
-
-
-def _j200_to_utc(j200_time_sec: float) -> datetime:
-    j2000_epoch_utc = datetime(2000, 1, 1, 12, tzinfo=timezone.utc)
-    delta_sec = timedelta(seconds=j200_time_sec)
-    return j2000_epoch_utc + delta_sec
-
-
-def _to_array_int_32(array: ArrayInt16 | ArrayUint16) -> ArrayInt32:
-    return array.astype(int32)
 
 
 class _DatasetInfo(DatasetView):
@@ -62,25 +51,13 @@ class _DatasetInfo(DatasetView):
     )
 
 
-class _VISInfo(Protocol):
-
-    long_name: str
-    units: str
-    actual_range: ArrayInt16
-
-    shape: tuple[int]
-
-
-class _IRInfo(Protocol):
+class _ImageInfo(Protocol):
 
     long_name: str
     standard_name: str
     units: str
-    actual_range: ArrayInt16
-
-    measurement_name: str
-    measurement_units: str
-
+    actual_range: tuple[float, float]
+    comment: str
     shape: tuple[int]
 
 
@@ -212,6 +189,11 @@ class GOESDatasetInfo(HasStrHelp):
     The measurement field units.
     """
 
+    remarks: str = NA
+    """
+    Remarks about the measurement.
+    """
+
     valid_range: tuple[float, float] = (NAF, NAF)
     """
     The valid range for the measurements.
@@ -283,14 +265,45 @@ class GOESDatasetInfo(HasStrHelp):
 
         self.radiometric_resolution = radiometric_resolution_gc
 
-        # ---------------------------------------
+        minfo = self._get_measurement_info(dataframe, channel)
 
-        self.standard_name = NA
-        self.measurement_name = NA
-        self.measurement_units = NA
-        self.valid_range = ()
+        self.standard_name = minfo.standard_name
+        self.measurement_name = minfo.long_name
+        self.measurement_units = minfo.units
+        self.remarks = minfo.comment
+        self.valid_range = minfo.actual_range
+        self.shape = minfo.shape
 
-        self.shape = ()
+    @staticmethod
+    def _get_measurement_info(dataframe: Dataset, field_id: str) -> _ImageInfo:
+        image = variable(field_id)
+
+        def _to_float_tuple(x: Any) -> tuple[float, float]:
+            return float(x[0]), float(x[1])
+
+        class _IMInfo(DatasetView):
+            long_name: str = image.attribute()
+            units: str = image.attribute()
+            actual_range: tuple[float, float] = image.attribute(
+                convert=_to_float_tuple
+            )
+            shape: tuple[int] = image.attribute()
+
+        if field_id == "ch1":
+
+            class _VISInfo(_IMInfo):
+                standard_name: str = field(ch1_standard_name)
+                comment: str = image.attribute()
+
+            vis_info = _VISInfo(dataframe)
+
+            return cast(_ImageInfo, vis_info)
+
+        class _IRInfo(_IMInfo):
+            standard_name: str = image.attribute()
+            comment: str = field(NA)
+
+        return _IRInfo(dataframe)
 
     @staticmethod
     def _get_platform_name(platform: str) -> str:
