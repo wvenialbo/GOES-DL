@@ -18,7 +18,7 @@ from .databook_gc import (
     measurement_units_gc,
     platform_origin_gridsat_gc,
     scene_id_gc,
-    scene_name_goesr,
+    scene_name_gc,
     spectral_units_gc,
     square_igfov_at_nadir_gc,
     wavelength_range_lower_bound_gc,
@@ -176,7 +176,7 @@ class GSPlatformInfo(HasStrHelp):
         """
         The scene name (e.g. 'Full Disk', etc.).
         """
-        return scene_name_goesr[self.scene_id]
+        return scene_name_gc[self.scene_id]
 
 
 class _GeospatialInfo(DatasetView):
