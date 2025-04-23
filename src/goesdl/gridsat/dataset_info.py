@@ -204,16 +204,7 @@ class GSDatasetInfo(HasStrHelp):
     """
 
     def __init__(self, dataframe: Dataset, channel: str) -> None:
-        if not channel:
-            raise ValueError(
-                "Channel information is required for multi-band datasets"
-            )
-        if channel not in channel_description_gc:
-            allowed_channels = "', '".join(channel_description_gc.keys())
-            raise ValueError(
-                f"Invalid channel: '{channel}'; "
-                f"allowed channels are: '{allowed_channels}'"
-            )
+        self._validate_channel(channel)
 
         info = _DatasetInfo(dataframe)
 
@@ -276,6 +267,19 @@ class GSDatasetInfo(HasStrHelp):
         self.remarks = minfo.comment
         self.valid_range = minfo.actual_range
         self.shape = minfo.shape
+
+    @staticmethod
+    def _validate_channel(channel: str) -> None:
+        if not channel:
+            raise ValueError(
+                "Channel information is required for multi-band datasets"
+            )
+        if channel not in channel_description_gc:
+            allowed_channels = "', '".join(channel_description_gc.keys())
+            raise ValueError(
+                f"Invalid channel: '{channel}'; "
+                f"allowed channels are: '{allowed_channels}'"
+            )
 
     @staticmethod
     def _get_measurement_info(dataframe: Dataset, field_id: str) -> _ImageInfo:
