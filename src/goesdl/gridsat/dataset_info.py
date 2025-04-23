@@ -61,7 +61,7 @@ class _ImageInfo(Protocol):
     shape: tuple[int]
 
 
-class GOESDatasetInfo(HasStrHelp):
+class GSDatasetInfo(HasStrHelp):
 
     database_name: str = NA
     """
