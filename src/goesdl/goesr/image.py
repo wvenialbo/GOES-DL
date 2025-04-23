@@ -58,10 +58,10 @@ class GOESImage(GOESImageData):
 
         channel_id = self._validate_channel(product_id, channel)
 
-        field = self._validate_field(record, product_id, channel_id)
+        field_id = self._validate_field(record, product_id, channel_id)
 
         data = self._extract_image(
-            record, field, grid.lon_limits, grid.lat_limits
+            record, field_id, grid.lon_limits, grid.lat_limits
         )
 
         self.grid = grid
