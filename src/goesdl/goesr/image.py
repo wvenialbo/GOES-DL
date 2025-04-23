@@ -120,16 +120,21 @@ class GOESImage(GOESImageData):
         record: Dataset, product_id: str, channel_id: str
     ) -> str:
         if product_id == "MCMIP":
-            field = f"CMI_{channel_id}"
+            field_id = f"CMI_{channel_id}"
         elif product_id == "CMIP":
-            field = "CMI"
+            field_id = "CMI"
         else:
-            field = product_id
+            field_id = product_id
 
-        if field not in record.variables:
-            raise ValueError(f"Field '{field}' not found in the dataset")
+        if field_id not in record.variables:
+            raise ValueError(f"Field '{field_id}' not found in the dataset")
 
-        return field
+        if ("y", "x") != record.variables[field_id].dimensions:
+            raise ValueError(
+                f"Field '{field_id}' does not have the required dimensions"
+            )
+
+        return field_id
 
     @classmethod
     def _validate_product(cls, record: Dataset) -> str:
