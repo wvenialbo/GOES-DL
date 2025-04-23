@@ -200,6 +200,11 @@ class GOESDatasetInfo(HasStrHelp):
     The measurement field units.
     """
 
+    remarks: str = NA
+    """
+    Remarks about the measurement.
+    """
+
     valid_range: tuple[float, float] = ()
     """
     The valid range for the measurements.
@@ -290,6 +295,7 @@ class GOESDatasetInfo(HasStrHelp):
         self.standard_name = minfo.standard_name
         self.measurement_name = minfo.measurement_name
         self.measurement_units = minfo.measurement_units
+        self.remarks = NA
 
         valid_range = minfo.valid_range * minfo.scale_factor + minfo.add_offset
 
