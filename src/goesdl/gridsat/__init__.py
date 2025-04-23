@@ -7,15 +7,10 @@ Classes:
 """
 
 from .dataset_info import GSDatasetInfo
-from .locator_b1 import GridSatProductLocatorB1
-from .locator_gc import GridSatProductLocatorGC
 from .geodetic import GSLatLonGrid
 from .image import GSImage
-from .netcdf_info import (
-    GSGeospatialInfo,
-    GSPlatformInfo,
-    GSRadiometricInfo,
-)
+from .locator_b1 import GridSatProductLocatorB1
+from .locator_gc import GridSatProductLocatorGC
 from .projection import GSGlobe, GSOrbitGeometry
 from .time import GSCoverageTime, GSTimeGrid
 from .utility import read_gridsat_dataset
@@ -28,9 +23,6 @@ __all__ = [
     "GSTimeGrid",
     "GSCoverageTime",
     "GSDatasetInfo",
-    "GSPlatformInfo",
-    "GSGeospatialInfo",
-    "GSRadiometricInfo",
     "read_gridsat_dataset",
     "GSOrbitGeometry",
     "GSGlobe",
