@@ -8,6 +8,7 @@ from netCDF4 import Dataset
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
 from ..utils.array import ArrayInt16, ArrayInt32, ArrayUint16, int32
 from .databook_gr import (
+    channel_correspondence_goesr,
     channel_description_goesr,
     get_abstract_goesr,
     origin_platform_goesr,
@@ -209,6 +210,13 @@ class GOESDatasetInfo(HasStrHelp):
     """
 
     def __init__(self, dataframe: Dataset, channel: str = "") -> None:
+        if channel and channel not in channel_correspondence_goesr:
+            allowed_channels = "', '".join(channel_correspondence_goesr.keys())
+            raise ValueError(
+                f"Invalid channel: '{channel}'; "
+                f"allowed channels are: '{allowed_channels}'"
+            )
+
         info = _DatasetInfo(dataframe)
 
         kilometres_per_pixel = self._get_spatial_resolution(
