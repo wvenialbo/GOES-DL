@@ -14,6 +14,11 @@ from .metadata import CoordinateMetadata, VariableMetadata
 MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 
 
+class _DatasetInfo(DatasetView):
+
+    cdm_data_type: str
+
+
 class GSLatLonData(HasStrHelp):
     lon: ArrayFloat32
     lat: ArrayFloat32
