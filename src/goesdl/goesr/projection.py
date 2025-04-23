@@ -160,7 +160,7 @@ class GOESGeostationaryGrid(HasStrHelp):
     grid: tuple[ArrayFloat64, ArrayFloat64]
 
     def __init__(
-        self, record: Dataset, delta: int, limits: BoxLimits | None
+        self, dataframe: Dataset, delta: int, limits: BoxLimits | None
     ) -> None:
         # Validate delta parameter (subsampling increment step)
         if not 1 <= delta <= 10:
@@ -172,7 +172,7 @@ class GOESGeostationaryGrid(HasStrHelp):
         lat_limits = limits[2:4] if limits else None
 
         grid, geom, globe = self._extract_geos_grid(
-            record, delta, lon_limits, lat_limits
+            dataframe, delta, lon_limits, lat_limits
         )
 
         self.geometry = geom
@@ -181,7 +181,7 @@ class GOESGeostationaryGrid(HasStrHelp):
 
     @staticmethod
     def _extract_geos_grid(
-        record: Dataset,
+        dataframe: Dataset,
         step: int | None,
         lon_limits: IndexRange | None,
         lat_limits: IndexRange | None,
@@ -202,8 +202,8 @@ class GOESGeostationaryGrid(HasStrHelp):
                 filter=subsample(lat_limits), convert=_to_float64
             )
 
-        grid = _FixedGrid(record)
-        geom = GOESOrbitGeometry(record)
-        globe = GOESGlobe(record)
+        grid = _FixedGrid(dataframe)
+        geom = GOESOrbitGeometry(dataframe)
+        globe = GOESGlobe(dataframe)
 
         return grid, geom, globe
