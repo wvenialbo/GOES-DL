@@ -192,6 +192,11 @@ wavelength_range_upper_bound_gc = {
 spectral_units_gc = "micrometres"
 
 
+# Radiometric resolution
+
+radiometric_resolution_gc = 10
+
+
 # Measurement range lower bound in % albedo (1) / K (2-5)
 
 _measurement_range_lower_bound_im = {
