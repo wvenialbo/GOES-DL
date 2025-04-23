@@ -155,6 +155,12 @@ class DatasetInfo(Protocol):
         """
 
     @property
+    def remarks(self) -> str:
+        """
+        Remarks about the measurement.
+        """
+
+    @property
     def valid_range(self) -> tuple[float, float]:
         """
         The valid range for the measurements.
