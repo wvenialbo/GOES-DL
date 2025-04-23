@@ -6,12 +6,12 @@ Classes:
     - GridSatProductLocatorGC: Locator for GC products.
 """
 
+from .dataset_info import GSDatasetInfo
 from .locator_b1 import GridSatProductLocatorB1
 from .locator_gc import GridSatProductLocatorGC
 from .netcdf_geodetic import GSLatLonGrid
 from .netcdf_image import GSImage
 from .netcdf_info import (
-    GSDatasetInfo,
     GSGeospatialInfo,
     GSPlatformInfo,
     GSRadiometricInfo,
