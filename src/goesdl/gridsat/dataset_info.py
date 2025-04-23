@@ -255,17 +255,16 @@ class GSDatasetInfo(HasStrHelp):
         channel_nr = channel_correspondence_gc[platform_id][channel]
 
         self.band_id = channel_nr
-        self.band_description = channel_description_gc[channel]
 
         if channel_nr:
+            self.band_description = channel_description_gc[channel]
             wl_lower = wavelength_range_lower_bound_gc[platform_id][channel_nr]
             wl_upper = wavelength_range_upper_bound_gc[platform_id][channel_nr]
             self.band_wavelength = 0.5 * (wl_lower + wl_upper)
-
             self.wavelength_units = spectral_units_gc
-
             self.radiometric_resolution = radiometric_resolution_gc
         else:
+            self.band_description = NA
             self.band_wavelength = NAF
             self.wavelength_units = NA
             self.radiometric_resolution = NAI
