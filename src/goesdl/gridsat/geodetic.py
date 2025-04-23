@@ -54,6 +54,7 @@ class GSLatLonGrid(GSLatLonData):
         info = _DatasetInfo(dataframe)
 
         self._validate_content_type(dataframe, info.cdm_data_type)
+        self._validate_dimensions(dataframe)
 
         # Extract the region of interest...
         if region:
