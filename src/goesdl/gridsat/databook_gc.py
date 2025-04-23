@@ -79,6 +79,11 @@ channel_description_gc = {
 }
 
 
+ch1_standard_name = (
+    "toa_lambertian_equivalent_albedo_"
+    "multiplied_by_cosine_solar_zenith_angle"
+)
+
 # GridSat-GOES channel to actual channel correspondence
 
 _channel_correspondence_il = {
