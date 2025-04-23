@@ -104,8 +104,9 @@ class GSImage(GSImageData):
                 f"allowed channels are: '{allowed_channels}'"
             )
 
+    @staticmethod
     def _validate_content_type(
-        self, dataframe: Dataset, content_type: str, field_id: str
+        dataframe: Dataset, content_type: str, field_id: str
     ) -> None:
         if content_type != "Grid":
             raise ValueError(
