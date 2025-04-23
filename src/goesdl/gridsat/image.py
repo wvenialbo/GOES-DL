@@ -32,7 +32,7 @@ class GSImage(GSImageData):
             record, channel, grid.lon_limits, grid.lat_limits
         )
 
-        self.channel_id = pinfo.channel_id
+        self.channel_id = channel
 
         self._grid = grid
         self.raster = data.raster
