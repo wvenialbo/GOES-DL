@@ -7,6 +7,7 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
+from .databook_gc import channel_description_gc
 from .geodetic import GSLatLonGrid
 from .metadata import MeasurementMetadata
 
@@ -27,6 +28,7 @@ class GSImage(GSImageData):
     def __init__(
         self, record: Dataset, grid: GSLatLonGrid, channel: str
     ) -> None:
+        self._validate_channel(channel)
 
         data = self._extract_image(
             record, channel, grid.lon_limits, grid.lat_limits
@@ -76,6 +78,19 @@ class GSImage(GSImageData):
         metadata = _GSImageMetadata(record)
 
         return MeasurementMetadata(metadata)
+
+    @staticmethod
+    def _validate_channel(channel: str) -> None:
+        if not channel:
+            raise ValueError(
+                "Channel information is required for multi-band datasets"
+            )
+        if channel not in channel_description_gc:
+            allowed_channels = "', '".join(channel_description_gc.keys())
+            raise ValueError(
+                f"Invalid channel: '{channel}'; "
+                f"allowed channels are: '{allowed_channels}'"
+            )
 
     @property
     def image(self) -> ArrayFloat32:
