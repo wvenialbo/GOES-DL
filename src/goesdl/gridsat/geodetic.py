@@ -21,7 +21,7 @@ class GSLatLonData(HasStrHelp):
 
 class GSLatLonGrid(GSLatLonData):
 
-    _region: RectangularRegion
+    region: RectangularRegion
 
     lon: ArrayFloat32
     lat: ArrayFloat32
@@ -57,7 +57,7 @@ class GSLatLonGrid(GSLatLonData):
             region = self._extract_region(dataframe)
             data, lon_limits, lat_limits = self._full_frame(dataframe, corners)
 
-        self._region = region
+        self.region = region
 
         self.lon, self.lat = meshgrid(data.lon, data.lat)
 
@@ -265,7 +265,3 @@ class GSLatLonGrid(GSLatLonData):
     @property
     def globe(self) -> Globe:
         return self.crs.globe
-
-    @property
-    def region(self) -> RectangularRegion:
-        return self._region
