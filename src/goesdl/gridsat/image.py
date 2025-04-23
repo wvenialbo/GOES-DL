@@ -8,7 +8,11 @@ from ..geodesy import RectangularRegion
 from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
-from .databook_gc import channel_description_gc
+from .databook_gc import (
+    channel_correspondence_gc,
+    channel_description_gc,
+    platform_origin_gridsat_gc,
+)
 from .geodetic import GSLatLonGrid
 from .metadata import MeasurementMetadata
 
@@ -38,6 +42,8 @@ class GSImage(GSImageData):
         self._validate_channel(channel)
 
         info = _DatasetInfo(dataframe)
+
+        self._validate_availability(channel, info.platform)
 
         self._validate_content_type(dataframe, info.cdm_data_type, channel)
 
@@ -98,6 +104,17 @@ class GSImage(GSImageData):
         if match := search(pattern, platform):
             return match[1]
         raise ValueError(f"Unexpected platform: '{platform}'")
+
+    @classmethod
+    def _validate_availability(cls, channel: str, platform: str) -> None:
+        plaform_name = cls._get_platform_name(platform)
+        platform_id = platform_origin_gridsat_gc[plaform_name]
+        channel_nr = channel_correspondence_gc[platform_id][channel]
+
+        if not channel_nr:
+            raise ValueError(
+                f"Band '{channel}' is not supported by '{plaform_name}'"
+            )
 
     @staticmethod
     def _validate_channel(channel: str) -> None:
