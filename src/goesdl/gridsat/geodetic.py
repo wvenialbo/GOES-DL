@@ -35,7 +35,7 @@ class GSLatLonGrid(GSLatLonData):
 
     def __init__(
         self,
-        record: Dataset,
+        dataframe: Dataset,
         region: RectangularRegion | None = None,
         delta: int = 5,
         corners: bool = False,
@@ -49,13 +49,13 @@ class GSLatLonGrid(GSLatLonData):
         # Extract the region of interest...
         if region:
             data, lon_limits, lat_limits = self._slice(
-                record, region, delta, corners
+                dataframe, region, delta, corners
             )
 
         # ...or extract the entire field of view
         else:
-            region = self._extract_region(record)
-            data, lon_limits, lat_limits = self._full_frame(record, corners)
+            region = self._extract_region(dataframe)
+            data, lon_limits, lat_limits = self._full_frame(dataframe, corners)
 
         self._region = region
 
@@ -70,11 +70,11 @@ class GSLatLonGrid(GSLatLonData):
 
         self.crs = PlateCarree(central_longitude=0.0, globe=source_globe)
 
-        self.metadata = self._get_metadata(record)
+        self.metadata = self._get_metadata(dataframe)
 
     @staticmethod
     def _extract(
-        record: Dataset,
+        dataframe: Dataset,
         step: int | None,
         lon_limits: IndexRange | None,
         lat_limits: IndexRange | None,
@@ -95,13 +95,13 @@ class GSLatLonGrid(GSLatLonData):
                 filter=subsample(lat_limits)
             )
 
-        data = _LatLonData(record)
+        data = _LatLonData(dataframe)
 
         return cast(GSLatLonData, data)
 
     @staticmethod
     def _extract_bounds(
-        record: Dataset,
+        dataframe: Dataset,
         lon_limits: IndexRange | None,
         lat_limits: IndexRange | None,
     ) -> "GSLatLonData":
@@ -121,13 +121,13 @@ class GSLatLonGrid(GSLatLonData):
                 filter=subsample(lat_limits)
             )
 
-        data = _LatLonData(record)
+        data = _LatLonData(dataframe)
 
         return cast(GSLatLonData, data)
 
     @staticmethod
     def _extract_bounds_metadata(
-        record: Dataset, name: str
+        dataframe: Dataset, name: str
     ) -> VariableMetadata:
         coordinate = variable(name)
 
@@ -137,12 +137,12 @@ class GSLatLonGrid(GSLatLonData):
             units: str = coordinate.attribute()
             shape: tuple[int] = coordinate.attribute()
 
-        metadata = _LatLonMetata(record)
+        metadata = _LatLonMetata(dataframe)
 
         return VariableMetadata(metadata)
 
     @staticmethod
-    def _extract_metadata(record: Dataset, name: str) -> CoordinateMetadata:
+    def _extract_metadata(dataframe: Dataset, name: str) -> CoordinateMetadata:
         coordinate = variable(name)
 
         class _LatLonMetata(DatasetView):
@@ -153,12 +153,12 @@ class GSLatLonGrid(GSLatLonData):
             axis: str = coordinate.attribute()
             shape: tuple[int] = coordinate.attribute()
 
-        metadata = _LatLonMetata(record)
+        metadata = _LatLonMetata(dataframe)
 
         return CoordinateMetadata(metadata)
 
     @staticmethod
-    def _extract_region(record: Dataset) -> RectangularRegion:
+    def _extract_region(dataframe: Dataset) -> RectangularRegion:
         def subsample(x: Any) -> Any:
             skip = x.shape[0] - 1
             return x[::skip]
@@ -167,7 +167,7 @@ class GSLatLonGrid(GSLatLonData):
             lon: ArrayFloat32 = variable("lon").data(filter=subsample)
             lat: ArrayFloat32 = variable("lat").data(filter=subsample)
 
-        data = _LatLonData(record)
+        data = _LatLonData(dataframe)
 
         domain = (
             (float(data.lon[0]), float(data.lon[-1])),
@@ -203,38 +203,42 @@ class GSLatLonGrid(GSLatLonData):
     @classmethod
     def _full_frame(
         cls,
-        record: Dataset,
+        dataframe: Dataset,
         corners: bool,
     ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
         if corners:
-            data = cls._extract_bounds(record, None, None)
+            data = cls._extract_bounds(dataframe, None, None)
             lon_limits = 0, data.lon.size - 1
             lat_limits = 0, data.lat.size - 1
         else:
-            data = cls._extract(record, None, None, None)
+            data = cls._extract(dataframe, None, None, None)
             lon_limits = 0, data.lon.size
             lat_limits = 0, data.lat.size
 
         return data, lon_limits, lat_limits
 
     @classmethod
-    def _get_metadata(cls, record: Dataset) -> MetadataType:
+    def _get_metadata(cls, dataframe: Dataset) -> MetadataType:
         return {
-            "lon": cls._extract_metadata(record, "lon"),
-            "lat": cls._extract_metadata(record, "lat"),
-            "lon_bounds": cls._extract_bounds_metadata(record, "lon_bounds"),
-            "lat_bounds": cls._extract_bounds_metadata(record, "lat_bounds"),
+            "lon": cls._extract_metadata(dataframe, "lon"),
+            "lat": cls._extract_metadata(dataframe, "lat"),
+            "lon_bounds": cls._extract_bounds_metadata(
+                dataframe, "lon_bounds"
+            ),
+            "lat_bounds": cls._extract_bounds_metadata(
+                dataframe, "lat_bounds"
+            ),
         }
 
     @classmethod
     def _slice(
         cls,
-        record: Dataset,
+        dataframe: Dataset,
         region: RectangularRegion,
         delta: int,
         corners: bool,
     ) -> tuple["GSLatLonData", IndexRange, IndexRange]:
-        data = cls._extract(record, delta, None, None)
+        data = cls._extract(dataframe, delta, None, None)
 
         lon_limits = cls._find_limits(data.lon, region.lon_bounds, delta, 0)
         lat_limits = cls._find_limits(data.lat, region.lat_bounds, delta, 0)
@@ -242,7 +246,7 @@ class GSLatLonGrid(GSLatLonData):
         if delta > 1:
             lon_offset, lat_offset = lon_limits[0], lat_limits[0]
 
-            data = cls._extract(record, None, lon_limits, lat_limits)
+            data = cls._extract(dataframe, None, lon_limits, lat_limits)
 
             lon_limits = cls._find_limits(
                 data.lon, region.lon_bounds, 1, lon_offset
@@ -252,9 +256,9 @@ class GSLatLonGrid(GSLatLonData):
             )
 
         if corners:
-            data = cls._extract_bounds(record, lon_limits, lat_limits)
+            data = cls._extract_bounds(dataframe, lon_limits, lat_limits)
         else:
-            data = cls._extract(record, None, lon_limits, lat_limits)
+            data = cls._extract(dataframe, None, lon_limits, lat_limits)
 
         return data, lon_limits, lat_limits
 
