@@ -4,9 +4,10 @@ from re import search
 from typing import Protocol
 
 from netCDF4 import Dataset
+from numpy import int32
 
 from ..netcdf import DatasetView, HasStrHelp, attribute, scalar, variable
-from ..utils.array import ArrayInt16, ArrayInt32, ArrayUint16, int32
+from ..utils.array import ArrayInt16, ArrayInt32, ArrayUint16
 from .databook_gr import (
     channel_correspondence_goesr,
     channel_description_goesr,
