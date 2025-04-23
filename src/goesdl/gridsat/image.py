@@ -8,7 +8,6 @@ from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .geodetic import GSLatLonGrid
-from .netcdf_info import GSPlatformInfo
 from .metadata import MeasurementMetadata
 
 
@@ -28,8 +27,6 @@ class GSImage(GSImageData):
     def __init__(
         self, record: Dataset, grid: GSLatLonGrid, channel: str
     ) -> None:
-        # Get platform information (validate channel parameter)
-        pinfo = GSPlatformInfo(record, channel)
 
         data = self._extract_image(
             record, channel, grid.lon_limits, grid.lat_limits
