@@ -20,9 +20,10 @@ class EnhancementColormap:
         if isinstance(cmap_names, str):
             cmap_names = [cmap_names]
 
-        if len(keypoints) != len(cmap_names) + 1:
+        keypoints_size = len(cmap_names) + 1
+        if len(keypoints) != keypoints_size:
             raise ValueError(
-                f"Expected {len(cmap_names) + 1} keypoints, got {len(keypoints)}"
+                f"Expected {keypoints_size} keypoints, got {len(keypoints)}"
             )
 
         for i in range(1, len(keypoints)):
