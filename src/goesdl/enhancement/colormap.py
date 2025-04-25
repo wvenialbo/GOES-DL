@@ -29,6 +29,17 @@ class DiscreteColormap:
 
         self.segment_data = self._create_segment_data(listed_colors)
 
+    @classmethod
+    def _copy_listed_colors(
+        cls, raw_listed_colors: GListedColors
+    ) -> ListedColors:
+
+        try:
+            return cls._do_copy(raw_listed_colors)
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
     @staticmethod
     def _create_segment_data(listed_colors: ListedColors) -> SegmentData:
         n_colors = len(listed_colors)
@@ -64,17 +75,6 @@ class DiscreteColormap:
                 segment_data[component].append((value, color, color))
 
         return segment_data
-
-    @classmethod
-    def _copy_listed_colors(
-        cls, raw_listed_colors: GListedColors
-    ) -> ListedColors:
-
-        try:
-            return cls._do_copy(raw_listed_colors)
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color list: {error}") from error
 
     @classmethod
     def _do_copy(cls, raw_listed_colors: GListedColors) -> ListedColors:
