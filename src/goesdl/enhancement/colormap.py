@@ -1,12 +1,20 @@
 from collections.abc import Sequence
+from copy import deepcopy
+from typing import cast
+
+from matplotlib.colors import LinearSegmentedColormap
 
 from .shared import (
     DomainData,
     GColorValue,
     GListedColors,
+    GSegmentData,
+    GSegmentEntry,
     ListedColors,
+    MSegmentData,
     RGBValue,
     SegmentData,
+    SegmentEntry,
 )
 
 color_components = ["red", "green", "blue"]
@@ -82,6 +90,114 @@ class DiscreteColormap:
     def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
         red, green, blue = raw_segment_entry
         return float(red), float(green), float(blue)
+
+
+class SegmentedColormap:
+
+    def __init__(self, raw_segment_data: GSegmentData) -> None:
+        segment_data = self._copy_segment_data(raw_segment_data)
+
+        self.segment_data = self._homogenize_segment_data(segment_data)
+
+    @staticmethod
+    def _add_next_segment(
+        k: int,
+        vmin: float,
+        color: GColorValue,
+        entries: list[SegmentEntry],
+        src_segment: list[SegmentEntry],
+        dst_segment: list[SegmentEntry],
+    ) -> SegmentEntry:
+        current_entry = entries[k]
+        current_value = current_entry[0]
+        if current_value != vmin:
+            previous_entry = dst_segment[-1]
+            previous_value = previous_entry[0]
+            if previous_value == vmin:
+                next_entry = previous_entry
+            else:
+                vcolor = float(color[k])
+                next_entry = vmin, vcolor, vcolor
+        else:
+            next_entry = current_entry
+            current_entry = src_segment.pop(0)
+        dst_segment.append(next_entry)
+        return current_entry
+
+    @classmethod
+    def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
+        try:
+            return cls._do_copy(raw_segment_data)
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color segment data: {error}") from error
+
+    @classmethod
+    def _do_copy(cls, raw_segment_data: GSegmentData) -> SegmentData:
+        segment_data: SegmentData = {}
+
+        for component in color_components:
+            segment_data[component] = []
+
+            for segment_entry in raw_segment_data[component]:
+                segment_entry = cls._to_segment_entry(segment_entry)
+                segment_data[component].append(segment_entry)
+
+        return segment_data
+
+    @classmethod
+    def _homogenize_segment_data(
+        cls, src_segment_data: SegmentData
+    ) -> SegmentData:
+        colormap = LinearSegmentedColormap(
+            "temp-cmap", cast(MSegmentData, src_segment_data), 256
+        )
+
+        src_segment_data = deepcopy(src_segment_data)
+
+        dst_segment_data: SegmentData = {
+            component: [] for component in color_components
+        }
+
+        src_segments = [
+            src_segment_data[component] for component in color_components
+        ]
+
+        entries = [segment.pop(0) for segment in src_segments]
+
+        while True:
+            # Get the current minimum level value
+            values = {entry[0] for entry in entries}
+            vmin = min(values)
+
+            # Check if all the current level values are the same
+            if len(values) == 1:
+                # Add the current level to the destination segment
+                for k, component in enumerate(color_components):
+                    dst_segment_data[component].append(entries[k])
+                # Update the segment entries if required and continue or
+                # terminate the loop
+                if vmin < 1.0:
+                    entries = [segment.pop(0) for segment in src_segments]
+                    continue
+                break
+
+            color = colormap(vmin)
+
+            for k, component in enumerate(color_components):
+                src_segment = src_segment_data[component]
+                dst_segment = dst_segment_data[component]
+
+                entries[k] = cls._add_next_segment(
+                    k, vmin, color, entries, src_segment, dst_segment
+                )
+
+        return dst_segment_data
+
+    @staticmethod
+    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> SegmentEntry:
+        value, y0, y1 = raw_segment_entry
+        return float(value), float(y0), float(y1)
 
 
 class EnhancementColormap:
