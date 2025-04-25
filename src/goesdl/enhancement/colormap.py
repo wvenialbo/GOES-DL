@@ -250,7 +250,36 @@ class DiscreteColormap(SegmentedColormap):
         return float(red), float(green), float(blue)
 
 
-class EnhancementColormap(SegmentedColormap):
+class _NamedColormapBased:
+
+    @staticmethod
+    def _get_segment_data(colormap: Colormap) -> SegmentData:
+        if isinstance(colormap, LinearSegmentedColormap):
+            raw_segment_data = getattr(colormap, "_segmentdata")
+            s_colormap = SegmentedColormap(raw_segment_data)
+
+            return s_colormap.segment_data
+
+        if isinstance(colormap, ListedColormap):
+            listed_colors = cast(GListedColors, colormap.colors)
+            l_colormap = DiscreteColormap(listed_colors)
+
+            return l_colormap.segment_data
+
+        raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+
+    @staticmethod
+    def _get_colormap(colormap_name: str) -> Colormap:
+        try:
+            return colormaps.get_cmap(colormap_name)
+
+        except (KeyError, ValueError) as error:
+            raise ValueError(
+                f"Invalid colormap'{colormap_name}': {error}"
+            ) from error
+
+
+class EnhancementColormap(SegmentedColormap, _NamedColormapBased):
 
     def __init__(
         self,
@@ -304,29 +333,3 @@ class EnhancementColormap(SegmentedColormap):
                 segments.extend(segment_data[component])
 
         super().__init__(cast(GSegmentData, combined_segment_data))
-
-    @staticmethod
-    def _get_segment_data(colormap: Colormap) -> SegmentData:
-        if isinstance(colormap, LinearSegmentedColormap):
-            raw_segment_data = getattr(colormap, "_segmentdata")
-            s_colormap = SegmentedColormap(raw_segment_data)
-
-            return s_colormap.segment_data
-
-        if isinstance(colormap, ListedColormap):
-            listed_colors = cast(GListedColors, colormap.colors)
-            l_colormap = DiscreteColormap(listed_colors)
-
-            return l_colormap.segment_data
-
-        raise ValueError(f"Unsupported colormap type: {type(colormap)}")
-
-    @staticmethod
-    def _get_colormap(colormap_name: str) -> Colormap:
-        try:
-            return colormaps.get_cmap(colormap_name)
-
-        except (KeyError, ValueError) as error:
-            raise ValueError(
-                f"Invalid colormap'{colormap_name}': {error}"
-            ) from error
