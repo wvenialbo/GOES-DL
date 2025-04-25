@@ -176,14 +176,14 @@ class SegmentedColormap:
         return cleaned_color_segments
 
 
-class DiscreteColormap:
-
-    segment_data: SegmentData
+class DiscreteColormap(SegmentedColormap):
 
     def __init__(self, raw_listed_colors: GListedColors) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
-        self.segment_data = self._create_segment_data(listed_colors)
+        segment_data = self._create_segment_data(listed_colors)
+
+        super().__init__(cast(GSegmentData, segment_data))
 
     @classmethod
     def _copy_listed_colors(
@@ -191,7 +191,7 @@ class DiscreteColormap:
     ) -> ListedColors:
 
         try:
-            return cls._do_copy(raw_listed_colors)
+            return cls._do_copy_listed_colors(raw_listed_colors)
 
         except (IndexError, TypeError, ValueError) as error:
             raise ValueError(f"Invalid color list: {error}") from error
@@ -233,7 +233,9 @@ class DiscreteColormap:
         return segment_data
 
     @classmethod
-    def _do_copy(cls, raw_listed_colors: GListedColors) -> ListedColors:
+    def _do_copy_listed_colors(
+        cls, raw_listed_colors: GListedColors
+    ) -> ListedColors:
         listed_colors: ListedColors = []
 
         for color_data in raw_listed_colors:
