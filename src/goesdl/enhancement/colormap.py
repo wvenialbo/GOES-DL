@@ -20,78 +20,6 @@ from .shared import (
 )
 
 
-class DiscreteColormap:
-
-    segment_data: SegmentData
-
-    def __init__(self, raw_listed_colors: GListedColors) -> None:
-        listed_colors = self._copy_listed_colors(raw_listed_colors)
-
-        self.segment_data = self._create_segment_data(listed_colors)
-
-    @classmethod
-    def _copy_listed_colors(
-        cls, raw_listed_colors: GListedColors
-    ) -> ListedColors:
-
-        try:
-            return cls._do_copy(raw_listed_colors)
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color list: {error}") from error
-
-    @staticmethod
-    def _create_segment_data(listed_colors: ListedColors) -> SegmentData:
-        n_colors = len(listed_colors)
-
-        # Create keypoint values
-        values: list[float] = []
-
-        for i in range(n_colors + 1):
-            value = i / n_colors
-            values.extend([value, value])
-        values.pop(-1)
-        values.pop(0)
-
-        # Create segmen data
-        segment_data: SegmentData = {}
-
-        for k, component in enumerate(COLOR_COMPONENTS):
-            # Create the segments for the k-th color component
-            segment_data[component] = []
-
-            for i in range(0, len(values), 2):
-                j = i // 2
-
-                # Get the k-th color component value of the j-th color
-                color = listed_colors[j][k]
-
-                # Add the i-th value entry
-                value = values[i]
-                segment_data[component].append((value, color, color))
-
-                # Add the (i+1)-th value entry
-                value = values[i + 1]
-                segment_data[component].append((value, color, color))
-
-        return segment_data
-
-    @classmethod
-    def _do_copy(cls, raw_listed_colors: GListedColors) -> ListedColors:
-        listed_colors: ListedColors = []
-
-        for color_data in raw_listed_colors:
-            color_entry: RGBValue = cls._to_rgb(color_data)
-            listed_colors.append(color_entry)
-
-        return listed_colors
-
-    @staticmethod
-    def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
-        red, green, blue = raw_segment_entry
-        return float(red), float(green), float(blue)
-
-
 class SegmentedColormap:
 
     def __init__(self, raw_segment_data: GSegmentData) -> None:
@@ -244,6 +172,78 @@ class SegmentedColormap:
             cleaned_color_segments.append(color_segment)
 
         return cleaned_color_segments
+
+
+class DiscreteColormap:
+
+    segment_data: SegmentData
+
+    def __init__(self, raw_listed_colors: GListedColors) -> None:
+        listed_colors = self._copy_listed_colors(raw_listed_colors)
+
+        self.segment_data = self._create_segment_data(listed_colors)
+
+    @classmethod
+    def _copy_listed_colors(
+        cls, raw_listed_colors: GListedColors
+    ) -> ListedColors:
+
+        try:
+            return cls._do_copy(raw_listed_colors)
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @staticmethod
+    def _create_segment_data(listed_colors: ListedColors) -> SegmentData:
+        n_colors = len(listed_colors)
+
+        # Create keypoint values
+        values: list[float] = []
+
+        for i in range(n_colors + 1):
+            value = i / n_colors
+            values.extend([value, value])
+        values.pop(-1)
+        values.pop(0)
+
+        # Create segmen data
+        segment_data: SegmentData = {}
+
+        for k, component in enumerate(COLOR_COMPONENTS):
+            # Create the segments for the k-th color component
+            segment_data[component] = []
+
+            for i in range(0, len(values), 2):
+                j = i // 2
+
+                # Get the k-th color component value of the j-th color
+                color = listed_colors[j][k]
+
+                # Add the i-th value entry
+                value = values[i]
+                segment_data[component].append((value, color, color))
+
+                # Add the (i+1)-th value entry
+                value = values[i + 1]
+                segment_data[component].append((value, color, color))
+
+        return segment_data
+
+    @classmethod
+    def _do_copy(cls, raw_listed_colors: GListedColors) -> ListedColors:
+        listed_colors: ListedColors = []
+
+        for color_data in raw_listed_colors:
+            color_entry: RGBValue = cls._to_rgb(color_data)
+            listed_colors.append(color_entry)
+
+        return listed_colors
+
+    @staticmethod
+    def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
+        red, green, blue = raw_segment_entry
+        return float(red), float(green), float(blue)
 
 
 class EnhancementColormap:
