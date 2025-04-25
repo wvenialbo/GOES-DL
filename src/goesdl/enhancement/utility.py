@@ -2,12 +2,14 @@
 
 from collections.abc import Sequence
 
-from .shared import ColorSegment
+from .shared import ColorSegment, GColorValue, RGBValue
 
 
-def compress_color_data(
-    color_data: list[ColorSegment],
-) -> list[ColorSegment]:
+def to_rgb(color_data: GColorValue) -> RGBValue:
+    return float(color_data[0]), float(color_data[1]), float(color_data[2])
+
+
+def compress_color_data(color_data: list[ColorSegment]) -> list[ColorSegment]:
     """
     Compress color data by removing duplicate entries.
 
