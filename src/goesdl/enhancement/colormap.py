@@ -2,12 +2,12 @@ from collections.abc import Sequence
 
 from .shared import (
     DomainData,
+    GColorValue,
     GListedColors,
     ListedColors,
     RGBValue,
     SegmentData,
 )
-from .utility import to_rgb
 
 color_components = ["red", "green", "blue"]
 
@@ -68,15 +68,20 @@ class DiscreteColormap:
         except (IndexError, TypeError, ValueError) as error:
             raise ValueError(f"Invalid color list: {error}") from error
 
-    @staticmethod
-    def _do_copy(raw_listed_colors: GListedColors) -> ListedColors:
+    @classmethod
+    def _do_copy(cls, raw_listed_colors: GListedColors) -> ListedColors:
         listed_colors: ListedColors = []
 
         for color_data in raw_listed_colors:
-            color_entry: RGBValue = to_rgb(color_data)
+            color_entry: RGBValue = cls._to_rgb(color_data)
             listed_colors.append(color_entry)
 
         return listed_colors
+
+    @staticmethod
+    def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
+        red, green, blue = raw_segment_entry
+        return float(red), float(green), float(blue)
 
 
 class EnhancementColormap:
