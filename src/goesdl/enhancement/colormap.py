@@ -3,12 +3,12 @@ from copy import deepcopy
 from math import nan
 from typing import cast
 
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib import colormaps
+from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 from .constants import COLOR_COMPONENTS
 from .shared import (
     ColorSegment,
-    DomainData,
     GColorValue,
     GListedColors,
     GSegmentData,
@@ -250,35 +250,83 @@ class DiscreteColormap(SegmentedColormap):
         return float(red), float(green), float(blue)
 
 
-class EnhancementColormap:
-
-    cmap_names: Sequence[str]
-    domain: DomainData
-    extent: DomainData
-    keypoints: Sequence[float]
-    name: str
+class EnhancementColormap(SegmentedColormap):
 
     def __init__(
         self,
-        name: str,
-        cmap_names: str | Sequence[str],
+        colormap_names: str | Sequence[str],
         keypoints: Sequence[float],
     ) -> None:
-        if isinstance(cmap_names, str):
-            cmap_names = [cmap_names]
+        if isinstance(colormap_names, str):
+            colormap_names = [colormap_names]
 
-        keypoints_size = len(cmap_names) + 1
+        # Validate keypoints number
+        keypoints_size = len(colormap_names) + 1
         if len(keypoints) != keypoints_size:
             raise ValueError(
                 f"Expected {keypoints_size} keypoints, got {len(keypoints)}"
             )
 
+        # Validate keypoints disposition
         for i in range(1, len(keypoints)):
             if keypoints[i] <= keypoints[i - 1]:
                 raise ValueError("Keypoints must be monotonically increasing")
 
-        self.cmap_names = cmap_names
-        self.domain = keypoints[0], keypoints[-1]
-        self.extent = self.domain
-        self.keypoints = keypoints
-        self.name = name
+        # Normalise keypoints
+        vmin, vmax = min(keypoints), max(keypoints)
+
+        norm = vmax - vmin
+        normalized_keypoints = [
+            (keypoint - vmin) / norm for keypoint in keypoints
+        ]
+
+        # Get the segment data of each sub-colormap
+        segment_data_list: list[SegmentData] = []
+        for colormap_name in colormap_names:
+            colormap = self._get_colormap(colormap_name)
+            segment_data = self._get_segment_data(colormap)
+            segment_data_list.append(segment_data)
+
+        # Rescale segment values for concatenation
+        for i, segment_data in enumerate(segment_data_list):
+            smin, smax = normalized_keypoints[i : i + 2]
+            for component, segments in segment_data.items():
+                for j, (x, y1, y2) in enumerate(segments):
+                    x = smin * (1 - x) + smax * x
+                    segments[j] = x, y1, y2
+                segment_data[component] = segments
+
+        # Create the combined color segment data
+        combined_segment_data: SegmentData = {}
+        for component in COLOR_COMPONENTS:
+            combined_segment_data[component] = []
+            for segment_data in segment_data_list:
+                segments.extend(segment_data[component])
+
+        super().__init__(cast(GSegmentData, combined_segment_data))
+
+    @staticmethod
+    def _get_segment_data(colormap: Colormap) -> SegmentData:
+        if isinstance(colormap, LinearSegmentedColormap):
+            raw_segment_data = getattr(colormap, "_segmentdata")
+            s_colormap = SegmentedColormap(raw_segment_data)
+
+            return s_colormap.segment_data
+
+        if isinstance(colormap, ListedColormap):
+            listed_colors = cast(GListedColors, colormap.colors)
+            l_colormap = DiscreteColormap(listed_colors)
+
+            return l_colormap.segment_data
+
+        raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+
+    @staticmethod
+    def _get_colormap(colormap_name: str) -> Colormap:
+        try:
+            return colormaps.get_cmap(colormap_name)
+
+        except (KeyError, ValueError) as error:
+            raise ValueError(
+                f"Invalid colormap'{colormap_name}': {error}"
+            ) from error
