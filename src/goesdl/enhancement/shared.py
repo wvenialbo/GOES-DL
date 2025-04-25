@@ -9,7 +9,6 @@ from collections.abc import Sequence
 from typing import Any, Literal
 
 ColorEntry = tuple[float, float, float, float]
-ColorSegment = tuple[float, ...]
 DomainData = tuple[float, float]
 
 CMYKValue = ColorEntry
@@ -33,8 +32,9 @@ ListedColors = list[RGBValue]
 GSegmentEntry = Sequence[Any]
 GSegmentData = dict[str, Sequence[GSegmentEntry]]
 
+MColorSegment = tuple[float, ...]
 MComponents = Literal["red", "green", "blue", "alpha"]
-MSegmentData = dict[MComponents, Sequence[ColorSegment]]
+MSegmentData = dict[MComponents, Sequence[MColorSegment]]
 
 SegmentEntry = tuple[float, float, float]
 SegmentData = dict[str, list[SegmentEntry]]
