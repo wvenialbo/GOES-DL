@@ -6,7 +6,7 @@ enhancement color tables, as well as reverse and manipulate color maps.
 """
 
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Literal
 
 ColorEntry = tuple[float, float, float, float]
 ColorSegment = tuple[float, ...]
@@ -32,6 +32,9 @@ ListedColors = list[RGBValue]
 
 GSegmentEntry = Sequence[Any]
 GSegmentData = dict[str, Sequence[GSegmentEntry]]
+
+MComponents = Literal["red", "green", "blue", "alpha"]
+MSegmentData = dict[MComponents, Sequence[ColorSegment]]
 
 SegmentEntry = tuple[float, float, float]
 SegmentData = dict[str, list[SegmentEntry]]
