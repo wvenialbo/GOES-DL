@@ -5,6 +5,7 @@ from typing import cast
 from matplotlib.colors import LinearSegmentedColormap
 
 from .shared import (
+    ColorSegment,
     DomainData,
     GColorValue,
     GListedColors,
@@ -14,7 +15,6 @@ from .shared import (
     MSegmentData,
     RGBValue,
     SegmentData,
-    SegmentEntry,
 )
 
 color_components = ["red", "green", "blue"]
@@ -104,10 +104,10 @@ class SegmentedColormap:
         k: int,
         vmin: float,
         color: GColorValue,
-        entries: list[SegmentEntry],
-        src_segment: list[SegmentEntry],
-        dst_segment: list[SegmentEntry],
-    ) -> SegmentEntry:
+        entries: list[ColorSegment],
+        src_segment: list[ColorSegment],
+        dst_segment: list[ColorSegment],
+    ) -> ColorSegment:
         current_entry = entries[k]
         current_value = current_entry[0]
         if current_value != vmin:
@@ -195,7 +195,7 @@ class SegmentedColormap:
         return dst_segment_data
 
     @staticmethod
-    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> SegmentEntry:
+    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> ColorSegment:
         value, y0, y1 = raw_segment_entry
         return float(value), float(y0), float(y1)
 

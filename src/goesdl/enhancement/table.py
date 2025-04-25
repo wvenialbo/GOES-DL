@@ -8,13 +8,19 @@ from pathlib import Path
 from typing import Literal
 
 from .palette import EnhacementPalette
-from .shared import ColorEntry, ColorSegment, DomainData, PaletteData, RGBValue
+from .shared import (
+    ColorEntry,
+    DomainData,
+    MColorSegment,
+    PaletteData,
+    RGBValue,
+)
 from .stretching import EnhacementStretching
 from .utility import interp, interpx
 
 ColorKey = Literal["red", "green", "blue", "alpha"]
 ColorStock = dict[str, RGBValue]
-PaletteTable = dict[ColorKey, Sequence[ColorSegment]]
+PaletteTable = dict[ColorKey, Sequence[MColorSegment]]
 
 
 class EnhacementTable:
@@ -158,9 +164,9 @@ class EnhacementTable:
 
     @staticmethod
     def _make_colortable(table: PaletteData) -> PaletteTable:
-        blue: list[ColorSegment] = []
-        green: list[ColorSegment] = []
-        red: list[ColorSegment] = []
+        blue: list[MColorSegment] = []
+        green: list[MColorSegment] = []
+        red: list[MColorSegment] = []
 
         _, bp, gp, rp = table[0]
         for i, (x, b, g, r) in enumerate(table):
