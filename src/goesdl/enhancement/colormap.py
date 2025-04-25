@@ -5,6 +5,7 @@ from typing import cast
 
 from matplotlib.colors import LinearSegmentedColormap
 
+from .constants import COLOR_COMPONENTS
 from .shared import (
     ColorSegment,
     DomainData,
@@ -17,8 +18,6 @@ from .shared import (
     RGBValue,
     SegmentData,
 )
-
-color_components = ["red", "green", "blue"]
 
 
 class DiscreteColormap:
@@ -57,7 +56,7 @@ class DiscreteColormap:
         # Create segmen data
         segment_data: SegmentData = {}
 
-        for k, component in enumerate(color_components):
+        for k, component in enumerate(COLOR_COMPONENTS):
             # Create the segments for the k-th color component
             segment_data[component] = []
 
@@ -153,7 +152,7 @@ class SegmentedColormap:
     def _do_copy(cls, raw_segment_data: GSegmentData) -> SegmentData:
         segment_data: SegmentData = {}
 
-        for component in color_components:
+        for component in COLOR_COMPONENTS:
             segment_data[component] = []
 
             for segment_entry in raw_segment_data[component]:
@@ -173,11 +172,11 @@ class SegmentedColormap:
         src_segment_data = deepcopy(src_segment_data)
 
         dst_segment_data: SegmentData = {
-            component: [] for component in color_components
+            component: [] for component in COLOR_COMPONENTS
         }
 
         src_segments = [
-            src_segment_data[component] for component in color_components
+            src_segment_data[component] for component in COLOR_COMPONENTS
         ]
 
         entries = [segment.pop(0) for segment in src_segments]
@@ -190,7 +189,7 @@ class SegmentedColormap:
             # Check if all the current level values are the same
             if len(values) == 1:
                 # Add the current level to the destination segment
-                for k, component in enumerate(color_components):
+                for k, component in enumerate(COLOR_COMPONENTS):
                     dst_segment_data[component].append(entries[k])
                 # Update the segment entries if required and continue or
                 # terminate the loop
@@ -201,7 +200,7 @@ class SegmentedColormap:
 
             color = colormap(vmin)
 
-            for k, component in enumerate(color_components):
+            for k, component in enumerate(COLOR_COMPONENTS):
                 src_segment = src_segment_data[component]
                 dst_segment = dst_segment_data[component]
 
@@ -220,7 +219,7 @@ class SegmentedColormap:
     def _reduce_segment_data(cls, segment_data: SegmentData) -> SegmentData:
         reduced_segment_data: SegmentData = {}
 
-        for component in color_components:
+        for component in COLOR_COMPONENTS:
             color_segments = segment_data[component]
             color_segments = cls._remove_duplicate_color_segment(
                 color_segments
