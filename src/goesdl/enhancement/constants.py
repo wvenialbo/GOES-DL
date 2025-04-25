@@ -13,3 +13,5 @@ CM_GRAY = "GRAY"
 CM_HSV = "HSV"
 
 UNNAMED_TABLE = "UNNAMED"
+
+COLOR_COMPONENTS = ["red", "green", "blue"]
