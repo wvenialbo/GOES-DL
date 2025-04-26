@@ -316,11 +316,7 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         normalized_keypoints = self._normalize_keypoints(keypoints)
 
         # Get the segment data of each sub-colormap
-        segment_data_list: list[SegmentData] = []
-        for colormap_name in colormap_names:
-            colormap = self._get_colormap(colormap_name)
-            segment_data = self._get_segment_data(colormap)
-            segment_data_list.append(segment_data)
+        segment_data_list = self._extract_subsegment_data(colormap_names)
 
         # Rescale segment values for concatenation
         for i, segment_data in enumerate(segment_data_list):
@@ -339,6 +335,16 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
                 segments.extend(segment_data[component])
 
         super().__init__(combined_segment_data)
+
+    def _extract_subsegment_data(
+        self, colormap_names: Sequence[str]
+    ) -> list[SegmentData]:
+        segment_data_list: list[SegmentData] = []
+        for colormap_name in colormap_names:
+            colormap = self._get_colormap(colormap_name)
+            segment_data = self._get_segment_data(colormap)
+            segment_data_list.append(segment_data)
+        return segment_data_list
 
     def _normalize_keypoints(self, keypoints: Sequence[float]) -> list[float]:
         vmin, vmax = min(keypoints), max(keypoints)
