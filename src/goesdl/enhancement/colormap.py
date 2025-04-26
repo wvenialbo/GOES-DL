@@ -324,13 +324,23 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         )
 
         # Create the combined color segment data
+        combined_segment_data = self._combine_segmen_data(
+            segment_data_list, segments
+        )
+
+        super().__init__(combined_segment_data)
+
+    def _combine_segmen_data(
+        self,
+        segment_data_list: list[SegmentData],
+        segments: list[ColorSegment],
+    ) -> SegmentData:
         combined_segment_data: SegmentData = {}
         for component in COLOR_COMPONENTS:
             combined_segment_data[component] = []
             for segment_data in segment_data_list:
                 segments.extend(segment_data[component])
-
-        super().__init__(combined_segment_data)
+        return combined_segment_data
 
     def _extract_subsegment_data(
         self, colormap_names: Sequence[str]
