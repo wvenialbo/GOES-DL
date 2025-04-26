@@ -319,13 +319,9 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         segment_data_list = self._extract_subsegment_data(colormap_names)
 
         # Rescale segment values for concatenation
-        for i, segment_data in enumerate(segment_data_list):
-            smin, smax = normalized_keypoints[i : i + 2]
-            for component, segments in segment_data.items():
-                for j, (x, y1, y2) in enumerate(segments):
-                    x = smin * (1 - x) + smax * x
-                    segments[j] = x, y1, y2
-                segment_data[component] = segments
+        segments = self._rescale_segment_values(
+            normalized_keypoints, segment_data_list
+        )
 
         # Create the combined color segment data
         combined_segment_data: SegmentData = {}
@@ -351,6 +347,20 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
 
         norm = vmax - vmin
         return [(keypoint - vmin) / norm for keypoint in keypoints]
+
+    def _rescale_segment_values(
+        self,
+        normalized_keypoints: list[float],
+        segment_data_list: list[SegmentData],
+    ) -> list[ColorSegment]:
+        for i, segment_data in enumerate(segment_data_list):
+            smin, smax = normalized_keypoints[i : i + 2]
+            for component, segments in segment_data.items():
+                for j, (x, y1, y2) in enumerate(segments):
+                    x = smin * (1 - x) + smax * x
+                    segments[j] = x, y1, y2
+                segment_data[component] = segments
+        return segments
 
     def _validate_keypoints(
         self, colormap_names: Sequence[str], keypoints: Sequence[float]
