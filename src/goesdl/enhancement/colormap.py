@@ -287,7 +287,7 @@ class _NamedColormapBased:
             ) from error
 
 
-class NamedColormap(SegmentedColormap, _NamedColormapBased):
+class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
 
     def __init__(
         self,
@@ -296,7 +296,7 @@ class NamedColormap(SegmentedColormap, _NamedColormapBased):
         colormap = self._get_colormap(colormap_name)
         segment_data = self._get_segment_data(colormap)
 
-        super().__init__(cast(GSegmentData, segment_data))
+        super().__init__(segment_data)
 
 
 class EnhancementColormap(SegmentedColormap, _NamedColormapBased):
