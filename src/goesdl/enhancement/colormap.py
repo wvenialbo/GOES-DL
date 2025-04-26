@@ -299,7 +299,7 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
         super().__init__(segment_data)
 
 
-class EnhancementColormap(SegmentedColormap, _NamedColormapBased):
+class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
 
     def __init__(
         self,
@@ -352,4 +352,4 @@ class EnhancementColormap(SegmentedColormap, _NamedColormapBased):
             for segment_data in segment_data_list:
                 segments.extend(segment_data[component])
 
-        super().__init__(cast(GSegmentData, combined_segment_data))
+        super().__init__(combined_segment_data)
