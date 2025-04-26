@@ -313,12 +313,7 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         self._validate_keypoints(colormap_names, keypoints)
 
         # Normalise keypoints
-        vmin, vmax = min(keypoints), max(keypoints)
-
-        norm = vmax - vmin
-        normalized_keypoints = [
-            (keypoint - vmin) / norm for keypoint in keypoints
-        ]
+        normalized_keypoints = self._normalize_keypoints(keypoints)
 
         # Get the segment data of each sub-colormap
         segment_data_list: list[SegmentData] = []
@@ -344,6 +339,12 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
                 segments.extend(segment_data[component])
 
         super().__init__(combined_segment_data)
+
+    def _normalize_keypoints(self, keypoints: Sequence[float]) -> list[float]:
+        vmin, vmax = min(keypoints), max(keypoints)
+
+        norm = vmax - vmin
+        return [(keypoint - vmin) / norm for keypoint in keypoints]
 
     def _validate_keypoints(
         self, colormap_names: Sequence[str], keypoints: Sequence[float]
