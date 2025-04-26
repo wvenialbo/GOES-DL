@@ -84,6 +84,15 @@ class _SegmentedColormapBased:
 
         return decompressed_color_segments
 
+    @staticmethod
+    def _get_keypoints(segment_data: SegmentData) -> list[float]:
+        values: set[float] = set()
+
+        for component, segments in segment_data.items():
+            values.update({x for (x, y0, y1) in segments})
+
+        return sorted(values)
+
     @classmethod
     def _homogenize_segment_data(
         cls, src_segment_data: SegmentData
