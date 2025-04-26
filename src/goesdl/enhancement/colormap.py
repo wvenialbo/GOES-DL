@@ -27,16 +27,6 @@ class _SegmentedColormapBased:
     def __init__(self, segment_data: SegmentData) -> None:
         self.segment_data = segment_data
 
-
-class SegmentedColormap(_SegmentedColormapBased):
-
-    def __init__(self, raw_segment_data: GSegmentData) -> None:
-        segment_data = self._copy_segment_data(raw_segment_data)
-
-        segment_data = self._reduce_segment_data(segment_data)
-
-        super().__init__(segment_data)
-
     @staticmethod
     def _add_next_segment(
         k: int,
@@ -77,27 +67,6 @@ class SegmentedColormap(_SegmentedColormapBased):
                 compressed_color_segments.append((x_1, y_2_0, y_2_1))
 
         return compressed_color_segments
-
-    @classmethod
-    def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
-        try:
-            return cls._do_copy(raw_segment_data)
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color segment data: {error}") from error
-
-    @classmethod
-    def _do_copy(cls, raw_segment_data: GSegmentData) -> SegmentData:
-        segment_data: SegmentData = {}
-
-        for component in COLOR_COMPONENTS:
-            segment_data[component] = []
-
-            for segment_entry in raw_segment_data[component]:
-                segment_entry = cls._to_segment_entry(segment_entry)
-                segment_data[component].append(segment_entry)
-
-        return segment_data
 
     @classmethod
     def _homogenize_segment_data(
@@ -148,11 +117,6 @@ class SegmentedColormap(_SegmentedColormapBased):
 
         return dst_segment_data
 
-    @staticmethod
-    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> ColorSegment:
-        x, y_0, y_1 = raw_segment_entry
-        return float(x), float(y_0), float(y_1)
-
     @classmethod
     def _reduce_segment_data(cls, segment_data: SegmentData) -> SegmentData:
         reduced_segment_data: SegmentData = {}
@@ -182,6 +146,42 @@ class SegmentedColormap(_SegmentedColormapBased):
             cleaned_color_segments.append(color_segment)
 
         return cleaned_color_segments
+
+
+class SegmentedColormap(_SegmentedColormapBased):
+
+    def __init__(self, raw_segment_data: GSegmentData) -> None:
+        segment_data = self._copy_segment_data(raw_segment_data)
+
+        segment_data = self._reduce_segment_data(segment_data)
+
+        super().__init__(segment_data)
+
+    @classmethod
+    def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
+        try:
+            return cls._do_copy(raw_segment_data)
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color segment data: {error}") from error
+
+    @classmethod
+    def _do_copy(cls, raw_segment_data: GSegmentData) -> SegmentData:
+        segment_data: SegmentData = {}
+
+        for component in COLOR_COMPONENTS:
+            segment_data[component] = []
+
+            for segment_entry in raw_segment_data[component]:
+                segment_entry = cls._to_segment_entry(segment_entry)
+                segment_data[component].append(segment_entry)
+
+        return segment_data
+
+    @staticmethod
+    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> ColorSegment:
+        x, y_0, y_1 = raw_segment_entry
+        return float(x), float(y_0), float(y_1)
 
 
 class DiscreteColormap(SegmentedColormap):
