@@ -309,17 +309,8 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         if isinstance(colormap_names, str):
             colormap_names = [colormap_names]
 
-        # Validate keypoints number
-        keypoints_size = len(colormap_names) + 1
-        if len(keypoints) != keypoints_size:
-            raise ValueError(
-                f"Expected {keypoints_size} keypoints, got {len(keypoints)}"
-            )
-
-        # Validate keypoints disposition
-        for i in range(1, len(keypoints)):
-            if keypoints[i] <= keypoints[i - 1]:
-                raise ValueError("Keypoints must be monotonically increasing")
+        # Validate keypoints
+        self._validate_keypoints(colormap_names, keypoints)
 
         # Normalise keypoints
         vmin, vmax = min(keypoints), max(keypoints)
@@ -353,3 +344,18 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
                 segments.extend(segment_data[component])
 
         super().__init__(combined_segment_data)
+
+    def _validate_keypoints(
+        self, colormap_names: Sequence[str], keypoints: Sequence[float]
+    ) -> None:
+        # Validate keypoints number
+        keypoints_size = len(colormap_names) + 1
+        if len(keypoints) != keypoints_size:
+            raise ValueError(
+                f"Expected {keypoints_size} keypoints, got {len(keypoints)}"
+            )
+
+        # Validate keypoints disposition
+        for i in range(1, len(keypoints)):
+            if keypoints[i] <= keypoints[i - 1]:
+                raise ValueError("Keypoints must be monotonically increasing")
