@@ -20,14 +20,22 @@ from .shared import (
 )
 
 
-class SegmentedColormap:
+class _SegmentedColormapBased:
 
     segment_data: SegmentData
+
+    def __init__(self, segment_data: SegmentData) -> None:
+        self.segment_data = segment_data
+
+
+class SegmentedColormap(_SegmentedColormapBased):
 
     def __init__(self, raw_segment_data: GSegmentData) -> None:
         segment_data = self._copy_segment_data(raw_segment_data)
 
-        self.segment_data = self._reduce_segment_data(segment_data)
+        segment_data = self._reduce_segment_data(segment_data)
+
+        super().__init__(segment_data)
 
     @staticmethod
     def _add_next_segment(
