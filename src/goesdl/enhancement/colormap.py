@@ -68,6 +68,22 @@ class _SegmentedColormapBased:
 
         return compressed_color_segments
 
+    @staticmethod
+    def _decompress_color_segment(
+        color_segments: list[ColorSegment],
+    ) -> list[ColorSegment]:
+        decompressed_color_segments: list[ColorSegment] = []
+
+        for x, y_0, y_1 in color_segments:
+            if y_0 == y_1:
+                decompressed_color_segments.append((x, y_0, y_1))
+            else:
+                decompressed_color_segments.extend(
+                    [(x, y_0, y_0), (x, y_1, y_1)]
+                )
+
+        return decompressed_color_segments
+
     @classmethod
     def _homogenize_segment_data(
         cls, src_segment_data: SegmentData
