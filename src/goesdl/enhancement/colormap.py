@@ -22,10 +22,12 @@ from .shared import (
 
 class _SegmentedColormapBased:
 
+    keypoints: list[float]
     segment_data: SegmentData
 
     def __init__(self, segment_data: SegmentData) -> None:
         self.segment_data = segment_data
+        self.keypoints = self._get_keypoints(segment_data)
 
     @staticmethod
     def _add_next_segment(
