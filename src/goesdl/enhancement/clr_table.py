@@ -14,7 +14,7 @@ class clr_utility:
         return [k / CLR_MAX for k in y]
 
     @staticmethod
-    def _normalize_grayscale(y: ColorValueList) -> ColorValueList:
+    def _normalize_grayscale_values(y: ColorValueList) -> ColorValueList:
         return [k / BRG_MAX for k in y]
 
     @staticmethod

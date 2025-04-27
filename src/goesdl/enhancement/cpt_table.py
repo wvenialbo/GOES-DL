@@ -132,7 +132,7 @@ class cpt_utility(clr_utility):
                 r[i], g[i], b[i] = cls._cmyk_to_rgb(c, m, y, k)
 
         elif color_model == CM_GRAY:
-            r = cls._normalize_grayscale(r)
+            r = cls._normalize_grayscale_values(r)
             g, b = r, r
 
         else:
