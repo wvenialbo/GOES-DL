@@ -77,11 +77,7 @@ class EnhacementPalette(ColormapBase):
         return cls(NamedColormap(name))
 
     @classmethod
-    def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
-        return cls(SegmentedColormap(name, segment_data))
-
-    @classmethod
-    def from_table(cls, path: str | Path, name: str = "") -> ColormapBase:
+    def load(cls, path: str | Path, name: str = "") -> ColormapBase:
         """
         Load a McIDAS or GMT enhancement color table specification.
 
@@ -121,6 +117,10 @@ class EnhacementPalette(ColormapBase):
         """
         return cls(ColormapTable(path, name))
 
+    @classmethod
+    def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
+        return cls(SegmentedColormap(name, segment_data))
+
     @staticmethod
     def _create_color_table(segment_data: SegmentData) -> ColorTable:
         # Pack RGB segments
@@ -156,7 +156,7 @@ class EnhacementPalette(ColormapBase):
 
         return color_table
 
-    def save_to_file(self, path: str | Path, rgb: bool = False) -> None:
+    def save(self, path: str | Path, rgb: bool = False) -> None:
         """
         Save the color table.
 
