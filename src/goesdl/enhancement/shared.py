@@ -47,8 +47,9 @@ GListedColors = Sequence[GColorValue]
 # Natively defined discrete colour map list
 DiscreteColorList = list[RGBValue]
 
-# Continuous color gradient definition table
+# Continuous color gradient definition list and table
 ColorStep = tuple[float, RGBValue]
+ContinuousColorList = DiscreteColorList
 ContinuousColorTable = list[ColorStep]
 
 
