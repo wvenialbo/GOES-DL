@@ -114,6 +114,7 @@ class eu_utility(clr_utility):
     @classmethod
     def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
         j: ValueTableColumn = []
+
         b: ValueTableColumn = []
         g: ValueTableColumn = []
         r: ValueTableColumn = []
