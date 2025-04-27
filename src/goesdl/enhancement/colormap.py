@@ -23,7 +23,7 @@ from .shared import (
     SegmentData,
 )
 
-UNNAMED_CMAP = "unnamed"
+UNNAMED_COLORMAP = "unnamed"
 
 
 class ColormapProtocol(Protocol):
@@ -64,7 +64,7 @@ class _SegmentedColormapBased:
 
         self.keypoints = keypoints or self._get_keypoints(segment_data)
 
-        self.name = name or UNNAMED_CMAP
+        self.name = name or UNNAMED_COLORMAP
 
     @property
     def full_segment_data(self) -> SegmentData:
@@ -158,7 +158,7 @@ class _SegmentedColormapBased:
         cls, src_segment_data: SegmentData
     ) -> SegmentData:
         colormap = LinearSegmentedColormap(
-            UNNAMED_CMAP, cast(MSegmentData, src_segment_data), 1024
+            UNNAMED_COLORMAP, cast(MSegmentData, src_segment_data), 1024
         )
 
         src_segment_data = deepcopy(src_segment_data)
@@ -289,7 +289,7 @@ class ContinuousColormap(_SegmentedColormapBased):
     def _get_colormap(listed_colors: GListedColors) -> Colormap:
         try:
             return LinearSegmentedColormap.from_list(
-                UNNAMED_CMAP, listed_colors
+                UNNAMED_COLORMAP, listed_colors
             )
 
         except (TypeError, ValueError) as error:
