@@ -37,6 +37,12 @@ class ColormapProtocol(Protocol):
     @property
     def full_segment_data(self) -> SegmentData: ...
 
+    @property
+    def name(self) -> str: ...
+
+    @name.setter
+    def name(self, colormap_name: str) -> None: ...
+
 
 class _SegmentedColormapBased:
 
