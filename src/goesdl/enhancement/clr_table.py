@@ -1,13 +1,13 @@
 from .constants import CLR_MAX
-from .shared import ColorEntry
+from .shared import ColorTable
 
 
 class clr_utility:
 
     @classmethod
-    def _make_color_entries(
+    def _make_color_table(
         cls, x: list[float], b: list[float], g: list[float], r: list[float]
-    ) -> list[ColorEntry]:
+    ) -> ColorTable:
         return list(zip(x, b, g, r))
 
     @staticmethod
