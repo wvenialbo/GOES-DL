@@ -3,51 +3,85 @@ Provide the EnhacementPalette class for handling color enhancement
 palettes.
 """
 
+from collections.abc import Sequence
 from pathlib import Path
 
-from .constants import UNNAMED_COLORMAP
-from .cpt_table import cpt_utility
+from .colormap import (
+    ColormapBase,
+    CombinedColormap,
+    ContinuousColormap,
+    DiscreteColormap,
+    NamedColormap,
+    SegmentedColormap,
+)
+from .colortable import ColormapTable
+from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .eu_table import eu_utility
-from .shared import ColorTable
+from .shared import (
+    ColorSegment,
+    ColorTable,
+    ColorValueList,
+    ContinuousColorList,
+    ContinuousColorTable,
+    DiscreteColorList,
+    GKeypointList,
+    GSegmentData,
+    KeypointList,
+    SegmentData,
+)
 
 
-class EnhacementPalette:
+class EnhacementPalette(ColormapBase):
     """
-    Represent a color enhancement color palette.
-
-    This class provides methods to load, parse, and process McIDAS and
-    GMT enhancement color tables, creating color dictionaries for
-    Matplotlib colormaps.
-
-    Attributes
-    ----------
-    name : str
-        The name of the enhancement color palette.
-    table : ColorTable
-        The palette data containing color segments.
+    Represent a enhancement color palette.
 
     Methods
     -------
-    create_file(path, name, table, rgb)
-        Create a file with the enhancement color palette.
     from_file(path)
         Load a McIDAS or GMT enhancement color palette specification and
         create an EnhacementPalette instance.
-    reverse()
-        Reverse the enhancement color palette.
     save_to_file(path, name, rgb)
         Save the enhancement color palette.
     """
 
-    name: str
-    table: ColorTable
-
-    def __init__(self, name: str, table: ColorTable) -> None:
-        self.name = name
-        self.table = table
+    def __init__(self, colormap: ColormapBase) -> None:
+        super().__init__(
+            colormap.name, colormap.segment_data, colormap.keypoints, False
+        )
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "EnhacementPalette":
+    def combined_from_stock(
+        cls,
+        colormap_names: str | Sequence[str],
+        keypoints: GKeypointList,
+        name: str = "",
+    ) -> ColormapBase:
+        return cls(CombinedColormap(name, colormap_names, keypoints))
+
+    @classmethod
+    def continuous(
+        cls,
+        name: str,
+        listed_colors: ContinuousColorList | ContinuousColorTable,
+    ) -> ColormapBase:
+        return cls(ContinuousColormap(name, listed_colors))
+
+    @classmethod
+    def discrete(
+        cls, name: str, listed_colors: DiscreteColorList
+    ) -> ColormapBase:
+        return cls(DiscreteColormap(name, listed_colors))
+
+    @classmethod
+    def from_stock(cls, name: str) -> ColormapBase:
+        return cls(NamedColormap(name))
+
+    @classmethod
+    def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
+        return cls(SegmentedColormap(name, segment_data))
+
+    @classmethod
+    def from_table(cls, path: str | Path, name: str = "") -> ColormapBase:
         """
         Load a McIDAS or GMT enhancement color table specification.
 
@@ -59,11 +93,13 @@ class EnhacementPalette:
         ----------
         path : str or Path
             Path to the color table specification text file.
+        name : str
+            The name for the palette.
 
         Returns
         -------
-        ColorSpec
-            Tuple of color table and stock color values.
+        EnhacementPalette
+            A EnhacementPalette object.
 
         Notes
         -----
@@ -83,12 +119,42 @@ class EnhacementPalette:
 
         - https://www.generic-mapping-tools.org/
         """
-        with open(path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
+        return cls(ColormapTable(path, name))
 
-        items, name = cls._parse_table(lines)
+    @staticmethod
+    def _create_color_table(segment_data: SegmentData) -> ColorTable:
+        # Pack RGB segments
+        packed_segments: list[list[ColorSegment]] = []
 
-        return cls(name, items)
+        packed_segments.extend(
+            segment_data[component] for component in COLOR_COMPONENTS
+        )
+
+        # Unpack segment values
+        unpacked_segment_valuess: list[
+            tuple[float, float, float, float, float, float, float]
+        ] = [
+            (*red, *green[1:], *blue[1:])
+            for red, green, blue in zip(*packed_segments)
+        ]
+
+        x: KeypointList = []
+        r: ColorValueList = []
+        g: ColorValueList = []
+        b: ColorValueList = []
+
+        for xi, r0, r1, g0, g1, b0, b1 in unpacked_segment_valuess:
+            x.extend((xi, xi))
+            r.extend((r0, r1))
+            g.extend((g0, g1))
+            b.extend((b0, b1))
+
+        color_table = eu_utility.make_color_table((x, b, g, r))
+
+        color_table.pop(-1)
+        color_table.pop(0)
+
+        return color_table
 
     def save_to_file(
         self, path: str | Path, name: str = "", rgb: bool = False
@@ -97,7 +163,7 @@ class EnhacementPalette:
         Save the color table.
 
         Save the color table to a McIDAS enhancement utility table (EU
-        TABLE) or GMT color palette table (CPT TABLE) text file.
+        TABLE) text file.
 
         Parameters
         ----------
@@ -111,13 +177,6 @@ class EnhacementPalette:
         if not name and self.name != UNNAMED_COLORMAP:
             name = self.name
 
-        eu_utility.create_file(path, name, self.table, rgb)
+        color_table = self._create_color_table(self.full_segment_data)
 
-    @staticmethod
-    def _parse_table(lines: list[str]) -> tuple[ColorTable, str]:
-        # Try parse a EU file first (if EU file detected)
-        if eu_utility.is_eu_table(lines[0]):
-            return eu_utility.parse_eu_table(lines)
-
-        # Try parse a CPT file
-        return cpt_utility.parse_cpt_table(lines)
+        eu_utility.create_file(path, name, color_table, rgb)
