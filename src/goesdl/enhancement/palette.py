@@ -18,7 +18,7 @@ from .colortable import ColormapTable
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .eu_table import eu_utility
 from .shared import (
-    ColorSegment,
+    ColorSegments,
     ColorTable,
     ColorValueList,
     ContinuousColorList,
@@ -121,14 +121,10 @@ class EnhacementPalette(ColormapBase):
     def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
         return cls(SegmentedColormap(name, segment_data))
 
-    @staticmethod
-    def _create_color_table(segment_data: SegmentData) -> ColorTable:
+    @classmethod
+    def _create_color_table(cls, segment_data: SegmentData) -> ColorTable:
         # Pack RGB segments
-        packed_segments: list[list[ColorSegment]] = []
-
-        packed_segments.extend(
-            segment_data[component] for component in COLOR_COMPONENTS
-        )
+        packed_segments = cls._pack_segment_data(segment_data)
 
         # Unpack segment values
         unpacked_segment_valuess: list[
@@ -156,6 +152,16 @@ class EnhacementPalette(ColormapBase):
 
         return color_table
 
+    @staticmethod
+    def _pack_segment_data(segment_data: SegmentData) -> list[ColorSegments]:
+        packed_segments: list[ColorSegments] = []
+
+        packed_segments.extend(
+            segment_data[component] for component in COLOR_COMPONENTS
+        )
+
+        return packed_segments
+
     def save(self, path: str | Path, rgb: bool = False) -> None:
         """
         Save the color table.
@@ -173,5 +179,6 @@ class EnhacementPalette(ColormapBase):
         name = "" if self.name == UNNAMED_COLORMAP else self.name
 
         color_table = self._create_color_table(self.full_segment_data)
+        print(color_table)
 
         eu_utility.create_file(path, name, color_table, rgb)
