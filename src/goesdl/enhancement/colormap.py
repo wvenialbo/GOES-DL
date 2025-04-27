@@ -26,9 +26,10 @@ class _SegmentedColormapBased:
     segment_data: SegmentData
 
     def __init__(
-        self, segment_data: SegmentData, keypoints: list[float]
+        self, segment_data: SegmentData, keypoints: list[float], reduce: bool
     ) -> None:
-        segment_data = self._reduce_segment_data(segment_data)
+        if reduce:
+            segment_data = self._reduce_segment_data(segment_data)
 
         self.segment_data = segment_data
 
@@ -185,7 +186,7 @@ class SegmentedColormap(_SegmentedColormapBased):
     def __init__(self, raw_segment_data: GSegmentData) -> None:
         segment_data = self._copy_segment_data(raw_segment_data)
 
-        super().__init__(segment_data, [])
+        super().__init__(segment_data, [], True)
 
     @classmethod
     def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
@@ -221,7 +222,7 @@ class DiscreteColormap(_SegmentedColormapBased):
 
         segment_data = self._create_segment_data(listed_colors)
 
-        super().__init__(segment_data, [])
+        super().__init__(segment_data, [], True)
 
     @classmethod
     def _copy_listed_colors(
@@ -324,7 +325,9 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
         segmented_colormap = self._get_segment_data(colormap)
 
         super().__init__(
-            segmented_colormap.segment_data, segmented_colormap.keypoints
+            segmented_colormap.segment_data,
+            segmented_colormap.keypoints,
+            False,
         )
 
 
@@ -357,7 +360,7 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
             segment_data_list, segments
         )
 
-        super().__init__(combined_segment_data, [])
+        super().__init__(combined_segment_data, [], True)
 
     def _combine_segmen_data(
         self,
