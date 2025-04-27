@@ -139,7 +139,7 @@ class eu_utility(clr_utility):
 
         x, b, g, r = cls._process_eu_table(color_model, (j, b, g, r))
 
-        color_table = cls._make_color_table(x, b, g, r)
+        color_table = cls._make_color_table((x, b, g, r))
 
         name = UNNAMED_TABLE
         if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
