@@ -99,8 +99,8 @@ class eu_utility(clr_utility):
 
             lines.append(line)
 
-    @classmethod
-    def _get_color_entry(cls, entry: ColorTableEntry) -> ColorTableEntry:
+    @staticmethod
+    def _get_color_entry(entry: ColorTableEntry) -> ColorTableEntry:
         x, b, g, r = entry
 
         x = round(x * CLR_MAX)
