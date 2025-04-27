@@ -8,7 +8,7 @@ from pathlib import Path
 from .constants import UNNAMED_TABLE
 from .cpt_table import cpt_utility
 from .eu_table import eu_utility
-from .shared import ColorTable, DomainData, PaletteData, PaletteItem
+from .shared import ColorList, ColorTable, DomainData, PaletteItem
 
 
 class EnhacementPalette:
@@ -46,8 +46,8 @@ class EnhacementPalette:
 
     name: str
     extent: DomainData
-    table: PaletteData
-    stock: ColorTable
+    table: ColorTable
+    stock: ColorList
 
     def __init__(
         self, name: str, specs: PaletteItem, extent: DomainData

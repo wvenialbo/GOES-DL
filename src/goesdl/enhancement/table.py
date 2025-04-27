@@ -9,10 +9,10 @@ from typing import Literal
 
 from .palette import EnhacementPalette
 from .shared import (
-    ColorEntry,
+    ColorTable,
+    ColorTableEntry,
     DomainData,
     MColorSegment,
-    PaletteData,
     RGBValue,
 )
 from .stretching import EnhacementStretching
@@ -61,7 +61,7 @@ class EnhacementTable:
     name: str
     stock: ColorStock
     color_table: PaletteTable
-    color_data: PaletteData
+    color_data: ColorTable
     palette: EnhacementPalette
     stretching: EnhacementStretching
 
@@ -103,7 +103,7 @@ class EnhacementTable:
         cmin = self._interp_color(vmin, self.color_data)
         cmax = self._interp_color(vmax, self.color_data)
 
-        sub_palette: PaletteData = [cmin]
+        sub_palette: ColorTable = [cmin]
         for entry in self.color_data:
             if entry[0] <= cmin[0] or entry[0] >= cmax[0]:
                 continue
@@ -150,7 +150,7 @@ class EnhacementTable:
         return cls(palette, stretching)
 
     @staticmethod
-    def _interp_color(x: float, color_data: PaletteData) -> ColorEntry:
+    def _interp_color(x: float, color_data: ColorTable) -> ColorTableEntry:
         x_pal, b_pal, g_pal, r_pal = zip(*color_data)
 
         # Linear interpolation between the two points
@@ -163,7 +163,7 @@ class EnhacementTable:
         return x, b, g, r
 
     @staticmethod
-    def _make_colortable(table: PaletteData) -> PaletteTable:
+    def _make_colortable(table: ColorTable) -> PaletteTable:
         blue: list[MColorSegment] = []
         green: list[MColorSegment] = []
         red: list[MColorSegment] = []
@@ -193,7 +193,7 @@ class EnhacementTable:
 
     @staticmethod
     def _normalize_palette(
-        vmin: float, vmax: float, sub_palette: PaletteData
+        vmin: float, vmax: float, sub_palette: ColorTable
     ) -> None:
         vrange = vmax - vmin
         for i, entry in enumerate(sub_palette):
@@ -204,12 +204,12 @@ class EnhacementTable:
     @staticmethod
     def _stretch_palette(
         stretching: EnhacementStretching, palette: EnhacementPalette
-    ) -> PaletteData:
+    ) -> ColorTable:
         x_stretch: tuple[float]
         y_stretch: tuple[float]
         y_stretch, x_stretch = zip(*stretching.table)
 
-        linearized_table: PaletteData = []
+        linearized_table: ColorTable = []
         for x, b, g, r in palette.table:
             y = interpx(x, x_stretch, y_stretch)
             linearized_table.append((y, b, g, r))
