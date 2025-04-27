@@ -1,13 +1,12 @@
 from .constants import BRG_MAX, CLR_MAX
-from .shared import ColorTable
+from .shared import ColorTable, ValueTables
 
 
 class clr_utility:
 
     @classmethod
-    def _make_color_table(
-        cls, x: list[float], b: list[float], g: list[float], r: list[float]
-    ) -> ColorTable:
+    def _make_color_table(cls, values: ValueTables) -> ColorTable:
+        x, b, g, r = values
         return list(zip(x, b, g, r))
 
     @staticmethod
