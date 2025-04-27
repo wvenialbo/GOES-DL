@@ -62,9 +62,9 @@ class cpt_utility(clr_utility):
         # to the blue, green, and red colour components, respectively;
         # the `n` list is left unchanged since it is used only for CMYK
         # to RGB colorspace conversion.
-        r, g, b = cls._process_cpt_colors(color_model, r, g, b, k)
+        x, b, g, r = cls._process_cpt_colors(color_model, (j, r, g, b, k))
 
-        entries = cls._make_color_table(j, b, g, r)
+        entries = cls._make_color_table((x, b, g, r))
 
         return entries, UNNAMED_TABLE
 
@@ -110,13 +110,13 @@ class cpt_utility(clr_utility):
 
     @classmethod
     def _process_cpt_colors(
-        cls,
-        color_model: str,
-        r: list[float],
-        g: list[float],
-        b: list[float],
-        n: list[float],
+        cls, color_model: str, values: ValueTable
     ) -> ValueTable:
+        j, r, g, b, n = values
+
+        # Normalise scale values
+        x = cls._normalize_values(j)
+
         # Normalize colour values
         if color_model == CM_RGB:
             r = cls._normalize_colors(r)
@@ -139,4 +139,4 @@ class cpt_utility(clr_utility):
         else:
             raise ValueError("Invalid colour model")
 
-        return r, g, b
+        return x, b, g, r
