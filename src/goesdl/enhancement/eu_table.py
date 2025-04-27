@@ -136,7 +136,7 @@ class eu_utility(clr_utility):
             g.extend((float(ls[4]), float(ls[5])))
             r.extend((float(ls[6]), float(ls[7])))
 
-        x, b, g, r = cls._process_eu_table(color_model, j, b, g, r)
+        x, b, g, r = cls._process_eu_table(color_model, (j, b, g, r))
 
         color_table = cls._make_color_table(x, b, g, r)
 
@@ -151,11 +151,10 @@ class eu_utility(clr_utility):
     def _process_eu_table(
         cls,
         color_model: str,
-        j: list[float],
-        b: list[float],
-        g: list[float],
-        r: list[float],
+        values: ValueTables,
     ) -> ValueTables:
+        j, b, g, r = values
+
         # Normalise scale values
         x = cls._normalize_values(j)
 
