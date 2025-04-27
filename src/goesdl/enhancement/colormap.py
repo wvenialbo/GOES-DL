@@ -9,13 +9,13 @@ from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 from .constants import COLOR_COMPONENTS
 from .shared import (
     ColorSegment,
+    DiscreteColorList,
     GColorValue,
     GKeypointList,
     GListedColors,
     GSegmentData,
     GSegmentEntry,
     KeypointList,
-    ListedColors,
     MSegmentData,
     RGBValue,
     SegmentData,
@@ -298,7 +298,7 @@ class DiscreteColormap(_SegmentedColormapBased):
     @classmethod
     def _copy_listed_colors(
         cls, raw_listed_colors: GListedColors
-    ) -> ListedColors:
+    ) -> DiscreteColorList:
 
         try:
             return cls._do_copy_listed_colors(raw_listed_colors)
@@ -307,7 +307,7 @@ class DiscreteColormap(_SegmentedColormapBased):
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _create_segment_data(listed_colors: ListedColors) -> SegmentData:
+    def _create_segment_data(listed_colors: DiscreteColorList) -> SegmentData:
         n_colors = len(listed_colors)
 
         # Create keypoint values
@@ -345,8 +345,8 @@ class DiscreteColormap(_SegmentedColormapBased):
     @classmethod
     def _do_copy_listed_colors(
         cls, raw_listed_colors: GListedColors
-    ) -> ListedColors:
-        listed_colors: ListedColors = []
+    ) -> DiscreteColorList:
+        listed_colors: DiscreteColorList = []
 
         for color_data in raw_listed_colors:
             color_entry: RGBValue = cls._to_rgb(color_data)
