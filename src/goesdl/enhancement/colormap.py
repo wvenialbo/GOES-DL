@@ -127,7 +127,7 @@ class _SegmentedColormapBased:
         cls, src_segment_data: SegmentData
     ) -> SegmentData:
         colormap = LinearSegmentedColormap(
-            "temp-cmap", cast(MSegmentData, src_segment_data), 256
+            "temp-cmap", cast(MSegmentData, src_segment_data), 1024
         )
 
         src_segment_data = deepcopy(src_segment_data)
