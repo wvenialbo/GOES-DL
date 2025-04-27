@@ -59,20 +59,10 @@ class EnhacementStretching:
     """
 
     name: str
-    domain: DomainData
-    extent: DomainData
     table: StretchingTable
 
-    def __init__(
-        self,
-        name: str,
-        table: StretchingTable,
-        scale_domain: DomainData,
-        palette_extent: DomainData,
-    ) -> None:
+    def __init__(self, name: str, table: StretchingTable) -> None:
         self.name = name
-        self.domain = scale_domain
-        self.extent = palette_extent
         self.table = table
 
     @classmethod
