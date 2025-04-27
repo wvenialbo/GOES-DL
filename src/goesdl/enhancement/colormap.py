@@ -26,7 +26,10 @@ class _SegmentedColormapBased:
     segment_data: SegmentData
 
     def __init__(self, segment_data: SegmentData) -> None:
+        segment_data = self._reduce_segment_data(segment_data)
+
         self.segment_data = segment_data
+
         self.keypoints = self._get_keypoints(segment_data)
 
     @staticmethod
@@ -180,8 +183,6 @@ class SegmentedColormap(_SegmentedColormapBased):
     def __init__(self, raw_segment_data: GSegmentData) -> None:
         segment_data = self._copy_segment_data(raw_segment_data)
 
-        segment_data = self._reduce_segment_data(segment_data)
-
         super().__init__(segment_data)
 
     @classmethod
@@ -217,8 +218,6 @@ class DiscreteColormap(_SegmentedColormapBased):
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
         segment_data = self._create_segment_data(listed_colors)
-
-        segment_data = self._reduce_segment_data(segment_data)
 
         super().__init__(segment_data)
 
