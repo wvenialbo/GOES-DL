@@ -1,5 +1,4 @@
 import colorsys
-import math
 
 from .clr_table import clr_utility
 from .constants import (
@@ -13,7 +12,7 @@ from .constants import (
     HUE_MAX,
     UNNAMED_TABLE,
 )
-from .shared import CMYKValue, ColorTable, RGBValue, ValueTables
+from .shared import ColorTable, RGBValue, ValueTables
 
 GMT_CPT_KEYWORD = (
     "#",
@@ -43,11 +42,6 @@ class cpt_utility(clr_utility):
 
         clr_values = r, g, b, k
 
-        cl_nan = math.nan
-        bg: CMYKValue = (cl_nan, cl_nan, cl_nan, cl_nan)
-        fg: CMYKValue = (cl_nan, cl_nan, cl_nan, cl_nan)
-        nn: CMYKValue = 1.0, 0.0, 1.0, cl_nan
-
         color_model = CM_RGB
 
         for line in lines:
@@ -58,16 +52,11 @@ class cpt_utility(clr_utility):
             if line[0] == GMT_CPT_COMMENT and ls[-1] in GMT_CPT_COLOR_MODEL:
                 color_model = ls[-1]
 
-            # Extract stock colors
-            bg, fg, nn = cls._extract_stock_color(color_model, bg, fg, nn, ls)
-
             # Ignore header lines
             if ls[0] in GMT_CPT_KEYWORD:
                 continue
 
             cls._extract_color_range(j, clr_values, color_model, ls)
-
-        bg, fg = cls._finalize_stock_colors(clr_values, bg, fg, color_model)
 
         # The `r`, `g`, and `b` lists are modified in place and contain
         # the normalized color component intensity values corresponding
@@ -76,10 +65,7 @@ class cpt_utility(clr_utility):
         # to RGB colorspace conversion.
         r, g, b = cls._process_cpt_colors(color_model, r, g, b, k)
 
-        extent = j[0], j[-1]
-
         entries = cls._make_color_table(j, b, g, r)
-        stock = cls._process_cpt_stock(color_model, bg, fg, nn)
 
         return entries, UNNAMED_TABLE
 
@@ -118,57 +104,6 @@ class cpt_utility(clr_utility):
             r.extend((float(ls[1]), float(ls[5])))
             g.extend((float(ls[2]), float(ls[6])))
             b.extend((float(ls[3]), float(ls[7])))
-
-    @classmethod
-    def _extract_stock_color(
-        cls,
-        color_model: str,
-        bg: CMYKValue,
-        fg: CMYKValue,
-        nn: CMYKValue,
-        ls: list[str],
-    ) -> tuple[CMYKValue, CMYKValue, CMYKValue]:
-        if ls[0] == GMT_CPT_KEYWORD[2]:
-            bg = cls._get_stock_color(color_model, ls)
-        elif ls[0] == GMT_CPT_KEYWORD[3]:
-            fg = cls._get_stock_color(color_model, ls)
-        elif ls[0] == GMT_CPT_KEYWORD[4]:
-            nn = cls._get_stock_color(color_model, ls)
-        return bg, fg, nn
-
-    @classmethod
-    def _finalize_stock_colors(
-        cls,
-        clr_values: ValueTables,
-        bg: CMYKValue,
-        fg: CMYKValue,
-        color_model: str,
-    ) -> tuple[CMYKValue, CMYKValue]:
-        r, g, b, k = clr_values
-
-        if color_model == CM_GRAY:
-            bg = (r[0], 0.0, 0.0, 0.0) if math.isnan(bg[0]) else bg
-            fg = (r[-1], 0.0, 0.0, 0.0) if math.isnan(fg[0]) else fg
-
-        elif color_model == CM_CMYK:
-            bg = (r[0], g[0], b[0], k[0]) if math.isnan(bg[0]) else bg
-            fg = (r[-1], g[-1], b[-1], k[-1]) if math.isnan(fg[0]) else fg
-
-        else:
-            bg = (r[0], g[0], b[0], 0.0) if math.isnan(bg[0]) else bg
-            fg = (r[-1], g[-1], b[-1], 0.0) if math.isnan(fg[0]) else fg
-
-        return bg, fg
-
-    @staticmethod
-    def _get_stock_color(color_model: str, ls: list[str]) -> CMYKValue:
-        r, g, b, k = float(ls[1]), 0.0, 0.0, 0.0
-        if color_model in {CM_RGB, CM_CMYK}:
-            g = float(ls[2])
-            b = float(ls[3])
-            if color_model == CM_CMYK:
-                k = float(ls[4])
-        return r, g, b, k
 
     @staticmethod
     def _hsv_to_rgb(h: float, s: float, v: float) -> RGBValue:
@@ -210,19 +145,3 @@ class cpt_utility(clr_utility):
             raise ValueError("Invalid color model")
 
         return r, g, b
-
-    @classmethod
-    def _process_cpt_stock(
-        cls,
-        color_model: str,
-        bg: CMYKValue,
-        fg: CMYKValue,
-        nn: CMYKValue,
-    ) -> list[RGBValue]:
-        packed = (bg, fg, nn)
-        u, v, w, y = zip(*packed)
-        r, g, b, k = list(u), list(v), list(w), list(y)
-
-        r, g, b = cls._process_cpt_colors(color_model, r, g, b, k)
-
-        return list(zip(r, g, b))
