@@ -11,7 +11,7 @@ from .constants import (
     HUE_MAX,
     UNNAMED_TABLE,
 )
-from .shared import ColorTable, RGBValue, ValueTable
+from .shared import ColorTable, RGBValue, ValueTable, ValueTableColumn
 
 GMT_CPT_KEYWORD = (
     "#",
@@ -32,12 +32,12 @@ class cpt_utility(clr_utility):
 
     @classmethod
     def parse_cpt_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
-        j: list[float] = []
+        j: ValueTableColumn = []
 
-        r: list[float] = []
-        g: list[float] = []
-        b: list[float] = []
-        k: list[float] = []
+        r: ValueTableColumn = []
+        g: ValueTableColumn = []
+        b: ValueTableColumn = []
+        k: ValueTableColumn = []
 
         input_table = j, r, g, b, k
 
