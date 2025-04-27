@@ -48,9 +48,9 @@ GListedColors = Sequence[GColorValue]
 DiscreteColorList = list[RGBValue]
 
 # Continuous colour gradient definition list and table
-ColorStep = tuple[float, RGBValue]
 ContinuousColorList = DiscreteColorList
-ContinuousColorTable = list[ColorStep]
+ContinuousColorTableRow = tuple[float, RGBValue]
+ContinuousColorTable = list[ContinuousColorTableRow]
 
 
 # Colour segments
