@@ -4,9 +4,8 @@ from typing import TextIO
 from .clr_table import clr_utility
 from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_TABLE
 from .shared import (
-    ColorEntry,
-    DomainData,
-    PaletteData,
+    ColorTable,
+    ColorTableEntry,
     ValueTables,
 )
 
@@ -49,8 +48,7 @@ class eu_utility(clr_utility):
         cls,
         path: str | Path,
         name: str,
-        table: PaletteData,
-        extent: DomainData,
+        table: ColorTable,
         rgb: bool = False,
     ) -> None:
         """
@@ -64,16 +62,13 @@ class eu_utility(clr_utility):
             The name of the color table.
         table : PaletteTable
             The color table data.
-        extent : DomainData
-            The palette extent containing the minimum and maximum
-            defined values.
         rgb : bool, optional
             Flag indicating if the color model is RGB, by default False.
         """
         lines: list[str] = []
 
         eu_utility._add_color_table_header(lines, name, rgb)
-        cls._create_color_table(lines, table, extent, rgb)
+        cls._create_color_table(lines, table, rgb)
 
         with open(path, "w", encoding="utf-8", newline="\n") as file:
             cls._write_color_table_file(file, lines)
@@ -86,28 +81,16 @@ class eu_utility(clr_utility):
     def _create_color_table(
         cls,
         lines: list[str],
-        table: PaletteData,
-        extent: DomainData,
+        table: ColorTable,
         rgb: bool,
     ) -> None:
-        x_min, x_max = extent
-        x_range = x_max - x_min
-
         if rgb:
             table = [(x, r, g, b) for x, b, g, r in table]
 
         for i in range(0, len(table), 2):
-            x_lo, b_lo, g_lo, r_lo = cls._get_color_entry(
-                table[i],
-                x_min,
-                x_range,
-            )
+            x_lo, b_lo, g_lo, r_lo = cls._get_color_entry(table[i])
 
-            x_hi, b_hi, g_hi, r_hi = cls._get_color_entry(
-                table[i + 1],
-                x_min,
-                x_range,
-            )
+            x_hi, b_hi, g_hi, r_hi = cls._get_color_entry(table[i + 1])
 
             line = (
                 f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
@@ -117,20 +100,18 @@ class eu_utility(clr_utility):
             lines.append(line)
 
     @classmethod
-    def _get_color_entry(
-        cls, entry: ColorEntry, x_min: float, x_range: float
-    ) -> ColorEntry:
-        x_lo, b_lo, g_lo, r_lo = entry
+    def _get_color_entry(cls, entry: ColorTableEntry) -> ColorTableEntry:
+        x, b, g, r = entry
 
-        x_lo = round(x_min + x_lo * x_range)
-        b_lo = round(b_lo * CLR_MAX)
-        g_lo = round(g_lo * CLR_MAX)
-        r_lo = round(r_lo * CLR_MAX)
+        x = round(x * CLR_MAX)
+        b = round(b * CLR_MAX)
+        g = round(g * CLR_MAX)
+        r = round(r * CLR_MAX)
 
-        return x_lo, b_lo, g_lo, r_lo
+        return x, b, g, r
 
     @classmethod
-    def parse_eu_table(cls, lines: list[str]) -> tuple[PaletteData, str]:
+    def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
         j: list[float] = []
         b: list[float] = []
         g: list[float] = []
@@ -142,7 +123,7 @@ class eu_utility(clr_utility):
             # Split line into list of strings of keywords or values
             ls = line.split()
 
-            # Check for alternative color model
+            # Check for alternative colour model
             if ls[0] == MCIDAS_EU_KEYWORD[2] and ls[1] == MCIDAS_EU_KEYWORD[3]:
                 color_model = CM_RGB
 
