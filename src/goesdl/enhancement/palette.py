@@ -156,9 +156,7 @@ class EnhacementPalette(ColormapBase):
 
         return color_table
 
-    def save_to_file(
-        self, path: str | Path, name: str = "", rgb: bool = False
-    ) -> None:
+    def save_to_file(self, path: str | Path, rgb: bool = False) -> None:
         """
         Save the color table.
 
@@ -169,13 +167,10 @@ class EnhacementPalette(ColormapBase):
         ----------
         path : str or Path
             Path to the file where the color table will be saved.
-        name : str
-            Name of the color table. Override the actual name if provided.
         rgb : bool, optional
             Flag indicating if the color model is RGB, by default False.
         """
-        if not name and self.name != UNNAMED_COLORMAP:
-            name = self.name
+        name = "" if self.name == UNNAMED_COLORMAP else self.name
 
         color_table = self._create_color_table(self.full_segment_data)
 
