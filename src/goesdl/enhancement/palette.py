@@ -139,7 +139,6 @@ class EnhacementPalette(ColormapBase):
         name = "" if self.name == UNNAMED_COLORMAP else self.name
 
         color_table = self._create_color_table(self.full_segment_data)
-        print(color_table)
 
         eu_utility.create_file(path, name, color_table, rgb)
 
@@ -161,6 +160,11 @@ class EnhacementPalette(ColormapBase):
         return x, b, g, r
 
     @classmethod
+    def _cleanup_color_table(cls, color_table: ColorTable) -> None:
+        color_table.pop(-1)
+        color_table.pop(0)
+
+    @classmethod
     def _create_color_table(cls, segment_data: SegmentData) -> ColorTable:
         packed_segments = cls._pack_segment_data(segment_data)
 
@@ -170,8 +174,7 @@ class EnhacementPalette(ColormapBase):
 
         color_table = eu_utility.make_color_table(value_tables)
 
-        color_table.pop(-1)
-        color_table.pop(0)
+        cls._cleanup_color_table(color_table)
 
         return color_table
 
