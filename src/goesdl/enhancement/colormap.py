@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from copy import deepcopy
 from math import nan
-from typing import cast
+from typing import Protocol, cast
 
 from matplotlib import colormaps
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
@@ -13,11 +13,24 @@ from .shared import (
     GListedColors,
     GSegmentData,
     GSegmentEntry,
+    KeypointList,
     ListedColors,
     MSegmentData,
     RGBValue,
     SegmentData,
 )
+
+
+class ColormapProtocol(Protocol):
+
+    @property
+    def keypoints(self) -> KeypointList: ...
+
+    @property
+    def segment_data(self) -> SegmentData: ...
+
+    @property
+    def full_segment_data(self) -> SegmentData: ...
 
 
 class _SegmentedColormapBased:
