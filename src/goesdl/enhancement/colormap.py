@@ -23,7 +23,7 @@ from .shared import (
     SegmentData,
 )
 
-UNNAMED_CMAP = "temporary_cmap"
+UNNAMED_CMAP = "unnamed"
 
 
 class ColormapProtocol(Protocol):
