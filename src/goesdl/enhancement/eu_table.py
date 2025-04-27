@@ -45,6 +45,28 @@ class eu_utility(clr_utility):
         lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
 
     @classmethod
+    def _create_color_table(
+        cls,
+        lines: list[str],
+        table: ColorTable,
+        rgb: bool,
+    ) -> None:
+        if rgb:
+            table = [(x, r, g, b) for x, b, g, r in table]
+
+        for i in range(0, len(table), 2):
+            x_lo, b_lo, g_lo, r_lo = cls._get_color_entry(table[i])
+
+            x_hi, b_hi, g_hi, r_hi = cls._get_color_entry(table[i + 1])
+
+            line = (
+                f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
+                f"{g_lo:>6}{g_hi:>4}{r_lo:>6}{r_hi:>4}"
+            )
+
+            lines.append(line)
+
+    @classmethod
     def create_file(
         cls,
         path: str | Path,
@@ -75,32 +97,6 @@ class eu_utility(clr_utility):
             cls._write_color_table_file(file, lines)
 
     @staticmethod
-    def is_eu_table(header: str) -> bool:
-        return MCIDAS_EU_SIGNATURE in header
-
-    @classmethod
-    def _create_color_table(
-        cls,
-        lines: list[str],
-        table: ColorTable,
-        rgb: bool,
-    ) -> None:
-        if rgb:
-            table = [(x, r, g, b) for x, b, g, r in table]
-
-        for i in range(0, len(table), 2):
-            x_lo, b_lo, g_lo, r_lo = cls._get_color_entry(table[i])
-
-            x_hi, b_hi, g_hi, r_hi = cls._get_color_entry(table[i + 1])
-
-            line = (
-                f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
-                f"{g_lo:>6}{g_hi:>4}{r_lo:>6}{r_hi:>4}"
-            )
-
-            lines.append(line)
-
-    @staticmethod
     def _get_color_entry(entry: ColorTableRow) -> ColorTableRow:
         x, b, g, r = entry
 
@@ -110,6 +106,24 @@ class eu_utility(clr_utility):
         r = round(r * CLR_MAX)
 
         return x, b, g, r
+
+    @staticmethod
+    def is_eu_table(header: str) -> bool:
+        return MCIDAS_EU_SIGNATURE in header
+
+    @classmethod
+    def make_color_table(cls, values: ValueTable) -> ColorTable:
+        x, r, g, b = values
+
+        # Scale keypoints values
+        y = cls._scale_keypoint_values(x)
+
+        # Normalise colour component values
+        r = cls._scale_color_values(r)
+        g = cls._scale_color_values(g)
+        b = cls._scale_color_values(b)
+
+        return cls._make_color_table((y, r, g, b))
 
     @classmethod
     def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
@@ -157,7 +171,7 @@ class eu_utility(clr_utility):
     ) -> ValueTable:
         j, b, g, r = values
 
-        # Normalise scale values
+        # Normalise keypoints values
         x = cls._normalize_keypoint_values(j)
 
         # Normalise colour component values
