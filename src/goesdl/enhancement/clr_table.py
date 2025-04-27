@@ -16,3 +16,8 @@ class clr_utility:
     @staticmethod
     def _normalize_color(x: float) -> float:
         return x / CLR_MAX
+
+    @staticmethod
+    def _normalize_values(j: list[float]) -> list[float]:
+        length = j[-1] - j[0]
+        return [(k - j[0]) / length for k in j]
