@@ -14,9 +14,9 @@ CMYKValue = tuple[float, float, float, float]
 RGBValue = tuple[float, float, float]
 
 ColorList = list[RGBValue]
-ColorTable = tuple[float, float, float, float]
-PaletteData = list[ColorTable]
-PaletteItem = tuple[PaletteData, ColorList]
+ColorTableEntry = tuple[float, float, float, float]
+ColorTable = list[ColorTableEntry]
+PaletteItem = tuple[ColorTable, ColorList]
 StretchingTable = list[tuple[float, float]]
 ValueTables = tuple[list[float], ...]
 
