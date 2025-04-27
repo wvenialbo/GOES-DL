@@ -10,7 +10,11 @@ from typing import Any, Literal
 
 DomainData = tuple[float, float]
 
-StretchingTable = list[tuple[float, float]]
+
+# Colour scale stretching table
+
+StretchingTableRow = tuple[float, float]
+StretchingTable = list[StretchingTableRow]
 
 # Keypoint and colour values tabular structure
 
