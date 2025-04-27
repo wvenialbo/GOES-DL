@@ -8,7 +8,7 @@ from pathlib import Path
 from .constants import UNNAMED_TABLE
 from .cpt_table import cpt_utility
 from .eu_table import eu_utility
-from .shared import ColorList, ColorTable, DomainData, PaletteItem
+from .shared import ColorTable
 
 
 class EnhacementPalette:
@@ -23,17 +23,12 @@ class EnhacementPalette:
     ----------
     name : str
         The name of the enhancement color palette.
-    extent : DomainData
-        The palette extent containing the minimum and maximum defined
-        values.
-    table : PaletteData
+    table : ColorTable
         The palette data containing color segments.
-    stock : ColorStock
-        The stock color values.
 
     Methods
     -------
-    create_file(path, name, table, extent, rgb)
+    create_file(path, name, table, rgb)
         Create a file with the enhancement color palette.
     from_file(path)
         Load a McIDAS or GMT enhancement color palette specification and
@@ -45,17 +40,11 @@ class EnhacementPalette:
     """
 
     name: str
-    extent: DomainData
     table: ColorTable
-    stock: ColorList
 
-    def __init__(
-        self, name: str, specs: PaletteItem, extent: DomainData
-    ) -> None:
+    def __init__(self, name: str, table: ColorTable) -> None:
         self.name = name
-        self.extent = extent
-        self.table = specs[0]
-        self.stock = specs[1]
+        self.table = table
 
     @classmethod
     def from_file(cls, path: str | Path) -> "EnhacementPalette":
@@ -97,9 +86,9 @@ class EnhacementPalette:
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        items, name, extent = cls._parse_table(lines)
+        items, name = cls._parse_table(lines)
 
-        return cls(name, items, extent)
+        return cls(name, items)
 
     def save_to_file(
         self, path: str | Path, name: str = "", rgb: bool = False
@@ -122,10 +111,10 @@ class EnhacementPalette:
         if not name and self.name != UNNAMED_TABLE:
             name = self.name
 
-        eu_utility.create_file(path, name, self.table, self.extent, rgb)
+        eu_utility.create_file(path, name, self.table, rgb)
 
     @staticmethod
-    def _parse_table(lines: list[str]) -> tuple[PaletteItem, str, DomainData]:
+    def _parse_table(lines: list[str]) -> tuple[ColorTable, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
             return eu_utility.parse_eu_table(lines)
