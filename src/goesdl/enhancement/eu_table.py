@@ -157,14 +157,14 @@ class eu_utility(clr_utility):
 
         x, b, g, r = cls._process_eu_table(color_model, j, b, g, r)
 
-        entries = cls._make_color_entries(x, b, g, r)
+        color_table = cls._make_color_table(x, b, g, r)
 
         name = UNNAMED_TABLE
         if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
             name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        return entries, name
+        return color_table, name
 
     @classmethod
     def _process_eu_table(
