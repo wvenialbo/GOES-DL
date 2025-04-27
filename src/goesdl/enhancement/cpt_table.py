@@ -39,7 +39,7 @@ class cpt_utility(clr_utility):
         b: list[float] = []
         k: list[float] = []
 
-        clr_values = r, g, b, k
+        input_table = j, r, g, b, k
 
         color_model = CM_RGB
 
@@ -55,7 +55,7 @@ class cpt_utility(clr_utility):
             if ls[0] in GMT_CPT_KEYWORD:
                 continue
 
-            cls._extract_color_range(j, clr_values, color_model, ls)
+            cls._extract_color_range(input_table, color_model, ls)
 
         # The `r`, `g`, and `b` lists are modified in place and contain
         # the normalized colour component intensity values corresponding
@@ -80,12 +80,11 @@ class cpt_utility(clr_utility):
     @classmethod
     def _extract_color_range(
         cls,
-        j: list[float],
-        clr_values: ValueTable,
+        value_table: ValueTable,
         color_model: str,
         ls: list[str],
     ) -> None:
-        r, g, b, k = clr_values
+        j, r, g, b, k = value_table
 
         if color_model == CM_GRAY:
             j.extend((float(ls[0]), float(ls[2])))
