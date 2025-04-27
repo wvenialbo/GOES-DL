@@ -1,4 +1,4 @@
-from .constants import CLR_MAX
+from .constants import BRG_MAX, CLR_MAX
 from .shared import ColorTable
 
 
@@ -13,6 +13,10 @@ class clr_utility:
     @staticmethod
     def _normalize_colors(y: list[float]) -> list[float]:
         return [k / CLR_MAX for k in y]
+
+    @staticmethod
+    def _normalize_grayscale(y: list[float]) -> list[float]:
+        return [k / BRG_MAX for k in y]
 
     @staticmethod
     def _normalize_values(x: list[float]) -> list[float]:
