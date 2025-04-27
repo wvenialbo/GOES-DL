@@ -152,7 +152,7 @@ class eu_utility(clr_utility):
             name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        return color_table, name
+        return color_table, name.lower()
 
     @classmethod
     def _process_eu_table(
