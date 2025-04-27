@@ -11,8 +11,8 @@ class clr_utility:
         return list(zip(x, b, g, r))
 
     @staticmethod
-    def _normalize_color(x: float) -> float:
-        return x / CLR_MAX
+    def _normalize_colors(y: list[float]) -> list[float]:
+        return [k / CLR_MAX for k in y]
 
     @staticmethod
     def _normalize_values(j: list[float]) -> list[float]:
