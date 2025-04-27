@@ -323,6 +323,7 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
         colormap_name: str,
     ) -> None:
         colormap = self._get_colormap(colormap_name)
+
         segment_data = self._get_segment_data(colormap)
 
         super().__init__(segment_data)
