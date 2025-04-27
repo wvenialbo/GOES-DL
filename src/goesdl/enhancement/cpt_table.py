@@ -114,7 +114,7 @@ class cpt_utility(clr_utility):
         j, r, g, b, n = values
 
         # Normalise scale values
-        x = cls._normalize_values(j)
+        x = cls._normalize_keypoint_values(j)
 
         # Normalize colour values
         if color_model == CM_RGB:

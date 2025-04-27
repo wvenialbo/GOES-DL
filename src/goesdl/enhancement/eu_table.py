@@ -158,7 +158,7 @@ class eu_utility(clr_utility):
         j, b, g, r = values
 
         # Normalise scale values
-        x = cls._normalize_values(j)
+        x = cls._normalize_keypoint_values(j)
 
         # Normalise colour component values
         b = cls._normalize_color_values(b)
