@@ -81,7 +81,7 @@ class cpt_utility(clr_utility):
         entries = cls._make_color_table(j, b, g, r)
         stock = cls._process_cpt_stock(color_model, bg, fg, nn)
 
-        return (entries, stock), UNNAMED_TABLE, extent
+        return entries, UNNAMED_TABLE
 
     @staticmethod
     def _cmyk_to_rgb(c: float, m: float, y: float, k: float) -> RGBValue:
