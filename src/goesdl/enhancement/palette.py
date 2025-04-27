@@ -28,6 +28,7 @@ from .shared import (
     GSegmentData,
     KeypointList,
     SegmentData,
+    ValueTable,
 )
 
 
@@ -121,42 +122,6 @@ class EnhacementPalette(ColormapBase):
     def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
         return cls(SegmentedColormap(name, segment_data))
 
-    @classmethod
-    def _create_color_table(cls, segment_data: SegmentData) -> ColorTable:
-        # Pack RGB segments
-        packed_segments = cls._pack_segment_data(segment_data)
-
-        # Unpack segment values
-        unpacked_segment_valuess = cls._unpack_segment_values(packed_segments)
-
-        x: KeypointList = []
-        r: ColorValueList = []
-        g: ColorValueList = []
-        b: ColorValueList = []
-
-        for xi, r0, r1, g0, g1, b0, b1 in unpacked_segment_valuess:
-            x.extend((xi, xi))
-            r.extend((r0, r1))
-            g.extend((g0, g1))
-            b.extend((b0, b1))
-
-        color_table = eu_utility.make_color_table((x, b, g, r))
-
-        color_table.pop(-1)
-        color_table.pop(0)
-
-        return color_table
-
-    @staticmethod
-    def _pack_segment_data(segment_data: SegmentData) -> list[ColorSegments]:
-        packed_segments: list[ColorSegments] = []
-
-        packed_segments.extend(
-            segment_data[component] for component in COLOR_COMPONENTS
-        )
-
-        return packed_segments
-
     def save(self, path: str | Path, rgb: bool = False) -> None:
         """
         Save the color table.
@@ -177,6 +142,48 @@ class EnhacementPalette(ColormapBase):
         print(color_table)
 
         eu_utility.create_file(path, name, color_table, rgb)
+
+    @classmethod
+    def _build_value_tables(
+        cls, unpacked_segment_values: list[tuple[float, ...]]
+    ) -> ValueTable:
+        x: KeypointList = []
+        r: ColorValueList = []
+        g: ColorValueList = []
+        b: ColorValueList = []
+
+        for xi, r0, r1, g0, g1, b0, b1 in unpacked_segment_values:
+            x.extend((xi, xi))
+            r.extend((r0, r1))
+            g.extend((g0, g1))
+            b.extend((b0, b1))
+
+        return x, b, g, r
+
+    @classmethod
+    def _create_color_table(cls, segment_data: SegmentData) -> ColorTable:
+        packed_segments = cls._pack_segment_data(segment_data)
+
+        unpacked_segment_valuess = cls._unpack_segment_values(packed_segments)
+
+        value_tables = cls._build_value_tables(unpacked_segment_valuess)
+
+        color_table = eu_utility.make_color_table(value_tables)
+
+        color_table.pop(-1)
+        color_table.pop(0)
+
+        return color_table
+
+    @staticmethod
+    def _pack_segment_data(segment_data: SegmentData) -> list[ColorSegments]:
+        packed_segments: list[ColorSegments] = []
+
+        packed_segments.extend(
+            segment_data[component] for component in COLOR_COMPONENTS
+        )
+
+        return packed_segments
 
     @classmethod
     def _unpack_segment_values(
