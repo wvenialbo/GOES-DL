@@ -67,5 +67,6 @@ MComponents = Literal["red", "green", "blue", "alpha"]
 MSegmentData = dict[MComponents, Sequence[MColorSegment]]
 
 # Natively defined colour segment data
-ColorSegment = tuple[float, float, float]
-SegmentData = dict[str, list[ColorSegment]]
+SegmentDataRow = tuple[float, float, float]
+ColorSegments = list[SegmentDataRow]
+SegmentData = dict[str, ColorSegments]
