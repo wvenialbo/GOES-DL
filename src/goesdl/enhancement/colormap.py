@@ -35,11 +35,11 @@ class ColormapProtocol(Protocol):
 
 class _SegmentedColormapBased:
 
-    keypoints: list[float]
+    keypoints: KeypointList
     segment_data: SegmentData
 
     def __init__(
-        self, segment_data: SegmentData, keypoints: list[float], reduce: bool
+        self, segment_data: SegmentData, keypoints: KeypointList, reduce: bool
     ) -> None:
         if reduce:
             segment_data = self._reduce_segment_data(segment_data)
@@ -127,7 +127,7 @@ class _SegmentedColormapBased:
         return cls._homogenize_segment_data(expanded_segment_data)
 
     @staticmethod
-    def _get_keypoints(segment_data: SegmentData) -> list[float]:
+    def _get_keypoints(segment_data: SegmentData) -> KeypointList:
         values: set[float] = set()
 
         for component, segments in segment_data.items():
@@ -274,7 +274,7 @@ class DiscreteColormap(_SegmentedColormapBased):
         n_colors = len(listed_colors)
 
         # Create keypoint values
-        values: list[float] = []
+        values: KeypointList = []
 
         for i in range(n_colors + 1):
             value = i / n_colors
@@ -421,7 +421,7 @@ class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
 
         return segment_data_list
 
-    def _normalize_keypoints(self, keypoints: Sequence[float]) -> list[float]:
+    def _normalize_keypoints(self, keypoints: Sequence[float]) -> KeypointList:
         vmin, vmax = min(keypoints), max(keypoints)
 
         norm = vmax - vmin
@@ -429,7 +429,7 @@ class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
 
     def _rescale_segment_values(
         self,
-        normalized_keypoints: list[float],
+        normalized_keypoints: KeypointList,
         segment_data_list: list[SegmentData],
     ) -> list[SegmentData]:
         for i, segment_data in enumerate(segment_data_list):
