@@ -6,6 +6,7 @@ from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_TABLE
 from .shared import (
     ColorTable,
     ColorTableEntry,
+    ValueTableColumn,
     ValueTables,
 )
 
@@ -112,10 +113,10 @@ class eu_utility(clr_utility):
 
     @classmethod
     def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
-        j: list[float] = []
-        b: list[float] = []
-        g: list[float] = []
-        r: list[float] = []
+        j: ValueTableColumn = []
+        b: ValueTableColumn = []
+        g: ValueTableColumn = []
+        r: ValueTableColumn = []
 
         color_model = CM_BGR
 
