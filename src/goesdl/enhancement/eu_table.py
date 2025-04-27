@@ -130,9 +130,7 @@ class eu_utility(clr_utility):
         return x_lo, b_lo, g_lo, r_lo
 
     @classmethod
-    def parse_eu_table(
-        cls, lines: list[str]
-    ) -> tuple[PaletteData, str, DomainData]:
+    def parse_eu_table(cls, lines: list[str]) -> tuple[PaletteData, str]:
         j: list[float] = []
         b: list[float] = []
         g: list[float] = []
@@ -159,8 +157,6 @@ class eu_utility(clr_utility):
 
         b, g, r = cls._process_eu_colors(color_model, b, g, r)
 
-        extent = j[0], j[-1]
-
         x = cls._normalize_values(j)
 
         entries = cls._make_color_entries(x, b, g, r)
@@ -170,7 +166,7 @@ class eu_utility(clr_utility):
             name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        return entries, name, extent
+        return entries, name
 
     @classmethod
     def _process_eu_colors(
