@@ -58,6 +58,9 @@ class eu_utility(clr_utility):
 
             x_hi, b_hi, g_hi, r_hi = table[i + 1]
 
+            if x_lo == x_hi:
+                continue
+
             line = (
                 f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
                 f"{g_lo:>6}{g_hi:>4}{r_lo:>6}{r_hi:>4}"
