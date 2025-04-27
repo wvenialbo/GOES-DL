@@ -6,7 +6,7 @@ enhancement color tables, as well as reverse and manipulate color maps.
 """
 
 from .catalogue import cmap
-from .colormap import EnhancementColormap
+from .colormap import CombinedColormap
 from .palette import EnhacementPalette
 from .preview import show_colormap
 from .scale import EnhancementScale
@@ -14,7 +14,7 @@ from .stretching import EnhacementStretching
 from .table import EnhacementTable
 
 __all__ = [
-    "EnhancementColormap",
+    "CombinedColormap",
     "EnhacementPalette",
     "EnhancementScale",
     "EnhacementStretching",

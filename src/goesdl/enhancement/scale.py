@@ -12,7 +12,7 @@ from matplotlib.colors import (
 )
 from numpy.typing import NDArray
 
-from .colormap import EnhancementColormap
+from .colormap import CombinedColormap
 from .shared import DomainData, RGBValue
 from .table import EnhacementTable
 from .ticks import ColorbarTicks
@@ -33,7 +33,7 @@ class EnhancementScale:
 
     def __init__(
         self,
-        specs: EnhacementTable | EnhancementColormap,
+        specs: EnhacementTable | CombinedColormap,
         offset: float = 0.0,
         ncolors: int = 256,
         nticks: int = 16,
@@ -76,7 +76,7 @@ class EnhancementScale:
         nticks: int = 16,
         mode: ExtendMode = "neither",
     ) -> "EnhancementScale":
-        cmap = EnhancementColormap(name, cmap_names, keypoints)
+        cmap = CombinedColormap(name, cmap_names, keypoints)
 
         return cls(cmap, offset, ncolors, nticks, mode)
 
@@ -136,7 +136,7 @@ class EnhancementScale:
 
     def _create_from_colormap(
         self,
-        colormap: EnhancementColormap,
+        colormap: CombinedColormap,
         offset: float,
         ncolors: int,
         mode: ExtendMode,

@@ -352,7 +352,7 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
         )
 
 
-class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
+class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
 
     def __init__(
         self,
