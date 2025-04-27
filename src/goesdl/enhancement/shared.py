@@ -12,10 +12,10 @@ DomainData = tuple[float, float]
 
 StretchingTable = list[tuple[float, float]]
 
-# Keypoint and colour values structure
+# Keypoint and colour values tabular structure
 
 ValueTableColumn = list[float]
-ValueTables = tuple[ValueTableColumn, ...]
+ValueTable = tuple[ValueTableColumn, ...]
 
 # RGB packed colour value
 

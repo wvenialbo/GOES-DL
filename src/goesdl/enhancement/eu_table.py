@@ -6,8 +6,8 @@ from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_TABLE
 from .shared import (
     ColorTable,
     ColorTableRow,
+    ValueTable,
     ValueTableColumn,
-    ValueTables,
 )
 
 MCIDAS_EU_SIGNATURE = "EU TABLE"
@@ -152,8 +152,8 @@ class eu_utility(clr_utility):
     def _process_eu_table(
         cls,
         color_model: str,
-        values: ValueTables,
-    ) -> ValueTables:
+        values: ValueTable,
+    ) -> ValueTable:
         j, b, g, r = values
 
         # Normalise scale values

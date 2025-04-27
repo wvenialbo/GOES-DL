@@ -11,7 +11,7 @@ from .constants import (
     HUE_MAX,
     UNNAMED_TABLE,
 )
-from .shared import ColorTable, RGBValue, ValueTables
+from .shared import ColorTable, RGBValue, ValueTable
 
 GMT_CPT_KEYWORD = (
     "#",
@@ -81,7 +81,7 @@ class cpt_utility(clr_utility):
     def _extract_color_range(
         cls,
         j: list[float],
-        clr_values: ValueTables,
+        clr_values: ValueTable,
         color_model: str,
         ls: list[str],
     ) -> None:
@@ -116,7 +116,7 @@ class cpt_utility(clr_utility):
         g: list[float],
         b: list[float],
         n: list[float],
-    ) -> ValueTables:
+    ) -> ValueTable:
         # Normalize colour values
         if color_model == CM_RGB:
             r = cls._normalize_colors(r)
