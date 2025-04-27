@@ -113,17 +113,17 @@ class eu_utility(clr_utility):
 
     @classmethod
     def make_color_table(cls, values: ValueTable) -> ColorTable:
-        x, r, g, b = values
+        x, b, g, r = values
 
         # Scale keypoints values
         y = cls._scale_keypoint_values(x)
 
         # Normalise colour component values
-        r = cls._scale_color_values(r)
-        g = cls._scale_color_values(g)
         b = cls._scale_color_values(b)
+        g = cls._scale_color_values(g)
+        r = cls._scale_color_values(r)
 
-        return cls._make_color_table((y, r, g, b))
+        return cls._make_color_table((y, b, g, r))
 
     @classmethod
     def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
