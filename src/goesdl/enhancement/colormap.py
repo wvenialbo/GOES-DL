@@ -92,6 +92,17 @@ class _SegmentedColormapBased:
 
         return decompressed_color_segments
 
+    @classmethod
+    def _expand_segment_data(cls, segment_data: SegmentData) -> SegmentData:
+        expanded_segment_data: SegmentData = {}
+
+        for component in COLOR_COMPONENTS:
+            color_segments = segment_data[component]
+            color_segments = cls._decompress_color_segment(color_segments)
+            expanded_segment_data[component] = color_segments
+
+        return expanded_segment_data
+
     @staticmethod
     def _get_keypoints(segment_data: SegmentData) -> list[float]:
         values: set[float] = set()
