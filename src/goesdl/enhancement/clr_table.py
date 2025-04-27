@@ -22,3 +22,11 @@ class clr_utility:
         x_min = x[0]
         length = x[-1] - x_min
         return [(k - x_min) / length for k in x]
+
+    @staticmethod
+    def _scale_color_values(y: ColorValueList) -> ColorValueList:
+        return [round(k * CLR_MAX) for k in y]
+
+    @staticmethod
+    def _scale_keypoint_values(x: KeypointList) -> KeypointList:
+        return [round(k * CLR_MAX) for k in x]
