@@ -13,7 +13,7 @@ from .constants import (
     HUE_MAX,
     UNNAMED_TABLE,
 )
-from .shared import CMYKValue, DomainData, PaletteItem, RGBValue, ValueTables
+from .shared import CMYKValue, ColorTable, RGBValue, ValueTables
 
 GMT_CPT_KEYWORD = (
     "#",
@@ -33,9 +33,7 @@ GMT_CPT_COLOR_MODEL = {CM_CMYK, CM_GRAY, CM_HSV, CM_RGB}
 class cpt_utility(clr_utility):
 
     @classmethod
-    def parse_cpt_table(
-        cls, lines: list[str]
-    ) -> tuple[PaletteItem, str, DomainData]:
+    def parse_cpt_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
         j: list[float] = []
 
         r: list[float] = []
