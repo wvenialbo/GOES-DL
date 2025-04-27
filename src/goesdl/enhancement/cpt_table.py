@@ -45,7 +45,7 @@ class cpt_utility(clr_utility):
 
         clr_values = r, g, b, k
 
-        cl_nan = float("nan")
+        cl_nan = math.nan
         bg: CMYKValue = (cl_nan, cl_nan, cl_nan, cl_nan)
         fg: CMYKValue = (cl_nan, cl_nan, cl_nan, cl_nan)
         nn: CMYKValue = 1.0, 0.0, 1.0, cl_nan
