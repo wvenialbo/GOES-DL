@@ -21,6 +21,8 @@ from .shared import (
     SegmentData,
 )
 
+UNNAMED_CMAP = "temporary_cmap"
+
 
 class ColormapProtocol(Protocol):
 
@@ -141,7 +143,7 @@ class _SegmentedColormapBased:
         cls, src_segment_data: SegmentData
     ) -> SegmentData:
         colormap = LinearSegmentedColormap(
-            "temp-cmap", cast(MSegmentData, src_segment_data), 1024
+            UNNAMED_CMAP, cast(MSegmentData, src_segment_data), 1024
         )
 
         src_segment_data = deepcopy(src_segment_data)
@@ -250,6 +252,40 @@ class SegmentedColormap(_SegmentedColormapBased):
         return float(x), float(y_0), float(y_1)
 
 
+class ContinuousColormap(_SegmentedColormapBased):
+
+    def __init__(self, raw_listed_colors: GListedColors) -> None:
+        colormap = self._get_colormap(raw_listed_colors)
+
+        segmented_colormap = self._get_segment_data(colormap)
+
+        super().__init__(
+            segmented_colormap.segment_data,
+            segmented_colormap.keypoints,
+            False,
+        )
+
+    @staticmethod
+    def _get_colormap(listed_colors: GListedColors) -> Colormap:
+        try:
+            return LinearSegmentedColormap.from_list(
+                UNNAMED_CMAP, listed_colors
+            )
+
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Invalid colour list specification: {error}"
+            ) from error
+
+    @staticmethod
+    def _get_segment_data(colormap: Colormap) -> _SegmentedColormapBased:
+        if isinstance(colormap, LinearSegmentedColormap):
+            raw_segment_data = getattr(colormap, "_segmentdata")
+            return SegmentedColormap(raw_segment_data)
+
+        raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+
+
 class DiscreteColormap(_SegmentedColormapBased):
 
     def __init__(self, raw_listed_colors: GListedColors) -> None:
@@ -345,7 +381,7 @@ class _NamedColormapBased:
 
         except (KeyError, ValueError) as error:
             raise ValueError(
-                f"Invalid colormap'{colormap_name}': {error}"
+                f"Invalid colormap '{colormap_name}': {error}"
             ) from error
 
 
