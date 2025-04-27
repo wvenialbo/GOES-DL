@@ -25,12 +25,14 @@ class _SegmentedColormapBased:
     keypoints: list[float]
     segment_data: SegmentData
 
-    def __init__(self, segment_data: SegmentData) -> None:
+    def __init__(
+        self, segment_data: SegmentData, keypoints: list[float]
+    ) -> None:
         segment_data = self._reduce_segment_data(segment_data)
 
         self.segment_data = segment_data
 
-        self.keypoints = self._get_keypoints(segment_data)
+        self.keypoints = keypoints or self._get_keypoints(segment_data)
 
     @staticmethod
     def _add_next_segment(
@@ -319,7 +321,7 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
     ) -> None:
         colormap = self._get_colormap(colormap_name)
 
-        segment_data = self._get_segment_data(colormap)
+        segmented_colormap = self._get_segment_data(colormap)
 
         super().__init__(segment_data)
 
