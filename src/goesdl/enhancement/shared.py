@@ -10,15 +10,17 @@ from typing import Any, Literal
 
 DomainData = tuple[float, float]
 
-CMYKValue = tuple[float, float, float, float]
-RGBValue = tuple[float, float, float]
-
-ColorList = list[RGBValue]
-ColorTableEntry = tuple[float, float, float, float]
-ColorTable = list[ColorTableEntry]
-PaletteItem = tuple[ColorTable, ColorList]
 StretchingTable = list[tuple[float, float]]
 ValueTables = tuple[list[float], ...]
+
+# RGB packed colour value
+
+RGBValue = tuple[float, float, float]
+
+# Colour table structure
+
+ColorTableEntry = tuple[float, float, float, float]
+ColorTable = list[ColorTableEntry]
 
 # Listed colours
 
