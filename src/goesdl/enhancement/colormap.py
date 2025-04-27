@@ -9,6 +9,8 @@ from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 from .constants import COLOR_COMPONENTS
 from .shared import (
     ColorSegment,
+    ContinuousColorList,
+    ContinuousColorTable,
     DiscreteColorList,
     GColorValue,
     GKeypointList,
@@ -254,8 +256,10 @@ class SegmentedColormap(_SegmentedColormapBased):
 
 class ContinuousColormap(_SegmentedColormapBased):
 
-    def __init__(self, raw_listed_colors: GListedColors) -> None:
-        colormap = self._get_colormap(raw_listed_colors)
+    def __init__(
+        self, listed_colors: ContinuousColorList | ContinuousColorTable
+    ) -> None:
+        colormap = self._get_colormap(listed_colors)
 
         segmented_colormap = self._get_segment_data(colormap)
 
