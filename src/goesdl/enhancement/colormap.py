@@ -8,7 +8,6 @@ from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .shared import (
-    ColorSegment,
     ContinuousColorList,
     ContinuousColorTable,
     DiscreteColorList,
@@ -21,6 +20,7 @@ from .shared import (
     MSegmentData,
     RGBValue,
     SegmentData,
+    SegmentDataRow,
 )
 
 
@@ -73,10 +73,10 @@ class ColormapBase:
         k: int,
         vmin: float,
         color: GColorValue,
-        entries: list[ColorSegment],
-        src_segment: list[ColorSegment],
-        dst_segment: list[ColorSegment],
-    ) -> ColorSegment:
+        entries: list[SegmentDataRow],
+        src_segment: list[SegmentDataRow],
+        dst_segment: list[SegmentDataRow],
+    ) -> SegmentDataRow:
         current_entry = entries[k]
         current_value = current_entry[0]
         if current_value != vmin:
@@ -95,9 +95,9 @@ class ColormapBase:
 
     @staticmethod
     def _compress_color_segment(
-        color_segments: list[ColorSegment],
-    ) -> list[ColorSegment]:
-        compressed_color_segments: list[ColorSegment] = [color_segments[0]]
+        color_segments: list[SegmentDataRow],
+    ) -> list[SegmentDataRow]:
+        compressed_color_segments: list[SegmentDataRow] = [color_segments[0]]
 
         for x_1, y_2_0, y_2_1 in color_segments[1:]:
             x_0, y_1_0, _ = compressed_color_segments[-1]
@@ -111,9 +111,9 @@ class ColormapBase:
 
     @staticmethod
     def _decompress_color_segment(
-        color_segments: list[ColorSegment],
-    ) -> list[ColorSegment]:
-        decompressed_color_segments: list[ColorSegment] = []
+        color_segments: list[SegmentDataRow],
+    ) -> list[SegmentDataRow]:
+        decompressed_color_segments: list[SegmentDataRow] = []
 
         for x, y_0, y_1 in color_segments:
             if y_0 == y_1:
@@ -216,9 +216,9 @@ class ColormapBase:
 
     @staticmethod
     def _remove_duplicate_color_segment(
-        color_segments: list[ColorSegment],
-    ) -> list[ColorSegment]:
-        cleaned_color_segments: list[ColorSegment] = []
+        color_segments: list[SegmentDataRow],
+    ) -> list[SegmentDataRow]:
+        cleaned_color_segments: list[SegmentDataRow] = []
 
         previous_color_segment = (nan, nan, nan)
         for color_segment in color_segments:
@@ -260,7 +260,7 @@ class SegmentedColormap(ColormapBase):
         return segment_data
 
     @staticmethod
-    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> ColorSegment:
+    def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> SegmentDataRow:
         x, y_0, y_1 = raw_segment_entry
         return float(x), float(y_0), float(y_1)
 
@@ -459,7 +459,7 @@ class CombinedColormap(ColormapBase, _NamedColormapBased):
         combined_segment_data: SegmentData = {}
 
         for component in COLOR_COMPONENTS:
-            segments: list[ColorSegment] = []
+            segments: list[SegmentDataRow] = []
 
             for segment_data in segment_data_list:
                 segments.extend(segment_data[component])
