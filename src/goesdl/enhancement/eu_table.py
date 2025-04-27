@@ -157,11 +157,11 @@ class eu_utility(clr_utility):
             g.extend((float(ls[4]), float(ls[5])))
             r.extend((float(ls[6]), float(ls[7])))
 
+        b, g, r = cls._process_eu_colors(color_model, b, g, r)
+
         bg = b[0], g[0], r[0]
         fg = b[-1], g[-1], r[-1]
         nn = 1.0, 0.0, 1.0
-
-        b, g, r = cls._process_eu_colors(color_model, b, g, r)
 
         extent = j[0], j[-1]
 
