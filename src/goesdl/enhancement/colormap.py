@@ -6,7 +6,7 @@ from typing import Protocol, cast
 from matplotlib import colormaps
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
-from .constants import COLOR_COMPONENTS
+from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .shared import (
     ColorSegment,
     ContinuousColorList,
@@ -22,8 +22,6 @@ from .shared import (
     RGBValue,
     SegmentData,
 )
-
-UNNAMED_COLORMAP = "unnamed"
 
 
 class ColormapProtocol(Protocol):
