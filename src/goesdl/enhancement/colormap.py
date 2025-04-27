@@ -35,6 +35,10 @@ class _SegmentedColormapBased:
 
         self.keypoints = keypoints or self._get_keypoints(segment_data)
 
+    @property
+    def full_segment_data(self) -> SegmentData:
+        return self._get_full_segment_data(self.segment_data)
+
     @staticmethod
     def _add_next_segment(
         k: int,
