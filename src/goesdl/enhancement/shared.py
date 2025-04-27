@@ -11,7 +11,11 @@ from typing import Any, Literal
 DomainData = tuple[float, float]
 
 StretchingTable = list[tuple[float, float]]
-ValueTables = tuple[list[float], ...]
+
+# Keypoint and colour values structure
+
+ValueTableEntry = list[float]
+ValueTables = tuple[ValueTableEntry, ...]
 
 # RGB packed colour value
 
