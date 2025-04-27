@@ -289,18 +289,14 @@ class DiscreteColormap(_SegmentedColormapBased):
 class _NamedColormapBased:
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> SegmentData:
+    def _get_segment_data(colormap: Colormap) -> _SegmentedColormapBased:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
-            s_colormap = SegmentedColormap(raw_segment_data)
-
-            return s_colormap.segment_data
+            return SegmentedColormap(raw_segment_data)
 
         if isinstance(colormap, ListedColormap):
             listed_colors = cast(GListedColors, colormap.colors)
-            l_colormap = DiscreteColormap(listed_colors)
-
-            return l_colormap.segment_data
+            return DiscreteColormap(listed_colors)
 
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
