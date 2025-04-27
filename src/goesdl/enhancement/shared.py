@@ -16,19 +16,23 @@ DomainData = tuple[float, float]
 StretchingTableRow = tuple[float, float]
 StretchingTable = list[StretchingTableRow]
 
+
 # Keypoint and colour values tabular structure
 
 ValueTableColumn = list[float]
 ValueTable = tuple[ValueTableColumn, ...]
 
+
 # RGB packed colour value
 
 RGBValue = tuple[float, float, float]
+
 
 # Colour table structure
 
 ColorTableRow = tuple[float, float, float, float]
 ColorTable = list[ColorTableRow]
+
 
 # Listed colours
 
@@ -38,6 +42,7 @@ GListedColors = Sequence[GColorValue]
 
 # Natively defined discrete colour map list
 ListedColors = list[RGBValue]
+
 
 # Colour segments
 
