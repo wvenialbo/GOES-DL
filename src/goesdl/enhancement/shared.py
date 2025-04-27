@@ -14,8 +14,8 @@ StretchingTable = list[tuple[float, float]]
 
 # Keypoint and colour values structure
 
-ValueTableEntry = list[float]
-ValueTables = tuple[ValueTableEntry, ...]
+ValueTableColumn = list[float]
+ValueTables = tuple[ValueTableColumn, ...]
 
 # RGB packed colour value
 
