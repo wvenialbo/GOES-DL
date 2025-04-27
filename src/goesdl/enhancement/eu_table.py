@@ -167,8 +167,10 @@ class eu_utility(clr_utility):
 
         extent = j[0], j[-1]
 
-        entries = cls._make_color_entries(j, b, g, r)
-        stock = cls._process_eu_stock(color_model, bg, fg, nn)
+        x = cls._normalize_values(j)
+
+        entries = cls._make_color_entries(x, b, g, r)
+        stock = cls._process_eu_stock(bg, fg, nn)
 
         name = UNNAMED_TABLE
         if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
@@ -199,7 +201,6 @@ class eu_utility(clr_utility):
     @classmethod
     def _process_eu_stock(
         cls,
-        color_model: str,
         bg: RGBValue,
         fg: RGBValue,
         nn: RGBValue,
@@ -207,8 +208,6 @@ class eu_utility(clr_utility):
         packed = (bg, fg, nn)
         u, v, w = zip(*packed)
         b, g, r = list(u), list(v), list(w)
-
-        b, g, r = cls._process_eu_colors(color_model, b, g, r)
 
         return list(zip(r, g, b))
 
