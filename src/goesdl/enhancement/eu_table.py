@@ -155,9 +155,7 @@ class eu_utility(clr_utility):
             g.extend((float(ls[4]), float(ls[5])))
             r.extend((float(ls[6]), float(ls[7])))
 
-        b, g, r = cls._process_eu_colors(color_model, b, g, r)
-
-        x = cls._normalize_values(j)
+        x, b, g, r = cls._process_eu_table(color_model, j, b, g, r)
 
         entries = cls._make_color_entries(x, b, g, r)
 
@@ -169,14 +167,18 @@ class eu_utility(clr_utility):
         return entries, name
 
     @classmethod
-    def _process_eu_colors(
+    def _process_eu_table(
         cls,
         color_model: str,
+        j: list[float],
         b: list[float],
         g: list[float],
         r: list[float],
     ) -> ValueTables:
-        # Normalize color values
+        # Normalise scale values
+        x = cls._normalize_values(j)
+
+        # Normalise colour component values
         b = cls._normalize_colors(b)
         g = cls._normalize_colors(g)
         r = cls._normalize_colors(r)
@@ -185,7 +187,7 @@ class eu_utility(clr_utility):
         if color_model == CM_RGB:
             r, b = b, r
 
-        return b, g, r
+        return x, b, g, r
 
     @staticmethod
     def _write_color_table_file(file: TextIO, lines: list[str]) -> None:
