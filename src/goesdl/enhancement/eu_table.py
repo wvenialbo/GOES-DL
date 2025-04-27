@@ -30,7 +30,9 @@ MCIDAS_EU_KEYWORD = (
 class eu_utility(clr_utility):
 
     @staticmethod
-    def _add_color_table_header(lines: list[str], name: str, rgb: bool) -> None:
+    def _add_color_table_header(
+        lines: list[str], name: str, rgb: bool
+    ) -> None:
         lines.append(f"{MCIDAS_EU_SIGNATURE} {name.upper()}")
         i, j, k = (3, 4, 5) if rgb else (5, 4, 3)
         lines.append(
