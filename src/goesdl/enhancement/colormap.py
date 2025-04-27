@@ -323,7 +323,9 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
 
         segmented_colormap = self._get_segment_data(colormap)
 
-        super().__init__(segment_data)
+        super().__init__(
+            segmented_colormap.segment_data, segmented_colormap.keypoints
+        )
 
 
 class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
