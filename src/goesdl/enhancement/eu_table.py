@@ -7,8 +7,6 @@ from .shared import (
     ColorEntry,
     DomainData,
     PaletteData,
-    PaletteItem,
-    RGBValue,
     ValueTables,
 )
 
@@ -134,7 +132,7 @@ class eu_utility(clr_utility):
     @classmethod
     def parse_eu_table(
         cls, lines: list[str]
-    ) -> tuple[PaletteItem, str, DomainData]:
+    ) -> tuple[PaletteData, str, DomainData]:
         j: list[float] = []
         b: list[float] = []
         g: list[float] = []
@@ -161,23 +159,18 @@ class eu_utility(clr_utility):
 
         b, g, r = cls._process_eu_colors(color_model, b, g, r)
 
-        bg = b[0], g[0], r[0]
-        fg = b[-1], g[-1], r[-1]
-        nn = 1.0, 0.0, 1.0
-
         extent = j[0], j[-1]
 
         x = cls._normalize_values(j)
 
         entries = cls._make_color_entries(x, b, g, r)
-        stock = cls._pack_eu_stock_colors(bg, fg, nn)
 
         name = UNNAMED_TABLE
         if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
             name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        return (entries, stock), name, extent
+        return entries, name, extent
 
     @classmethod
     def _process_eu_colors(
@@ -197,19 +190,6 @@ class eu_utility(clr_utility):
             r, b = b, r
 
         return b, g, r
-
-    @classmethod
-    def _pack_eu_stock_colors(
-        cls,
-        bg: RGBValue,
-        fg: RGBValue,
-        nn: RGBValue,
-    ) -> list[RGBValue]:
-        packed = (bg, fg, nn)
-        u, v, w = zip(*packed)
-        b, g, r = list(u), list(v), list(w)
-
-        return list(zip(r, g, b))
 
     @staticmethod
     def _write_color_table_file(file: TextIO, lines: list[str]) -> None:
