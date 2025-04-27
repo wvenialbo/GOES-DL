@@ -10,6 +10,7 @@ from .constants import COLOR_COMPONENTS
 from .shared import (
     ColorSegment,
     GColorValue,
+    GKeypointList,
     GListedColors,
     GSegmentData,
     GSegmentEntry,
@@ -370,7 +371,7 @@ class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
     def __init__(
         self,
         colormap_names: str | Sequence[str],
-        keypoints: Sequence[float],
+        keypoints: GKeypointList,
     ) -> None:
         if isinstance(colormap_names, str):
             colormap_names = [colormap_names]
@@ -421,7 +422,7 @@ class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
 
         return segment_data_list
 
-    def _normalize_keypoints(self, keypoints: Sequence[float]) -> KeypointList:
+    def _normalize_keypoints(self, keypoints: GKeypointList) -> KeypointList:
         vmin, vmax = min(keypoints), max(keypoints)
 
         norm = vmax - vmin
@@ -447,7 +448,7 @@ class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
         return segment_data_list
 
     def _validate_keypoints(
-        self, colormap_names: Sequence[str], keypoints: Sequence[float]
+        self, colormap_names: Sequence[str], keypoints: GKeypointList
     ) -> None:
         # Validate keypoints number
         keypoints_size = len(colormap_names) + 1
