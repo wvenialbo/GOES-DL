@@ -10,7 +10,7 @@ from typing import Literal
 from .palette import EnhacementPalette
 from .shared import (
     ColorTable,
-    ColorTableEntry,
+    ColorTableRow,
     DomainData,
     MColorSegment,
     RGBValue,
@@ -150,7 +150,7 @@ class EnhacementTable:
         return cls(palette, stretching)
 
     @staticmethod
-    def _interp_color(x: float, color_data: ColorTable) -> ColorTableEntry:
+    def _interp_color(x: float, color_data: ColorTable) -> ColorTableRow:
         x_pal, b_pal, g_pal, r_pal = zip(*color_data)
 
         # Linear interpolation between the two points

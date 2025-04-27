@@ -23,8 +23,8 @@ RGBValue = tuple[float, float, float]
 
 # Colour table structure
 
-ColorTableEntry = tuple[float, float, float, float]
-ColorTable = list[ColorTableEntry]
+ColorTableRow = tuple[float, float, float, float]
+ColorTable = list[ColorTableRow]
 
 # Listed colours
 

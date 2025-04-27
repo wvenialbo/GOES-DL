@@ -5,7 +5,7 @@ from .clr_table import clr_utility
 from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_TABLE
 from .shared import (
     ColorTable,
-    ColorTableEntry,
+    ColorTableRow,
     ValueTableColumn,
     ValueTables,
 )
@@ -101,7 +101,7 @@ class eu_utility(clr_utility):
             lines.append(line)
 
     @staticmethod
-    def _get_color_entry(entry: ColorTableEntry) -> ColorTableEntry:
+    def _get_color_entry(entry: ColorTableRow) -> ColorTableRow:
         x, b, g, r = entry
 
         x = round(x * CLR_MAX)
