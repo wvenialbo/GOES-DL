@@ -8,15 +8,15 @@ enhancement color tables, as well as reverse and manipulate color maps.
 from collections.abc import Sequence
 from typing import Any, Literal
 
-ColorEntry = tuple[float, float, float, float]
 DomainData = tuple[float, float]
 
-CMYKValue = ColorEntry
+CMYKValue = tuple[float, float, float, float]
 RGBValue = tuple[float, float, float]
 
-ColorTable = list[RGBValue]
-PaletteData = list[ColorEntry]
-PaletteItem = tuple[PaletteData, ColorTable]
+ColorList = list[RGBValue]
+ColorTable = tuple[float, float, float, float]
+PaletteData = list[ColorTable]
+PaletteItem = tuple[PaletteData, ColorList]
 StretchingTable = list[tuple[float, float]]
 ValueTables = tuple[list[float], ...]
 
