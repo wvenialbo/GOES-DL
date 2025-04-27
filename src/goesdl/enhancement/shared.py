@@ -22,6 +22,8 @@ StretchingTable = list[StretchingTableRow]
 ValueTableColumn = list[float]
 ValueTable = tuple[ValueTableColumn, ...]
 
+# Generic and natively specialised keypoints
+GKeypointList = Sequence[float]
 KeypointList = ValueTableColumn
 
 
