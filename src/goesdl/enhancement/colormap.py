@@ -185,7 +185,7 @@ class SegmentedColormap(_SegmentedColormapBased):
     def __init__(self, raw_segment_data: GSegmentData) -> None:
         segment_data = self._copy_segment_data(raw_segment_data)
 
-        super().__init__(segment_data)
+        super().__init__(segment_data, [])
 
     @classmethod
     def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
@@ -221,7 +221,7 @@ class DiscreteColormap(_SegmentedColormapBased):
 
         segment_data = self._create_segment_data(listed_colors)
 
-        super().__init__(segment_data)
+        super().__init__(segment_data, [])
 
     @classmethod
     def _copy_listed_colors(
@@ -357,7 +357,7 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
             segment_data_list, segments
         )
 
-        super().__init__(combined_segment_data)
+        super().__init__(combined_segment_data, [])
 
     def _combine_segmen_data(
         self,
@@ -377,8 +377,8 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         segment_data_list: list[SegmentData] = []
         for colormap_name in colormap_names:
             colormap = self._get_colormap(colormap_name)
-            segment_data = self._get_segment_data(colormap)
-            segment_data_list.append(segment_data)
+            segmented_colormap = self._get_segment_data(colormap)
+            segment_data_list.append(segmented_colormap.segment_data)
         return segment_data_list
 
     def _normalize_keypoints(self, keypoints: Sequence[float]) -> list[float]:
