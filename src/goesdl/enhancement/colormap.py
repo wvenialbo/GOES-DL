@@ -363,6 +363,16 @@ class DiscreteColormap(_SegmentedColormapBased):
 class _NamedColormapBased:
 
     @staticmethod
+    def _get_colormap(colormap_name: str) -> Colormap:
+        try:
+            return colormaps.get_cmap(colormap_name)
+
+        except (KeyError, ValueError) as error:
+            raise ValueError(
+                f"Invalid colormap '{colormap_name}': {error}"
+            ) from error
+
+    @staticmethod
     def _get_segment_data(colormap: Colormap) -> _SegmentedColormapBased:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
@@ -373,16 +383,6 @@ class _NamedColormapBased:
             return DiscreteColormap(listed_colors)
 
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
-
-    @staticmethod
-    def _get_colormap(colormap_name: str) -> Colormap:
-        try:
-            return colormaps.get_cmap(colormap_name)
-
-        except (KeyError, ValueError) as error:
-            raise ValueError(
-                f"Invalid colormap '{colormap_name}': {error}"
-            ) from error
 
 
 class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
