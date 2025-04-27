@@ -80,7 +80,7 @@ class cpt_utility(clr_utility):
 
         extent = j[0], j[-1]
 
-        entries = cls._make_color_entries(j, b, g, r)
+        entries = cls._make_color_table(j, b, g, r)
         stock = cls._process_cpt_stock(color_model, bg, fg, nn)
 
         return (entries, stock), UNNAMED_TABLE, extent
@@ -191,9 +191,9 @@ class cpt_utility(clr_utility):
     ) -> ValueTables:
         # Normalize color values
         if color_model == CM_RGB:
-            r = list(map(cls._normalize_color, r))
-            g = list(map(cls._normalize_color, g))
-            b = list(map(cls._normalize_color, b))
+            r = list(map(cls._normalize_colors, r))
+            g = list(map(cls._normalize_colors, g))
+            b = list(map(cls._normalize_colors, b))
 
         # Convert color model if necessary
         elif color_model == CM_HSV:
