@@ -42,7 +42,7 @@ class ColormapProtocol(Protocol):
     def name(self, colormap_name: str) -> None: ...
 
 
-class _SegmentedColormapBased:
+class ColormapBase:
 
     keypoints: KeypointList
     name: str
@@ -231,7 +231,7 @@ class _SegmentedColormapBased:
         return cleaned_color_segments
 
 
-class SegmentedColormap(_SegmentedColormapBased):
+class SegmentedColormap(ColormapBase):
 
     def __init__(self, name: str, raw_segment_data: GSegmentData) -> None:
         segment_data = self._copy_segment_data(raw_segment_data)
@@ -265,7 +265,7 @@ class SegmentedColormap(_SegmentedColormapBased):
         return float(x), float(y_0), float(y_1)
 
 
-class ContinuousColormap(_SegmentedColormapBased):
+class ContinuousColormap(ColormapBase):
 
     def __init__(
         self,
@@ -296,7 +296,7 @@ class ContinuousColormap(_SegmentedColormapBased):
             ) from error
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> _SegmentedColormapBased:
+    def _get_segment_data(colormap: Colormap) -> ColormapBase:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
             return SegmentedColormap(colormap.name, raw_segment_data)
@@ -304,7 +304,7 @@ class ContinuousColormap(_SegmentedColormapBased):
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
 
-class DiscreteColormap(_SegmentedColormapBased):
+class DiscreteColormap(ColormapBase):
 
     def __init__(self, name: str, raw_listed_colors: GListedColors) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
@@ -391,7 +391,7 @@ class _NamedColormapBased:
             ) from error
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> _SegmentedColormapBased:
+    def _get_segment_data(colormap: Colormap) -> ColormapBase:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
             return SegmentedColormap(colormap.name, raw_segment_data)
@@ -403,7 +403,7 @@ class _NamedColormapBased:
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
 
-class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
+class NamedColormap(ColormapBase, _NamedColormapBased):
 
     def __init__(
         self,
@@ -421,7 +421,7 @@ class NamedColormap(_SegmentedColormapBased, _NamedColormapBased):
         )
 
 
-class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
+class CombinedColormap(ColormapBase, _NamedColormapBased):
 
     def __init__(
         self,
