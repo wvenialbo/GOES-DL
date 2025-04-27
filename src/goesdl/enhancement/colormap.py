@@ -103,6 +103,12 @@ class _SegmentedColormapBased:
 
         return expanded_segment_data
 
+    @classmethod
+    def _get_full_segment_data(cls, segment_data: SegmentData) -> SegmentData:
+        expanded_segment_data = cls._expand_segment_data(segment_data)
+
+        return cls._homogenize_segment_data(expanded_segment_data)
+
     @staticmethod
     def _get_keypoints(segment_data: SegmentData) -> list[float]:
         values: set[float] = set()
