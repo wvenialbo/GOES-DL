@@ -177,9 +177,9 @@ class eu_utility(clr_utility):
         r: list[float],
     ) -> ValueTables:
         # Normalize color values
-        b = list(map(cls._normalize_color, b))
-        g = list(map(cls._normalize_color, g))
-        r = list(map(cls._normalize_color, r))
+        b = cls._normalize_colors(b)
+        g = cls._normalize_colors(g)
+        r = cls._normalize_colors(r)
 
         # Convert color model if necessary
         if color_model == CM_RGB:
