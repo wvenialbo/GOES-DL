@@ -170,7 +170,7 @@ class eu_utility(clr_utility):
         x = cls._normalize_values(j)
 
         entries = cls._make_color_entries(x, b, g, r)
-        stock = cls._process_eu_stock(bg, fg, nn)
+        stock = cls._pack_eu_stock_colors(bg, fg, nn)
 
         name = UNNAMED_TABLE
         if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
@@ -199,7 +199,7 @@ class eu_utility(clr_utility):
         return b, g, r
 
     @classmethod
-    def _process_eu_stock(
+    def _pack_eu_stock_colors(
         cls,
         bg: RGBValue,
         fg: RGBValue,
