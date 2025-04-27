@@ -15,6 +15,7 @@ class clr_utility:
         return [k / CLR_MAX for k in y]
 
     @staticmethod
-    def _normalize_values(j: list[float]) -> list[float]:
-        length = j[-1] - j[0]
-        return [(k - j[0]) / length for k in j]
+    def _normalize_values(x: list[float]) -> list[float]:
+        x_min = x[0]
+        length = x[-1] - x_min
+        return [(k - x_min) / length for k in x]
