@@ -449,6 +449,8 @@ class CombinedColormap(_SegmentedColormapBased, _NamedColormapBased):
         # Create the combined color segment data
         combined_segment_data = self._combine_segment_data(segment_data_list)
 
+        name = name or "+".join(colormap_names)
+
         super().__init__(name, combined_segment_data, [], True)
 
     def _combine_segment_data(
