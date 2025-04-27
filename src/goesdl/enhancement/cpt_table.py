@@ -9,7 +9,7 @@ from .constants import (
     CMYK_MAX,
     HSV_MAX,
     HUE_MAX,
-    UNNAMED_TABLE,
+    UNNAMED_COLORMAP,
 )
 from .shared import ColorTable, RGBValue, ValueTable, ValueTableColumn
 
@@ -66,7 +66,7 @@ class cpt_utility(clr_utility):
 
         color_table = cls._make_color_table(value_table)
 
-        return color_table, UNNAMED_TABLE
+        return color_table, UNNAMED_COLORMAP
 
     @staticmethod
     def _cmyk_to_rgb(c: float, m: float, y: float, k: float) -> RGBValue:

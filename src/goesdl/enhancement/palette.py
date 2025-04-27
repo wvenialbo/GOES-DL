@@ -5,7 +5,7 @@ palettes.
 
 from pathlib import Path
 
-from .constants import UNNAMED_TABLE
+from .constants import UNNAMED_COLORMAP
 from .cpt_table import cpt_utility
 from .eu_table import eu_utility
 from .shared import ColorTable
@@ -108,7 +108,7 @@ class EnhacementPalette:
         rgb : bool, optional
             Flag indicating if the color model is RGB, by default False.
         """
-        if not name and self.name != UNNAMED_TABLE:
+        if not name and self.name != UNNAMED_COLORMAP:
             name = self.name
 
         eu_utility.create_file(path, name, self.table, rgb)

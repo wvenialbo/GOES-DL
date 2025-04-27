@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import TextIO
 
 from .clr_table import clr_utility
-from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_TABLE
+from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_COLORMAP
 from .shared import (
     ColorTable,
     ColorTableRow,
@@ -142,7 +142,7 @@ class eu_utility(clr_utility):
 
         color_table = cls._make_color_table(value_table)
 
-        name = UNNAMED_TABLE
+        name = UNNAMED_COLORMAP
         if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
             name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
             name = name.strip()

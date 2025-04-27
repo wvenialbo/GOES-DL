@@ -11,7 +11,7 @@ EnhacementStretching
 from pathlib import Path
 from typing import TextIO
 
-from .constants import UNNAMED_TABLE
+from .constants import UNNAMED_COLORMAP
 from .shared import DomainData, StretchingTable
 
 ST_SIGNATURE = "ST TABLE"
@@ -149,7 +149,7 @@ class EnhacementStretching:
             The name of the enhancement stretching table. Override the
             actual name if provided.
         """
-        if not name and self.name != UNNAMED_TABLE:
+        if not name and self.name != UNNAMED_COLORMAP:
             name = self.name
 
         self.create_file(path, name, self.table, self.domain, self.extent)
@@ -202,7 +202,7 @@ class EnhacementStretching:
         if ST_SIGNATURE not in lines[0]:
             raise ValueError("Invalid stretching table")
 
-        name = UNNAMED_TABLE
+        name = UNNAMED_COLORMAP
         if len(lines[0]) > len(ST_SIGNATURE):
             name = lines[0][len(ST_SIGNATURE) + 1 :]
             name = name.strip()
