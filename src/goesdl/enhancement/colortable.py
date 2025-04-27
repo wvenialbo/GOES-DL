@@ -7,6 +7,13 @@ from .shared import ColorTable, ContinuousColorTable
 
 
 class ColormapTable(ContinuousColormap):
+    """
+    Represent a color enhancement color table.
+
+    This class provides methods to load, parse, and process McIDAS and
+    GMT enhancement color tables, creating color segments for Matplotlib
+    colormaps.
+    """
 
     def __init__(self, path: str | Path, name: str = "") -> None:
 
@@ -34,8 +41,8 @@ class ColormapTable(ContinuousColormap):
 
         Returns
         -------
-        ColorSpec
-            Tuple of colour table and stock colour values.
+        tuple[ColorTable, str]
+            Tuple of colour table and name values.
 
         Notes
         -----
