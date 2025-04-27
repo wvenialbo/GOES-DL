@@ -127,12 +127,7 @@ class EnhacementPalette(ColormapBase):
         packed_segments = cls._pack_segment_data(segment_data)
 
         # Unpack segment values
-        unpacked_segment_valuess: list[
-            tuple[float, float, float, float, float, float, float]
-        ] = [
-            (*red, *green[1:], *blue[1:])
-            for red, green, blue in zip(*packed_segments)
-        ]
+        unpacked_segment_valuess = cls._unpack_segment_values(packed_segments)
 
         x: KeypointList = []
         r: ColorValueList = []
@@ -182,3 +177,12 @@ class EnhacementPalette(ColormapBase):
         print(color_table)
 
         eu_utility.create_file(path, name, color_table, rgb)
+
+    @classmethod
+    def _unpack_segment_values(
+        cls, packed_segments: list[ColorSegments]
+    ) -> list[tuple[float, ...]]:
+        return [
+            (*red, *green[1:], *blue[1:])
+            for red, green, blue in zip(*packed_segments)
+        ]
