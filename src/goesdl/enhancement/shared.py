@@ -26,6 +26,8 @@ ValueTable = tuple[ValueTableColumn, ...]
 GKeypointList = Sequence[float]
 KeypointList = ValueTableColumn
 
+# Color component value list
+ColorValueList = ValueTableColumn
 
 # RGB packed colour value
 
