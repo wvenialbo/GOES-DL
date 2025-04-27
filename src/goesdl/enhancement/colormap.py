@@ -351,37 +351,40 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         segment_data_list = self._extract_subsegment_data(colormap_names)
 
         # Rescale segment values for concatenation
-        segments = self._rescale_segment_values(
+        segment_data_list = self._rescale_segment_values(
             normalized_keypoints, segment_data_list
         )
 
         # Create the combined color segment data
-        combined_segment_data = self._combine_segmen_data(
-            segment_data_list, segments
-        )
+        combined_segment_data = self._combine_segment_data(segment_data_list)
 
         super().__init__(combined_segment_data, [], True)
 
-    def _combine_segmen_data(
-        self,
-        segment_data_list: list[SegmentData],
-        segments: list[ColorSegment],
+    def _combine_segment_data(
+        self, segment_data_list: list[SegmentData]
     ) -> SegmentData:
         combined_segment_data: SegmentData = {}
+
         for component in COLOR_COMPONENTS:
-            combined_segment_data[component] = []
+            segments: list[ColorSegment] = []
+
             for segment_data in segment_data_list:
                 segments.extend(segment_data[component])
+
+            combined_segment_data[component] = segments
+
         return combined_segment_data
 
     def _extract_subsegment_data(
         self, colormap_names: Sequence[str]
     ) -> list[SegmentData]:
         segment_data_list: list[SegmentData] = []
+
         for colormap_name in colormap_names:
             colormap = self._get_colormap(colormap_name)
             segmented_colormap = self._get_segment_data(colormap)
             segment_data_list.append(segmented_colormap.segment_data)
+
         return segment_data_list
 
     def _normalize_keypoints(self, keypoints: Sequence[float]) -> list[float]:
@@ -394,15 +397,20 @@ class EnhancementColormap(_SegmentedColormapBased, _NamedColormapBased):
         self,
         normalized_keypoints: list[float],
         segment_data_list: list[SegmentData],
-    ) -> list[ColorSegment]:
+    ) -> list[SegmentData]:
         for i, segment_data in enumerate(segment_data_list):
             smin, smax = normalized_keypoints[i : i + 2]
+
             for component, segments in segment_data.items():
                 for j, (x, y1, y2) in enumerate(segments):
-                    x = smin * (1 - x) + smax * x
+                    x = smin * (1.0 - x) + smax * x
                     segments[j] = x, y1, y2
+
                 segment_data[component] = segments
-        return segments
+
+            segment_data_list[i] = segment_data
+
+        return segment_data_list
 
     def _validate_keypoints(
         self, colormap_names: Sequence[str], keypoints: Sequence[float]
