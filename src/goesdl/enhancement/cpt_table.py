@@ -62,11 +62,11 @@ class cpt_utility(clr_utility):
         # to the blue, green, and red colour components, respectively;
         # the `n` list is left unchanged since it is used only for CMYK
         # to RGB colorspace conversion.
-        x, b, g, r = cls._process_cpt_colors(color_model, (j, r, g, b, k))
+        value_table = cls._process_cpt_colors(color_model, (j, r, g, b, k))
 
-        entries = cls._make_color_table((x, b, g, r))
+        color_table = cls._make_color_table(value_table)
 
-        return entries, UNNAMED_TABLE
+        return color_table, UNNAMED_TABLE
 
     @staticmethod
     def _cmyk_to_rgb(c: float, m: float, y: float, k: float) -> RGBValue:
