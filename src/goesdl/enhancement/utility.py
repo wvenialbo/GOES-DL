@@ -30,9 +30,9 @@ def interp(x: float, xp: Sequence[float], yp: Sequence[float]) -> float:
     ----------
     x : float
         The value to interpolate.
-    xp : Sequence of float
+    xp : Sequence[float]
         The x-coordinates of the data points.
-    yp : Sequence of float
+    yp : Sequence[float]
         The y-coordinates of the data points.
 
     Returns
@@ -54,9 +54,9 @@ def interpc(x: float, xp: Sequence[float], yp: Sequence[float]) -> float:
     ----------
     x : float
         The value to interpolate.
-    xp : Sequence of float
+    xp : Sequence[float]
         The x-coordinates of the data points.
-    yp : Sequence of float
+    yp : Sequence[float]
         The y-coordinates of the data points.
 
     Returns
@@ -81,9 +81,9 @@ def interpx(x: float, xp: Sequence[float], yp: Sequence[float]) -> float:
     ----------
     x : float
         The value to interpolate.
-    xp : Sequence of float
+    xp : Sequence[float]
         The x-coordinates of the data points.
-    yp : Sequence of float
+    yp : Sequence[float]
         The y-coordinates of the data points.
 
     Returns
