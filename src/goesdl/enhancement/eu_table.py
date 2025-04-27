@@ -2,10 +2,9 @@ from pathlib import Path
 from typing import TextIO
 
 from .clr_table import clr_utility
-from .constants import CLR_MAX, CM_BGR, CM_RGB, UNNAMED_COLORMAP
+from .constants import CM_BGR, CM_RGB, UNNAMED_COLORMAP
 from .shared import (
     ColorTable,
-    ColorTableRow,
     ValueTable,
     ValueTableColumn,
 )
@@ -55,9 +54,9 @@ class eu_utility(clr_utility):
             table = [(x, r, g, b) for x, b, g, r in table]
 
         for i in range(0, len(table), 2):
-            x_lo, b_lo, g_lo, r_lo = cls._get_color_entry(table[i])
+            x_lo, b_lo, g_lo, r_lo = table[i]
 
-            x_hi, b_hi, g_hi, r_hi = cls._get_color_entry(table[i + 1])
+            x_hi, b_hi, g_hi, r_hi = table[i + 1]
 
             line = (
                 f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
@@ -95,17 +94,6 @@ class eu_utility(clr_utility):
 
         with open(path, "w", encoding="utf-8", newline="\n") as file:
             cls._write_color_table_file(file, lines)
-
-    @staticmethod
-    def _get_color_entry(entry: ColorTableRow) -> ColorTableRow:
-        x, b, g, r = entry
-
-        x = round(x * CLR_MAX)
-        b = round(b * CLR_MAX)
-        g = round(g * CLR_MAX)
-        r = round(r * CLR_MAX)
-
-        return x, b, g, r
 
     @staticmethod
     def is_eu_table(header: str) -> bool:
