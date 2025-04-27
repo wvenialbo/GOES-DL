@@ -211,14 +211,16 @@ class SegmentedColormap(_SegmentedColormapBased):
         return float(x), float(y_0), float(y_1)
 
 
-class DiscreteColormap(SegmentedColormap):
+class DiscreteColormap(_SegmentedColormapBased):
 
     def __init__(self, raw_listed_colors: GListedColors) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
         segment_data = self._create_segment_data(listed_colors)
 
-        super().__init__(cast(GSegmentData, segment_data))
+        segment_data = self._reduce_segment_data(segment_data)
+
+        super().__init__(segment_data)
 
     @classmethod
     def _copy_listed_colors(
