@@ -2,7 +2,6 @@ import colorsys
 
 from .clr_table import clr_utility
 from .constants import (
-    BRG_MAX,
     CM_CMYK,
     CM_GRAY,
     CM_HSV,
@@ -48,7 +47,7 @@ class cpt_utility(clr_utility):
             # Split line into list of strings of keywords or values
             ls = line.split()
 
-            # Check for alternative color model
+            # Check for alternative colour model
             if line[0] == GMT_CPT_COMMENT and ls[-1] in GMT_CPT_COLOR_MODEL:
                 color_model = ls[-1]
 
@@ -59,8 +58,8 @@ class cpt_utility(clr_utility):
             cls._extract_color_range(j, clr_values, color_model, ls)
 
         # The `r`, `g`, and `b` lists are modified in place and contain
-        # the normalized color component intensity values corresponding
-        # to the blue, green, and red color components, respectively;
+        # the normalized colour component intensity values corresponding
+        # to the blue, green, and red colour components, respectively;
         # the `n` list is left unchanged since it is used only for CMYK
         # to RGB colorspace conversion.
         r, g, b = cls._process_cpt_colors(color_model, r, g, b, k)
@@ -109,10 +108,6 @@ class cpt_utility(clr_utility):
     def _hsv_to_rgb(h: float, s: float, v: float) -> RGBValue:
         return colorsys.hsv_to_rgb(h / HUE_MAX, s / HSV_MAX, v / HSV_MAX)
 
-    @staticmethod
-    def _normalize_grayscale(x: float) -> float:
-        return x / BRG_MAX
-
     @classmethod
     def _process_cpt_colors(
         cls,
@@ -122,13 +117,13 @@ class cpt_utility(clr_utility):
         b: list[float],
         n: list[float],
     ) -> ValueTables:
-        # Normalize color values
+        # Normalize colour values
         if color_model == CM_RGB:
-            r = list(map(cls._normalize_colors, r))
-            g = list(map(cls._normalize_colors, g))
-            b = list(map(cls._normalize_colors, b))
+            r = cls._normalize_colors(r)
+            g = cls._normalize_colors(g)
+            b = cls._normalize_colors(b)
 
-        # Convert color model if necessary
+        # Convert colour model if necessary
         elif color_model == CM_HSV:
             for i, (h, s, v) in enumerate(zip(r, g, b)):
                 r[i], g[i], b[i] = cls._hsv_to_rgb(h, s, v)
@@ -138,10 +133,10 @@ class cpt_utility(clr_utility):
                 r[i], g[i], b[i] = cls._cmyk_to_rgb(c, m, y, k)
 
         elif color_model == CM_GRAY:
-            r = list(map(cls._normalize_grayscale, r))
+            r = cls._normalize_grayscale(r)
             g, b = r, r
 
         else:
-            raise ValueError("Invalid color model")
+            raise ValueError("Invalid colour model")
 
         return r, g, b
