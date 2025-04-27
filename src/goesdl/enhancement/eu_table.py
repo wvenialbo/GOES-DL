@@ -161,9 +161,9 @@ class eu_utility(clr_utility):
         x = cls._normalize_values(j)
 
         # Normalise colour component values
-        b = cls._normalize_colors(b)
-        g = cls._normalize_colors(g)
-        r = cls._normalize_colors(r)
+        b = cls._normalize_color_values(b)
+        g = cls._normalize_color_values(g)
+        r = cls._normalize_color_values(r)
 
         # Convert color model if necessary
         if color_model == CM_RGB:

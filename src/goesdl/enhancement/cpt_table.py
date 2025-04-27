@@ -118,9 +118,9 @@ class cpt_utility(clr_utility):
 
         # Normalize colour values
         if color_model == CM_RGB:
-            r = cls._normalize_colors(r)
-            g = cls._normalize_colors(g)
-            b = cls._normalize_colors(b)
+            r = cls._normalize_color_values(r)
+            g = cls._normalize_color_values(g)
+            b = cls._normalize_color_values(b)
 
         # Convert colour model if necessary
         elif color_model == CM_HSV:
