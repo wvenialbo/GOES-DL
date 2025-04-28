@@ -1,10 +1,10 @@
 from .constants import CBTICKS_NMAX, CBTICKS_SMIN, CBTICKS_STEP
-from .shared import DomainData
+from .shared import DomainData, KeypointList
 
 
 class ColorbarTicks:
 
-    cticks: list[float]
+    cticks: KeypointList
     nticks: int
     tickstep: int
 
@@ -63,6 +63,9 @@ class ColorbarTicks:
         self.cticks = [float(tick) for tick in range(cbmin, cbmax, tickstep)]
         self.nticks = nticks
         self.tickstep = tickstep
+
+    def get_ticklabels(self, offset: float = 0.0) -> KeypointList:
+        return [tick + offset for tick in self.cticks]
 
     @staticmethod
     def _find_tick_max(vmax: float, step: int) -> int:
