@@ -5,6 +5,7 @@ from numpy import interp
 
 from goesdl.enhancement import EnhacementPalette, EnhacementStretching
 
+from .constants import CBTICKS_N, CBTICKS_STEP
 from .shared import (
     ColorSegments,
     KeypointList,
@@ -24,16 +25,19 @@ class EnhancementScale:
         self,
         palette: EnhacementPalette,
         stretching: EnhacementStretching,
-        nticks: int = 16,
+        cbarticks: ColorbarTicks | None = None,
     ) -> None:
         self.palette = palette
         self.stretching = stretching
-        self.barticks = ColorbarTicks(stretching.domain, nticks, step=0)
+
+        self.barticks = cbarticks or ColorbarTicks(
+            stretching.domain, CBTICKS_N, step=CBTICKS_STEP
+        )
 
     def set_offset(self, offset: float) -> None:
         self.stretching.offset = offset
 
-    def set_ticks(self, nticks: int = 16, step: int = 0) -> None:
+    def set_ticks(self, nticks: int = CBTICKS_N, step: int = 0) -> None:
         self.barticks = ColorbarTicks(self.stretching.domain, nticks, step)
 
     def _transform_color_segment(
