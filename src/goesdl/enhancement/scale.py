@@ -49,9 +49,7 @@ class EnhancementScale:
 
         return cast(float, y_scaled)
 
-    @property
-    def cmap(self) -> Colormap:
-
+    def _transform_segment_data(self) -> MSegmentData:
         transformed_segment_data: SegmentData = {}
 
         for channel_name, channel_data in self.palette.segment_data.items():
@@ -64,10 +62,14 @@ class EnhancementScale:
 
             transformed_segment_data[channel_name] = new_channel_data
 
-        new_segment_data = cast(MSegmentData, transformed_segment_data)
+        return cast(MSegmentData, transformed_segment_data)
+
+    @property
+    def cmap(self) -> Colormap:
+        transformed_segment_data = self._transform_segment_data()
 
         return LinearSegmentedColormap(
-            self.name, new_segment_data, N=self.palette.ncolors
+            self.name, transformed_segment_data, N=self.palette.ncolors
         )
 
     @property
