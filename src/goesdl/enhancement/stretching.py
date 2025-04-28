@@ -115,3 +115,9 @@ class EnhacementStretching:
         vmin = self.table[0][0] + self.offset
         vmax = self.table[-1][0] + self.offset
         return vmin, vmax
+
+    @property
+    def extent(self) -> DomainData:
+        vmin = self.table[0][0]
+        vmax = self.table[-1][0]
+        return vmin, vmax
