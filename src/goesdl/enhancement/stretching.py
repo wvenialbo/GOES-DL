@@ -10,7 +10,7 @@ EnhacementStretching
 
 from pathlib import Path
 
-from .constants import UNNAMED_COLORMAP
+from .constants import UNNAMED_TABLE
 from .shared import StretchingTable
 from .st_table import st_utility
 
@@ -100,7 +100,9 @@ class EnhacementStretching:
             The name of the enhancement stretching table. Override the
             actual name if provided.
         """
-        if not name and self.name != UNNAMED_COLORMAP:
-            name = self.name
+        if name:
+            table_name = name
+        else:
+            table_name = "" if self.name == UNNAMED_TABLE else self.name
 
-        st_utility.create_file(path, name, self.table)
+        st_utility.create_file(path, table_name, self.table)
