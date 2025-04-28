@@ -47,7 +47,11 @@ class EnhacementPalette(ColormapBase):
 
     def __init__(self, colormap: ColormapBase) -> None:
         super().__init__(
-            colormap.name, colormap.segment_data, colormap.keypoints, False
+            colormap.name,
+            colormap.segment_data,
+            colormap.keypoints,
+            colormap.ncolors,
+            False,
         )
 
     @classmethod
@@ -64,21 +68,22 @@ class EnhacementPalette(ColormapBase):
         cls,
         name: str,
         listed_colors: ContinuousColorList | ContinuousColorTable,
+        ncolors: int = 256,
     ) -> ColormapBase:
-        return cls(ContinuousColormap(name, listed_colors))
+        return cls(ContinuousColormap(name, listed_colors, ncolors))
 
     @classmethod
     def discrete(
-        cls, name: str, listed_colors: DiscreteColorList
+        cls, name: str, listed_colors: DiscreteColorList, ncolors: int = 256
     ) -> ColormapBase:
-        return cls(DiscreteColormap(name, listed_colors))
+        return cls(DiscreteColormap(name, listed_colors, ncolors))
 
     @classmethod
-    def from_stock(cls, name: str) -> ColormapBase:
-        return cls(NamedColormap(name))
+    def from_stock(cls, name: str, ncolors: int = 256) -> ColormapBase:
+        return cls(NamedColormap(name, ncolors))
 
     @classmethod
-    def load(cls, path: str | Path) -> ColormapBase:
+    def load(cls, path: str | Path, ncolors: int = 256) -> ColormapBase:
         """
         Load a McIDAS or GMT enhancement color table specification.
 
@@ -114,11 +119,13 @@ class EnhacementPalette(ColormapBase):
 
         - https://www.generic-mapping-tools.org/
         """
-        return cls(ColormapTable(path))
+        return cls(ColormapTable(path, ncolors))
 
     @classmethod
-    def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
-        return cls(SegmentedColormap(name, segment_data))
+    def segmented(
+        cls, name: str, segment_data: GSegmentData, ncolors: int = 256
+    ) -> ColormapBase:
+        return cls(SegmentedColormap(name, segment_data, ncolors))
 
     def save(self, path: str | Path, rgb: bool = False) -> None:
         """
