@@ -1,6 +1,5 @@
+from .constants import CBTICKS_NMAX, CBTICKS_SMIN, CBTICKS_STEP
 from .shared import DomainData
-
-MIN_TICKS = 5
 
 
 class ColorbarTicks:
@@ -9,12 +8,17 @@ class ColorbarTicks:
     nticks: int
     tickstep: int
 
-    def __init__(self, extent: DomainData, nticks: int, tickstep: int) -> None:
+    def __init__(
+        self,
+        extent: DomainData,
+        nticks: int = CBTICKS_NMAX,
+        tickstep: int = CBTICKS_STEP,
+    ) -> None:
         """
         Create a list of colorbar ticks for the given temperature range.
 
         Creates a list of ticks evenly spaced between tmin and tmax,
-        with a minimum step of 5.
+        with a minimum step of CBTICKS_SMIN=5.
 
         Parameters
         ----------
@@ -32,9 +36,9 @@ class ColorbarTicks:
         """
         tmin, tmax = extent
 
-        if tickstep < MIN_TICKS:
+        if tickstep < CBTICKS_SMIN:
             tickstep = self._find_tick_step(
-                tmin, tmax, max_ticks=nticks, min_step=MIN_TICKS
+                tmin, tmax, max_ticks=nticks, min_step=CBTICKS_SMIN
             )
 
         cbmin = self._find_tick_min(tmin, tickstep)
