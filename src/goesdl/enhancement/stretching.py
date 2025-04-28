@@ -11,7 +11,7 @@ EnhacementStretching
 from pathlib import Path
 
 from .constants import UNNAMED_TABLE
-from .shared import StretchingTable
+from .shared import DomainData, StretchingTable
 from .st_table import st_utility
 
 ST_SIGNATURE = "ST TABLE"
@@ -103,3 +103,9 @@ class EnhacementStretching:
         name = "" if self.name == UNNAMED_TABLE else self.name
 
         st_utility.create_file(path, name, self.table)
+
+    @property
+    def domain(self) -> DomainData:
+        vmin = self.table[0][0]
+        vmax = self.table[-1][0]
+        return vmin, vmax
