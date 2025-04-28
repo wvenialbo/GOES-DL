@@ -35,14 +35,15 @@ class EnhancementScale:
         )
 
         self.barticks = cbarticks or ColorbarTicks(
-            self.stretching.domain, CBTICKS_N, step=CBTICKS_STEP
+            self.stretching.domain, CBTICKS_N, tickstep=CBTICKS_STEP
         )
 
     def set_offset(self, offset: float) -> None:
         self.stretching.offset = offset
+        self.set_ticks(self.barticks.nticks, self.barticks.tickstep)
 
-    def set_ticks(self, nticks: int = CBTICKS_N, step: int = 0) -> None:
-        self.barticks = ColorbarTicks(self.stretching.domain, nticks, step)
+    def set_ticks(self, nticks: int = CBTICKS_N, tickstep: int = 0) -> None:
+        self.barticks = ColorbarTicks(self.stretching.domain, nticks, tickstep)
 
     def _transform_color_segment(
         self, segment: ColorSegments, xp: KeypointList, yp: KeypointList
