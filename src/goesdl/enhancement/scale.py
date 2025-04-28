@@ -7,6 +7,7 @@ from .constants import CBTICKS_N, CBTICKS_STEP
 from .palette import EnhacementPalette
 from .shared import (
     ColorSegments,
+    DomainData,
     KeypointList,
     MSegmentData,
     SegmentData,
@@ -90,5 +91,17 @@ class EnhancementScale:
         return self.barticks.cticks
 
     @property
+    def domain(self) -> DomainData:
+        return self.stretching.domain
+
+    @property
+    def extent(self) -> DomainData:
+        return self.stretching.extent
+
+    @property
     def name(self) -> str:
         return f"{self.palette.name}({self.stretching.name})"
+
+    @property
+    def ncolors(self) -> int:
+        return self.palette.ncolors
