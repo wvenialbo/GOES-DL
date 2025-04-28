@@ -1,4 +1,5 @@
-from typing import cast
+from collections.abc import Callable
+from typing import Any, cast
 
 from matplotlib.colors import Colormap, LinearSegmentedColormap, Normalize
 from numpy import interp
@@ -21,7 +22,6 @@ class EnhancementScale:
     barticks: ColorbarTicks
     palette: EnhacementPalette
     stretching: EnhacementStretching
-    offset: float
 
     def __init__(
         self,
@@ -36,6 +36,12 @@ class EnhancementScale:
         )
 
         self.barticks = cbarticks or ColorbarTicks(self.stretching.domain)
+
+    def get_ticklabels(
+        self, offset: float = 0.0, format: Callable[[float], Any] | None = None
+    ) -> list[Any]:
+        label_values = self.barticks.get_ticklabels(offset)
+        return list(map(format, label_values)) if format else label_values
 
     def set_ticks(
         self, nticks: int | None = None, tickstep: int | None = None
