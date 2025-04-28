@@ -15,13 +15,13 @@ class ColormapTable(ContinuousColormap):
     colormaps.
     """
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
 
         color_table, name = self._from_file(path)
 
         listed_colors = self._make_color_list(color_table)
 
-        super().__init__(name, listed_colors)
+        super().__init__(name, listed_colors, ncolors)
 
     @classmethod
     def _from_file(cls, path: str | Path) -> tuple[ColorTable, str]:
