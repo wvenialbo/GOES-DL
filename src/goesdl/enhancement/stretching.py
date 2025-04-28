@@ -87,7 +87,7 @@ class EnhacementStretching:
 
         return cls(name, stretching_table)
 
-    def save_to_file(self, path: str | Path, name: str = "") -> None:
+    def save(self, path: str | Path, name: str = "") -> None:
         """
         Save the enhancement stretching table to a file.
 
