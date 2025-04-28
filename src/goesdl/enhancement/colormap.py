@@ -46,6 +46,7 @@ class ColormapBase:
 
     keypoints: KeypointList
     name: str
+    ncolors: int
     segment_data: SegmentData
 
     def __init__(
@@ -53,6 +54,7 @@ class ColormapBase:
         name: str,
         segment_data: SegmentData,
         keypoints: KeypointList,
+        ncolors: int,
         reduce: bool,
     ) -> None:
         if reduce:
@@ -61,6 +63,8 @@ class ColormapBase:
         self.segment_data = segment_data
 
         self.keypoints = keypoints or self._get_keypoints(segment_data)
+
+        self.ncolors = ncolors
 
         self.name = name or UNNAMED_COLORMAP
 
@@ -233,10 +237,12 @@ class ColormapBase:
 
 class SegmentedColormap(ColormapBase):
 
-    def __init__(self, name: str, raw_segment_data: GSegmentData) -> None:
+    def __init__(
+        self, name: str, raw_segment_data: GSegmentData, ncolors: int = 256
+    ) -> None:
         segment_data = self._copy_segment_data(raw_segment_data)
 
-        super().__init__(name, segment_data, [], True)
+        super().__init__(name, segment_data, [], ncolors, True)
 
     @classmethod
     def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
@@ -271,6 +277,7 @@ class ContinuousColormap(ColormapBase):
         self,
         name: str,
         listed_colors: ContinuousColorList | ContinuousColorTable,
+        ncolors: int = 256,
     ) -> None:
         colormap = self._get_colormap(listed_colors)
 
@@ -280,6 +287,7 @@ class ContinuousColormap(ColormapBase):
             name,
             segmented_colormap.segment_data,
             segmented_colormap.keypoints,
+            ncolors,
             False,
         )
 
@@ -306,12 +314,14 @@ class ContinuousColormap(ColormapBase):
 
 class DiscreteColormap(ColormapBase):
 
-    def __init__(self, name: str, raw_listed_colors: GListedColors) -> None:
+    def __init__(
+        self, name: str, raw_listed_colors: GListedColors, ncolors: int = 256
+    ) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
         segment_data = self._create_segment_data(listed_colors)
 
-        super().__init__(name, segment_data, [], True)
+        super().__init__(name, segment_data, [], ncolors, True)
 
     @classmethod
     def _copy_listed_colors(
@@ -405,10 +415,7 @@ class _NamedColormapBased:
 
 class NamedColormap(ColormapBase, _NamedColormapBased):
 
-    def __init__(
-        self,
-        name: str,
-    ) -> None:
+    def __init__(self, name: str, ncolors: int = 256) -> None:
         colormap = self._get_colormap(name)
 
         segmented_colormap = self._get_segment_data(colormap)
@@ -417,6 +424,7 @@ class NamedColormap(ColormapBase, _NamedColormapBased):
             segmented_colormap.name,
             segmented_colormap.segment_data,
             segmented_colormap.keypoints,
+            ncolors,
             False,
         )
 
@@ -428,6 +436,7 @@ class CombinedColormap(ColormapBase, _NamedColormapBased):
         name: str,
         colormap_names: str | Sequence[str],
         keypoints: GKeypointList,
+        ncolors: int = 256,
     ) -> None:
         if isinstance(colormap_names, str):
             colormap_names = [colormap_names]
@@ -451,7 +460,7 @@ class CombinedColormap(ColormapBase, _NamedColormapBased):
 
         name = name or "+".join(colormap_names)
 
-        super().__init__(name, combined_segment_data, [], True)
+        super().__init__(name, combined_segment_data, [], ncolors, True)
 
     def _combine_segment_data(
         self, segment_data_list: list[SegmentData]
