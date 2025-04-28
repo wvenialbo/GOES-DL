@@ -12,6 +12,7 @@ from .shared import (
     MSegmentData,
     SegmentData,
 )
+from .st_stock import st_default, st_stock
 from .ticks import ColorbarTicks
 
 
@@ -24,14 +25,16 @@ class EnhancementScale:
     def __init__(
         self,
         palette: EnhacementPalette,
-        stretching: EnhacementStretching,
+        stretching: EnhacementStretching | None = None,
         cbarticks: ColorbarTicks | None = None,
     ) -> None:
         self.palette = palette
-        self.stretching = stretching
+        self.stretching = stretching or EnhacementStretching(
+            st_default, st_stock[st_default]
+        )
 
         self.barticks = cbarticks or ColorbarTicks(
-            stretching.domain, CBTICKS_N, step=CBTICKS_STEP
+            self.stretching.domain, CBTICKS_N, step=CBTICKS_STEP
         )
 
     def set_offset(self, offset: float) -> None:
