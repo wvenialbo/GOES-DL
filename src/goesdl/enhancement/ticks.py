@@ -6,6 +6,7 @@ MIN_TICKS = 5
 class ColorbarTicks:
 
     cticks: list[float]
+    nticks: int
 
     def __init__(self, extent: DomainData, nticks: int, step: int) -> None:
         """
@@ -39,6 +40,7 @@ class ColorbarTicks:
         cbmax = self._find_tick_max(tmax, step) + 1
 
         self.cticks = [float(tick) for tick in range(cbmin, cbmax, step)]
+        self.nticks = nticks
 
     @staticmethod
     def _find_tick_max(vmax: float, step: int) -> int:
