@@ -78,7 +78,7 @@ class EnhacementPalette(ColormapBase):
         return cls(NamedColormap(name))
 
     @classmethod
-    def load(cls, path: str | Path, name: str = "") -> ColormapBase:
+    def load(cls, path: str | Path) -> ColormapBase:
         """
         Load a McIDAS or GMT enhancement color table specification.
 
@@ -90,8 +90,6 @@ class EnhacementPalette(ColormapBase):
         ----------
         path : str or Path
             Path to the color table specification text file.
-        name : str
-            The name for the palette.
 
         Returns
         -------
@@ -116,7 +114,7 @@ class EnhacementPalette(ColormapBase):
 
         - https://www.generic-mapping-tools.org/
         """
-        return cls(ColormapTable(path, name))
+        return cls(ColormapTable(path))
 
     @classmethod
     def segmented(cls, name: str, segment_data: GSegmentData) -> ColormapBase:
