@@ -3,9 +3,8 @@ from typing import cast
 from matplotlib.colors import Colormap, LinearSegmentedColormap, Normalize
 from numpy import interp
 
-from goesdl.enhancement import EnhacementPalette, EnhacementStretching
-
 from .constants import CBTICKS_N, CBTICKS_STEP
+from .palette import EnhacementPalette
 from .shared import (
     ColorSegments,
     KeypointList,
@@ -13,6 +12,7 @@ from .shared import (
     SegmentData,
 )
 from .st_stock import st_default, st_stock
+from .stretching import EnhacementStretching
 from .ticks import ColorbarTicks
 
 
