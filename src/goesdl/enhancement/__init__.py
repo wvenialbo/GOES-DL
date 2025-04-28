@@ -10,8 +10,10 @@ from .palette import EnhacementPalette
 from .preview import show_colormap
 from .scale import EnhancementScale
 from .stretching import EnhacementStretching
+from .ticks import ColorbarTicks
 
 __all__ = [
+    "ColorbarTicks",
     "EnhacementPalette",
     "EnhancementScale",
     "EnhacementStretching",
