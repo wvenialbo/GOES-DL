@@ -126,7 +126,7 @@ class EnhacementStretching:
         y_min, y_max = self.extent
         yp = [(y_i - y_min) / (y_max - y_min) for y_i in y_v]
 
-        return xp, yp
+        return yp, xp
 
     @property
     def range(self) -> DomainData:
