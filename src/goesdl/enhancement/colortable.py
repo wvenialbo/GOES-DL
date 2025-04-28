@@ -15,13 +15,11 @@ class ColormapTable(ContinuousColormap):
     colormaps.
     """
 
-    def __init__(self, path: str | Path, name: str = "") -> None:
+    def __init__(self, path: str | Path) -> None:
 
-        color_table, table_name = self._from_file(path)
+        color_table, name = self._from_file(path)
 
         listed_colors = self._make_color_list(color_table)
-
-        name = name or table_name
 
         super().__init__(name, listed_colors)
 
