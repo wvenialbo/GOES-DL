@@ -30,7 +30,7 @@ class eu_utility(clr_utility):
     def _add_color_table_header(
         lines: list[str], name: str, rgb: bool
     ) -> None:
-        lines.append(f"{MCIDAS_EU_SIGNATURE} {name.upper()}")
+        lines.append(f"{MCIDAS_EU_SIGNATURE} {name}")
         i, j, k = (3, 4, 5) if rgb else (5, 4, 3)
         lines.append(
             f" {MCIDAS_EU_KEYWORD[2]}"
@@ -152,7 +152,7 @@ class eu_utility(clr_utility):
             name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        return color_table, name.lower()
+        return color_table, name
 
     @classmethod
     def _process_eu_table(
