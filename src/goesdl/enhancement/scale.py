@@ -64,10 +64,10 @@ class EnhancementScale:
     def _transform_segment_data(self) -> MSegmentData:
         new_segment_data: SegmentData = {}
 
-        for channel_name, channel_data in self.palette.segment_data.items():
-            new_segment = self._transform_color_segment(channel_data)
+        for component, segment in self.palette.segment_data.items():
+            new_segment = self._transform_color_segment(segment)
 
-            new_segment_data[channel_name] = new_segment
+            new_segment_data[component] = new_segment
 
         return cast(MSegmentData, new_segment_data)
 
