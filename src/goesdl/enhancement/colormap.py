@@ -261,8 +261,8 @@ class SegmentedColormap(ColormapBase):
 
     @staticmethod
     def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> SegmentDataRow:
-        x, y_0, y_1 = raw_segment_entry
-        return float(x), float(y_0), float(y_1)
+        x, y_0, y_1 = map(float, raw_segment_entry)
+        return x, y_0, y_1
 
 
 class ContinuousColormap(ColormapBase):
