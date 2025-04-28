@@ -59,14 +59,20 @@ class EnhacementStretching:
     """
 
     name: str
+    offset: float
     table: StretchingTable
 
-    def __init__(self, name: str, table: StretchingTable) -> None:
+    def __init__(
+        self, name: str, table: StretchingTable, offset: float = 0.0
+    ) -> None:
         self.name = name
+        self.offset = offset
         self.table = table
 
     @classmethod
-    def load(cls, path: str | Path) -> "EnhacementStretching":
+    def load(
+        cls, path: str | Path, offset: float = 0.0
+    ) -> "EnhacementStretching":
         """
         Create an EnhacementStretching instance from a file.
 
@@ -85,7 +91,7 @@ class EnhacementStretching:
 
         stretching_table, name = st_utility.parse_table(lines)
 
-        return cls(name, stretching_table)
+        return cls(name, stretching_table, offset)
 
     def save(self, path: str | Path) -> None:
         """
@@ -106,6 +112,6 @@ class EnhacementStretching:
 
     @property
     def domain(self) -> DomainData:
-        vmin = self.table[0][0]
-        vmax = self.table[-1][0]
+        vmin = self.table[0][0] + self.offset
+        vmax = self.table[-1][0] + self.offset
         return vmin, vmax
