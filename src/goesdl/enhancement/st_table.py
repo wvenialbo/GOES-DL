@@ -23,7 +23,7 @@ class st_utility:
     def _add_stretching_table_header(lines: list[str], name: str) -> None:
         lines.extend(
             (
-                f"{ST_SIGNATURE} {name.upper()}",
+                f"{ST_SIGNATURE} {name}",
                 f" {ST_KEYWORD[3]} {ST_KEYWORD[4]}",
                 f"{ST_KEYWORD[2]}  {ST_KEYWORD[5]}",
                 f"{ST_KEYWORD[6]:>8}{ST_KEYWORD[6]:>9}",
@@ -86,7 +86,7 @@ class st_utility:
 
             table.append((x, y))
 
-        return table, name.lower()
+        return table, name
 
     @staticmethod
     def _write_stretching_table_file(file: TextIO, lines: list[str]) -> None:
