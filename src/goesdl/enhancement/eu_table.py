@@ -178,5 +178,4 @@ class eu_utility(clr_utility):
 
     @staticmethod
     def _write_color_table_file(file: TextIO, lines: list[str]) -> None:
-        for line in lines:
-            file.write(f"{line:<85}\n")
+        file.write("".join(f"{line:<85}\n" for line in lines))
