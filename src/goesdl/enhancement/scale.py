@@ -3,7 +3,6 @@ from typing import cast
 from matplotlib.colors import Colormap, LinearSegmentedColormap, Normalize
 from numpy import interp
 
-from .constants import CBTICKS_N, CBTICKS_STEP
 from .palette import EnhacementPalette
 from .shared import (
     ColorSegments,
@@ -22,6 +21,7 @@ class EnhancementScale:
     barticks: ColorbarTicks
     palette: EnhacementPalette
     stretching: EnhacementStretching
+    offset: float
 
     def __init__(
         self,
@@ -30,19 +30,16 @@ class EnhancementScale:
         cbarticks: ColorbarTicks | None = None,
     ) -> None:
         self.palette = palette
+
         self.stretching = stretching or EnhacementStretching(
             st_default, st_stock[st_default]
         )
 
-        self.barticks = cbarticks or ColorbarTicks(
-            self.stretching.domain, CBTICKS_N, tickstep=CBTICKS_STEP
-        )
+        self.barticks = cbarticks or ColorbarTicks(self.stretching.domain)
 
-    def set_offset(self, offset: float) -> None:
-        self.stretching.offset = offset
-        self.set_ticks(self.barticks.nticks, self.barticks.tickstep)
-
-    def set_ticks(self, nticks: int = CBTICKS_N, tickstep: int = 0) -> None:
+    def set_ticks(
+        self, nticks: int | None = None, tickstep: int | None = None
+    ) -> None:
         self.barticks = ColorbarTicks(self.stretching.domain, nticks, tickstep)
 
     def _transform_color_segment(
@@ -77,14 +74,13 @@ class EnhancementScale:
     @property
     def cmap(self) -> Colormap:
         transformed_segment_data = self._transform_segment_data()
-
         return LinearSegmentedColormap(
             self.name, transformed_segment_data, N=self.palette.ncolors
         )
 
     @property
     def cnorm(self) -> Normalize:
-        vmin, vmax = self.stretching.extent
+        vmin, vmax = self.stretching.domain
         return Normalize(vmin=vmin, vmax=vmax, clip=False)
 
     @property
@@ -94,10 +90,6 @@ class EnhancementScale:
     @property
     def domain(self) -> DomainData:
         return self.stretching.domain
-
-    @property
-    def extent(self) -> DomainData:
-        return self.stretching.extent
 
     @property
     def name(self) -> str:
