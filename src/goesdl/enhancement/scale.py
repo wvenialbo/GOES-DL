@@ -36,6 +36,18 @@ class EnhancementScale:
     def set_ticks(self, nticks: int = 16, step: int = 0) -> None:
         self.barticks = ColorbarTicks(self.stretching.domain, nticks, step)
 
+    def _transform_color_segment(
+        self, segment: ColorSegments
+    ) -> ColorSegments:
+        new_segment: ColorSegments = []
+
+        for x0, y0, y1 in segment:
+            x1 = self._transform_keypoint(x0)
+
+            new_segment.append((x1, y0, y1))
+
+        return new_segment
+
     def _transform_keypoint(self, x: float) -> float:
         y_v, x_v = zip(*self.stretching.table)
 
@@ -53,12 +65,7 @@ class EnhancementScale:
         transformed_segment_data: SegmentData = {}
 
         for channel_name, channel_data in self.palette.segment_data.items():
-            new_channel_data: ColorSegments = []
-
-            for x0, y0, y1 in channel_data:
-                x1 = self._transform_keypoint(x0)
-
-                new_channel_data.append((x1, y0, y1))
+            new_channel_data = self._transform_color_segment(channel_data)
 
             transformed_segment_data[channel_name] = new_channel_data
 
