@@ -11,8 +11,8 @@ class ColorbarTicks:
     def __init__(
         self,
         extent: DomainData,
-        nticks: int = CBTICKS_NMAX,
-        tickstep: int = CBTICKS_STEP,
+        nticks: int | None = None,
+        tickstep: int | None = None,
     ) -> None:
         """
         Create a list of colorbar ticks for the given temperature range.
@@ -25,18 +25,34 @@ class ColorbarTicks:
         extent: DomainData
             Tuple with minimum and maximum temperature.
         nticks : int
-            Maximum number of ticks.
+            Maximum number of ticks, used to estimate the tick step
+            if not provided.
         tickstep : int, optional
-            Tick step, by default 0 (automatic).
+            Tick step, by default None (automatic).
 
         Returns
         -------
         list[float]
             List of colorbar ticks.
         """
+        if not nticks:
+            nticks = CBTICKS_NMAX
+        elif tickstep:
+            raise ValueError(
+                f"'nticks={nticks}' is not compatible with 'tickstep'"
+            )
+
+        if tickstep is None:
+            tickstep = CBTICKS_STEP
+        elif 0 < tickstep < CBTICKS_SMIN:
+            raise ValueError(
+                f"'tickstep' must have a minimum value of {CBTICKS_SMIN}; "
+                "use 'tickstep=0' for automatic scpacing"
+            )
+
         tmin, tmax = extent
 
-        if tickstep < CBTICKS_SMIN:
+        if tickstep == 0:
             tickstep = self._find_tick_step(
                 tmin, tmax, max_ticks=nticks, min_step=CBTICKS_SMIN
             )
