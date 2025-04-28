@@ -66,7 +66,7 @@ class EnhacementStretching:
         self.table = table
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "EnhacementStretching":
+    def load(cls, path: str | Path) -> "EnhacementStretching":
         """
         Create an EnhacementStretching instance from a file.
 
@@ -87,7 +87,7 @@ class EnhacementStretching:
 
         return cls(name, stretching_table)
 
-    def save(self, path: str | Path, name: str = "") -> None:
+    def save(self, path: str | Path) -> None:
         """
         Save the enhancement stretching table to a file.
 
@@ -100,9 +100,6 @@ class EnhacementStretching:
             The name of the enhancement stretching table. Override the
             actual name if provided.
         """
-        if name:
-            table_name = name
-        else:
-            table_name = "" if self.name == UNNAMED_TABLE else self.name
+        name = "" if self.name == UNNAMED_TABLE else self.name
 
-        st_utility.create_file(path, table_name, self.table)
+        st_utility.create_file(path, name, self.table)
