@@ -374,8 +374,8 @@ class DiscreteColormap(ColormapBase):
 
     @staticmethod
     def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
-        red, green, blue = raw_segment_entry
-        return float(red), float(green), float(blue)
+        red, green, blue = map(float, raw_segment_entry)
+        return red, green, blue
 
 
 class _NamedColormapBased:
