@@ -26,6 +26,6 @@ st_tables = [
     for keypoint in st_range
 ]
 
-st_stok = dict(zip(st_names, st_tables))
+st_stock = dict(zip(st_names, st_tables))
 
-st_default = st_stok[st_names[st_default_i]]
+st_default = st_names[st_default_i]
