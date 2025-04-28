@@ -11,7 +11,7 @@ EnhacementStretching
 from pathlib import Path
 
 from .constants import UNNAMED_TABLE
-from .shared import DomainData, StretchingTable
+from .shared import DomainData, KeypointList, StretchingTable
 from .st_table import st_utility
 
 ST_SIGNATURE = "ST TABLE"
@@ -115,6 +115,18 @@ class EnhacementStretching:
         vmin = self.table[0][0] + self.offset
         vmax = self.table[-1][0] + self.offset
         return vmin, vmax
+
+    @property
+    def keypoints(self) -> tuple[KeypointList, KeypointList]:
+        y_v, x_v = zip(*self.table)
+
+        x_min, x_max = self.range
+        xp = [(x_i - x_min) / (x_max - x_min) for x_i in x_v]
+
+        y_min, y_max = self.extent
+        yp = [(y_i - y_min) / (y_max - y_min) for y_i in y_v]
+
+        return xp, yp
 
     @property
     def range(self) -> DomainData:
