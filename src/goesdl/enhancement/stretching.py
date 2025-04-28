@@ -59,20 +59,14 @@ class EnhacementStretching:
     """
 
     name: str
-    offset: float
     table: StretchingTable
 
-    def __init__(
-        self, name: str, table: StretchingTable, offset: float = 0.0
-    ) -> None:
+    def __init__(self, name: str, table: StretchingTable) -> None:
         self.name = name
-        self.offset = offset
         self.table = table
 
     @classmethod
-    def load(
-        cls, path: str | Path, offset: float = 0.0
-    ) -> "EnhacementStretching":
+    def load(cls, path: str | Path) -> "EnhacementStretching":
         """
         Create an EnhacementStretching instance from a file.
 
@@ -91,7 +85,7 @@ class EnhacementStretching:
 
         stretching_table, name = st_utility.parse_table(lines)
 
-        return cls(name, stretching_table, offset)
+        return cls(name, stretching_table)
 
     def save(self, path: str | Path) -> None:
         """
@@ -112,8 +106,8 @@ class EnhacementStretching:
 
     @property
     def domain(self) -> DomainData:
-        vmin = self.table[0][0] + self.offset
-        vmax = self.table[-1][0] + self.offset
+        vmin = self.table[0][0]
+        vmax = self.table[-1][0]
         return vmin, vmax
 
     @property
@@ -123,7 +117,7 @@ class EnhacementStretching:
         x_min, x_max = self.range
         xp = [(x_i - x_min) / (x_max - x_min) for x_i in x_v]
 
-        y_min, y_max = self.extent
+        y_min, y_max = self.domain
         yp = [(y_i - y_min) / (y_max - y_min) for y_i in y_v]
 
         return yp, xp
@@ -132,10 +126,4 @@ class EnhacementStretching:
     def range(self) -> DomainData:
         vmin = self.table[0][1]
         vmax = self.table[-1][1]
-        return vmin, vmax
-
-    @property
-    def extent(self) -> DomainData:
-        vmin = self.table[0][0]
-        vmax = self.table[-1][0]
         return vmin, vmax
