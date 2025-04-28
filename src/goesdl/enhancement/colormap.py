@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from copy import deepcopy
 from math import nan
-from typing import Protocol, cast
+from typing import cast
 
 from matplotlib import colormaps
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
@@ -22,24 +22,6 @@ from .shared import (
     SegmentData,
     SegmentDataRow,
 )
-
-
-class ColormapProtocol(Protocol):
-
-    @property
-    def keypoints(self) -> KeypointList: ...
-
-    @property
-    def segment_data(self) -> SegmentData: ...
-
-    @property
-    def full_segment_data(self) -> SegmentData: ...
-
-    @property
-    def name(self) -> str: ...
-
-    @name.setter
-    def name(self, colormap_name: str) -> None: ...
 
 
 class ColormapBase:
