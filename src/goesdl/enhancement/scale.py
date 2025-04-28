@@ -56,13 +56,7 @@ class EnhancementScale:
         return cast(float, y_scaled)
 
     def _transform_segment_data(self) -> MSegmentData:
-        y_v, x_v = zip(*self.stretching.table)
-
-        x_min, x_max = self.stretching.range
-        xp = [(x_i - x_min) / (x_max - x_min) for x_i in x_v]
-
-        y_min, y_max = self.stretching.extent
-        yp = [(y_i - y_min) / (y_max - y_min) for y_i in y_v]
+        yp, xp = self.stretching.keypoints
 
         new_segment_data: SegmentData = {
             component: self._transform_color_segment(segment, xp, yp)
