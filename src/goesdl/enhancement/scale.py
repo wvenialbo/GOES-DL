@@ -1,4 +1,5 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from pathlib import Path
 from typing import Any, cast
 
 from matplotlib.colors import Colormap, LinearSegmentedColormap, Normalize
@@ -7,7 +8,12 @@ from numpy import interp
 from .palette import EnhacementPalette
 from .shared import (
     ColorSegments,
+    ContinuousColorList,
+    ContinuousColorTable,
+    DiscreteColorList,
     DomainData,
+    GKeypointList,
+    GSegmentData,
     KeypointList,
     MSegmentData,
     SegmentData,
@@ -36,6 +42,106 @@ class EnhancementScale:
         )
 
         self.barticks = cbarticks or ColorbarTicks(self.stretching.domain)
+
+    @classmethod
+    def combined_from_stock(
+        cls,
+        colormap_names: str | Sequence[str],
+        keypoints: GKeypointList,
+        name: str = "",
+    ) -> "EnhancementScale":
+        cpal = EnhacementPalette.combined_from_stock(
+            colormap_names, keypoints, name
+        )
+        return cls(cpal)
+
+    @classmethod
+    def continuous(
+        cls,
+        name: str,
+        listed_colors: ContinuousColorList | ContinuousColorTable,
+        ncolors: int = 256,
+    ) -> "EnhancementScale":
+        cpal = EnhacementPalette.continuous(name, listed_colors, ncolors)
+        return cls(cpal)
+
+    @classmethod
+    def discrete(
+        cls,
+        name: str,
+        listed_colors: DiscreteColorList,
+        ncolors: int | None = None,
+    ) -> "EnhancementScale":
+        cpal = EnhacementPalette.discrete(name, listed_colors, ncolors)
+        return cls(cpal)
+
+    @classmethod
+    def from_stock(cls, name: str, ncolors: int = 256) -> "EnhancementScale":
+        cpal = EnhacementPalette.from_stock(name, ncolors)
+        return cls(cpal)
+
+    @classmethod
+    def load(cls, path: str | Path, ncolors: int = 256) -> "EnhancementScale":
+        """
+        Load a McIDAS or GMT enhancement color table specification.
+
+        Parse a McIDAS enhancement utility table (EU TABLE) or GMT color
+        palette table (CPT TABLE) text file and create color dictionary
+        for a Matplotlib colormap.
+
+        Parameters
+        ----------
+        path : str or Path
+            Path to the color table specification text file.
+
+        Returns
+        -------
+        EnhacementPalette
+            A EnhacementPalette object.
+
+        Notes
+        -----
+        The Man computer Interactive Data Access System (McIDAS) is a
+        research quality suite of applications used for decoding,
+        analyzing, and displaying meteorological data developed by the
+        University of Wisconsin-Madison Space Science and Engineering
+        Center (UWisc/SSEC).
+
+        - https://www.ssec.wisc.edu/mcidas/
+        - https://www.unidata.ucar.edu/software/mcidas/
+
+        The Generic Mapping Tools (GMT) is an open-source collection of
+        tools for manipulating geographic and Cartesian data sets and
+        producing PostScript illustrations ranging from simple x-y plots
+        through maps to complex 3D perspective views.
+
+        - https://www.generic-mapping-tools.org/
+        """
+        cpal = EnhacementPalette.load(path, ncolors)
+        return cls(cpal)
+
+    @classmethod
+    def segmented(
+        cls, name: str, segment_data: GSegmentData, ncolors: int = 256
+    ) -> "EnhancementScale":
+        cpal = EnhacementPalette.segmented(name, segment_data, ncolors)
+        return cls(cpal)
+
+    def save(self, path: str | Path, rgb: bool = False) -> None:
+        """
+        Save the color table.
+
+        Save the color table to a McIDAS enhancement utility table (EU
+        TABLE) text file.
+
+        Parameters
+        ----------
+        path : str or Path
+            Path to the file where the color table will be saved.
+        rgb : bool, optional
+            Flag indicating if the color model is RGB, by default False.
+        """
+        self.palette.save(path, rgb)
 
     def get_ticklabels(
         self, offset: float = 0.0, format: Callable[[float], Any] | None = None
