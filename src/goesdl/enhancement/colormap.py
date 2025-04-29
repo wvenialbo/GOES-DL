@@ -297,11 +297,16 @@ class ContinuousColormap(ColormapBase):
 class DiscreteColormap(ColormapBase):
 
     def __init__(
-        self, name: str, raw_listed_colors: GListedColors, ncolors: int = 256
+        self,
+        name: str,
+        raw_listed_colors: GListedColors,
+        ncolors: int | None = None,
     ) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
         segment_data = self._create_segment_data(listed_colors)
+
+        ncolors = ncolors or len(listed_colors)
 
         super().__init__(name, segment_data, [], ncolors, True)
 
