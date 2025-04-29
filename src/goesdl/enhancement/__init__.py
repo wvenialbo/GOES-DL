@@ -9,7 +9,7 @@ from .catalogue import cmap, get_scale
 from .palette import EnhacementPalette
 from .preview import preview_colormap
 from .scale import EnhancementScale
-from .stretching import EnhacementStretching
+from .stretching import EnhacementStretching, get_stmap
 from .ticks import ColorbarTicks
 
 __all__ = [
@@ -20,4 +20,5 @@ __all__ = [
     "preview_colormap",
     "cmap",
     "get_scale",
+    "get_stmap",
 ]

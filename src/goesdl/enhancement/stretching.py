@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .constants import UNNAMED_TABLE
 from .shared import DomainData, KeypointList, StretchingTable
+from .st_stock import st_names, st_stock
 from .st_table import st_utility
 
 ST_SIGNATURE = "ST TABLE"
@@ -127,3 +128,16 @@ class EnhacementStretching:
         vmin = self.table[0][1]
         vmax = self.table[-1][1]
         return vmin, vmax
+
+
+def get_stmap(stretching_name: str) -> EnhacementStretching:
+    if stretching_name not in st_names:
+        supported_smaps = "'".join(st_names)
+        raise ValueError(
+            f"'{stretching_name}' is not a valid stretching table name, "
+            f"supported values are: '{supported_smaps}'"
+        )
+
+    stretching_table = st_stock[stretching_name]
+
+    return EnhacementStretching(stretching_name, stretching_table)
