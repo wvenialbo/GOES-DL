@@ -143,6 +143,12 @@ class EnhancementScale:
         """
         self.palette.save(path, rgb)
 
+    def update_palette(self, palette: EnhacementPalette) -> None:
+        self.palette = palette
+
+    def update_stretching(self, stretching: EnhacementStretching) -> None:
+        self.stretching = stretching
+
     def get_ticklabels(
         self, offset: float = 0.0, format: Callable[[float], Any] | None = None
     ) -> list[Any]:
