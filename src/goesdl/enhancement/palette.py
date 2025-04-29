@@ -60,7 +60,7 @@ class EnhacementPalette(ColormapBase):
         colormap_names: str | Sequence[str],
         keypoints: GKeypointList,
         name: str = "",
-    ) -> ColormapBase:
+    ) -> "EnhacementPalette":
         return cls(CombinedColormap(name, colormap_names, keypoints))
 
     @classmethod
@@ -69,21 +69,21 @@ class EnhacementPalette(ColormapBase):
         name: str,
         listed_colors: ContinuousColorList | ContinuousColorTable,
         ncolors: int = 256,
-    ) -> ColormapBase:
+    ) -> "EnhacementPalette":
         return cls(ContinuousColormap(name, listed_colors, ncolors))
 
     @classmethod
     def discrete(
         cls, name: str, listed_colors: DiscreteColorList, ncolors: int = 256
-    ) -> ColormapBase:
+    ) -> "EnhacementPalette":
         return cls(DiscreteColormap(name, listed_colors, ncolors))
 
     @classmethod
-    def from_stock(cls, name: str, ncolors: int = 256) -> ColormapBase:
+    def from_stock(cls, name: str, ncolors: int = 256) -> "EnhacementPalette":
         return cls(NamedColormap(name, ncolors))
 
     @classmethod
-    def load(cls, path: str | Path, ncolors: int = 256) -> ColormapBase:
+    def load(cls, path: str | Path, ncolors: int = 256) -> "EnhacementPalette":
         """
         Load a McIDAS or GMT enhancement color table specification.
 
@@ -124,7 +124,7 @@ class EnhacementPalette(ColormapBase):
     @classmethod
     def segmented(
         cls, name: str, segment_data: GSegmentData, ncolors: int = 256
-    ) -> ColormapBase:
+    ) -> "EnhacementPalette":
         return cls(SegmentedColormap(name, segment_data, ncolors))
 
     def save(self, path: str | Path, rgb: bool = False) -> None:
