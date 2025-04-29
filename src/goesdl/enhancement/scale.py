@@ -17,6 +17,7 @@ from .shared import (
     KeypointList,
     MSegmentData,
     SegmentData,
+    StretchingTable,
 )
 from .st_stock import st_default, st_stock
 from .stretching import EnhacementStretching
@@ -64,6 +65,9 @@ class EnhancementScale:
     ) -> "EnhancementScale":
         cpal = EnhacementPalette.continuous(name, listed_colors, ncolors)
         return cls(cpal)
+
+    def create_stretching(self, name: str, table: StretchingTable) -> None:
+        self.stretching = EnhacementStretching(name, table)
 
     @classmethod
     def discrete(
@@ -120,6 +124,22 @@ class EnhancementScale:
         cpal = EnhacementPalette.load(path, ncolors)
         return cls(cpal)
 
+    def load_stretching(self, path: str | Path) -> None:
+        """
+        Create an EnhacementStretching instance from a file.
+
+        Parameters
+        ----------
+        path : str or Path
+            Path to the file containing the enhancement stretching data.
+
+        Returns
+        -------
+        EnhacementStretching
+            An instance of the EnhacementStretching class.
+        """
+        self.stretching = EnhacementStretching.load(path)
+
     @classmethod
     def segmented(
         cls, name: str, segment_data: GSegmentData, ncolors: int = 256
@@ -142,6 +162,21 @@ class EnhancementScale:
             Flag indicating if the color model is RGB, by default False.
         """
         self.palette.save(path, rgb)
+
+    def save_stretching(self, path: str | Path) -> None:
+        """
+        Save the enhancement stretching table to a file.
+
+        Parameters
+        ----------
+        path : str or Path
+            Path to the file where the enhancement stretching table will
+            be saved.
+        name : str
+            The name of the enhancement stretching table. Override the
+            actual name if provided.
+        """
+        self.stretching.save(path)
 
     def update_palette(self, palette: EnhacementPalette) -> None:
         self.palette = palette
