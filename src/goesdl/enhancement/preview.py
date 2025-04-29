@@ -5,8 +5,6 @@ import numpy as np
 
 from .scale import EnhancementScale
 
-DEFAULT_PREVIEW_HEIGHT = 300
-
 
 class ColormapPlotLayout:
 
@@ -85,15 +83,12 @@ def preview_colormap(
     scale: EnhancementScale,
     measurement: str = "",
     offset: float = 0.0,
-    height: int = DEFAULT_PREVIEW_HEIGHT,
     save_path: str | Path = "",
 ) -> None:
     # Layout definition in pixel size units
-    width, height = 486, height
+    width, height = 486, 300
     layout = ColormapPlotLayout((width, height), dpi=100)
-    layout.from_margin(
-        (32, 12, 134, 24), (222 + height - DEFAULT_PREVIEW_HEIGHT, 12, 53, 24)
-    )
+    layout.from_margin((32, 12, 134, 24), (222, 12, 53, 24))
 
     # Scale factor for all measures in points
     pt_scale = 100 / layout.dpi
