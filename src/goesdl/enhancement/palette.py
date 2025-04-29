@@ -74,9 +74,12 @@ class EnhacementPalette(ColormapBase):
 
     @classmethod
     def discrete(
-        cls, name: str, listed_colors: DiscreteColorList
+        cls,
+        name: str,
+        listed_colors: DiscreteColorList,
+        ncolors: int | None = None,
     ) -> "EnhacementPalette":
-        return cls(DiscreteColormap(name, listed_colors))
+        return cls(DiscreteColormap(name, listed_colors, ncolors))
 
     @classmethod
     def from_stock(cls, name: str, ncolors: int = 256) -> "EnhacementPalette":
