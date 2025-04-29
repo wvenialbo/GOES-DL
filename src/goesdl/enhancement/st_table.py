@@ -24,7 +24,7 @@ class st_utility:
         lines.extend(
             (
                 f"{ST_SIGNATURE} {name}",
-                f" {ST_KEYWORD[3]} {ST_KEYWORD[4]}",
+                f"{ST_KEYWORD[3]} {ST_KEYWORD[4]}",
                 f"{ST_KEYWORD[2]}  {ST_KEYWORD[5]}",
                 f"{ST_KEYWORD[6]:>8}{ST_KEYWORD[6]:>9}",
             )
