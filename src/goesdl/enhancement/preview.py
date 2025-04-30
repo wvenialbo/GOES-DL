@@ -33,7 +33,7 @@ class ColormapPreviewLayout:
     cbar_box: tuple[float, float, float, float]
 
     def __init__(self, figsize: tuple[int, int], dpi: int = 100) -> None:
-        # figsize: figure size in pixel side units on input
+        # figsize: figure size (width, height) in dot (pixels) units
         # dpi: dots per inch
 
         # figure size in inches (dpi: dots per inch)
@@ -110,8 +110,7 @@ def preview_colormap(
     offset: float = 0.0,
 ) -> None:
     # Layout definition in pixel size units
-    width, height = 486, 300
-    layout = ColormapPreviewLayout((width, height), dpi=100)
+    layout = ColormapPreviewLayout(figsize=(486, 300), dpi=100)
 
     # Scale factor for all measures in points
     pt_scale = 100 / layout.dpi
