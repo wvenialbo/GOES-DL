@@ -6,6 +6,8 @@ from matplotlib import pyplot as plt
 from .scale import EnhancementScale
 from .shared import ColorValueList, DiscreteColorList
 
+REF_DPI = 100
+
 LUMA_COEFFICIENTS = {
     "rec240": (0.212, 0.701, 0.087),  # Adobe
     "rec601": (0.299, 0.587, 0.114),  # Standard for SDTV (NTSC, PAL)
@@ -113,7 +115,7 @@ def preview_colormap(
     layout = ColormapPreviewLayout(figsize=(486, 300), dpi=100)
 
     # Scale factor for all measures in points
-    pt_scale = 100 / layout.dpi
+    pt_scale = REF_DPI / layout.dpi
 
     # Example data
     vmin, vmax = scale.domain
