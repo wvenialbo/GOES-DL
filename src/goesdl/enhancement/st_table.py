@@ -14,6 +14,7 @@ ST_KEYWORD = (
     "-------",
     "---",
 )
+
 ST_SIGNATURE = f"{ST_KEYWORD[0]} {ST_KEYWORD[1]}"
 
 
