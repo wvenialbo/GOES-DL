@@ -46,28 +46,6 @@ class ColormapPreviewLayout:
 
         self.from_margin((32, 12, 134, 24), (222, 12, 53, 24))
 
-    def from_box(
-        self,
-        abox: tuple[int, int, int, int],
-        cbox: tuple[int, int, int, int],
-    ) -> None:
-        # plot and colour bar boxes position and dimensions in inches
-        aleft, abottom, awidth, aheight = (size / self.dpi for size in abox)
-        cleft, cbottom, cwidth, cheight = (size / self.dpi for size in cbox)
-
-        # figure size in inches
-        width, height = self.figsize
-
-        # plot box position and dimensions in relative units
-        abottom, aheight = (size / height for size in (abottom, aheight))
-        aleft, awidth = (size / width for size in (aleft, awidth))
-        self.axes_box = aleft, abottom, awidth, aheight
-
-        # colour bar box position and dimensions in relative units
-        cbottom, cheight = (size / height for size in (cbottom, cheight))
-        cleft, cwidth = (size / width for size in (cleft, cwidth))
-        self.cbar_box = cleft, cbottom, cwidth, cheight
-
     def from_margin(
         self,
         amargins: tuple[int, int, int, int],
