@@ -61,7 +61,7 @@ class st_utility:
     def _create_stretching_table(
         lines: list[str], table: StretchingTable
     ) -> None:
-        lines.extend(f"{x:>8}{y:>9}" for x, y in table)
+        lines.extend(f"{x:>10.2f}{y:>7d}" for x, y in table)
 
     @classmethod
     def parse_table(cls, lines: list[str]) -> tuple[StretchingTable, str]:
