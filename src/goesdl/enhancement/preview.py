@@ -29,10 +29,36 @@ LUMA_ALGORITHMS = {
 
 class ColormapPreviewLayout:
 
-    dpi: int
+    dpi: int = REF_DPI
+    pt_scale: float = 1.0
+
     figsize: tuple[float, float]
+
     axes_box: tuple[float, float, float, float]
     cbar_box: tuple[float, float, float, float]
+
+    title_fontsize: float = 12.0
+    title_labelpad: float = 6.0
+
+    plot_outline_linewidt: float = 0.6
+
+    axis_label_fontsize: float = 10.0
+    axis_label_labelpad: float = 3.0
+
+    axis_tick_width: float = 0.6
+    axis_tick_length: float = 3.5
+    axis_tick_fontsize: float = 10.0
+    axis_tick_labelpad: float = 4.5
+
+    cbar_outline_linewidth: float = 0.6
+
+    cbar_label_fontsize: float = 10.0
+    cbar_label_labelpad: float = 4.0
+
+    cbar_tick_width: float = 0.6
+    cbar_tick_length: float = 3.5
+    cbar_tick_fontsize: float = 10.0
+    cbar_tick_labelpad: float = 4.0
 
     def __init__(self, figsize: tuple[int, int], dpi: int) -> None:
         # figsize: figure size (width, height) in dot (pixels) units
@@ -43,8 +69,11 @@ class ColormapPreviewLayout:
 
         self.dpi = dpi
         self.figsize = width, height
+        self.pt_scale = REF_DPI / dpi
 
         self._init_boxes((32, 12, 134, 24), (222, 12, 53, 24))
+
+        self._init_sizes()
 
     def _init_boxes(
         self,
@@ -82,6 +111,34 @@ class ColormapPreviewLayout:
 
         self.cbar_box = cbox_px, cbox_py, cbox_cx, cbox_cy
 
+    def _init_sizes(self) -> None:
+        # Scale factor for all measures in points
+        pt_scale = self.pt_scale
+        self.pt_scale = pt_scale
+
+        self.title_fontsize = 12.0 * pt_scale
+        self.title_labelpad = 6 * pt_scale
+
+        self.axis_outline_linewidth = 0.6 * pt_scale
+
+        self.axis_label_fontsize = 10.0 * pt_scale
+        self.axis_label_labelpad = 3.0 * pt_scale
+
+        self.axis_tick_width = 0.6 * pt_scale
+        self.axis_tick_length = 3.5 * pt_scale
+        self.axis_tick_fontsize = 10.0 * pt_scale
+        self.axis_tick_labelpad = 4.5 * pt_scale
+
+        self.cbar_outline_linewidth = 0.6 * pt_scale
+
+        self.cbar_label_fontsize = 10.0 * pt_scale
+        self.cbar_label_labelpad = 4.0 * pt_scale
+
+        self.cbar_tick_width = 0.6 * pt_scale
+        self.cbar_tick_length = 3.5 * pt_scale
+        self.cbar_tick_fontsize = 10.0 * pt_scale
+        self.cbar_tick_labelpad = 4.0 * pt_scale
+
 
 def preview_colormap(
     scale: EnhancementScale,
@@ -91,9 +148,6 @@ def preview_colormap(
 ) -> None:
     # Layout definition in pixel size units
     layout = ColormapPreviewLayout(figsize=(486, 300), dpi=100)
-
-    # Scale factor for all measures in points
-    pt_scale = REF_DPI / layout.dpi
 
     # Example data
     vmin, vmax = scale.domain
@@ -110,34 +164,34 @@ def preview_colormap(
     # Set the plot title
     ax.set_title(
         f"Enhancement scale: {scale.name}",
-        fontsize=12 * pt_scale,
-        pad=6 * pt_scale,
+        fontsize=layout.title_fontsize,
+        pad=layout.title_labelpad,
     )
 
     # Set the plot box ouline format
     for spine in ["top", "bottom", "left", "right"]:
-        ax.spines[spine].set_linewidth(0.6 * pt_scale)
-
-    # Setup the x-axis ticks
-    ax.tick_params(
-        axis="x",
-        labelsize=10 * pt_scale,
-        width=0.6 * pt_scale,
-        length=3.5 * pt_scale,
-        pad=4.5 * pt_scale,
-    )
-
-    # Hide the y-axis ticks since it does not make sense
-    ax.tick_params(
-        axis="y", which="both", left=False, right=False, labelleft=False
-    )
+        ax.spines[spine].set_linewidth(layout.axis_outline_linewidth)
 
     # Set the x-axis label
     ax.set_xlabel(
         "Color Index",
         color="black",
-        labelpad=3 * pt_scale,
-        fontsize=10 * pt_scale,
+        fontsize=layout.axis_label_fontsize,
+        labelpad=layout.axis_label_labelpad,
+    )
+
+    # Setup the x-axis ticks
+    ax.tick_params(
+        axis="x",
+        width=layout.axis_tick_width,
+        length=layout.axis_tick_length,
+        labelsize=layout.axis_tick_fontsize,
+        pad=layout.axis_tick_labelpad,
+    )
+
+    # Hide the y-axis ticks since it does not make sense
+    ax.tick_params(
+        axis="y", which="both", left=False, right=False, labelleft=False
     )
 
     # Create the colour bar box
@@ -147,15 +201,15 @@ def preview_colormap(
     cbar = fig.colorbar(im, orientation="horizontal", cax=cax)
 
     # Set the colour bar box ouline format
-    cbar.outline.set_linewidth(0.6 * pt_scale)  # type: ignore
+    cbar.outline.set_linewidth(layout.cbar_outline_linewidth)  # type: ignore
 
     # Set the colorbar caption
     cbar.set_label(
         label=measurement or "Measurement",
         color="black",
         weight="normal",
-        fontsize=10 * pt_scale,
-        labelpad=4 * pt_scale,
+        fontsize=layout.cbar_label_fontsize,
+        labelpad=layout.cbar_label_labelpad,
     )
 
     # Create and setup the colour bar ticks
@@ -163,10 +217,10 @@ def preview_colormap(
 
     cax.tick_params(
         axis="x",
-        labelsize=10 * pt_scale,
-        width=0.6 * pt_scale,
-        length=3.5 * pt_scale,
-        pad=4 * pt_scale,
+        width=layout.cbar_tick_width,
+        length=layout.cbar_tick_length,
+        labelsize=layout.cbar_tick_fontsize,
+        pad=layout.cbar_tick_labelpad,
     )
 
     cbar.ax.minorticks_off()
