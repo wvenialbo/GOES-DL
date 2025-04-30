@@ -114,7 +114,6 @@ class ColormapPreviewLayout:
     def _init_sizes(self) -> None:
         # Scale factor for all measures in points
         pt_scale = self.pt_scale
-        self.pt_scale = pt_scale
 
         self.title_fontsize = 12.0 * pt_scale
         self.title_labelpad = 6 * pt_scale
