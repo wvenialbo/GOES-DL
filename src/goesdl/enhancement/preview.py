@@ -44,9 +44,9 @@ class ColormapPreviewLayout:
         self.dpi = dpi
         self.figsize = width, height
 
-        self.from_margin((32, 12, 134, 24), (222, 12, 53, 24))
+        self._init_boxes((32, 12, 134, 24), (222, 12, 53, 24))
 
-    def from_margin(
+    def _init_boxes(
         self,
         amargins: tuple[int, int, int, int],
         cmargins: tuple[int, int, int, int],
