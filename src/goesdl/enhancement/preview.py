@@ -40,7 +40,7 @@ class ColormapPreviewLayout:
     title_fontsize: float = 12.0
     title_labelpad: float = 6.0
 
-    plot_outline_linewidt: float = 0.6
+    axis_outline_linewidt: float = 0.6
 
     axis_label_fontsize: float = 10.0
     axis_label_labelpad: float = 3.0
