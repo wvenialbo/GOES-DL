@@ -1,9 +1,28 @@
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
 
 from .scale import EnhancementScale
+from .shared import ColorValueList, DiscreteColorList
+
+LUMA_COEFFICIENTS = {
+    "rec240": (0.212, 0.701, 0.087),  # Adobe
+    "rec601": (0.299, 0.587, 0.114),  # Standard for SDTV (NTSC, PAL)
+    "rec709": (0.2126, 0.7152, 0.0722),  # Recommended for sRGB/HDTV
+    "rec2020": (0.2627, 0.6780, 0.0593),  # Standard for UHDTV/HDR
+    "average": (1 / 3, 1 / 3, 1 / 3),
+    # You can add other models here if needed
+}
+
+LUMA_ALGORITHMS = {
+    "rec240": "Rec. 240",  # Adobe
+    "rec601": "Rec. 601",  # Standard for SDTV (NTSC, PAL)
+    "rec709": "Rec. 709",  # Recommended for sRGB/HDTV
+    "rec2020": "Rec. 2020",  # Standard for UHDTV/HDR
+    "average": "average",
+    # You can add other models here if needed
+}
 
 
 class ColormapPlotLayout:
@@ -174,9 +193,184 @@ def preview_colormap(
 
     cbar.set_ticklabels(ticklabels)
 
-    # Savet the plot if required
+    # Save the plot if required
     if save_path:
         plt.savefig(save_path, dpi=layout.dpi, bbox_inches=None)
+
+    # Adjust layout to prevent overlaps
+    plt.tight_layout()
+
+    # Display the plot
+    plt.show()
+
+
+def create_colors_lut(
+    scale: EnhancementScale, ncolors: int
+) -> DiscreteColorList:
+    colors_lut: DiscreteColorList = []
+    colors_map = scale.cmap
+
+    for i in range(ncolors):
+        rgb_value = colors_map(i / ncolors)[:3]
+        colors_lut.append(rgb_value)
+
+    return colors_lut
+
+
+def rgb_to_brightness(
+    colors_lut: DiscreteColorList, brightness_max: int, algorithm: str
+) -> ColorValueList:
+    """
+    Convert RGB components to grayscale value.
+
+    Calculates the perceived brightness (Luminance/Luma) of an RGB color
+    using the Rec. 601/709/2020 formulae.
+
+    Parameters
+    ----------
+    colors_lut : DiscreteColorList
+        Colour look-up table
+    algorithm : str
+        Name of the conversion algorithm
+
+    Returns
+    -------
+    float
+        The perceived brightness (Luminance/Luma) value in the range [0,
+        1].
+    """
+    try:
+        r_weight, g_weight, b_weight = LUMA_COEFFICIENTS[algorithm]
+    except KeyError as error:
+        valid_algorithms = ", ".join(LUMA_COEFFICIENTS.keys())
+        raise ValueError(
+            f"Invalid conversion algorithm '{algorithm}'. "
+            f"Supported algorithms: {valid_algorithms}"
+        ) from error
+
+    brightness: ColorValueList = []
+
+    def rgb_to_grayscale(r: float, g: float, b: float) -> float:
+        return r_weight * r + g_weight * g + b_weight * b
+
+    for rgb_value in colors_lut:
+        gray_value = rgb_to_grayscale(*rgb_value)
+        brightness.append(gray_value * brightness_max)
+
+    return brightness
+
+
+def plot_brightness_profile(
+    scale: EnhancementScale,
+    ncolors: int = 256,
+    algorithm: str = "rec709",
+    save_path: str | Path = "",
+) -> None:
+    """
+    Creates a graphical representation of the perceived brightness (Rec. 709) profile of a color LUT.
+
+    This function visualizes a 256-entry color lookup table (LUT) by plotting
+    the perceived brightness (calculated using the Rec. 709 luminance formula)
+    for each color in the LUT against its index (0-255). The area beneath the
+    resulting curve is shaded with the corresponding color from the LUT for
+    each index, providing a direct visual representation of how perceived
+    brightness changes across the palette.
+
+    Args:
+        lut_colors (np.ndarray or list): A structure (preferably a NumPy array
+                                         of shape (256, 3)) containing the 256
+                                         color entries of the LUT. Each entry is
+                                         expected to be an RGB color with values
+                                         typically in the range [0, 255].
+        title (str, optional): The title to display on the plot.
+                                 Defaults to "Relative Brightness of Color Bars".
+        xlabel (str, optional): The label for the X-axis of the plot.
+                                Defaults to "Index of Enhancement".
+        ylabel (str, optional): The label for the Y-axis of the plot.
+                                Defaults to "Brightness (Rec. 709)".
+        show_plot (bool, optional): If True, calls `plt.show()` to display
+                                     the plot immediately after creation.
+                                     Defaults to True.
+
+    Returns:
+        tuple: A tuple containing (fig, ax), which are the Matplotlib
+               Figure and Axes objects respectively, allowing further
+               external customization of the plot.
+
+    Raises:
+        ValueError: If `lut_colors` does not contain exactly 256 entries.
+
+    Notes:
+        - The Rec. 709 brightness formula used is 0.2126*R + 0.7152*G + 0.0722*B,
+          applied to R, G, B values normalized to the range [0, 1].
+        - Assumes that input values in `lut_colors` are in the range [0, 255].
+          They are normalized internally for brightness calculation.
+        - The Y-axis (Brightness) is scaled to the range [0, 255] to match
+          the typical range of 8-bit pixel values.
+
+    Example:
+        >>> # Example of creating a test LUT (grayscale ramp)
+        >>> test_lut_gray = np.zeros((256, 3), dtype=np.uint8)
+        >>> for i in range(256):
+        ...     test_lut_gray[i, :] = i # Grayscale ramp from 0 to 255
+        >>>
+        >>> # Plot the brightness profile of the test LUT
+        >>> fig, ax = plot_lut_brightness_profile(test_lut_gray, title="Grayscale Ramp Brightness Profile")
+        >>> # If show_plot=False, you can add more elements here before plt.show()
+        >>> # plt.show()
+
+        >>> # Example with a color LUT loaded from a file (pseudocode)
+        >>> # lut_data = load_my_lut_file('my_palette.lut') # Assumes it loads a (256, 3) array
+        >>> # fig, ax = plot_lut_brightness_profile(lut_data, title="My Palette Brightness Profile", show_plot=False)
+        >>> # ax.grid(True) # Add a grid
+        >>> # plt.show()
+    """
+    # Create color LUT with 256 entries
+    colors_lut = create_colors_lut(scale, ncolors)
+
+    # Calculate the perceived brightness according to a given model
+    brightness = rgb_to_brightness(colors_lut, ncolors, algorithm)
+
+    # Prepare the plotting data
+    x_indices = [index + 0.1 for index in range(ncolors)]
+    y_brightness = brightness
+
+    # Create and color the plot
+    fig, ax = plt.subplots(figsize=(6, 6))
+
+    # Plot the perceived brightness curve
+    ax.plot(x_indices, y_brightness, color="black", linewidth=1.5)
+
+    # Color the area under the curve using thin bars
+    bar_width = 1.0
+    for i in range(ncolors):
+        # Draw a bar from y=0 up to the calculated brightness, with the LUT color
+        ax.bar(
+            x_indices[i] - 0.5,
+            y_brightness[i],
+            width=bar_width,
+            color=colors_lut[i],
+            align="edge",
+        )
+
+    # Configure axis limits
+    ax.set_xlim(0, ncolors - 1)
+    ax.set_ylim(0, ncolors - 1)
+
+    # Optional: Improve plot appearance
+    plt.grid(True, linestyle="--", alpha=0.6)
+
+    # Configure labels and title
+    ax.set_xlabel(f"Index of Enhancement: {scale.name}")
+    ax.set_ylabel(f"Brightness ({LUMA_ALGORITHMS[algorithm]})")
+    ax.set_title("Relative Brightness of Color Bars")
+
+    # Save the plot if required
+    if save_path:
+        plt.savefig(save_path, dpi=100, bbox_inches=None)
+
+    # Adjust layout to prevent overlaps
+    plt.tight_layout()
 
     # Display the plot
     plt.show()
