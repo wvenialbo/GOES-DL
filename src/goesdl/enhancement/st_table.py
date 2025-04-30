@@ -4,7 +4,6 @@ from typing import TextIO
 from .constants import UNNAMED_TABLE
 from .shared import StretchingTable
 
-ST_SIGNATURE = "ST TABLE"
 ST_KEYWORD = (
     "ST",
     "TABLE",
@@ -12,9 +11,10 @@ ST_KEYWORD = (
     "Temperature",
     "Color",
     "Index",
+    "-------",
     "---",
-    "------",
 )
+ST_SIGNATURE = f"{ST_KEYWORD[0]} {ST_KEYWORD[1]}"
 
 
 class st_utility:
@@ -24,9 +24,9 @@ class st_utility:
         lines.extend(
             (
                 f"{ST_SIGNATURE} {name}",
-                f"{ST_KEYWORD[3]} {ST_KEYWORD[4]}",
-                f"{ST_KEYWORD[2]}  {ST_KEYWORD[5]}",
-                f"{ST_KEYWORD[6]:>8}{ST_KEYWORD[6]:>9}",
+                f"{ST_KEYWORD[2]}  {ST_KEYWORD[4]}",
+                f"{ST_KEYWORD[3]} {ST_KEYWORD[5]}",
+                f"{ST_KEYWORD[6]:>10}{ST_KEYWORD[7]:>7}",
             )
         )
 
