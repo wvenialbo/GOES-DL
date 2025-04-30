@@ -25,7 +25,7 @@ LUMA_ALGORITHMS = {
 }
 
 
-class ColormapPlotLayout:
+class ColormapPreviewLayout:
 
     dpi: int
     figsize: tuple[float, float]
@@ -106,7 +106,7 @@ def preview_colormap(
 ) -> None:
     # Layout definition in pixel size units
     width, height = 486, 300
-    layout = ColormapPlotLayout((width, height), dpi=100)
+    layout = ColormapPreviewLayout((width, height), dpi=100)
     layout.from_margin((32, 12, 134, 24), (222, 12, 53, 24))
 
     # Scale factor for all measures in points
