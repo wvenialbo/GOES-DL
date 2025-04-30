@@ -259,8 +259,8 @@ def rgb_to_brightness(
 
 def plot_brightness_profile(
     scale: EnhancementScale,
-    algorithm: str = "rec709",
     save_path: str | Path = "",
+    algorithm: str = "rec709",
 ) -> None:
     """
     Creates a graphical representation of the perceived brightness (Rec. 709) profile of a color LUT.
