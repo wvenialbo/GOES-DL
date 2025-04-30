@@ -238,62 +238,6 @@ def preview_colormap(
     plt.show()
 
 
-def create_colors_lut(
-    scale: EnhancementScale, ncolors: int
-) -> DiscreteColorList:
-    colors_lut: DiscreteColorList = []
-    colors_map = scale.cmap
-
-    for i in range(ncolors):
-        rgb_value = colors_map(i / ncolors)[:3]
-        colors_lut.append(rgb_value)
-
-    return colors_lut
-
-
-def rgb_to_brightness(
-    colors_lut: DiscreteColorList, brightness_max: int, algorithm: str
-) -> ColorValueList:
-    """
-    Convert RGB components to grayscale value.
-
-    Calculates the perceived brightness (Luminance/Luma) of an RGB color
-    using the Rec. 601/709/2020 formulae.
-
-    Parameters
-    ----------
-    colors_lut : DiscreteColorList
-        Colour look-up table
-    algorithm : str
-        Name of the conversion algorithm
-
-    Returns
-    -------
-    float
-        The perceived brightness (Luminance/Luma) value in the range [0,
-        1].
-    """
-    try:
-        r_weight, g_weight, b_weight = LUMA_COEFFICIENTS[algorithm]
-    except KeyError as error:
-        valid_algorithms = ", ".join(LUMA_COEFFICIENTS.keys())
-        raise ValueError(
-            f"Invalid conversion algorithm '{algorithm}'. "
-            f"Supported algorithms: {valid_algorithms}"
-        ) from error
-
-    brightness: ColorValueList = []
-
-    def rgb_to_grayscale(r: float, g: float, b: float) -> float:
-        return r_weight * r + g_weight * g + b_weight * b
-
-    for rgb_value in colors_lut:
-        gray_value = rgb_to_grayscale(*rgb_value)
-        brightness.append(gray_value * brightness_max)
-
-    return brightness
-
-
 def plot_brightness_profile(
     scale: EnhancementScale,
     save_path: str | Path = "",
@@ -362,10 +306,10 @@ def plot_brightness_profile(
     ncolors: int = 256
 
     # Create color LUT with 256 entries
-    colors_lut = create_colors_lut(scale, ncolors)
+    colors_lut = _create_colors_lut(scale, ncolors)
 
     # Calculate the perceived brightness according to a given model
-    brightness = rgb_to_brightness(colors_lut, ncolors, algorithm)
+    brightness = _rgb_to_brightness(colors_lut, ncolors, algorithm)
 
     # Prepare the plotting data
     x_indices = list(range(ncolors))
@@ -411,3 +355,59 @@ def plot_brightness_profile(
 
     # Display the plot
     plt.show()
+
+
+def _create_colors_lut(
+    scale: EnhancementScale, ncolors: int
+) -> DiscreteColorList:
+    colors_lut: DiscreteColorList = []
+    colors_map = scale.cmap
+
+    for i in range(ncolors):
+        rgb_value = colors_map(i / ncolors)[:3]
+        colors_lut.append(rgb_value)
+
+    return colors_lut
+
+
+def _rgb_to_brightness(
+    colors_lut: DiscreteColorList, brightness_max: int, algorithm: str
+) -> ColorValueList:
+    """
+    Convert RGB components to grayscale value.
+
+    Calculates the perceived brightness (Luminance/Luma) of an RGB color
+    using the Rec. 601/709/2020 formulae.
+
+    Parameters
+    ----------
+    colors_lut : DiscreteColorList
+        Colour look-up table
+    algorithm : str
+        Name of the conversion algorithm
+
+    Returns
+    -------
+    float
+        The perceived brightness (Luminance/Luma) value in the range [0,
+        1].
+    """
+    try:
+        r_weight, g_weight, b_weight = LUMA_COEFFICIENTS[algorithm]
+    except KeyError as error:
+        valid_algorithms = ", ".join(LUMA_COEFFICIENTS.keys())
+        raise ValueError(
+            f"Invalid conversion algorithm '{algorithm}'. "
+            f"Supported algorithms: {valid_algorithms}"
+        ) from error
+
+    brightness: ColorValueList = []
+
+    def rgb_to_grayscale(r: float, g: float, b: float) -> float:
+        return r_weight * r + g_weight * g + b_weight * b
+
+    for rgb_value in colors_lut:
+        gray_value = rgb_to_grayscale(*rgb_value)
+        brightness.append(gray_value * brightness_max)
+
+    return brightness
