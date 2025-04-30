@@ -259,7 +259,6 @@ def rgb_to_brightness(
 
 def plot_brightness_profile(
     scale: EnhancementScale,
-    ncolors: int = 256,
     algorithm: str = "rec709",
     save_path: str | Path = "",
 ) -> None:
@@ -322,6 +321,9 @@ def plot_brightness_profile(
         >>> # ax.grid(True) # Add a grid
         >>> # plt.show()
     """
+    # Number of color brightness levels
+    ncolors: int = 256
+
     # Create color LUT with 256 entries
     colors_lut = create_colors_lut(scale, ncolors)
 
@@ -329,7 +331,7 @@ def plot_brightness_profile(
     brightness = rgb_to_brightness(colors_lut, ncolors, algorithm)
 
     # Prepare the plotting data
-    x_indices = [index + 0.1 for index in range(ncolors)]
+    x_indices = list(range(ncolors))
     y_brightness = brightness
 
     # Create and color the plot
@@ -340,10 +342,11 @@ def plot_brightness_profile(
 
     # Color the area under the curve using thin bars
     bar_width = 1.0
-    for i in range(ncolors):
+    pad_offset = -0.6
+    for i in x_indices:
         # Draw a bar from y=0 up to the calculated brightness, with the LUT color
         ax.bar(
-            x_indices[i] - 0.5,
+            x_indices[i] + pad_offset,
             y_brightness[i],
             width=bar_width,
             color=colors_lut[i],
