@@ -237,6 +237,93 @@ def preview_colormap(
     plt.show()
 
 
+class BrightnessProfileLayout:
+
+    dpi: int = REF_DPI
+    pt_scale: float = 1.0
+
+    figsize: tuple[float, float]
+
+    axes_box: tuple[float, float, float, float]
+
+    plot_linewidth: float = 1.2
+
+    title_fontsize: float = 12.0
+    title_labelpad: float = 6.0
+
+    axis_outline_linewidt: float = 0.8
+
+    axis_label_fontsize: float = 10.0
+    axis_label_labelpad: float = 4.0
+
+    axis_tick_width: float = 0.6
+    axis_tick_length: float = 3.5
+    axis_tick_fontsize: float = 10.0
+    axis_x_tick_labelpad: float = 3.0
+    axis_y_tick_labelpad: float = 3.5
+
+    grid_linewidth: float = 0.8
+
+    def __init__(self, figsize: tuple[int, int], dpi: int) -> None:
+        # figsize: figure size (width, height) in dot (pixels) units
+        # dpi: dots per inch
+
+        # figure size in inches (dpi: dots per inch)
+        width, height = (size / dpi for size in figsize)
+
+        self.dpi = dpi
+        self.figsize = width, height
+        self.pt_scale = REF_DPI / dpi
+
+        self._init_boxes((32, 18, 52, 66))  # (32, 13, 53, 66)
+
+        self._init_sizes()
+
+    def _init_boxes(
+        self,
+        amargins: tuple[int, int, int, int],
+    ) -> None:
+        # plot and colour bar boxes margins in inches
+        atop, aright, abottom, aleft = (size / self.dpi for size in amargins)
+
+        # figure size in inches
+        width, height = self.figsize
+
+        # plot box margins in relative units
+        atop, abottom = (size / height for size in (atop, abottom))
+        aright, aleft = (size / width for size in (aright, aleft))
+
+        # plot box position and dimensions in relative units
+        abox_px = aleft
+        abox_py = abottom
+        abox_cx = 1.0 - aright - aleft
+        abox_cy = 1.0 - atop - abottom
+
+        self.axes_box = abox_px, abox_py, abox_cx, abox_cy
+
+    def _init_sizes(self) -> None:
+        # Scale factor for all measures in points
+        pt_scale = self.pt_scale
+
+        self.plot_linewidth = 1.2 * pt_scale
+
+        self.title_fontsize = 12.0 * pt_scale
+        self.title_labelpad = 6 * pt_scale
+
+        self.axis_outline_linewidth = 0.8 * pt_scale
+
+        self.axis_label_fontsize = 10.0 * pt_scale
+        self.axis_label_labelpad = 4.0 * pt_scale
+
+        self.axis_tick_width = 0.6 * pt_scale
+        self.axis_tick_length = 3.5 * pt_scale
+        self.axis_tick_fontsize = 10.0 * pt_scale
+        self.axis_x_tick_labelpad = 3.0 * pt_scale
+        self.axis_y_tick_labelpad = 3.5 * pt_scale
+
+        self.grid_linewidth = 0.8 * pt_scale
+
+
 def plot_brightness_profile(
     scale: EnhancementScale,
     save_path: str | Path = "",
@@ -301,6 +388,9 @@ def plot_brightness_profile(
         >>> # ax.grid(True) # Add a grid
         >>> # plt.show()
     """
+    # Layout definition in pixel size units
+    layout = BrightnessProfileLayout(figsize=(486, 486), dpi=100)
+
     # Number of color brightness levels
     ncolors: int = 256
 
@@ -314,15 +404,25 @@ def plot_brightness_profile(
     x_indices = list(range(ncolors))
     y_brightness = brightness
 
-    # Create and color the plot
-    fig, ax = plt.subplots(figsize=(6, 6))
+    # Create the figure and plot box
+    fig = plt.figure(figsize=layout.figsize, dpi=layout.dpi)
 
-    # Plot the perceived brightness curve
-    ax.plot(x_indices, y_brightness, color="black", linewidth=1.5)
+    ax = fig.add_axes(layout.axes_box)
+
+    # Set the plot title
+    ax.set_title(
+        "Relative Brightness of Color Bars",
+        fontsize=layout.title_fontsize,
+        pad=layout.title_labelpad,
+    )
+
+    # Set the plot box ouline format
+    for spine in ["top", "bottom", "left", "right"]:
+        ax.spines[spine].set_linewidth(layout.axis_outline_linewidth)
 
     # Color the area under the curve using thin bars
     bar_width = 1.0
-    pad_offset = -0.6
+    pad_offset = -0.3
     for i in x_indices:
         # Draw a bar from y=0 up to the calculated brightness, with the LUT color
         ax.bar(
@@ -333,24 +433,53 @@ def plot_brightness_profile(
             align="edge",
         )
 
-    # Configure axis limits
+    # Plot the perceived brightness curve
+    ax.plot(
+        x_indices, y_brightness, color="black", linewidth=layout.plot_linewidth
+    )
+
+    # Configure axes limits
     ax.set_xlim(0, ncolors - 1)
     ax.set_ylim(0, ncolors - 1)
 
-    # Optional: Improve plot appearance
-    plt.grid(True, linestyle="--", alpha=0.6)
+    # Set the axes labels
+    ax.set_xlabel(
+        f"Index of Enhancement: {scale.name}",
+        color="black",
+        fontsize=layout.axis_label_fontsize,
+        labelpad=layout.axis_label_labelpad,
+    )
 
-    # Configure labels and title
-    ax.set_xlabel(f"Index of Enhancement: {scale.name}")
-    ax.set_ylabel(f"Brightness ({LUMA_ALGORITHMS[algorithm]})")
-    ax.set_title("Relative Brightness of Color Bars")
+    ax.set_ylabel(
+        f"Brightness ({LUMA_ALGORITHMS[algorithm]})",
+        color="black",
+        fontsize=layout.axis_label_fontsize,
+        labelpad=layout.axis_label_labelpad,
+    )
+
+    # Setup the axes ticks
+    ax.tick_params(
+        axis="x",
+        width=layout.axis_tick_width,
+        length=layout.axis_tick_length,
+        labelsize=layout.axis_tick_fontsize,
+        pad=layout.axis_x_tick_labelpad,
+    )
+
+    ax.tick_params(
+        axis="y",
+        width=layout.axis_tick_width,
+        length=layout.axis_tick_length,
+        labelsize=layout.axis_tick_fontsize,
+        pad=layout.axis_y_tick_labelpad,
+    )
+
+    # Optional: Improve plot appearance
+    plt.grid(True, linestyle="--", alpha=0.6, linewidth=layout.grid_linewidth)
 
     # Save the plot if required
     if save_path:
-        plt.savefig(save_path, dpi=100, bbox_inches=None)
-
-    # Adjust layout to prevent overlaps
-    plt.tight_layout()
+        plt.savefig(save_path, dpi=layout.dpi, bbox_inches=None)
 
     # Display the plot
     plt.show()
