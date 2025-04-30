@@ -9,7 +9,6 @@ from .shared import (
     ValueTableColumn,
 )
 
-EU_SIGNATURE = "EU TABLE"
 EU_KEYWORD = (
     "EU",
     "TABLE",
@@ -22,6 +21,7 @@ EU_KEYWORD = (
     "---",
     "------",
 )
+EU_SIGNATURE = f"{EU_KEYWORD[0]} {EU_KEYWORD[1]}"
 
 
 class eu_utility(clr_utility):
