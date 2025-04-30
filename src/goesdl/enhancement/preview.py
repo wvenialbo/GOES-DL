@@ -100,9 +100,9 @@ class ColormapPlotLayout:
 
 def preview_colormap(
     scale: EnhancementScale,
+    save_path: str | Path = "",
     measurement: str = "",
     offset: float = 0.0,
-    save_path: str | Path = "",
 ) -> None:
     # Layout definition in pixel size units
     width, height = 486, 300
