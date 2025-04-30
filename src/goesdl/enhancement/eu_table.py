@@ -19,7 +19,6 @@ EU_KEYWORD = (
     "min",
     "max",
     "---",
-    "------",
 )
 EU_SIGNATURE = f"{EU_KEYWORD[0]} {EU_KEYWORD[1]}"
 
