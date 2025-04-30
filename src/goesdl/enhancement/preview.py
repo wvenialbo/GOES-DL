@@ -197,9 +197,6 @@ def preview_colormap(
     if save_path:
         plt.savefig(save_path, dpi=layout.dpi, bbox_inches=None)
 
-    # Adjust layout to prevent overlaps
-    plt.tight_layout()
-
     # Display the plot
     plt.show()
 
