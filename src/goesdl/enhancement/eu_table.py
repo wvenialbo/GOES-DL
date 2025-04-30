@@ -9,8 +9,8 @@ from .shared import (
     ValueTableColumn,
 )
 
-MCIDAS_EU_SIGNATURE = "EU TABLE"
-MCIDAS_EU_KEYWORD = (
+EU_SIGNATURE = "EU TABLE"
+EU_KEYWORD = (
     "EU",
     "TABLE",
     "Brightness",
@@ -30,17 +30,17 @@ class eu_utility(clr_utility):
     def _add_color_table_header(
         lines: list[str], name: str, rgb: bool
     ) -> None:
-        lines.append(f"{MCIDAS_EU_SIGNATURE} {name}")
+        lines.append(f"{EU_SIGNATURE} {name}")
         i, j, k = (3, 4, 5) if rgb else (5, 4, 3)
         lines.append(
-            f" {MCIDAS_EU_KEYWORD[2]}"
-            f"{MCIDAS_EU_KEYWORD[i]:>6}"
-            f"{MCIDAS_EU_KEYWORD[j]:>11}"
-            f"{MCIDAS_EU_KEYWORD[k]:>9}"
+            f" {EU_KEYWORD[2]}"
+            f"{EU_KEYWORD[i]:>6}"
+            f"{EU_KEYWORD[j]:>11}"
+            f"{EU_KEYWORD[k]:>9}"
         )
-        hdr = f"{MCIDAS_EU_KEYWORD[6]} {MCIDAS_EU_KEYWORD[7]}"
+        hdr = f"{EU_KEYWORD[6]} {EU_KEYWORD[7]}"
         lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
-        hdr = f"{MCIDAS_EU_KEYWORD[8]} {MCIDAS_EU_KEYWORD[8]}"
+        hdr = f"{EU_KEYWORD[8]} {EU_KEYWORD[8]}"
         lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
 
     @classmethod
@@ -101,7 +101,7 @@ class eu_utility(clr_utility):
 
     @staticmethod
     def is_eu_table(header: str) -> bool:
-        return MCIDAS_EU_SIGNATURE in header
+        return EU_SIGNATURE in header
 
     @classmethod
     def make_color_table(cls, values: ValueTable) -> ColorTable:
@@ -132,11 +132,11 @@ class eu_utility(clr_utility):
             ls = line.split()
 
             # Check for alternative colour model
-            if ls[0] == MCIDAS_EU_KEYWORD[2] and ls[1] == MCIDAS_EU_KEYWORD[3]:
+            if ls[0] == EU_KEYWORD[2] and ls[1] == EU_KEYWORD[3]:
                 color_model = CM_RGB
 
             # Ignore header lines
-            if ls[0] in MCIDAS_EU_KEYWORD:
+            if ls[0] in EU_KEYWORD:
                 continue
 
             j.extend((float(ls[0]), float(ls[1])))
@@ -149,8 +149,8 @@ class eu_utility(clr_utility):
         color_table = cls._make_color_table(value_table)
 
         name = UNNAMED_COLORMAP
-        if len(lines[0]) > len(MCIDAS_EU_SIGNATURE):
-            name = lines[0][len(MCIDAS_EU_SIGNATURE) + 1 :]
+        if len(lines[0]) > len(EU_SIGNATURE):
+            name = lines[0][len(EU_SIGNATURE) + 1 :]
             name = name.strip()
 
         return color_table, name
