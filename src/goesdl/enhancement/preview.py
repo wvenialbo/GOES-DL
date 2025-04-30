@@ -34,7 +34,7 @@ class ColormapPreviewLayout:
     axes_box: tuple[float, float, float, float]
     cbar_box: tuple[float, float, float, float]
 
-    def __init__(self, figsize: tuple[int, int], dpi: int = 100) -> None:
+    def __init__(self, figsize: tuple[int, int], dpi: int) -> None:
         # figsize: figure size (width, height) in dot (pixels) units
         # dpi: dots per inch
 
