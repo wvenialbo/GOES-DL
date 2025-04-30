@@ -71,7 +71,7 @@ class ColormapPreviewLayout:
         self.figsize = width, height
         self.pt_scale = REF_DPI / dpi
 
-        self._init_boxes((32, 12, 134, 24), (222, 12, 53, 24))
+        self._init_boxes((32, 12, 134, 24), (224, 12, 52, 24))
 
         self._init_sizes()
 
