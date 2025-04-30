@@ -8,6 +8,8 @@ enhancement color tables, as well as reverse and manipulate color maps.
 from collections.abc import Sequence
 from typing import Any, Literal
 
+# Brightness domain or range
+
 DomainData = tuple[float, float]
 
 
