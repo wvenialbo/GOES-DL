@@ -53,9 +53,9 @@ class eu_utility(clr_utility):
             table = [(x, r, g, b) for x, b, g, r in table]
 
         for i in range(0, len(table), 2):
-            x_lo, b_lo, g_lo, r_lo = table[i]
+            x_lo, b_lo, g_lo, r_lo = map(round, table[i])
 
-            x_hi, b_hi, g_hi, r_hi = table[i + 1]
+            x_hi, b_hi, g_hi, r_hi = map(round, table[i + 1])
 
             if x_lo == x_hi:
                 continue
