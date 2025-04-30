@@ -92,7 +92,8 @@ class eu_utility(clr_utility):
         """
         lines: list[str] = []
 
-        eu_utility._add_color_table_header(lines, name, rgb)
+        cls._add_color_table_header(lines, name, rgb)
+
         cls._create_color_table(lines, table, rgb)
 
         with open(path, "w", encoding="utf-8", newline="\n") as file:
