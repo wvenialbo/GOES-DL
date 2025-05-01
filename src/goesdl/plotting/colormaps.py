@@ -32,6 +32,7 @@ def preview_colormap(
     save_path: str | Path = "",
     measurement: str = "",
     offset: float = 0.0,
+    show: bool = True,
 ) -> None:
     # Referece rectangle
     # - units in pixel per dimension
@@ -141,13 +142,17 @@ def preview_colormap(
         plt.savefig(save_path, dpi=rect.dpi, bbox_inches=None)
 
     # Display the plot
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close()
 
 
 def plot_brightness_profile(
     scale: EnhancementScale,
     save_path: str | Path = "",
     algorithm: str = "rec709",
+    show: bool = True,
 ) -> None:
     """
     Creates a graphical representation of the perceived brightness (Rec. 709) profile of a color LUT.
@@ -315,7 +320,10 @@ def plot_brightness_profile(
         plt.savefig(save_path, dpi=rect.dpi, bbox_inches=None)
 
     # Display the plot
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close()
 
 
 def _create_colors_lut(
