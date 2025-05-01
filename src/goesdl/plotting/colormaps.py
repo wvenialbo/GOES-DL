@@ -2,8 +2,11 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 from matplotlib.spines import Spine
 
+from ..enhancement.clr_table import clr_utility
 from ..enhancement.scale import EnhancementScale
 from ..enhancement.shared import ColorValueList, DiscreteColorList
 from .helpers import Rect, Size
@@ -314,6 +317,176 @@ def plot_brightness_profile(
 
     # Add grid lines
     plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
+
+    # Save the plot if required
+    if save_path:
+        plt.savefig(save_path, dpi=rect.dpi, bbox_inches=None)
+
+    # Display the plot
+    if show:
+        plt.show()
+    else:
+        plt.close()
+
+
+def plot_color_profile(
+    scale: EnhancementScale, save_path: str | Path = "", show: bool = True
+) -> None:
+    # Referece rectangle
+    # - units in pixel per dimension
+    rect = Rect(486, 568, 100)
+    size = Size(rect.dpi)
+
+    # Create the figure and the enhancement scale plot box
+    fig = plt.figure(figsize=rect.figsize, dpi=rect.dpi)
+
+    ax = fig.add_axes(rect.margins(66, 134, 18, 32))
+
+    # Set the figure title
+    fig.suptitle(
+        "Color Component Intensities",
+        fontsize=size.pt(12.0),
+        color="black",
+        alpha=1.0,
+        y=rect.y_pos(557),
+    )
+
+    # Set the plot box ouline style
+    for spine in ["top", "bottom", "left", "right"]:
+        axes_outline = ax.spines[spine]
+        _set_outline(axes_outline, size.pt(0.8))
+
+    # Set the x-axis label
+    ax.set_xlabel(
+        f"Index of Enhancement: {scale.name}",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Set the y-axis label
+    ax.set_ylabel(
+        "Primary component intensity",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Setup the x-axis ticks
+    ax.tick_params(
+        axis="x",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(3.0),
+    )
+
+    # Setup the y-axis ticks
+    ax.tick_params(
+        axis="y",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(3.5),
+    )
+
+    ax.minorticks_off()
+
+    # Number of color brightness levels
+    ncolors: int = 256
+
+    # Create color LUT with 256 entries
+    colors_lut = _create_colors_lut(scale, ncolors)
+
+    # Extract colour components
+    components = map(list, zip(*colors_lut))
+
+    # Compute colour component intensity
+    intensities = [
+        clr_utility._scale_color_values(component) for component in components
+    ]
+
+    # Prepare the plotting data
+    x_indices = list(range(ncolors))
+    y_intensities = list(reversed(intensities))
+
+    # Plot the colours intensity curves
+    for i, color_name in enumerate(["blue", "green", "red"]):
+        y_intensity = y_intensities[i]
+        ax.plot(
+            x_indices,
+            y_intensity,
+            color=color_name,
+            label=color_name,
+            linewidth=size.pt(1.2),
+        )
+
+    ax.legend()
+
+    # Configure axes limits
+    ax.set_xlim(-5, ncolors + 4)
+    ax.set_ylim(-5, ncolors + 4)
+
+    # Add grid lines
+    plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
+
+    # Create the colour bar box
+    cax = fig.add_axes(rect.margins(74, 52, 25, 492))
+
+    # Createa a mappable colour scale
+    cnorm = Normalize(vmin=0, vmax=ncolors - 1)
+
+    smap = ScalarMappable(cmap=scale.cmap, norm=cnorm)
+
+    # Plot the colour bar box with the measurement scale
+    cbar = fig.colorbar(smap, orientation="horizontal", cax=cax)
+
+    # Set the colour bar box ouline style
+    cbar_outline: Spine = cbar.ax.spines["outline"]
+    _set_outline(cbar_outline, size.pt(0.6))
+
+    # Set the colorbar caption
+    cbar.set_label(
+        label="Color Index",
+        weight="normal",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Create and setup the colour bar ticks
+    cticks = list(range(0, ncolors, 50))
+
+    cbar.set_ticks(cticks)
+
+    cbar.ax.tick_params(
+        axis="x",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(4.0),
+    )
+
+    # Hide the y-axis ticks since it does not make sense
+    cbar.ax.tick_params(
+        axis="y", which="both", left=False, right=False, labelleft=False
+    )
+
+    cbar.ax.minorticks_off()
+
+    # Add labels to the colour bar ticks
+    ticklabels = [str(i) for i in cticks]
+
+    cbar.set_ticklabels(ticklabels)
 
     # Save the plot if required
     if save_path:
