@@ -363,6 +363,9 @@
         },
         {
             "scope": "goesr"
+        },
+        {
+            "scope": "plotting"
         }
     ],
     // AI assistance tools settings
