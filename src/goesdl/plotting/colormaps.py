@@ -225,7 +225,7 @@ def plot_brightness_profile(
 
     # Set the figure title
     fig.suptitle(
-        "Relative Brightness of Color Bars",
+        "Relative Brightness of Color Scale",
         fontsize=size.pt(12.0),
         color="black",
         alpha=1.0,
