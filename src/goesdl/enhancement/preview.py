@@ -27,38 +27,139 @@ LUMA_ALGORITHMS = {
 }
 
 
-class BasicBoxStyle:
+class LabelStyle:
 
-    dpi: int = REF_DPI
-    pt_scale: float = 1.0
+    fontsize: float
+    pad: float
+    color: str
 
-    figsize: tuple[float, float] = (4.86, 3.00)
+    pt_scale: float
 
-    box: tuple[float, float, float, float] = 0.025, 0.173, 0.926, 0.720
+    def __init__(self, pt_scale: float) -> None:
+        self.pt_scale = pt_scale
+        self.fontsize = 10.0 * pt_scale
+        self.pad = 4.0 * pt_scale
+        self.color = "black"
 
-    outline_linewidth: float = 0.6
+    def style(
+        self,
+        fontsize: float = 10.0,
+        labelpad: float = 4.0,
+        color: str = "black",
+    ) -> None:
+        self.fontsize = fontsize * self.pt_scale
+        self.pad = labelpad * self.pt_scale
+        self.color = color
 
-    label_fontsize: float = 10.0
-    label_labelpad: float = 3.0
 
-    tick_fontsize: float = 10.0
-    tick_labelpad: float = 4.5
-    tick_width: float = 0.6
-    tick_length: float = 3.5
+class TickStyle:
+
+    label: LabelStyle
+
+    width: float
+    length: float
+    color: str
+
+    pt_scale: float
+
+    def __init__(self, pt_scale: float) -> None:
+        self.pt_scale = pt_scale
+
+        self.width = 0.6 * pt_scale
+        self.length = 3.5 * pt_scale
+        self.color = "black"
+
+        self.label = LabelStyle(pt_scale)
+
+    def style(
+        self,
+        width: float = 0.6,
+        length: float = 3.5,
+        color: str = "black",
+    ) -> None:
+        self.width = width * self.pt_scale
+        self.length = length * self.pt_scale
+        self.color = color
+
+
+class AxesTickStyle:
+
+    x: TickStyle
+    y: TickStyle
+
+    def __init__(self, pt_scale: float) -> None:
+        self.x = TickStyle(pt_scale)
+        self.y = TickStyle(pt_scale)
+
+
+class AxesLabelStyle:
+
+    x: LabelStyle
+    y: LabelStyle
+
+    def __init__(self, pt_scale: float) -> None:
+        self.x = LabelStyle(pt_scale)
+        self.y = LabelStyle(pt_scale)
+
+
+class OutlineStyle:
+
+    width: float
+    color: str
+
+    pt_scale: float
+
+    def __init__(self, pt_scale: float) -> None:
+        self.pt_scale = pt_scale
+        self.width = 0.6 * pt_scale
+        self.color = "black"
+
+    def style(self, linewidth: float = 0.6, color: str = "black") -> None:
+        self.outline_linewidth = linewidth * self.pt_scale
+        self.color = color
+
+
+class PlotStyle:
+
+    dpi: int
+
+    figsize: tuple[float, float]
+
+    box: tuple[float, float, float, float]
+
+    outline: OutlineStyle
+
+    title: LabelStyle
+
+    label: AxesLabelStyle
+
+    tick: AxesTickStyle
 
     def __init__(self, figsize: tuple[float, float], dpi: int) -> None:
         self.dpi = dpi
         self.figsize = figsize
-        self.pt_scale = REF_DPI / dpi
 
-    def label(self, fontsize: float = 10.0, labelpad: float = 3.0) -> None:
-        self.label_fontsize = fontsize * self.pt_scale
-        self.label_labelpad = labelpad * self.pt_scale
+        pt_scale = REF_DPI / dpi
 
-    def layout(
-        self,
-        margins: tuple[float, float, float, float],
+        self.box = self._get_box((32, 24, 52, 24))
+
+        self.outline = OutlineStyle(pt_scale)
+
+        self.title = LabelStyle(pt_scale)
+        self.title.style(12.0, 6.0)
+
+        self.label = AxesLabelStyle(pt_scale)
+
+        self.tick = AxesTickStyle(pt_scale)
+
+    def margins(
+        self, top: int = 32, right: int = 24, bottom: int = 52, left: int = 24
     ) -> None:
+        self.box = self._get_box((top, right, bottom, left))
+
+    def _get_box(
+        self, margins: tuple[int, int, int, int]
+    ) -> tuple[float, float, float, float]:
         # figure dimensions in inches
         width, height = self.figsize
 
@@ -75,80 +176,71 @@ class BasicBoxStyle:
         box_cx = 1.0 - right - left
         box_cy = 1.0 - top - bottom
 
-        self.box = box_px, box_py, box_cx, box_cy
+        return box_px, box_py, box_cx, box_cy
 
-    def outline(self, linewidth: float = 0.6) -> None:
-        self.outline_linewidth = linewidth * self.pt_scale
 
-    def tick(
+class TitleStyle:
+
+    fontsize: float
+    baseline: float
+    color: str
+
+    pt_scale: float
+
+    def __init__(self, dpi: int) -> None:
+        self.pt_scale = REF_DPI / dpi
+        self.fontsize = 12.0 * self.pt_scale
+        self.baseline = 0.0
+        self.color = "black"
+
+    def style(
         self,
-        fontsize: float = 10.0,
-        labelpad: float = 4.5,
-        width: float = 0.6,
-        length: float = 3.5,
+        fontsize: float = 12.0,
+        baseline: float = 0.0,
+        color: str = "black",
     ) -> None:
-        self.tick_fontsize = fontsize * self.pt_scale
-        self.tick_labelpad = labelpad * self.pt_scale
-        self.tick_width = width * self.pt_scale
-        self.tick_length = length * self.pt_scale
+        self.fontsize = fontsize * self.pt_scale
+        self.baseline = baseline
+        self.color = color
+
+    @property
+    def position(self) -> float:
+        return 0.98 + self.baseline
 
 
-class BoxStyle(BasicBoxStyle):
+class FigureLayout:
 
-    title_fontsize: float = 12.0
-    title_labelpad: float = 6.0
-
-    def __init__(self, figsize: tuple[float, float], dpi: int) -> None:
-        super().__init__(figsize, dpi)
-
-    def title(self, fontsize: float = 12.0, labelpad: float = 6.0) -> None:
-        self.title_fontsize = fontsize * self.pt_scale
-        self.title_labelpad = labelpad * self.pt_scale
-
-
-class PlotLayout:
-
-    dpi: int = REF_DPI
+    dpi: int
 
     figsize: tuple[float, float]
 
-    title_fontsize: float = 12.0
-    title_baseline: float = 0.0
+    title: TitleStyle
 
-    axes: BoxStyle
-
-    def __init__(self, figsize: tuple[int, int], dpi: int) -> None:
-        # figsize: figure size (width, height) in dot (pixels) units
-        # dpi: dots per inch
-
-        # figure size in inches
-        width, height = (size / dpi for size in figsize)
+    def __init__(
+        self, width: int = 486, height: int = 300, dpi: int = REF_DPI
+    ) -> None:
+        width_in, height_in = (size / dpi for size in (width, height))
 
         self.dpi = dpi
 
-        self.figsize = width, height
+        self.figsize = width_in, height_in
 
-        self.axes = BoxStyle(self.figsize, self.dpi)
-
-    def title(self, fontsize: float = 12.0, baseline: float = 0.0) -> None:
-        pt_scale = REF_DPI / self.dpi
-
-        self.title_fontsize = fontsize * pt_scale
-        self.title_baseline = baseline
-
-    @property
-    def title_position(self) -> float:
-        return 0.98 + self.title_baseline
+        self.title = TitleStyle(dpi)
 
 
-class ColormapPreviewLayout(PlotLayout):
+class ColormapPreviewLayout(FigureLayout):
 
-    cbar: BasicBoxStyle
+    axes: PlotStyle
+    cbar: PlotStyle
 
-    def __init__(self, figsize: tuple[int, int], dpi: int) -> None:
-        super().__init__(figsize, dpi)
+    def __init__(
+        self, width: int = 486, height: int = 300, dpi: int = REF_DPI
+    ) -> None:
+        super().__init__(width, height, dpi)
 
-        self.cbar = BasicBoxStyle(self.figsize, self.dpi)
+        self.axes = PlotStyle(self.figsize, self.dpi)
+
+        self.cbar = PlotStyle(self.figsize, self.dpi)
 
 
 def preview_colormap(
@@ -160,28 +252,30 @@ def preview_colormap(
     # Plot layout and style definition
     # - figsize and margins in pixel size units
     # - font size and strokes width and length in points
-    style = ColormapPreviewLayout((486, 300), 100)
+    layout = ColormapPreviewLayout(486, 300, 100)
 
-    style.title(12.0, 0.0)
+    layout.title.style(12.0, 0.0)
 
-    style.axes.layout((32, 24, 134, 24))
-    style.axes.outline(0.6)
-    style.axes.label(10.0, 3.0)
-    style.axes.tick(10.0, 4.5, 0.6, 3.5)
+    layout.axes.margins(32, 24, 134, 24)
+    layout.axes.outline.style(0.6)
+    layout.axes.label.x.style(10.0, 3.0)
+    layout.axes.tick.x.style(0.6, 3.5)
+    layout.axes.tick.x.label.style(10.0, 4.5)
 
-    style.cbar.layout((224, 24, 52, 24))
-    style.cbar.outline(0.6)
-    style.cbar.label(10.0, 4.0)
-    style.cbar.tick(10.0, 4.0, 0.6, 3.5)
+    layout.cbar.margins(224, 24, 52, 24)
+    layout.cbar.outline.style(0.6)
+    layout.cbar.label.x.style(10.0, 4.0)
+    layout.cbar.tick.x.style(0.6, 3.5)
+    layout.cbar.tick.x.label.style(10.0, 4.0)
 
     # Example data
     vmin, vmax = scale.domain
     data = np.linspace(vmin, vmax, scale.ncolors)[None, :]
 
     # Create the figure and the enhancement scale plot box
-    fig = plt.figure(figsize=style.figsize, dpi=style.dpi)
+    fig = plt.figure(figsize=layout.figsize, dpi=layout.dpi)
 
-    ax = fig.add_axes(style.axes.box)
+    ax = fig.add_axes(layout.axes.box)
 
     # Plot the example data
     im = ax.imshow(data, aspect="auto", cmap=scale.cmap, norm=scale.cnorm)
@@ -189,29 +283,33 @@ def preview_colormap(
     # Set the figure title
     fig.suptitle(
         f"Enhancement scale: {scale.name}",
-        fontsize=style.title_fontsize,
-        y=style.title_position,
+        fontsize=layout.title.fontsize,
+        color=layout.title.color,
+        y=layout.title.position,
     )
 
     # Set the plot box ouline format
     for spine in ["top", "bottom", "left", "right"]:
-        ax.spines[spine].set_linewidth(style.axes.outline_linewidth)
+        ax.spines[spine].set_linewidth(layout.axes.outline.width)
+        ax.spines[spine].set_color(layout.axes.outline.color)
 
     # Set the x-axis label
     ax.set_xlabel(
         "Color Index",
-        color="black",
-        fontsize=style.axes.label_fontsize,
-        labelpad=style.axes.label_labelpad,
+        color=layout.axes.label.x.color,
+        fontsize=layout.axes.label.x.fontsize,
+        labelpad=layout.axes.label.x.pad,
     )
 
     # Setup the x-axis ticks
     ax.tick_params(
         axis="x",
-        width=style.axes.tick_width,
-        length=style.axes.tick_length,
-        labelsize=style.axes.tick_fontsize,
-        pad=style.axes.tick_labelpad,
+        color=layout.axes.tick.x.color,
+        width=layout.axes.tick.x.width,
+        length=layout.axes.tick.x.length,
+        labelcolor=layout.axes.tick.x.label.color,
+        labelsize=layout.axes.tick.x.label.fontsize,
+        pad=layout.axes.tick.x.label.pad,
     )
 
     # Hide the y-axis ticks since it does not make sense
@@ -220,21 +318,23 @@ def preview_colormap(
     )
 
     # Create the colour bar box
-    cax = fig.add_axes(style.cbar.box)
+    cax = fig.add_axes(layout.cbar.box)
 
     # Plot the colour bar box with the measurement scale
     cbar = fig.colorbar(im, orientation="horizontal", cax=cax)
 
     # Set the colour bar box ouline format
-    cbar.outline.set_linewidth(style.cbar.outline_linewidth)  # type: ignore
+    cbar_outline = cbar.ax.spines["outline"]
+    cbar_outline.set_linewidth(layout.cbar.outline.width)
+    cbar_outline.set_color(layout.cbar.outline.color)
 
     # Set the colorbar caption
     cbar.set_label(
         label=measurement or "Measurement",
-        color="black",
         weight="normal",
-        fontsize=style.cbar.label_fontsize,
-        labelpad=style.cbar.label_labelpad,
+        color=layout.cbar.label.x.color,
+        fontsize=layout.cbar.label.x.fontsize,
+        labelpad=layout.cbar.label.x.pad,
     )
 
     # Create and setup the colour bar ticks
@@ -242,10 +342,12 @@ def preview_colormap(
 
     cax.tick_params(
         axis="x",
-        width=style.cbar.tick_width,
-        length=style.cbar.tick_length,
-        labelsize=style.cbar.tick_fontsize,
-        pad=style.cbar.tick_labelpad,
+        color=layout.cbar.tick.x.color,
+        width=layout.cbar.tick.x.width,
+        length=layout.cbar.tick.x.length,
+        labelcolor=layout.cbar.tick.x.label.color,
+        labelsize=layout.cbar.tick.x.label.fontsize,
+        pad=layout.cbar.tick.x.label.pad,
     )
 
     cbar.ax.minorticks_off()
@@ -257,38 +359,23 @@ def preview_colormap(
 
     # Save the plot if required
     if save_path:
-        plt.savefig(save_path, dpi=style.dpi, bbox_inches=None)
+        plt.savefig(save_path, dpi=layout.dpi, bbox_inches=None)
 
     # Display the plot
     plt.show()
 
 
-class BrightnessProfileLayout:
+class BrightnessProfileLayout(FigureLayout):
 
-    dpi: int = REF_DPI
-    pt_scale: float = 1.0
-
-    figsize: tuple[float, float]
-
-    axes_box: tuple[float, float, float, float]
+    grid_linewidth: float = 0.8
 
     plot_linewidth: float = 1.2
-
-    title_fontsize: float = 12.0
-    title_labelpad: float = 6.0
-
-    axis_outline_linewidt: float = 0.8
-
-    axis_label_fontsize: float = 10.0
-    axis_label_labelpad: float = 4.0
 
     axis_tick_width: float = 0.6
     axis_tick_length: float = 3.5
     axis_tick_fontsize: float = 10.0
     axis_x_tick_labelpad: float = 3.0
     axis_y_tick_labelpad: float = 3.5
-
-    grid_linewidth: float = 0.8
 
     def __init__(self, figsize: tuple[int, int], dpi: int) -> None:
         # figsize: figure size (width, height) in dot (pixels) units
