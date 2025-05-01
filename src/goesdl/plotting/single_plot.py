@@ -111,7 +111,7 @@ class GSPlot:
         # Add a watermark to the plot
         self._add_watermark(fig)
 
-        # Save the media file (ensure the destination path does exist)
+        # Save the media file
         if save_path:
             plt.savefig(save_path, dpi=self.fig_dpi, bbox_inches=None)
 
