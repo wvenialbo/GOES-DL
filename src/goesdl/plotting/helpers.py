@@ -22,6 +22,17 @@ class Rect:
         margins = self._calculate_margins((left, bottom, right, top))
         return self._get_rectangle(margins)
 
+    def pos(self, x: int, y: int) -> tuple[float, float]:
+        return self.x_pos(x), self.y_pos(y)
+
+    def x_pos(self, x: int) -> float:
+        pos_in = x / self.dpi
+        return pos_in / self.figsize[0]
+
+    def y_pos(self, x: int) -> float:
+        pos_in = x / self.dpi
+        return pos_in / self.figsize[1]
+
     def _calculate_corners(
         self, corners: tuple[int, int, int, int]
     ) -> tuple[float, float, float, float]:
