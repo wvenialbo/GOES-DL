@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from matplotlib.collections import QuadMesh
 from matplotlib.ticker import MultipleLocator
 
-from ..enhancement import EnhancementScale, cmap
+from ..enhancement import EnhancementScale, get_scale
 from ..protocols import GeodeticRegion, SatImageData
 
 
@@ -60,7 +60,7 @@ class GSPlot:
     crs: Projection
 
     def __init__(self) -> None:
-        self.enhancement = cmap["IRCOLOR"]
+        self.enhancement = get_scale("IRCOLOR")
 
         # Create the target plot projection (same as above)
 
