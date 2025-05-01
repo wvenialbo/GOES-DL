@@ -1,14 +1,12 @@
 from pathlib import Path
 
-from matplotlib.spines import Spine
 import numpy as np
 from matplotlib import pyplot as plt
-
-from .helpers import Rect
-from .helpers import Size
+from matplotlib.spines import Spine
 
 from ..enhancement.scale import EnhancementScale
 from ..enhancement.shared import ColorValueList, DiscreteColorList
+from .helpers import Rect, Size
 
 LUMA_COEFFICIENTS = {
     "rec240": (0.212, 0.701, 0.087),  # Adobe
@@ -54,10 +52,10 @@ def preview_colormap(
         y=0.0,
     )
 
-    # Set the plot box ouline format
+    # Set the plot box ouline style
     for spine in ["top", "bottom", "left", "right"]:
         axes_outline = ax.spines[spine]
-        _set_outline(axes_outline, size)
+        _set_outline(axes_outline, size.pt(0.6))
 
     # Set the x-axis label
     ax.set_xlabel(
@@ -71,16 +69,13 @@ def preview_colormap(
     # Setup the x-axis ticks
     ax.tick_params(
         axis="x",
-        color="black",
+        color=("black", 1.0),
         width=size.pt(0.6),
         length=size.pt(3.5),
-        labelcolor="black",
+        labelcolor=("black", 1.0),
         labelsize=size.pt(10.0),
         pad=size.pt(4.5),
     )
-
-    for label in ax.get_xticklabels():
-        label.set_alpha(1.0)
 
     # Hide the y-axis ticks since it does not make sense
     ax.tick_params(
@@ -102,9 +97,9 @@ def preview_colormap(
     # Plot the colour bar box with the measurement scale
     cbar = fig.colorbar(im, orientation="horizontal", cax=cax)
 
-    # Set the colour bar box ouline format
+    # Set the colour bar box ouline style
     cbar_outline: Spine = cbar.ax.spines["outline"]
-    _set_outline(cbar_outline, size)
+    _set_outline(cbar_outline, size.pt(0.6))
 
     # Set the colorbar caption
     cbar.set_label(
@@ -121,16 +116,13 @@ def preview_colormap(
 
     cbar.ax.tick_params(
         axis="x",
-        color="black",
+        color=("black", 1.0),
         width=size.pt(0.6),
         length=size.pt(3.5),
-        labelcolor="black",
+        labelcolor=("black", 1.0),
         labelsize=size.pt(10.0),
         pad=size.pt(4.0),
     )
-
-    for label in cbar.ax.get_xticklabels():
-        label.set_alpha(1.0)
 
     # Hide the y-axis ticks since it does not make sense
     cbar.ax.tick_params(
@@ -150,47 +142,6 @@ def preview_colormap(
 
     # Display the plot
     plt.show()
-
-
-def _set_outline(outline: Spine, size:Size):
-    outline.set_linewidth(size.pt(0.6))
-    outline.set_color("black")
-    outline.set_alpha(1.0)
-
-
-class BrightnessProfileLayout(FigureLayout):
-
-    axes: PlotStyle
-
-    def __init__(
-        self, width: int = 486, height: int = 486, dpi: int = REF_DPI
-    ) -> None:
-        super().__init__(width, height, dpi)
-
-        self.axes = PlotStyle(self.figsize, self.dpi)
-
-
-    def _init_sizes(self) -> None:
-        # Scale factor for all measures in points
-        pt_scale = self.pt_scale
-
-        self.plot_linewidth = 1.2 * pt_scale
-
-        self.title_fontsize = 12.0 * pt_scale
-        self.title_labelpad = 6 * pt_scale
-
-        self.axis_outline_linewidth = 0.8 * pt_scale
-
-        self.axis_label_fontsize = 10.0 * pt_scale
-        self.axis_label_labelpad = 4.0 * pt_scale
-
-        self.axis_tick_width = 0.6 * pt_scale
-        self.axis_tick_length = 3.5 * pt_scale
-        self.axis_tick_fontsize = 10.0 * pt_scale
-        self.axis_x_tick_labelpad = 3.0 * pt_scale
-        self.axis_y_tick_labelpad = 3.5 * pt_scale
-
-        self.grid_linewidth = 0.8 * pt_scale
 
 
 def plot_brightness_profile(
@@ -257,23 +208,76 @@ def plot_brightness_profile(
         >>> # ax.grid(True) # Add a grid
         >>> # plt.show()
     """
-    # Layout definition in pixel size units
-    layout = BrightnessProfileLayout(figsize=(486, 486), dpi=100)
-        self._init_boxes((32, 18, 52, 66))  # (32, 13, 53, 66)
+    # Referece rectangle
+    # - units in pixel per dimension
+    rect = Rect(486, 486, 100)
+    size = Size(rect.dpi)
 
-    layout.title.style(12.0, 0.0)
+    # Create the figure and plot box
+    fig = plt.figure(figsize=rect.figsize, dpi=rect.dpi)
 
-    layout.axes.margins(32, 24, 134, 24)
-    layout.axes.outline.style(0.6)
-    layout.axes.label.x.style(10.0, 3.0)
-    layout.axes.tick.x.style(0.6, 3.5)
-    layout.axes.tick.x.label.style(10.0, 4.5)
+    ax = fig.add_axes(rect.margins(66, 52, 18, 32))
 
-    layout.cbar.margins(224, 24, 52, 24)
-    layout.cbar.outline.style(0.6)
-    layout.cbar.label.x.style(10.0, 4.0)
-    layout.cbar.tick.x.style(0.6, 3.5)
-    layout.cbar.tick.x.label.style(10.0, 4.0)
+    # Set the figure title
+    fig.suptitle(
+        "Relative Brightness of Color Bars",
+        fontsize=size.pt(12.0),
+        color="black",
+        alpha=1.0,
+        y=0.0,
+    )
+
+    # Set the plot box ouline style
+    for spine in ["top", "bottom", "left", "right"]:
+        axes_outline = ax.spines[spine]
+        _set_outline(axes_outline, size.pt(0.8))
+
+    # Set the x-axis label
+    ax.set_xlabel(
+        f"Index of Enhancement: {scale.name}",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Set the y-axis label
+    ax.set_ylabel(
+        f"Brightness ({LUMA_ALGORITHMS[algorithm]})",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Setup the x-axis ticks
+    ax.tick_params(
+        axis="x",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(3.0),
+    )
+
+    # Setup the y-axis ticks
+    ax.tick_params(
+        axis="y",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(3.5),
+    )
+
+    # Hide the y-axis ticks since it does not make sense
+    ax.tick_params(
+        axis="y", which="both", left=False, right=False, labelleft=False
+    )
+
+    ax.minorticks_off()
 
     # Number of color brightness levels
     ncolors: int = 256
@@ -287,22 +291,6 @@ def plot_brightness_profile(
     # Prepare the plotting data
     x_indices = list(range(ncolors))
     y_brightness = brightness
-
-    # Create the figure and plot box
-    fig = plt.figure(figsize=layout.figsize, dpi=layout.dpi)
-
-    ax = fig.add_axes(layout.axes_box)
-
-    # Set the plot title
-    ax.set_title(
-        "Relative Brightness of Color Bars",
-        fontsize=layout.title_fontsize,
-        pad=layout.title_labelpad,
-    )
-
-    # Set the plot box ouline format
-    for spine in ["top", "bottom", "left", "right"]:
-        ax.spines[spine].set_linewidth(layout.axis_outline_linewidth)
 
     # Color the area under the curve using thin bars
     bar_width = 1.0
@@ -318,52 +306,18 @@ def plot_brightness_profile(
         )
 
     # Plot the perceived brightness curve
-    ax.plot(
-        x_indices, y_brightness, color="black", linewidth=layout.plot_linewidth
-    )
+    ax.plot(x_indices, y_brightness, color="black", linewidth=size.pt(1.2))
 
     # Configure axes limits
     ax.set_xlim(0, ncolors - 1)
     ax.set_ylim(0, ncolors - 1)
 
-    # Set the axes labels
-    ax.set_xlabel(
-        f"Index of Enhancement: {scale.name}",
-        color="black",
-        fontsize=layout.axis_label_fontsize,
-        labelpad=layout.axis_label_labelpad,
-    )
-
-    ax.set_ylabel(
-        f"Brightness ({LUMA_ALGORITHMS[algorithm]})",
-        color="black",
-        fontsize=layout.axis_label_fontsize,
-        labelpad=layout.axis_label_labelpad,
-    )
-
-    # Setup the axes ticks
-    ax.tick_params(
-        axis="x",
-        width=layout.axis_tick_width,
-        length=layout.axis_tick_length,
-        labelsize=layout.axis_tick_fontsize,
-        pad=layout.axis_x_tick_labelpad,
-    )
-
-    ax.tick_params(
-        axis="y",
-        width=layout.axis_tick_width,
-        length=layout.axis_tick_length,
-        labelsize=layout.axis_tick_fontsize,
-        pad=layout.axis_y_tick_labelpad,
-    )
-
-    # Optional: Improve plot appearance
-    plt.grid(True, linestyle="--", alpha=0.6, linewidth=layout.grid_linewidth)
+    # Add grid lines
+    plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
 
     # Save the plot if required
     if save_path:
-        plt.savefig(save_path, dpi=layout.dpi, bbox_inches=None)
+        plt.savefig(save_path, dpi=rect.dpi, bbox_inches=None)
 
     # Display the plot
     plt.show()
@@ -423,3 +377,9 @@ def _rgb_to_brightness(
         brightness.append(gray_value * brightness_max)
 
     return brightness
+
+
+def _set_outline(outline: Spine, linewidth: float) -> None:
+    outline.set_linewidth(linewidth)
+    outline.set_color("black")
+    outline.set_alpha(1.0)
