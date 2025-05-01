@@ -7,7 +7,6 @@ enhancement color tables, as well as reverse and manipulate color maps.
 
 from .catalogue import get_scale
 from .palette import EnhacementPalette
-from .preview import plot_brightness_profile, preview_colormap
 from .scale import EnhancementScale
 from .stretching import EnhacementStretching, get_stmap
 from .ticks import ColorbarTicks
@@ -17,8 +16,6 @@ __all__ = [
     "EnhacementPalette",
     "EnhancementScale",
     "EnhacementStretching",
-    "plot_brightness_profile",
-    "preview_colormap",
     "get_scale",
     "get_stmap",
 ]

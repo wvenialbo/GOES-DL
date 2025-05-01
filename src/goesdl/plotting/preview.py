@@ -4,8 +4,8 @@ from matplotlib.spines import Spine
 import numpy as np
 from matplotlib import pyplot as plt
 
-from .scale import EnhancementScale
-from .shared import ColorValueList, DiscreteColorList
+from ..enhancement.scale import EnhancementScale
+from ..enhancement.shared import ColorValueList, DiscreteColorList
 
 LUMA_COEFFICIENTS = {
     "rec240": (0.212, 0.701, 0.087),  # Adobe
