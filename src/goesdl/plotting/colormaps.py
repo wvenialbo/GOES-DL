@@ -49,7 +49,7 @@ def preview_colormap(
         fontsize=size.pt(12.0),
         color="black",
         alpha=1.0,
-        y=0.0,
+        y=rect.y_pos(294),
     )
 
     # Set the plot box ouline style
@@ -224,7 +224,7 @@ def plot_brightness_profile(
         fontsize=size.pt(12.0),
         color="black",
         alpha=1.0,
-        y=0.0,
+        y=rect.y_pos(476),
     )
 
     # Set the plot box ouline style
@@ -272,11 +272,6 @@ def plot_brightness_profile(
         pad=size.pt(3.5),
     )
 
-    # Hide the y-axis ticks since it does not make sense
-    ax.tick_params(
-        axis="y", which="both", left=False, right=False, labelleft=False
-    )
-
     ax.minorticks_off()
 
     # Number of color brightness levels
@@ -309,8 +304,8 @@ def plot_brightness_profile(
     ax.plot(x_indices, y_brightness, color="black", linewidth=size.pt(1.2))
 
     # Configure axes limits
-    ax.set_xlim(0, ncolors - 1)
-    ax.set_ylim(0, ncolors - 1)
+    ax.set_xlim(-5, ncolors + 4)
+    ax.set_ylim(-5, ncolors + 4)
 
     # Add grid lines
     plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
