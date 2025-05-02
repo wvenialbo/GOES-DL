@@ -116,6 +116,12 @@ class EnhacementStretching:
         )
 
     @property
+    def is_reversed(self) -> bool:
+        first_output = self.table[0][1]
+        last_output = self.table[-1][1]
+        return first_output > last_output
+
+    @property
     def keypoints(self) -> tuple[KeypointList, KeypointList]:
         y_v, x_v = zip(*self.table)
 
