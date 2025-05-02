@@ -5,16 +5,16 @@
 # default: 200K - 240K
 
 st_step = 5
-st_delta = -40
+st_delta = -29
 st_width = 40
 
-st_range = range(180, 205 + st_step, st_step)
+st_range = list(range(180, 205 + st_step, st_step))
 
 st_template = [
-    (0.0, 0.0),
-    (40.0, 40.0),
-    (80.0, 80.0),
-    (167.5, 255.0),
+    (0.0, 255.0),
+    (29.0, 226.0),
+    (69.0, 186.0),
+    (255.0, 0.0),
 ]
 
 st_names = [f"K{keypoint}-{keypoint+st_width}" for keypoint in st_range]
