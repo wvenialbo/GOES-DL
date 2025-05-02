@@ -5,14 +5,12 @@ from .constants import UNNAMED_TABLE
 from .shared import StretchingTable
 
 ST_KEYWORD = (
-    "ST",
+    "SU",
     "TABLE",
-    "Brightness",
-    "Temperature",
-    "Color",
-    "Index",
-    "-------",
-    "---",
+    "Input",
+    "Output",
+    "-----",
+    "------",
 )
 
 ST_SIGNATURE = f"{ST_KEYWORD[0]} {ST_KEYWORD[1]}"
@@ -25,9 +23,8 @@ class st_utility:
         lines.extend(
             (
                 f"{ST_SIGNATURE} {name}",
-                f"{ST_KEYWORD[2]}  {ST_KEYWORD[4]}",
-                f"{ST_KEYWORD[3]} {ST_KEYWORD[5]}",
-                f"{ST_KEYWORD[6]:>10}{ST_KEYWORD[7]:>7}",
+                f"{ST_KEYWORD[2]:>6}{ST_KEYWORD[3]:>8}",
+                f"{ST_KEYWORD[4]:>6}{ST_KEYWORD[5]:>8}",
             )
         )
 
@@ -62,7 +59,7 @@ class st_utility:
     def _create_stretching_table(
         lines: list[str], table: StretchingTable
     ) -> None:
-        lines.extend(f"{round(x,2):>10.2f}{round(y):>7d}" for x, y in table)
+        lines.extend(f"{round(x,1):>6.1f}{round(y):>8d}" for x, y in table)
 
     @classmethod
     def parse_table(cls, lines: list[str]) -> tuple[StretchingTable, str]:
