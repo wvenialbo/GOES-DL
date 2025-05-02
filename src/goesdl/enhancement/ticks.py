@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from .constants import CBTICKS_NMAX, CBTICKS_SMIN, CBTICKS_STEP
 from .shared import DomainData, KeypointList
 
@@ -5,14 +7,15 @@ from .shared import DomainData, KeypointList
 class ColorbarTicks:
 
     cticks: KeypointList
-    nticks: int
-    tickstep: int
+    lticks: KeypointList
 
     def __init__(
         self,
         extent: DomainData,
         nticks: int | None = None,
         tickstep: int | None = None,
+        offset: float = 0.0,
+        scale: float = 1.0,
     ) -> None:
         """
         Create a list of colorbar ticks for the given temperature range.
@@ -50,22 +53,33 @@ class ColorbarTicks:
                 "use 'tickstep=0' for automatic scpacing"
             )
 
-        tmin, tmax = extent
+        def forward_mapping(x: float) -> float:
+            return scale * x + offset
+
+        def inverse_mapping(y: float) -> float:
+            return (y - offset) / scale
+
+        vmin, vmax = (forward_mapping(x) for x in extent)
 
         if tickstep == 0:
             tickstep = self._find_tick_step(
-                tmin, tmax, max_ticks=nticks, min_step=CBTICKS_SMIN
+                vmin, vmax, max_ticks=nticks, min_step=CBTICKS_SMIN
             )
 
-        cbmin = self._find_tick_min(tmin, tickstep)
-        cbmax = self._find_tick_max(tmax, tickstep) + 1
+        cbmin = self._find_tick_min(vmin, tickstep)
+        cbmax = self._find_tick_max(vmax, tickstep) + 1
 
-        self.cticks = [float(tick) for tick in range(cbmin, cbmax, tickstep)]
-        self.nticks = nticks
-        self.tickstep = tickstep
+        self.lticks = [float(tick) for tick in range(cbmin, cbmax, tickstep)]
+        self.cticks = [inverse_mapping(y) for y in self.lticks]
 
-    def get_ticklabels(self, offset: float = 0.0) -> KeypointList:
-        return [tick + offset for tick in self.cticks]
+    def get_ticks(self) -> KeypointList:
+        return self.cticks
+
+    def get_labels(
+        self, format: Callable[[float], str] | None = None
+    ) -> list[str]:
+        _format = format or str
+        return list(map(_format, self.lticks))
 
     @staticmethod
     def _find_tick_max(vmax: float, step: int) -> int:
