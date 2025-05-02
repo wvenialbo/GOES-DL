@@ -33,6 +33,10 @@ class EnhancementScale:
 
     palette: EnhacementPalette
     stretching: EnhacementStretching
+
+    cmap: Colormap
+    cnorm: Normalize
+
     ticker: ColorbarTicks
 
     def __init__(
@@ -47,6 +51,9 @@ class EnhancementScale:
         )
 
         self.ticker = ColorbarTicks(self.stretching.domain)
+
+        self.cmap = self._get_cmap()
+        self.cnorm = self._get_cnorm()
 
     @classmethod
     def combined_from_stock(
@@ -228,48 +235,45 @@ class EnhancementScale:
 
         return cast(MSegmentData, new_segment_data)
 
-    @property
-    def cmap(self) -> Colormap:
+    def _get_cmap(self) -> Colormap:
         segment_data = cast(MSegmentData, self.palette.segment_data)
         return LinearSegmentedColormap(
             self.name, segment_data, N=self.palette.ncolors
         )
 
-    @property
-    def cnorm(self) -> Normalize:
-        ymin, ymax = self.stretching.range
-        xmin, xmax = self.stretching.domain
+    def _get_cnorm(self) -> Normalize:
+        fx: tuple[float, ...]
+        fy: tuple[float, ...]
+        fx, fy = zip(*self.stretching.table)
 
-        if ymin < ymax:
-            return Normalize(vmin=xmin, vmax=xmax, clip=True)
+        ymin, ymax = self.stretching.range
+        fy = tuple((y - ymin) / (ymax - ymin) for y in fy)
+
+        if self.stretching.is_reversed:
+            fp = fy[::-1]
+            fq = fx[::-1]
+        else:
+            fp = fy
+            fq = fx
 
         def forward_mapping(x: Any) -> Any:
-            fx, fy = zip(*self.stretching.table)
             return interp(x, fx, fy, left=fy[0], right=fy[-1])
 
-        def inverse_mapping(y: Any) -> Any:
-            fx, fy = zip(*self.stretching.table)
-            return interp(y, fy, fx, left=fx[0], right=fx[-1])
+        def inverse_mapping(p: Any) -> Any:
+            return interp(p, fp, fq, left=fq[0], right=fq[-1])
 
-        class Norma(Normalize):
-            # def __init__(self, vmin=None, vmax=None, clip=False) -> None:
-            #     super().__init__(vmin, vmax, clip)
-
+        class _Normalize(Normalize):
             def __call__(self, x: Any) -> Any:  # type: ignore
                 return forward_mapping(x)
 
             def inverse(self, y: Any) -> Any:  # type: ignore
                 return inverse_mapping(y)
 
-        return Norma()
+        return _Normalize()
 
     @property
     def domain(self) -> DomainData:
         return self.stretching.domain
-
-    @property
-    def is_reversed(self) -> bool:
-        return self.stretching.is_reversed
 
     @property
     def name(self) -> str:
