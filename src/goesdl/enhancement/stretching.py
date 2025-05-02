@@ -13,7 +13,7 @@ from pathlib import Path
 from .constants import UNNAMED_TABLE
 from .shared import DomainData, KeypointList, StretchingTable
 from .st_stock import st_names, st_stock
-from .st_table import st_utility
+from .su_table import st_utility
 
 ST_SIGNATURE = "ST TABLE"
 ST_KEYWORD = (
