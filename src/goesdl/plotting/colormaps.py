@@ -90,7 +90,7 @@ def preview_colormap(
 
     # Example data
     vmin, vmax = scale.domain
-    data = np.linspace(vmin, vmax, scale.ncolors)[None, :]
+    data = np.linspace(vmax, vmin, scale.ncolors, endpoint=True)[None, :]
 
     # Plot the example data
     im = ax.imshow(data, aspect="auto", cmap=scale.cmap, norm=scale.cnorm)
@@ -100,6 +100,8 @@ def preview_colormap(
 
     # Plot the colour bar box with the measurement scale
     cbar = fig.colorbar(im, orientation="horizontal", cax=cax)
+
+    cbar.ax.set_xlim(vmax, vmin)
 
     # Set the colour bar box ouline style
     cbar_outline: Spine = cbar.ax.spines["outline"]
