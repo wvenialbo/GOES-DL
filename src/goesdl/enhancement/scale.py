@@ -1,8 +1,13 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, cast
 
-from matplotlib.colors import Colormap, LinearSegmentedColormap, Normalize
+from matplotlib.colors import (
+    Colormap,
+    FuncNorm,
+    LinearSegmentedColormap,
+    Normalize,
+)
 from numpy import interp
 
 from .palette import EnhacementPalette
@@ -26,15 +31,14 @@ from .ticks import ColorbarTicks
 
 class EnhancementScale:
 
-    barticks: ColorbarTicks
     palette: EnhacementPalette
     stretching: EnhacementStretching
+    ticker: ColorbarTicks
 
     def __init__(
         self,
         palette: EnhacementPalette,
         stretching: EnhacementStretching | None = None,
-        cbarticks: ColorbarTicks | None = None,
     ) -> None:
         self.palette = palette
 
@@ -42,7 +46,7 @@ class EnhancementScale:
             st_default, st_stock[st_default]
         )
 
-        self.barticks = cbarticks or ColorbarTicks(self.stretching.domain)
+        self.ticker = ColorbarTicks(self.stretching.domain)
 
     @classmethod
     def combined_from_stock(
@@ -178,22 +182,22 @@ class EnhancementScale:
         """
         self.stretching.save(path)
 
+    def set_ticks(
+        self,
+        nticks: int | None = None,
+        tickstep: int | None = None,
+        offset: float = 0.0,
+        scale: float = 1.0,
+    ) -> None:
+        self.ticker = ColorbarTicks(
+            self.stretching.domain, nticks, tickstep, offset, scale
+        )
+
     def update_palette(self, palette: EnhacementPalette) -> None:
         self.palette = palette
 
     def update_stretching(self, stretching: EnhacementStretching) -> None:
         self.stretching = stretching
-
-    def get_ticklabels(
-        self, offset: float = 0.0, format: Callable[[float], Any] | None = None
-    ) -> list[Any]:
-        label_values = self.barticks.get_ticklabels(offset)
-        return list(map(format, label_values)) if format else label_values
-
-    def set_ticks(
-        self, nticks: int | None = None, tickstep: int | None = None
-    ) -> None:
-        self.barticks = ColorbarTicks(self.stretching.domain, nticks, tickstep)
 
     def _transform_color_segment(
         self, segment: ColorSegments, xp: KeypointList, yp: KeypointList
@@ -226,23 +230,46 @@ class EnhancementScale:
 
     @property
     def cmap(self) -> Colormap:
-        transformed_segment_data = self._transform_segment_data()
+        segment_data = cast(MSegmentData, self.palette.segment_data)
         return LinearSegmentedColormap(
-            self.name, transformed_segment_data, N=self.palette.ncolors
+            self.name, segment_data, N=self.palette.ncolors
         )
 
     @property
     def cnorm(self) -> Normalize:
-        vmin, vmax = self.stretching.domain
-        return Normalize(vmin=vmin, vmax=vmax, clip=False)
+        ymin, ymax = self.stretching.range
+        xmin, xmax = self.stretching.domain
 
-    @property
-    def cticks(self) -> KeypointList:
-        return self.barticks.cticks
+        if ymin < ymax:
+            return Normalize(vmin=xmin, vmax=xmax, clip=True)
+
+        def forward_mapping(x: Any) -> Any:
+            fx, fy = zip(*self.stretching.table)
+            return interp(x, fx, fy, left=fy[0], right=fy[-1])
+
+        def inverse_mapping(y: Any) -> Any:
+            fx, fy = zip(*self.stretching.table)
+            return interp(y, fy, fx, left=fx[0], right=fx[-1])
+
+        class Norma(Normalize):
+            # def __init__(self, vmin=None, vmax=None, clip=False) -> None:
+            #     super().__init__(vmin, vmax, clip)
+
+            def __call__(self, x: Any) -> Any:  # type: ignore
+                return forward_mapping(x)
+
+            def inverse(self, y: Any) -> Any:  # type: ignore
+                return inverse_mapping(y)
+
+        return Norma()
 
     @property
     def domain(self) -> DomainData:
         return self.stretching.domain
+
+    @property
+    def is_reversed(self) -> bool:
+        return self.stretching.is_reversed
 
     @property
     def name(self) -> str:
@@ -251,3 +278,35 @@ class EnhancementScale:
     @property
     def ncolors(self) -> int:
         return self.palette.ncolors
+
+    @property
+    def range(self) -> DomainData:
+        return self.stretching.range
+
+    @property
+    def tmap(self) -> Colormap:
+        transformed_segment_data = self._transform_segment_data()
+        return LinearSegmentedColormap(
+            self.name, transformed_segment_data, N=self.palette.ncolors
+        )
+
+    @property
+    def tnorm(self) -> Normalize:
+        ymin, ymax = self.stretching.range
+        xmin, xmax = self.stretching.domain
+
+        if ymin < ymax:
+            return Normalize(vmin=xmin, vmax=xmax, clip=False)
+
+        def forward_mapping(x: float) -> float:
+            return (x - xmax) / (xmin - xmax)
+
+        def inverse_mapping(v: float) -> float:
+            return v * xmin + (1 - v) * xmax
+
+        return FuncNorm(
+            (forward_mapping, inverse_mapping),
+            vmin=xmin,
+            vmax=xmax,
+            clip=False,
+        )
