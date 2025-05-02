@@ -34,7 +34,6 @@ def preview_colormap(
     scale: EnhancementScale,
     save_path: str | Path = "",
     measurement: str = "",
-    offset: float = 0.0,
     show: bool = True,
 ) -> None:
     # Referece rectangle
@@ -88,20 +87,17 @@ def preview_colormap(
 
     ax.minorticks_off()
 
-    # Example data
-    vmin, vmax = scale.domain
-    data = np.linspace(vmax, vmin, scale.ncolors, endpoint=True)[None, :]
+    # Generate example data
+    data = np.linspace(0, 1, scale.ncolors, endpoint=True)[None, :]
 
     # Plot the example data
-    im = ax.imshow(data, aspect="auto", cmap=scale.cmap, norm=scale.cnorm)
+    im = ax.imshow(data, aspect="auto", cmap=scale.cmap)
 
     # Create the colour bar box
     cax = fig.add_axes(rect.margins(24, 52, 24, 224))
 
     # Plot the colour bar box with the measurement scale
     cbar = fig.colorbar(im, orientation="horizontal", cax=cax)
-
-    cbar.ax.set_xlim(vmax, vmin)
 
     # Set the colour bar box ouline style
     cbar_outline: Spine = cbar.ax.spines["outline"]
@@ -118,8 +114,6 @@ def preview_colormap(
     )
 
     # Create and setup the colour bar ticks
-    cbar.set_ticks(scale.cticks)
-
     cbar.ax.tick_params(
         axis="x",
         color=("black", 1.0),
@@ -135,12 +129,19 @@ def preview_colormap(
         axis="y", which="both", left=False, right=False, labelleft=False
     )
 
+    # Hide the minor ticks
     cbar.ax.minorticks_off()
 
-    # Add labels to the colour bar ticks
-    ticklabels = scale.get_ticklabels(offset, int)
+    # Add the colour bar ticks and labels
+    def _to_int_str(x: float) -> str:
+        return str(round(x))
 
-    cbar.set_ticklabels(ticklabels)
+    ticker = scale.ticker
+
+    tickmarks = [float(scale.cnorm(v)) for v in ticker.get_ticks()]
+    ticklabels = ticker.get_labels(_to_int_str)
+
+    cbar.set_ticks(tickmarks, labels=ticklabels)
 
     # Save the plot if required
     if save_path:
