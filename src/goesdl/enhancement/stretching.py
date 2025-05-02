@@ -107,9 +107,13 @@ class EnhacementStretching:
 
     @property
     def domain(self) -> DomainData:
-        vmin = self.table[0][0]
-        vmax = self.table[-1][0]
-        return vmin, vmax
+        first_input = self.table[0][0]
+        last_input = self.table[-1][0]
+        return (
+            (first_input, last_input)
+            if first_input < last_input
+            else (last_input, first_input)
+        )
 
     @property
     def keypoints(self) -> tuple[KeypointList, KeypointList]:
@@ -125,14 +129,13 @@ class EnhacementStretching:
 
     @property
     def range(self) -> DomainData:
-        vmin = self.table[0][1]
-        vmax = self.table[-1][1]
-        return vmin, vmax
-
-    @property
-    def is_reversed(self) -> bool:
-        ymin, ymax = self.range
-        return ymin > ymax
+        first_output = self.table[0][1]
+        last_output = self.table[-1][1]
+        return (
+            (first_output, last_output)
+            if first_output < last_output
+            else (last_output, first_output)
+        )
 
 
 def get_stmap(stretching_name: str) -> EnhacementStretching:
