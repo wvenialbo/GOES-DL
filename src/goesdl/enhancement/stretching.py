@@ -129,6 +129,11 @@ class EnhacementStretching:
         vmax = self.table[-1][1]
         return vmin, vmax
 
+    @property
+    def is_reversed(self) -> bool:
+        ymin, ymax = self.range
+        return ymin > ymax
+
 
 def get_stmap(stretching_name: str) -> EnhacementStretching:
     if stretching_name not in st_names:
