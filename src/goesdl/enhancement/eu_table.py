@@ -73,7 +73,7 @@ class eu_utility(clr_utility):
         g = cls._scale_color_values(g)
         r = cls._scale_color_values(r)
 
-        return list(zip(x, b, g, r))
+        return cls._make_color_table((x, b, g, r))
 
     @classmethod
     def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
