@@ -10,6 +10,7 @@ from .constants import (
 from .shared import (
     ColorTable,
     ColorValueList,
+    DomainData,
     KeypointList,
     RGBValue,
     ValueTable,
@@ -45,10 +46,12 @@ class clr_utility:
         return [k / BRG_MAX for k in y]
 
     @staticmethod
-    def _normalize_keypoint_values(x: KeypointList) -> KeypointList:
-        x_min = x[0]
-        length = x[-1] - x_min
-        return [(k - x_min) / length for k in x]
+    def _normalize_keypoint_values(
+        x: KeypointList,
+    ) -> tuple[KeypointList, DomainData]:
+        x_min, x_max = tuple(sorted((x[0], x[-1])))
+        length = x_max - x_min
+        return [(k - x_min) / length for k in x], (x_min, x_max)
 
     @staticmethod
     def _scale_color_values(y: ColorValueList) -> ColorValueList:
