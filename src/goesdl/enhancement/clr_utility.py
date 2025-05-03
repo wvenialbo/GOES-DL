@@ -60,3 +60,28 @@ class clr_utility:
     @staticmethod
     def _scale_keypoint_values(x: KeypointList) -> KeypointList:
         return [round(k * CLR_MAX) for k in x]
+
+    @staticmethod
+    def _validate_monotonic_keypoints(x: KeypointList) -> None:
+        if len(x) <= 1:
+            return
+
+        is_increasing = True
+        is_decreasing = True
+
+        for i in range(len(x) - 1):
+            k_current = x[i]
+            k_next = x[i + 1]
+
+            if k_current > k_next:
+                is_increasing = False
+            elif k_current < k_next:
+                is_decreasing = False
+
+            if not is_increasing and not is_decreasing:
+                break
+
+        if not is_increasing and not is_decreasing:
+            raise ValueError(
+                "Keypoints are expected to increase or decrease monotonically"
+            )
