@@ -50,10 +50,7 @@ class EnhancementScale:
             st_default, st_stock[st_default]
         )
 
-        self.ticker = ColorbarTicks(self.stretching.domain)
-
-        self.cmap = self._get_cmap()
-        self.cnorm = self._get_cnorm()
+        self._stretching_updated()
 
     @classmethod
     def combined_from_stock(
@@ -79,6 +76,7 @@ class EnhancementScale:
 
     def create_stretching(self, name: str, table: StretchingTable) -> None:
         self.stretching = EnhacementStretching(name, table)
+        self._stretching_updated()
 
     @classmethod
     def discrete(
@@ -150,6 +148,7 @@ class EnhancementScale:
             An instance of the EnhacementStretching class.
         """
         self.stretching = EnhacementStretching.load(path)
+        self._stretching_updated()
 
     @classmethod
     def segmented(
@@ -202,38 +201,11 @@ class EnhancementScale:
 
     def update_palette(self, palette: EnhacementPalette) -> None:
         self.palette = palette
+        self.cmap = self._get_cmap()
 
     def update_stretching(self, stretching: EnhacementStretching) -> None:
         self.stretching = stretching
-
-    def _transform_color_segment(
-        self, segment: ColorSegments, xp: KeypointList, yp: KeypointList
-    ) -> ColorSegments:
-        new_segment: ColorSegments = []
-
-        for x0, y0, y1 in segment:
-            x1 = self._transform_keypoint(x0, xp, yp)
-
-            new_segment.append((x1, y0, y1))
-
-        return new_segment
-
-    def _transform_keypoint(
-        self, x: float, xp: KeypointList, yp: KeypointList
-    ) -> float:
-        y_scaled = interp(x, xp, yp, left=0.0, right=1.0)
-
-        return cast(float, y_scaled)
-
-    def _transform_segment_data(self) -> MSegmentData:
-        yp, xp = self.stretching.keypoints
-
-        new_segment_data: SegmentData = {
-            component: self._transform_color_segment(segment, xp, yp)
-            for component, segment in self.palette.segment_data.items()
-        }
-
-        return cast(MSegmentData, new_segment_data)
+        self._stretching_updated()
 
     def _get_cmap(self) -> Colormap:
         segment_data = cast(MSegmentData, self.palette.segment_data)
@@ -270,6 +242,40 @@ class EnhancementScale:
                 return inverse_mapping(y)
 
         return _Normalize()
+
+    def _stretching_updated(self):
+        self.ticker = ColorbarTicks(self.stretching.domain)
+        self.cmap = self._get_cmap()
+        self.cnorm = self._get_cnorm()
+
+    def _transform_color_segment(
+        self, segment: ColorSegments, xp: KeypointList, yp: KeypointList
+    ) -> ColorSegments:
+        new_segment: ColorSegments = []
+
+        for x0, y0, y1 in segment:
+            x1 = self._transform_keypoint(x0, xp, yp)
+
+            new_segment.append((x1, y0, y1))
+
+        return new_segment
+
+    def _transform_keypoint(
+        self, x: float, xp: KeypointList, yp: KeypointList
+    ) -> float:
+        y_scaled = interp(x, xp, yp, left=0.0, right=1.0)
+
+        return cast(float, y_scaled)
+
+    def _transform_segment_data(self) -> MSegmentData:
+        yp, xp = self.stretching.keypoints
+
+        new_segment_data: SegmentData = {
+            component: self._transform_color_segment(segment, xp, yp)
+            for component, segment in self.palette.segment_data.items()
+        }
+
+        return cast(MSegmentData, new_segment_data)
 
     @property
     def domain(self) -> DomainData:
