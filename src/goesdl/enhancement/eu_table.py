@@ -50,9 +50,9 @@ class eu_utility(clr_utility):
         """
         lines: list[str] = []
 
-        cls._add_color_table_header(lines, name, rgb)
+        cls._add_eu_table_header(lines, name, rgb)
 
-        cls._create_color_table(lines, table, rgb)
+        cls._create_eu_table(lines, table, rgb)
 
         with open(path, "w", encoding="utf-8", newline="\n") as file:
             cls._write_color_table_file(file, lines)
@@ -114,7 +114,7 @@ class eu_utility(clr_utility):
         return color_table, name
 
     @staticmethod
-    def _add_color_table_header(
+    def _add_eu_table_header(
         lines: list[str], name: str, rgb: bool
     ) -> None:
         lines.append(f"{EU_SIGNATURE} {name}")
@@ -131,7 +131,7 @@ class eu_utility(clr_utility):
         lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
 
     @classmethod
-    def _create_color_table(
+    def _create_eu_table(
         cls,
         lines: list[str],
         table: ColorTable,
