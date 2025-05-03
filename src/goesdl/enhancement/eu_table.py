@@ -102,9 +102,11 @@ class eu_utility(clr_utility):
             g.extend((float(ls[4]), float(ls[5])))
             r.extend((float(ls[6]), float(ls[7])))
 
-        value_table = cls._process_eu_table(color_model, (j, b, g, r))
+        # Convert color model if necessary
+        if color_model == CM_RGB:
+            r, b = b, r
 
-        color_table = cls._make_color_table(value_table)
+        color_table = cls._process_eu_table((j, b, g, r))
 
         name = UNNAMED_COLORMAP
         if len(lines[0]) > len(EU_SIGNATURE):
@@ -114,9 +116,7 @@ class eu_utility(clr_utility):
         return color_table, name
 
     @staticmethod
-    def _add_eu_table_header(
-        lines: list[str], name: str, rgb: bool
-    ) -> None:
+    def _add_eu_table_header(lines: list[str], name: str, rgb: bool) -> None:
         lines.append(f"{EU_SIGNATURE} {name}")
         i, j, k = (3, 4, 5) if rgb else (5, 4, 3)
         lines.append(
@@ -158,9 +158,8 @@ class eu_utility(clr_utility):
     @classmethod
     def _process_eu_table(
         cls,
-        color_model: str,
         values: ValueTable,
-    ) -> ValueTable:
+    ) -> ColorTable:
         j, b, g, r = values
 
         # Normalise keypoints values
@@ -171,11 +170,7 @@ class eu_utility(clr_utility):
         g = cls._normalize_color_values(g)
         r = cls._normalize_color_values(r)
 
-        # Convert color model if necessary
-        if color_model == CM_RGB:
-            r, b = b, r
-
-        return x, b, g, r
+        return cls._make_color_table((x, b, g, r))
 
     @staticmethod
     def _write_color_table_file(file: TextIO, lines: list[str]) -> None:
