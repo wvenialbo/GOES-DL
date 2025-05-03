@@ -87,6 +87,7 @@ def preview_colormap(
         axis="y", which="both", left=False, right=False, labelleft=False
     )
 
+    # Hide the minor ticks
     ax.minorticks_off()
 
     # Generate example data
@@ -228,6 +229,7 @@ def preview_stretching(
         pad=size.pt(3.5),
     )
 
+    # Hide the minor ticks
     ax.minorticks_off()
 
     # Configure axes limits
@@ -317,6 +319,7 @@ def preview_stretching(
         axis="y", which="both", left=False, right=False, labelleft=False
     )
 
+    # Hide the minor ticks
     cbar.ax.minorticks_off()
 
     # Add labels to the colour bar ticks
@@ -464,10 +467,15 @@ def plot_brightness_profile(
         pad=size.pt(3.5),
     )
 
+    # Hide the minor ticks
     ax.minorticks_off()
 
     # Number of color brightness levels
     ncolors: int = 256
+
+    # Configure axes limits
+    ax.set_xlim(-5, ncolors + 4)
+    ax.set_ylim(-5, ncolors + 4)
 
     # Create color LUT with 256 entries
     colors_lut = _create_colors_lut(scale, ncolors)
@@ -494,10 +502,6 @@ def plot_brightness_profile(
 
     # Plot the perceived brightness curve
     ax.plot(x_indices, y_brightness, color="black", linewidth=size.pt(1.2))
-
-    # Configure axes limits
-    ax.set_xlim(-5, ncolors + 4)
-    ax.set_ylim(-5, ncolors + 4)
 
     # Add grid lines
     plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
@@ -580,10 +584,15 @@ def plot_color_profile(
         pad=size.pt(3.5),
     )
 
+    # Hide the minor ticks
     ax.minorticks_off()
 
     # Number of color brightness levels
     ncolors: int = 256
+
+    # Configure axes limits
+    ax.set_xlim(-5, ncolors + 4)
+    ax.set_ylim(-5, ncolors + 4)
 
     # Create color LUT with 256 entries
     colors_lut = _create_colors_lut(scale, ncolors)
@@ -614,10 +623,6 @@ def plot_color_profile(
 
     # Display a legend
     ax.legend()
-
-    # Configure axes limits
-    ax.set_xlim(-5, ncolors + 4)
-    ax.set_ylim(-5, ncolors + 4)
 
     # Add grid lines
     plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
@@ -667,6 +672,7 @@ def plot_color_profile(
         axis="y", which="both", left=False, right=False, labelleft=False
     )
 
+    # Hide the minor ticks
     cbar.ax.minorticks_off()
 
     # Add labels to the colour bar ticks
