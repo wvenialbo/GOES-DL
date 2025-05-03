@@ -26,48 +26,6 @@ EU_SIGNATURE = f"{EU_KEYWORD[0]} {EU_KEYWORD[1]}"
 
 class eu_utility(clr_utility):
 
-    @staticmethod
-    def _add_color_table_header(
-        lines: list[str], name: str, rgb: bool
-    ) -> None:
-        lines.append(f"{EU_SIGNATURE} {name}")
-        i, j, k = (3, 4, 5) if rgb else (5, 4, 3)
-        lines.append(
-            f" {EU_KEYWORD[2]}"
-            f"{EU_KEYWORD[i]:>6}"
-            f"{EU_KEYWORD[j]:>11}"
-            f"{EU_KEYWORD[k]:>9}"
-        )
-        hdr = f"{EU_KEYWORD[6]} {EU_KEYWORD[7]}"
-        lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
-        hdr = f"{EU_KEYWORD[8]} {EU_KEYWORD[8]}"
-        lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
-
-    @classmethod
-    def _create_color_table(
-        cls,
-        lines: list[str],
-        table: ColorTable,
-        rgb: bool,
-    ) -> None:
-        if rgb:
-            table = [(x, r, g, b) for x, b, g, r in table]
-
-        for i in range(0, len(table), 2):
-            x_lo, b_lo, g_lo, r_lo = map(round, table[i])
-
-            x_hi, b_hi, g_hi, r_hi = map(round, table[i + 1])
-
-            if x_lo == x_hi:
-                continue
-
-            line = (
-                f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
-                f"{g_lo:>6}{g_hi:>4}{r_lo:>6}{r_hi:>4}"
-            )
-
-            lines.append(line)
-
     @classmethod
     def create_file(
         cls,
@@ -154,6 +112,48 @@ class eu_utility(clr_utility):
             name = name.strip()
 
         return color_table, name
+
+    @staticmethod
+    def _add_color_table_header(
+        lines: list[str], name: str, rgb: bool
+    ) -> None:
+        lines.append(f"{EU_SIGNATURE} {name}")
+        i, j, k = (3, 4, 5) if rgb else (5, 4, 3)
+        lines.append(
+            f" {EU_KEYWORD[2]}"
+            f"{EU_KEYWORD[i]:>6}"
+            f"{EU_KEYWORD[j]:>11}"
+            f"{EU_KEYWORD[k]:>9}"
+        )
+        hdr = f"{EU_KEYWORD[6]} {EU_KEYWORD[7]}"
+        lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
+        hdr = f"{EU_KEYWORD[8]} {EU_KEYWORD[8]}"
+        lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
+
+    @classmethod
+    def _create_color_table(
+        cls,
+        lines: list[str],
+        table: ColorTable,
+        rgb: bool,
+    ) -> None:
+        if rgb:
+            table = [(x, r, g, b) for x, b, g, r in table]
+
+        for i in range(0, len(table), 2):
+            x_lo, b_lo, g_lo, r_lo = map(round, table[i])
+
+            x_hi, b_hi, g_hi, r_hi = map(round, table[i + 1])
+
+            if x_lo == x_hi:
+                continue
+
+            line = (
+                f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
+                f"{g_lo:>6}{g_hi:>4}{r_lo:>6}{r_hi:>4}"
+            )
+
+            lines.append(line)
 
     @classmethod
     def _process_eu_table(
