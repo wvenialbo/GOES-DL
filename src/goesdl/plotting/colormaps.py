@@ -29,6 +29,8 @@ LUMA_ALGORITHMS = {
     # You can add other models here if needed
 }
 
+COLOR_INDEX = "Color Index"
+
 
 def preview_colormap(
     scale: EnhancementScale,
@@ -62,7 +64,7 @@ def preview_colormap(
 
     # Set the x-axis label
     ax.set_xlabel(
-        "Color Index",
+        COLOR_INDEX,
         color="black",
         alpha=1.0,
         fontsize=size.pt(10.0),
@@ -287,7 +289,7 @@ def preview_stretching(
 
     # Set the colorbar caption
     cbar.set_label(
-        label="Color Index",
+        label=COLOR_INDEX,
         weight="normal",
         color="black",
         alpha=1.0,
@@ -637,7 +639,7 @@ def plot_color_profile(
 
     # Set the colorbar caption
     cbar.set_label(
-        label="Color Index",
+        label=COLOR_INDEX,
         weight="normal",
         color="black",
         alpha=1.0,
