@@ -155,7 +155,10 @@ def preview_colormap(
 
 
 def preview_stretching(
-    scale: EnhancementScale, save_path: str | Path = "", show: bool = True
+    scale: EnhancementScale,
+    save_path: str | Path = "",
+    measurement: str = "",
+    show: bool = True,
 ) -> None:
     # Referece rectangle
     # - units in pixel per dimension
@@ -169,7 +172,7 @@ def preview_stretching(
 
     # Set the figure title
     fig.suptitle(
-        "Color Component Intensities",
+        f"Stretching scale: {scale.name}",
         fontsize=size.pt(12.0),
         color="black",
         alpha=1.0,
@@ -181,9 +184,11 @@ def preview_stretching(
         axes_outline = ax.spines[spine]
         _set_outline(axes_outline, size.pt(0.8))
 
+    measurement = measurement or "Measurement"
+
     # Set the x-axis label
     ax.set_xlabel(
-        f"Index of Enhancement: {scale.name}",
+        f"{measurement} (input)",
         color="black",
         alpha=1.0,
         fontsize=size.pt(10.0),
@@ -192,7 +197,7 @@ def preview_stretching(
 
     # Set the y-axis label
     ax.set_ylabel(
-        "Primary component intensity",
+        "Color Index (output)",
         color="black",
         alpha=1.0,
         fontsize=size.pt(10.0),
@@ -223,14 +228,37 @@ def preview_stretching(
 
     ax.minorticks_off()
 
-    input_indices: tuple[float, ...]
-    output_indices: tuple[float, ...]
-    input_indices, output_indices = tuple(zip(*scale.stretching.table))
+    # Configure axes limits
+    xmin, xmax = scale.stretching.domain
+    ymin, ymax = scale.stretching.range
+    ax.set_xlim(xmin - 5, xmax + 5)
+    ax.set_ylim(ymin - 5, ymax + 5)
 
     # Number of color brightness levels
     ncolors: int = 256
 
-    # Plot the colours intensity curves
+    # Prepare the plotting data
+    x_indices = np.linspace(xmin, xmax, ncolors, endpoint=True)
+    y_output = scale.cnorm(x_indices)
+    y_indices = (ymax - ymin) * y_output
+
+    # Color the area under the curve using thin bars
+    bar_width = (xmax - xmin) / (ncolors - 1)
+    pad_offset = -0.3 * bar_width
+    for i in range(ncolors):
+        ax.bar(
+            x_indices[i] + pad_offset,
+            y_indices[i],
+            width=bar_width,
+            color=scale.cmap(y_output[i]),
+            align="edge",
+        )
+
+    # Plot the stretching curve
+    input_indices: tuple[float, ...]
+    output_indices: tuple[float, ...]
+    input_indices, output_indices = tuple(zip(*scale.stretching.table))
+
     ax.plot(
         input_indices,
         output_indices,
@@ -238,12 +266,6 @@ def preview_stretching(
         alpha=1.0,
         linewidth=size.pt(1.2),
     )
-
-    # Configure axes limits
-    xmin, xmax = scale.stretching.domain
-    ymin, ymax = scale.stretching.range
-    ax.set_xlim(xmin - 5, xmax + 5)
-    ax.set_ylim(ymin - 5, ymax + 5)
 
     # Add grid lines
     plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
