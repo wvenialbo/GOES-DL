@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import TextIO
 
-from .clr_table import clr_utility
+from .clr_utility import clr_utility
 from .constants import CM_BGR, CM_RGB, UNNAMED_COLORMAP
 from .shared import (
     ColorTable,

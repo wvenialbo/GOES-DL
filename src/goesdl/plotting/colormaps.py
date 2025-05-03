@@ -6,7 +6,7 @@ from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 from matplotlib.spines import Spine
 
-from ..enhancement.clr_table import clr_utility
+from ..enhancement.clr_utility import clr_utility
 from ..enhancement.scale import EnhancementScale
 from ..enhancement.shared import ColorValueList, DiscreteColorList
 from .helpers import Rect, Size
