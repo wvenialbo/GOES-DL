@@ -234,14 +234,16 @@ def preview_stretching(
     ax.plot(
         input_indices,
         output_indices,
-        color="blak",
+        color="black",
         alpha=1.0,
         linewidth=size.pt(1.2),
     )
 
     # Configure axes limits
-    ax.set_xlim(-5, ncolors + 4)
-    ax.set_ylim(-5, ncolors + 4)
+    xmin, xmax = scale.stretching.domain
+    ymin, ymax = scale.stretching.range
+    ax.set_xlim(xmin - 5, xmax + 5)
+    ax.set_ylim(ymin - 5, ymax + 5)
 
     # Add grid lines
     plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
