@@ -106,7 +106,7 @@ class eu_utility(clr_utility):
         if color_model == CM_RGB:
             r, b = b, r
 
-        color_table = cls._process_eu_table((j, b, g, r))
+        color_table = cls._normalize_color_table((j, b, g, r))
 
         name = UNNAMED_COLORMAP
         if len(lines[0]) > len(EU_SIGNATURE):
@@ -132,10 +132,7 @@ class eu_utility(clr_utility):
 
     @classmethod
     def _create_eu_table(
-        cls,
-        lines: list[str],
-        table: ColorTable,
-        rgb: bool,
+        cls, lines: list[str], table: ColorTable, rgb: bool
     ) -> None:
         if rgb:
             table = [(x, r, g, b) for x, b, g, r in table]
@@ -156,14 +153,11 @@ class eu_utility(clr_utility):
             lines.append(line)
 
     @classmethod
-    def _process_eu_table(
-        cls,
-        values: ValueTable,
-    ) -> ColorTable:
-        j, b, g, r = values
+    def _normalize_color_table(cls, values: ValueTable) -> ColorTable:
+        x, b, g, r = values
 
         # Normalise keypoints values
-        x = cls._normalize_keypoint_values(j)
+        x = cls._normalize_keypoint_values(x)
 
         # Normalise colour component values
         b = cls._normalize_color_values(b)
