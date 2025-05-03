@@ -154,6 +154,161 @@ def preview_colormap(
         plt.close()
 
 
+def preview_stretching(
+    scale: EnhancementScale, save_path: str | Path = "", show: bool = True
+) -> None:
+    # Referece rectangle
+    # - units in pixel per dimension
+    rect = Rect(486, 568, 100)
+    size = Size(rect.dpi)
+
+    # Create the figure and the enhancement scale plot box
+    fig = plt.figure(figsize=rect.figsize, dpi=rect.dpi)
+
+    ax = fig.add_axes(rect.margins(66, 134, 18, 32))
+
+    # Set the figure title
+    fig.suptitle(
+        "Color Component Intensities",
+        fontsize=size.pt(12.0),
+        color="black",
+        alpha=1.0,
+        y=rect.y_pos(557),
+    )
+
+    # Set the plot box ouline style
+    for spine in ["top", "bottom", "left", "right"]:
+        axes_outline = ax.spines[spine]
+        _set_outline(axes_outline, size.pt(0.8))
+
+    # Set the x-axis label
+    ax.set_xlabel(
+        f"Index of Enhancement: {scale.name}",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Set the y-axis label
+    ax.set_ylabel(
+        "Primary component intensity",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Setup the x-axis ticks
+    ax.tick_params(
+        axis="x",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(3.0),
+    )
+
+    # Setup the y-axis ticks
+    ax.tick_params(
+        axis="y",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(3.5),
+    )
+
+    ax.minorticks_off()
+
+    input_indices: tuple[float, ...]
+    output_indices: tuple[float, ...]
+    input_indices, output_indices = tuple(zip(*scale.stretching.table))
+
+    # Number of color brightness levels
+    ncolors: int = 256
+
+    # Plot the colours intensity curves
+    ax.plot(
+        input_indices,
+        output_indices,
+        color="blak",
+        alpha=1.0,
+        linewidth=size.pt(1.2),
+    )
+
+    # Configure axes limits
+    ax.set_xlim(-5, ncolors + 4)
+    ax.set_ylim(-5, ncolors + 4)
+
+    # Add grid lines
+    plt.grid(True, linestyle="--", alpha=0.6, linewidth=size.pt(0.8))
+
+    # Create the colour bar box
+    cax = fig.add_axes(rect.margins(74, 52, 25, 492))
+
+    # Createa a mappable colour scale
+    cnorm = Normalize(vmin=0, vmax=ncolors - 1)
+
+    smap = ScalarMappable(cmap=scale.cmap, norm=cnorm)
+
+    # Plot the colour bar box with the measurement scale
+    cbar = fig.colorbar(smap, orientation="horizontal", cax=cax)
+
+    # Set the colour bar box ouline style
+    cbar_outline: Spine = cbar.ax.spines["outline"]
+    _set_outline(cbar_outline, size.pt(0.6))
+
+    # Set the colorbar caption
+    cbar.set_label(
+        label="Color Index",
+        weight="normal",
+        color="black",
+        alpha=1.0,
+        fontsize=size.pt(10.0),
+        labelpad=size.pt(4.0),
+    )
+
+    # Create and setup the colour bar ticks
+    cticks = list(range(0, ncolors, 50))
+
+    cbar.set_ticks(cticks)
+
+    cbar.ax.tick_params(
+        axis="x",
+        color=("black", 1.0),
+        width=size.pt(0.6),
+        length=size.pt(3.5),
+        labelcolor=("black", 1.0),
+        labelsize=size.pt(10.0),
+        pad=size.pt(4.0),
+    )
+
+    # Hide the y-axis ticks since it does not make sense
+    cbar.ax.tick_params(
+        axis="y", which="both", left=False, right=False, labelleft=False
+    )
+
+    cbar.ax.minorticks_off()
+
+    # Add labels to the colour bar ticks
+    ticklabels = [str(i) for i in cticks]
+
+    cbar.set_ticklabels(ticklabels)
+
+    # Save the plot if required
+    if save_path:
+        plt.savefig(save_path, dpi=rect.dpi, bbox_inches=None)
+
+    # Display the plot
+    if show:
+        plt.show()
+    else:
+        plt.close()
+
+
 def plot_brightness_profile(
     scale: EnhancementScale,
     save_path: str | Path = "",
