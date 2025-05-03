@@ -426,10 +426,12 @@ def plot_color_profile(
             x_indices,
             y_intensity,
             color=color_name,
+            alpha=1.0,
             label=color_name,
             linewidth=size.pt(1.2),
         )
 
+    # Display a legend
     ax.legend()
 
     # Configure axes limits
