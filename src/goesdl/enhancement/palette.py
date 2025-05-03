@@ -180,7 +180,7 @@ class EnhacementPalette(ColormapBase):
 
         value_tables = cls._build_value_tables(unpacked_segment_valuess)
 
-        color_table = eu_utility.make_color_table(value_tables)
+        color_table = eu_utility.scale_color_table(value_tables)
 
         cls._cleanup_color_table(color_table)
 

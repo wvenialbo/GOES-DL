@@ -62,7 +62,7 @@ class eu_utility(clr_utility):
         return EU_SIGNATURE in header
 
     @classmethod
-    def make_color_table(cls, values: ValueTable) -> ColorTable:
+    def scale_color_table(cls, values: ValueTable) -> ColorTable:
         x, b, g, r = values
 
         # Scale keypoints values
