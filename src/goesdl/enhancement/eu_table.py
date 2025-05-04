@@ -5,6 +5,7 @@ from .clr_utility import clr_utility
 from .constants import CM_BGR, CM_RGB, UNNAMED_COLORMAP
 from .shared import (
     ColorTable,
+    DomainData,
     ValueTable,
     ValueTableColumn,
 )
@@ -104,7 +105,7 @@ class eu_utility(clr_utility):
             g.extend(lv[4:6])
             r.extend(lv[6:2])
 
-        # Convert colour model if necessary
+        # Adjust colour component ordering if necessary
         if color_model == CM_RGB:
             r, b = b, r
 
@@ -155,18 +156,22 @@ class eu_utility(clr_utility):
             lines.append(line)
 
     @classmethod
-    def _normalize_color_table(cls, values: ValueTable) -> ColorTable:
-        x, b, g, r = values
+    def _normalize_color_table(
+        cls, values: ValueTable
+    ) -> tuple[ColorTable, DomainData]:
+        j, r, g, b = values
 
-        # Normalise keypoints values
-        x = cls._normalize_keypoint_values(x)
+        # Normalise scale keypoints values
+        cls._validate_monotonic_keypoints(j)
+
+        x, domain = cls._normalize_keypoint_values(j)
 
         # Normalise colour component values
-        b = cls._normalize_color_values(b)
-        g = cls._normalize_color_values(g)
-        r = cls._normalize_color_values(r)
+        r, g, b = map(cls._normalize_color_values, (r, g, b))
 
-        return cls._make_color_table((x, b, g, r))
+        color_table = cls._make_color_table((x, r, g, b))
+
+        return color_table, domain
 
     @staticmethod
     def _write_color_table_file(file: TextIO, lines: list[str]) -> None:
