@@ -60,9 +60,9 @@ class BaseColormap:
 
         self.name = name or UNNAMED_COLORMAP
 
-        self.under = 0.0, 0.0, 0.0
-        self.over = 1.0, 1.0, 1.0
-        self.bad = 0.5, 0.5, 0.5
+        self.under = 0.0, 0.0, 1.0
+        self.over = 0.0, 1.0, 0.0
+        self.bad = 1.0, 0.0, 0.0
 
         self.domain = 0.0, ncolors - 1.0
 
