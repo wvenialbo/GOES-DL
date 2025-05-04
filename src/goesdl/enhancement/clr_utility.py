@@ -34,8 +34,8 @@ class clr_utility:
 
     @classmethod
     def _make_color_table(cls, values: ValueTable) -> ColorTable:
-        x, b, g, r = values
-        return list(zip(x, b, g, r))
+        x, r, g, b = values
+        return list(zip(x, r, g, b))
 
     @staticmethod
     def _normalize_color_values(y: ColorValueList) -> ColorValueList:
