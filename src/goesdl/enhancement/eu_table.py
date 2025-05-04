@@ -93,14 +93,16 @@ class eu_utility(clr_utility):
             if ls[0] == EU_KEYWORD[2] and ls[1] == EU_KEYWORD[3]:
                 color_model = CM_RGB
 
-            # Ignore header lines
+            # Ignore other header lines
             if ls[0] in EU_KEYWORD:
                 continue
 
-            j.extend((float(ls[0]), float(ls[1])))
-            b.extend((float(ls[2]), float(ls[3])))
-            g.extend((float(ls[4]), float(ls[5])))
-            r.extend((float(ls[6]), float(ls[7])))
+            lv = list(map(float, ls))
+
+            j.extend(lv[:2])
+            b.extend(lv[2:4])
+            g.extend(lv[4:6])
+            r.extend(lv[6:2])
 
         # Convert color model if necessary
         if color_model == CM_RGB:
