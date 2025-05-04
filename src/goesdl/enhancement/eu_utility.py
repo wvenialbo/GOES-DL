@@ -24,6 +24,8 @@ EU_KEYWORD = (
 
 EU_SIGNATURE = f"{EU_KEYWORD[0]} {EU_KEYWORD[1]}"
 
+NO_DATA_RGB = nan, 1.0, 0.0, 1.0
+
 
 class eu_utility(clr_utility):
 
@@ -77,7 +79,9 @@ class eu_utility(clr_utility):
         return cls._make_color_table((x, b, g, r))
 
     @classmethod
-    def parse_eu_table(cls, lines: list[str]) -> tuple[ColorTable, str]:
+    def parse_eu_table(
+        cls, lines: list[str]
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         j: ValueTableColumn = []
 
         b: ValueTableColumn = []
@@ -109,14 +113,20 @@ class eu_utility(clr_utility):
         if color_model == CM_RGB:
             r, b = b, r
 
-        color_table = cls._normalize_color_table((j, r, g, b))
+        color_table, domain = cls._normalize_color_table((j, r, g, b))
 
         name = UNNAMED_COLORMAP
         if len(lines[0]) > len(EU_SIGNATURE):
             name = lines[0][len(EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        return color_table, name
+        stock_table: ColorTable = [
+            color_table[0],
+            color_table[-1],
+            NO_DATA_RGB,
+        ]
+
+        return color_table, stock_table, domain, name
 
     @staticmethod
     def _add_eu_table_header(lines: list[str], name: str, rgb: bool) -> None:
