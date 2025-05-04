@@ -7,7 +7,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from .colormap import (
-    ColormapBase,
+    BaseColormap,
     CombinedColormap,
     ContinuousColormap,
     DiscreteColormap,
@@ -32,7 +32,7 @@ from .shared import (
 )
 
 
-class EnhacementPalette(ColormapBase):
+class EnhacementPalette(BaseColormap):
     """
     Represent a enhancement color palette.
 
@@ -45,7 +45,7 @@ class EnhacementPalette(ColormapBase):
         Save the enhancement color palette.
     """
 
-    def __init__(self, colormap: ColormapBase) -> None:
+    def __init__(self, colormap: BaseColormap) -> None:
         super().__init__(
             colormap.name,
             colormap.segment_data,

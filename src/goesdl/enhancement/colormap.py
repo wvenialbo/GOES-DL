@@ -24,7 +24,7 @@ from .shared import (
 )
 
 
-class ColormapBase:
+class BaseColormap:
 
     keypoints: KeypointList
     name: str
@@ -217,7 +217,7 @@ class ColormapBase:
         return cleaned_color_segments
 
 
-class SegmentedColormap(ColormapBase):
+class SegmentedColormap(BaseColormap):
 
     def __init__(
         self, name: str, raw_segment_data: GSegmentData, ncolors: int = 256
@@ -253,7 +253,7 @@ class SegmentedColormap(ColormapBase):
         return x, y_0, y_1
 
 
-class _GRadiendBasedColormap(ColormapBase):
+class _GRadiendBasedColormap(BaseColormap):
 
     def __init__(
         self,
@@ -286,7 +286,7 @@ class _GRadiendBasedColormap(ColormapBase):
             ) from error
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> ColormapBase:
+    def _get_segment_data(colormap: Colormap) -> BaseColormap:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
             return SegmentedColormap(colormap.name, raw_segment_data)
@@ -310,7 +310,7 @@ class UniformColormap(_GRadiendBasedColormap):
         super().__init__(name, color_list, ncolors)
 
 
-class DiscreteColormap(ColormapBase):
+class DiscreteColormap(BaseColormap):
 
     def __init__(
         self,
@@ -404,7 +404,7 @@ class _NamedColormapBased:
             ) from error
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> ColormapBase:
+    def _get_segment_data(colormap: Colormap) -> BaseColormap:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
             return SegmentedColormap(colormap.name, raw_segment_data)
@@ -416,7 +416,7 @@ class _NamedColormapBased:
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
 
-class NamedColormap(ColormapBase, _NamedColormapBased):
+class NamedColormap(BaseColormap, _NamedColormapBased):
 
     def __init__(self, name: str, ncolors: int = 256) -> None:
         colormap = self._get_colormap(name)
@@ -432,7 +432,7 @@ class NamedColormap(ColormapBase, _NamedColormapBased):
         )
 
 
-class CombinedColormap(ColormapBase, _NamedColormapBased):
+class CombinedColormap(BaseColormap, _NamedColormapBased):
 
     def __init__(
         self,
