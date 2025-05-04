@@ -263,7 +263,7 @@ class _GRadiendBasedColormap(BaseColormap):
     ) -> None:
         colormap = self._get_colormap(listed_colors)
 
-        segmented_colormap = self._get_segment_data(colormap)
+        segmented_colormap = self._get_segmented_colormap(colormap)
 
         super().__init__(
             name,
@@ -286,7 +286,7 @@ class _GRadiendBasedColormap(BaseColormap):
             ) from error
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> BaseColormap:
+    def _get_segmented_colormap(colormap: Colormap) -> BaseColormap:
         if not isinstance(colormap, LinearSegmentedColormap):
             raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
@@ -322,7 +322,7 @@ class DiscreteColormap(BaseColormap):
     def __init__(self, name: str, raw_listed_colors: GListedColors) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
-        segmented_colormap = self._create_segment_data(listed_colors)
+        segmented_colormap = self._get_segmented_colormap(listed_colors)
 
         super().__init__(
             name,
@@ -343,7 +343,9 @@ class DiscreteColormap(BaseColormap):
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _create_segment_data(listed_colors: DiscreteColorList) -> BaseColormap:
+    def _get_segmented_colormap(
+        listed_colors: DiscreteColorList,
+    ) -> BaseColormap:
         color_table: ContinuousColorTable = [
             (float(i + j), x)
             for i, color in enumerate(listed_colors)
@@ -379,14 +381,16 @@ class _NamedColormapBased:
             ) from error
 
     @staticmethod
-    def _get_segment_data(colormap: Colormap) -> BaseColormap:
+    def _get_segmented_colormap(
+        colormap: Colormap,
+    ) -> tuple[BaseColormap, bool]:
         if isinstance(colormap, LinearSegmentedColormap):
             raw_segment_data = getattr(colormap, "_segmentdata")
-            return SegmentedColormap(colormap.name, raw_segment_data)
+            return SegmentedColormap(colormap.name, raw_segment_data), True
 
         if isinstance(colormap, ListedColormap):
             listed_colors = cast(GListedColors, colormap.colors)
-            return DiscreteColormap(colormap.name, listed_colors)
+            return DiscreteColormap(colormap.name, listed_colors), False
 
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
@@ -396,7 +400,9 @@ class NamedColormap(BaseColormap, _NamedColormapBased):
     def __init__(self, name: str, ncolors: int = 256) -> None:
         colormap = self._get_colormap(name)
 
-        segmented_colormap = self._get_segment_data(colormap)
+        segmented_colormap, segmented = self._get_segmented_colormap(colormap)
+
+        ncolors = ncolors if segmented else segmented_colormap.ncolors
 
         super().__init__(
             segmented_colormap.name,
@@ -462,7 +468,7 @@ class CombinedColormap(BaseColormap, _NamedColormapBased):
 
         for colormap_name in colormap_names:
             colormap = self._get_colormap(colormap_name)
-            segmented_colormap = self._get_segment_data(colormap)
+            segmented_colormap = self._get_segmented_colormap(colormap)
             segment_data_list.append(segmented_colormap.segment_data)
 
         return segment_data_list
