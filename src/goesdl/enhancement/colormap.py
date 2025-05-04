@@ -471,7 +471,7 @@ class CombinedColormap(BaseColormap, _NamedColormapBased):
 
         for colormap_name in colormap_names:
             colormap = self._get_colormap(colormap_name)
-            segmented_colormap = self._get_segmented_colormap(colormap)
+            segmented_colormap, _ = self._get_segmented_colormap(colormap)
             segment_data_list.append(segmented_colormap.segment_data)
 
         return segment_data_list
