@@ -253,7 +253,7 @@ class SegmentedColormap(ColormapBase):
         return x, y_0, y_1
 
 
-class ContinuousColormap(ColormapBase):
+class _GRadiendBasedColormap(ColormapBase):
 
     def __init__(
         self,
@@ -292,6 +292,22 @@ class ContinuousColormap(ColormapBase):
             return SegmentedColormap(colormap.name, raw_segment_data)
 
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+
+
+class ContinuousColormap(_GRadiendBasedColormap):
+
+    def __init__(
+        self, name: str, color_table: ContinuousColorTable, ncolors: int = 256
+    ) -> None:
+        super().__init__(name, color_table, ncolors)
+
+
+class UniformColormap(_GRadiendBasedColormap):
+
+    def __init__(
+        self, name: str, color_list: ContinuousColorList, ncolors: int = 256
+    ) -> None:
+        super().__init__(name, color_list, ncolors)
 
 
 class DiscreteColormap(ColormapBase):
