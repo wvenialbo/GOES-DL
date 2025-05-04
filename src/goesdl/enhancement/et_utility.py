@@ -13,6 +13,10 @@ NO_DATA_RGB = nan, 1.0, 0.0, 1.0
 
 class et_utility(clr_utility):
 
+    @staticmethod
+    def is_et_table(header: bytes) -> bool:
+        return header == b"\x80\x80\x80\x80"
+
     @classmethod
     def parse_et_table(
         cls, data: bytes
