@@ -319,25 +319,23 @@ class UniformColormap(_GRadiendBasedColormap):
 
 class DiscreteColormap(BaseColormap):
 
-    def __init__(
-        self,
-        name: str,
-        raw_listed_colors: GListedColors,
-        ncolors: int | None = None,
-    ) -> None:
+    def __init__(self, name: str, raw_listed_colors: GListedColors) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
-        segment_data = self._create_segment_data(listed_colors)
+        segmented_colormap = self._create_segment_data(listed_colors)
 
-        ncolors = ncolors or len(listed_colors)
-
-        super().__init__(name, segment_data, [], ncolors, True)
+        super().__init__(
+            name,
+            segmented_colormap.segment_data,
+            segmented_colormap.keypoints,
+            segmented_colormap.ncolors,
+            False,
+        )
 
     @classmethod
     def _copy_listed_colors(
         cls, raw_listed_colors: GListedColors
     ) -> DiscreteColorList:
-
         try:
             return cls._do_copy_listed_colors(raw_listed_colors)
 
@@ -345,52 +343,22 @@ class DiscreteColormap(BaseColormap):
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _create_segment_data(listed_colors: DiscreteColorList) -> SegmentData:
-        n_colors = len(listed_colors)
+    def _create_segment_data(listed_colors: DiscreteColorList) -> BaseColormap:
+        color_table: ContinuousColorTable = [
+            (float(i + j), x)
+            for i, color in enumerate(listed_colors)
+            for j, x in enumerate((color, color))
+        ]
 
-        # Create keypoint values
-        values: KeypointList = []
+        ncolors = len(listed_colors)
 
-        for i in range(n_colors + 1):
-            value = i / n_colors
-            values.extend([value, value])
-        values.pop(-1)
-        values.pop(0)
-
-        # Create segmen data
-        segment_data: SegmentData = {}
-
-        for k, component in enumerate(COLOR_COMPONENTS):
-            # Create the segments for the k-th color component
-            segment_data[component] = []
-
-            for i in range(0, len(values), 2):
-                j = i // 2
-
-                # Get the k-th color component value of the j-th color
-                color = listed_colors[j][k]
-
-                # Add the i-th value entry
-                value = values[i]
-                segment_data[component].append((value, color, color))
-
-                # Add the (i+1)-th value entry
-                value = values[i + 1]
-                segment_data[component].append((value, color, color))
-
-        return segment_data
+        return ContinuousColormap(UNNAMED_COLORMAP, color_table, ncolors)
 
     @classmethod
     def _do_copy_listed_colors(
         cls, raw_listed_colors: GListedColors
     ) -> DiscreteColorList:
-        listed_colors: DiscreteColorList = []
-
-        for color_data in raw_listed_colors:
-            color_entry: RGBValue = cls._to_rgb(color_data)
-            listed_colors.append(color_entry)
-
-        return listed_colors
+        return list(map(cls._to_rgb, raw_listed_colors))
 
     @staticmethod
     def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
