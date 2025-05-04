@@ -39,6 +39,9 @@ class BaseColormap:
         ncolors: int,
         reduce: bool,
     ) -> None:
+        if ncolors < 1:
+            raise ValueError("'ncolors' must be a positive integer")
+
         if reduce:
             segment_data = self._reduce_segment_data(segment_data)
 
