@@ -104,11 +104,11 @@ class eu_utility(clr_utility):
             g.extend(lv[4:6])
             r.extend(lv[6:2])
 
-        # Convert color model if necessary
+        # Convert colour model if necessary
         if color_model == CM_RGB:
             r, b = b, r
 
-        color_table = cls._normalize_color_table((j, b, g, r))
+        color_table = cls._normalize_color_table((j, r, g, b))
 
         name = UNNAMED_COLORMAP
         if len(lines[0]) > len(EU_SIGNATURE):
