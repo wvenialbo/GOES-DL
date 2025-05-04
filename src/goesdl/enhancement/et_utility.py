@@ -17,17 +17,14 @@ class et_utility(clr_utility):
     def is_et_table(header: bytes) -> bool:
         return header == b"\x80\x80\x80\x80"
 
+    @staticmethod
+    def has_expected_size(data: bytes) -> bool:
+        return len(data) == EXPECTED_SIZE
+
     @classmethod
     def parse_et_table(
         cls, data: bytes
     ) -> tuple[ColorTable, ColorTable, DomainData]:
-        # Check file size
-        if len(data) != EXPECTED_SIZE:
-            raise ValueError(
-                f"Invalid ET file size. Expected: {EXPECTED_SIZE} bytes, "
-                f"got {len(data)} bytes"
-            )
-
         # Unpack all words as 32-bit big-endian integers
         words: tuple[int, ...] = unpack(">817I", data)
 
