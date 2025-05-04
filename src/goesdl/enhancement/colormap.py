@@ -349,13 +349,13 @@ class DiscreteColormap(BaseColormap):
     def _get_segmented_colormap(
         listed_colors: DiscreteColorList,
     ) -> BaseColormap:
+        ncolors = len(listed_colors)
+
         color_table: ContinuousColorTable = [
-            (float(i + j), x)
+            ((i + j) / ncolors, x)
             for i, color in enumerate(listed_colors)
             for j, x in enumerate((color, color))
         ]
-
-        ncolors = len(listed_colors)
 
         return ContinuousColormap(UNNAMED_COLORMAP, color_table, ncolors)
 
