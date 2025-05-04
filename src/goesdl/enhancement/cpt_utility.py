@@ -72,7 +72,7 @@ class cpt_utility(clr_utility):
                 continue
 
             cls._extract_color_range(color_model, cpt_table, ls)
-    
+
         # The `r`, `g`, and `b` lists are modified in place and contain
         # the normalized colour component intensity values corresponding
         # to the blue, green, and red colour components, respectively;
@@ -165,16 +165,16 @@ class cpt_utility(clr_utility):
     ) -> tuple[ColorTable, DomainData]:
         j, r, g, b, n = values
 
-        # Normalise scale values
+        # Normalise scale keypoints values
         cls._validate_monotonic_keypoints(j)
 
         x, domain = cls._normalize_keypoint_values(j)
 
-        # Normalise colour values
+        # Normalise colour component values
         if color_model == CM_RGB:
             r, g, b = map(cls._normalize_color_values, (r, g, b))
 
-        # Convert colour model if necessary
+        # Convert colour model and normalise if necessary
         elif color_model == CM_HSV:
             for i, (h, s, v) in enumerate(zip(r, g, b)):
                 r[i], g[i], b[i] = cls._hsv_to_rgb(h, s, v)
