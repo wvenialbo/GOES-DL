@@ -31,6 +31,10 @@ class BaseColormap:
     ncolors: int
     segment_data: SegmentData
 
+    under: RGBValue
+    over: RGBValue
+    bad: RGBValue
+
     def __init__(
         self,
         name: str,
@@ -52,6 +56,17 @@ class BaseColormap:
         self.ncolors = ncolors
 
         self.name = name or UNNAMED_COLORMAP
+
+        self.under = 0.0, 0.0, 0.0
+        self.over = 1.0, 1.0, 1.0
+        self.bad = 0.5, 0.5, 0.5
+
+    def set_stock_colors(
+        self, under: RGBValue, over: RGBValue, bad: RGBValue
+    ) -> None:
+        self.under = under
+        self.over = over
+        self.bad = bad
 
     @property
     def full_segment_data(self) -> SegmentData:
