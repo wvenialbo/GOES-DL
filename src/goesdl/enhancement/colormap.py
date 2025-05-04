@@ -11,6 +11,7 @@ from .shared import (
     ContinuousColorList,
     ContinuousColorTable,
     DiscreteColorList,
+    DomainData,
     GColorValue,
     GKeypointList,
     GListedColors,
@@ -34,6 +35,8 @@ class BaseColormap:
     under: RGBValue
     over: RGBValue
     bad: RGBValue
+
+    domain: DomainData
 
     def __init__(
         self,
@@ -61,12 +64,17 @@ class BaseColormap:
         self.over = 1.0, 1.0, 1.0
         self.bad = 0.5, 0.5, 0.5
 
+        self.domain = 0.0, ncolors - 1.0
+
     def set_stock_colors(
         self, under: RGBValue, over: RGBValue, bad: RGBValue
     ) -> None:
         self.under = under
         self.over = over
         self.bad = bad
+
+    def set_domain(self, domain: DomainData) -> None:
+        self.domain = domain
 
     @property
     def full_segment_data(self) -> SegmentData:
