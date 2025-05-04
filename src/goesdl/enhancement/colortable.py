@@ -2,8 +2,67 @@ from pathlib import Path
 
 from .colormap import ContinuousColormap
 from .cpt_utility import cpt_utility
+from .et_utility import et_utility
 from .eu_utility import eu_utility
 from .shared import ColorTable, ContinuousColorTable, DomainData
+
+
+class ETColorTable(ContinuousColormap):
+    """
+    Represent a McIDAS binary enhancement colour table.
+
+    This class provides methods to load, parse, and process McIDAS
+    enhancement utility binary colour table (.ET) files.
+
+    Notes
+    -----
+    The Man computer Interactive Data Access System (McIDAS) is a
+    research quality suite of applications used for decoding, analyzing,
+    and displaying meteorological data developed by the University of
+    Wisconsin-Madison Space Science and Engineering Center (UWisc/SSEC).
+
+    - https://www.ssec.wisc.edu/mcidas/
+    - https://www.unidata.ucar.edu/software/mcidas/
+    """
+
+    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
+        color_table, stock_table, domain = self._from_file(path)
+
+        color_list = self._make_color_list(color_table)
+
+        name = Path(path).stem
+
+        super().__init__(name, color_list, ncolors)
+
+        self.set_domain(domain)
+
+        under, over, bad = (entry[1:] for entry in stock_table)
+
+        self.set_stock_colors(under, over, bad)
+
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData]:
+        with open(path, "rb") as file:
+            data = file.read()
+
+        return cls._parse_table(data)
+
+    @staticmethod
+    def _parse_table(
+        data: bytes,
+    ) -> tuple[ColorTable, ColorTable, DomainData]:
+        if not et_utility.is_et_table(
+            data[:4]
+        ) or not et_utility.has_expected_size(data):
+            raise ValueError("Invalid McIDAS 'EU TABLE' (.EU) file")
+
+        return et_utility.parse_et_table(data)
+
+    @staticmethod
+    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
+        return [(j, (r, g, b)) for j, b, g, r in color_table]
 
 
 class EUColorTable(ContinuousColormap):
