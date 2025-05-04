@@ -1,3 +1,4 @@
+from math import nan
 from pathlib import Path
 from typing import TextIO
 
