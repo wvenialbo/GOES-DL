@@ -287,11 +287,18 @@ class _GRadiendBasedColormap(BaseColormap):
 
     @staticmethod
     def _get_segment_data(colormap: Colormap) -> BaseColormap:
-        if isinstance(colormap, LinearSegmentedColormap):
+        if not isinstance(colormap, LinearSegmentedColormap):
+            raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+
+        try:
             raw_segment_data = getattr(colormap, "_segmentdata")
             return SegmentedColormap(colormap.name, raw_segment_data)
 
-        raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+        except AttributeError as error:
+            raise ValueError(
+                "Unable to create the colour map segment data, "
+                "probably due to Matplotlib version issues"
+            ) from error
 
 
 class ContinuousColormap(_GRadiendBasedColormap):
