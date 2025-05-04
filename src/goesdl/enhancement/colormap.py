@@ -387,13 +387,20 @@ class _NamedColormapBased:
     def _get_segmented_colormap(
         colormap: Colormap,
     ) -> tuple[BaseColormap, bool]:
-        if isinstance(colormap, LinearSegmentedColormap):
-            raw_segment_data = getattr(colormap, "_segmentdata")
-            return SegmentedColormap(colormap.name, raw_segment_data), True
+        try:
+            if isinstance(colormap, LinearSegmentedColormap):
+                raw_segment_data = getattr(colormap, "_segmentdata")
+                return SegmentedColormap(colormap.name, raw_segment_data), True
 
-        if isinstance(colormap, ListedColormap):
-            listed_colors = cast(GListedColors, colormap.colors)
-            return DiscreteColormap(colormap.name, listed_colors), False
+            if isinstance(colormap, ListedColormap):
+                listed_colors = cast(GListedColors, colormap.colors)
+                return DiscreteColormap(colormap.name, listed_colors), False
+
+        except AttributeError as error:
+            raise ValueError(
+                "Unable to create the colour map segment data, "
+                "probably due to Matplotlib version issues"
+            ) from error
 
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
