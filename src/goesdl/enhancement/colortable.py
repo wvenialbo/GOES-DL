@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .colormap import ContinuousColormap
-from .cpt_table import cpt_utility
+from .cpt_utility import cpt_utility
 from .eu_table import eu_utility
 from .shared import ColorTable, ContinuousColorTable
 
