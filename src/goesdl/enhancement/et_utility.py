@@ -25,17 +25,22 @@ class et_utility(clr_utility):
             )
 
         # Unpack all words as 32-bit big-endian integers
-        words = unpack(">817I", data)
+        words: tuple[int, ...] = unpack(">817I", data)
 
         # Extract RGB channels
-        red = list(words[1:257])
-        green = list(words[257:513])
-        blue = list(words[513:769])
+        red = [float(x) for v in words[1:257] for x in (v, v)]
+        green = [float(x) for v in words[257:513] for x in (v, v)]
+        blue = [float(x) for v in words[513:769] for x in (v, v)]
 
-        x, domain = cls._normalize_keypoint_values(list(range(256)))
-
+        # Normalise RGB channels
         r, g, b = map(cls._normalize_color_values, (red, green, blue))
 
+        # Create and normalise keypoints
+        keys = [float(x) for v in range(256) for x in (v, v + 1)]
+
+        x, domain = cls._normalize_keypoint_values(keys)
+
+        # Create colour table
         color_table = cls._make_color_table((x, r, g, b))
 
         stock_table: ColorTable = [
