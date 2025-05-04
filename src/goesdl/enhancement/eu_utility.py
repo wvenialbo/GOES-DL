@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import TextIO
 
 from .clr_utility import clr_utility
-from .constants import CM_BGR, CM_RGB, UNNAMED_COLORMAP
+from .constants import CM_BGR, CM_RGB
 from .shared import (
     ColorTable,
     DomainData,
@@ -117,7 +117,7 @@ class eu_utility(clr_utility):
 
         color_table, domain = cls._normalize_color_table((j, r, g, b))
 
-        name = UNNAMED_COLORMAP
+        name = ""
         if len(lines[0]) > len(EU_SIGNATURE):
             name = lines[0][len(EU_SIGNATURE) + 1 :]
             name = name.strip()
