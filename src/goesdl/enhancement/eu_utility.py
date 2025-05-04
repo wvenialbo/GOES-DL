@@ -66,18 +66,19 @@ class eu_utility(clr_utility):
         return EU_SIGNATURE in header
 
     @classmethod
-    def scale_color_table(cls, values: ValueTable) -> ColorTable:
-        x, b, g, r = values
+    def _scale_color_table(cls, values: ValueTable) -> ColorTable:
+        x, r, g, b = values
 
-        # Scale keypoints values
-        x = cls._scale_keypoint_values(x)
+        # Rescale scale keypoints values
+        cls._validate_monotonic_keypoints(x)
 
-        # Normalise colour component values
-        b = cls._scale_color_values(b)
-        g = cls._scale_color_values(g)
-        r = cls._scale_color_values(r)
+        j = cls._scale_keypoint_values(x)
 
-        return cls._make_color_table((x, b, g, r))
+        # Rescale colour component values
+        r, g, b = map(cls._scale_color_values, (r, g, b))
+
+        # Set the default EU TABLE colour component ordering (BGR)
+        return cls._make_color_table((j, b, g, r))
 
     @classmethod
     def parse_eu_table(
