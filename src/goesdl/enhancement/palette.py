@@ -16,7 +16,7 @@ from .colormap import (
 )
 from .colortable import ColormapTable
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
-from .eu_table import eu_utility
+from .eu_utility import eu_utility
 from .shared import (
     ColorSegments,
     ColorTable,
