@@ -55,7 +55,7 @@ class CPTColorTable(ContinuousColormap):
         lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData]:
         try:
-            # Try parse a CPT file
+            # Try parse a .CPT file
             return cpt_utility.parse_cpt_table(lines)
 
         except (ValueError, IndexError, TypeError) as error:
