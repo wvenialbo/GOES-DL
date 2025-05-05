@@ -223,10 +223,10 @@ class EnhancementScale:
     def uniform(
         cls,
         name: str,
-        listed_colors: ContinuousColorList | ContinuousColorTable,
+        color_list: ContinuousColorList,
         ncolors: int = 256,
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.continuous(name, listed_colors, ncolors)
+        cpal = EnhacementPalette.uniform(name, color_list, ncolors)
         return cls(cpal)
 
     def update_palette(self, palette: EnhacementPalette) -> None:
