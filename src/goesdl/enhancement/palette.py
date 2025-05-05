@@ -55,6 +55,9 @@ class EnhacementPalette(BaseColormap):
             False,
         )
 
+        self.set_domain(colormap.domain)
+        self.set_stock_colors(colormap.under, colormap.over, colormap.bad)
+
     @classmethod
     def combined_from_stock(
         cls,
