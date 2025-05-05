@@ -13,6 +13,7 @@ from .colormap import (
     DiscreteColormap,
     NamedColormap,
     SegmentedColormap,
+    UniformColormap,
 )
 from .colortable import ColormapTable
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
@@ -67,10 +68,10 @@ class EnhacementPalette(BaseColormap):
     def continuous(
         cls,
         name: str,
-        listed_colors: ContinuousColorList | ContinuousColorTable,
+        color_table: ContinuousColorTable,
         ncolors: int = 256,
     ) -> "EnhacementPalette":
-        return cls(ContinuousColormap(name, listed_colors, ncolors))
+        return cls(ContinuousColormap(name, color_table, ncolors))
 
     @classmethod
     def discrete(
@@ -149,6 +150,15 @@ class EnhacementPalette(BaseColormap):
         color_table = self._create_color_table(self.full_segment_data)
 
         eu_utility.create_file(path, name, color_table, rgb)
+
+    @classmethod
+    def uniform(
+        cls,
+        name: str,
+        color_list: ContinuousColorList,
+        ncolors: int = 256,
+    ) -> "EnhacementPalette":
+        return cls(UniformColormap(name, color_list, ncolors))
 
     @classmethod
     def _build_value_tables(
