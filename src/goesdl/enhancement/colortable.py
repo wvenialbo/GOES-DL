@@ -13,10 +13,12 @@ INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 class _ColorTable(ABC, ContinuousColormap):
 
-    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
+    def __init__(
+        self, path: str | Path, ncolors: int = 256, invert: bool = False
+    ) -> None:
         color_table, stock_table, domain, name = self._from_file(path)
 
-        color_list = self._make_color_list(color_table)
+        color_list = self._make_color_list(color_table, invert)
 
         name = name or Path(path).stem
 
@@ -35,8 +37,13 @@ class _ColorTable(ABC, ContinuousColormap):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
     @staticmethod
-    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
-        return [(j, (r, g, b)) for j, r, g, b in color_table]
+    def _make_color_list(
+        color_table: ColorTable, invert: bool
+    ) -> ContinuousColorTable:
+        if invert:
+            return [(1 - j, (r, g, b)) for j, r, g, b in reversed(color_table)]
+        else:
+            return [(j, (r, g, b)) for j, r, g, b in color_table]
 
 
 class _BinaryColorTable(_ColorTable):
