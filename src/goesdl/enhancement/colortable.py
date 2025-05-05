@@ -126,7 +126,7 @@ class CPTColorTable(_TextBasedColorTable):
             ) from error
 
 
-class ETColorTable(_ColorTable):
+class ETColorTable(_BinaryColorTable):
     """
     Represent a McIDAS binary enhancement colour table.
 
@@ -143,12 +143,6 @@ class ETColorTable(_ColorTable):
     - https://www.ssec.wisc.edu/mcidas/
     - https://www.unidata.ucar.edu/software/mcidas/
     """
-
-    @classmethod
-    def _from_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        return cls._from_binary_file(path)
 
     @classmethod
     def _parse_binary_file(
