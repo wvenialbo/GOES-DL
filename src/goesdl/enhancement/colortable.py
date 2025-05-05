@@ -10,6 +10,13 @@ INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
 INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 
+class _ColorTable:
+
+    @staticmethod
+    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
+        return [(j, (r, g, b)) for j, b, g, r in color_table]
+
+
 class CPTColorTable(ContinuousColormap):
     """
     Represent a GMT text based colour palette table.
