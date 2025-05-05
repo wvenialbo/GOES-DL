@@ -171,7 +171,7 @@ class EUColorTable(_ColorTable):
     """
 
     def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain, name = self._from_file(path)
+        color_table, stock_table, domain, name = self._from_text_file(path)
 
         color_list = self._make_color_list(color_table)
 
@@ -184,31 +184,6 @@ class EUColorTable(_ColorTable):
         under, over, bad = (entry[1:] for entry in stock_table)
 
         self.set_stock_colors(under, over, bad)
-
-    @classmethod
-    def _from_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        """
-        Load McIDAS text based enhancement colour table.
-
-        Parse a McIDAS text based enhancement utility colour tables (EU
-        TABLE).
-
-        Parameters
-        ----------
-        path : str or Path
-            Path to the colour table specification text file.
-
-        Returns
-        -------
-        tuple[ColorTable, str]
-            Tuple of colour table and name values.
-        """
-        with open(path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-
-        return cls._parse_text_file(lines)
 
     @staticmethod
     def _parse_text_file(
