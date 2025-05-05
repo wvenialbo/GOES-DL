@@ -36,7 +36,7 @@ class _ColorTable(ABC, ContinuousColormap):
 
     @staticmethod
     def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
-        return [(j, (r, g, b)) for j, b, g, r in color_table]
+        return [(j, (r, g, b)) for j, r, g, b in color_table]
 
 
 class _BinaryColorTable(_ColorTable):
