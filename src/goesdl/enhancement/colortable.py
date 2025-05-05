@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from .colormap import ContinuousColormap
+from .colormap import BaseColormap
 from .cpt_utility import cpt_utility
 from .et_utility import et_utility
 from .eu_utility import eu_utility
@@ -11,18 +11,18 @@ INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
 INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 
-class _ColorTable(ABC, ContinuousColormap):
+class _ColorTable(ABC, BaseColormap):
 
     def __init__(
         self, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> None:
-        color_table, stock_table, domain, name = self._from_file(path)
+        color_list, stock_table, domain, name = self._from_file(path)
 
-        color_list = self._make_color_list(color_table, invert)
+        color_table = self._make_color_table(color_list, invert)
 
         name = name or Path(path).stem
 
-        super().__init__(name, color_list, ncolors)
+        super().__init__(name, color_table, [], ncolors)
 
         self.set_domain(domain)
 
@@ -37,13 +37,13 @@ class _ColorTable(ABC, ContinuousColormap):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
     @staticmethod
-    def _make_color_list(
-        color_table: ColorTable, invert: bool
+    def _make_color_table(
+        color_list: ColorTable, invert: bool
     ) -> ContinuousColorTable:
         if invert:
-            return [(1 - j, (r, g, b)) for j, r, g, b in reversed(color_table)]
+            return [(1 - j, (r, g, b)) for j, r, g, b in reversed(color_list)]
         else:
-            return [(j, (r, g, b)) for j, r, g, b in color_table]
+            return [(j, (r, g, b)) for j, r, g, b in color_list]
 
 
 class _BinaryColorTable(_ColorTable):
