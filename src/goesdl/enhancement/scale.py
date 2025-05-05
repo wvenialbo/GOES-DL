@@ -139,6 +139,13 @@ class EnhancementScale:
         cpal = EnhacementPalette.load_cpt(path, ncolors, invert)
         return cls(cpal)
 
+    @classmethod
+    def load_et(
+        cls, path: str | Path, ncolors: int = 256, invert: bool = False
+    ) -> "EnhancementScale":
+        cpal = EnhacementPalette.load_et(path, ncolors, invert)
+        return cls(cpal)
+
     def load_stretching(self, path: str | Path) -> None:
         """
         Create an EnhacementStretching instance from a file.
