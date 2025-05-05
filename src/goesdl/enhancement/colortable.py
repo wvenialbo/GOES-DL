@@ -71,6 +71,15 @@ class _ColorTable(ContinuousColormap):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
+class _BinaryColorTable(_ColorTable):
+
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        return cls._from_binary_file(path)
+
+
 class _TextBasedColorTable(_ColorTable):
 
     @classmethod
