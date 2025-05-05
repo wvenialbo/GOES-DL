@@ -61,8 +61,9 @@ class EnhacementPalette(BaseColormap):
         colormap_names: str | Sequence[str],
         keypoints: GKeypointList,
         name: str = "",
+        ncolors: int = 256,
     ) -> "EnhacementPalette":
-        return cls(CombinedColormap(name, colormap_names, keypoints))
+        return cls(CombinedColormap(name, colormap_names, keypoints, ncolors))
 
     @classmethod
     def continuous(
