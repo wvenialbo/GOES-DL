@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from pathlib import Path
 
 from .colormap import ContinuousColormap
@@ -10,11 +11,41 @@ INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
 INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 
-class _ColorTable:
+class _ColorTable(ContinuousColormap):
+
+    @classmethod
+    def _from_binary_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        with open(path, "rb") as file:
+            data = file.read()
+
+        return cls._parse_binary_file(data)
+
+    @classmethod
+    def _from_text_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        with open(path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+        return cls._parse_text_file(lines)
 
     @staticmethod
     def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
         return [(j, (r, g, b)) for j, b, g, r in color_table]
+
+    @abstractmethod
+    @staticmethod
+    def _parse_binary_file(
+        data: bytes,
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
+
+    @abstractmethod
+    @staticmethod
+    def _parse_text_file(
+        lines: list[str],
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
 class CPTColorTable(ContinuousColormap, _ColorTable):
@@ -56,10 +87,10 @@ class CPTColorTable(ContinuousColormap, _ColorTable):
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        return cls._parse_table(lines)
+        return cls._parse_text_file(lines)
 
     @staticmethod
-    def _parse_table(
+    def _parse_text_file(
         lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData]:
         try:
@@ -112,10 +143,10 @@ class ETColorTable(ContinuousColormap, _ColorTable):
         with open(path, "rb") as file:
             data = file.read()
 
-        return cls._parse_table(data)
+        return cls._parse_text_file(data)
 
     @staticmethod
-    def _parse_table(
+    def _parse_text_file(
         data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData]:
         if not et_utility.is_et_table(
@@ -186,10 +217,10 @@ class EUColorTable(ContinuousColormap, _ColorTable):
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        return cls._parse_table(lines)
+        return cls._parse_text_file(lines)
 
     @staticmethod
-    def _parse_table(
+    def _parse_text_file(
         lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not eu_utility.is_eu_table(lines[0]):
@@ -259,12 +290,12 @@ class ColormapTable(ContinuousColormap, _ColorTable):
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        color_table, name = cls._parse_table(lines)
+        color_table, name = cls._parse_text_file(lines)
 
         return color_table, name
 
     @staticmethod
-    def _parse_table(lines: list[str]) -> tuple[ColorTable, str]:
+    def _parse_text_file(lines: list[str]) -> tuple[ColorTable, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
             return eu_utility.parse_eu_table(lines)
