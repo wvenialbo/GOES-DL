@@ -113,7 +113,7 @@ class ETColorTable(_ColorTable):
     """
 
     def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain = self._from_file(path)
+        color_table, stock_table, domain, _ = self._from_binary_file(path)
 
         color_list = self._make_color_list(color_table)
 
@@ -127,26 +127,17 @@ class ETColorTable(_ColorTable):
 
         self.set_stock_colors(under, over, bad)
 
-    @classmethod
-    def _from_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData]:
-        with open(path, "rb") as file:
-            data = file.read()
-
-        return cls._parse_text_file(data)
-
     @staticmethod
-    def _parse_text_file(
+    def _parse_binary_file(
         data: bytes,
-    ) -> tuple[ColorTable, ColorTable, DomainData]:
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not et_utility.is_et_table(
             data[:4]
         ) or not et_utility.has_expected_size(data):
             raise ValueError(INVALID_ET_FILE)
         try:
             # Try parse a .ET file
-            return et_utility.parse_et_table(data)
+            return *et_utility.parse_et_table(data), ""
 
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_ET_FILE) from error
