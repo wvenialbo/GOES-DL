@@ -66,7 +66,7 @@ class CPTColorTable(_ColorTable):
     """
 
     def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain = self._from_file(path)
+        color_table, stock_table, domain, _ = self._from_text_file(path)
 
         color_list = self._make_color_list(color_table)
 
@@ -80,22 +80,13 @@ class CPTColorTable(_ColorTable):
 
         self.set_stock_colors(under, over, bad)
 
-    @classmethod
-    def _from_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData]:
-        with open(path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-
-        return cls._parse_text_file(lines)
-
     @staticmethod
     def _parse_text_file(
         lines: list[str],
-    ) -> tuple[ColorTable, ColorTable, DomainData]:
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .CPT file
-            return cpt_utility.parse_cpt_table(lines)
+            return *cpt_utility.parse_cpt_table(lines), ""
 
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(
