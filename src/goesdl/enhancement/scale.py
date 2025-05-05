@@ -89,18 +89,22 @@ class EnhancementScale:
         return cls(cpal)
 
     @classmethod
-    def load(cls, path: str | Path, ncolors: int = 256) -> "EnhancementScale":
+    def load(
+        cls, path: str | Path, ncolors: int = 256, invert: bool = False
+    ) -> "EnhancementScale":
         """
-        Load a McIDAS or GMT enhancement color table specification.
+        Load a McIDAS or GMT enhancement colour table specification.
 
-        Parse a McIDAS enhancement utility table (EU TABLE) or GMT color
-        palette table (CPT TABLE) text file and create color dictionary
-        for a Matplotlib colormap.
+        Parse a McIDAS binary and text based enhancement utility colour
+        tables (EU TABLE and .ET files) or GMT colour palette table
+        (.CPT files).
 
         Parameters
         ----------
-        path : str or Path
-            Path to the color table specification text file.
+        path : str | Path
+            Path to the colour table specification text file.
+        ncolors : int
+            Number of colours to instantiate. Default: 256.
 
         Returns
         -------
@@ -125,7 +129,7 @@ class EnhancementScale:
 
         - https://www.generic-mapping-tools.org/
         """
-        cpal = EnhacementPalette.load(path, ncolors)
+        cpal = EnhacementPalette.load(path, ncolors, invert)
         return cls(cpal)
 
     def load_stretching(self, path: str | Path) -> None:
