@@ -118,7 +118,7 @@ _colormap_data = [
     _{self.name}_data,
 ]
 
-cmaps = {{
+palette = {{
     name: ListedColormap(colors=data, name=name, N={ncolors})
     for name, data in zip(_colormap_names, _colormap_data)
 }}
@@ -149,7 +149,7 @@ _colormap_data = [
     _{self.name}_data,
 ]
 
-cmaps = {{
+ppaletteal = {{
     name: LinearSegmentedColormap.from_list(name=name, colors=data, N=256)
     for name, data in zip(_colormap_names, _colormap_data)
 }}
