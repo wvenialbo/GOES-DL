@@ -25,10 +25,13 @@ ValueTableColumn = list[float]
 ValueTable = tuple[ValueTableColumn, ...]
 
 # Generic and natively specialised keypoints
+
 GKeypointList = Sequence[float]
 KeypointList = ValueTableColumn
 
+
 # Color component value list
+
 ColorValueList = ValueTableColumn
 
 # RGB packed colour value
@@ -38,8 +41,8 @@ RGBValue = tuple[float, float, float]
 
 # Colour table structure
 
-ColorTableRow = tuple[float, float, float, float]
-ColorTable = list[ColorTableRow]
+ColorListRow = tuple[float, float, float, float]
+ColorList = list[ColorListRow]
 
 
 # Listed colours
@@ -52,9 +55,9 @@ GListedColors = Sequence[GColorValue]
 DiscreteColorList = list[RGBValue]
 
 # Continuous colour gradient definition list and table
-ContinuousColorList = DiscreteColorList
-ContinuousColorTableRow = tuple[float, RGBValue]
-ContinuousColorTable = list[ContinuousColorTableRow]
+UniformColorList = DiscreteColorList
+ColorTableRow = tuple[float, RGBValue]
+ColorTable = list[ColorTableRow]
 
 
 # Colour segments

@@ -8,7 +8,7 @@ from .constants import (
     CM_RGB,
 )
 from .shared import (
-    ColorTable,
+    ColorList,
     DomainData,
     ValueTable,
     ValueTableColumn,
@@ -41,7 +41,7 @@ class cpt_utility(clr_utility):
     @classmethod
     def parse_cpt_table(
         cls, lines: list[str]
-    ) -> tuple[ColorTable, ColorTable, DomainData]:
+    ) -> tuple[ColorList, ColorList, DomainData]:
         j: ValueTableColumn = []
 
         r: ValueTableColumn = []
@@ -165,7 +165,7 @@ class cpt_utility(clr_utility):
     @classmethod
     def _process_cpt_table(
         cls, color_model: str, values: ValueTable
-    ) -> tuple[ColorTable, DomainData]:
+    ) -> tuple[ColorList, DomainData]:
         j, r, g, b, n = values
 
         # Normalise scale keypoints values
@@ -201,9 +201,9 @@ class cpt_utility(clr_utility):
     def _process_cpt_stock(
         cls,
         color_model: str,
-        color_table: ColorTable,
+        color_table: ColorList,
         stock_values: tuple[CMYKValue, ...],
-    ) -> ColorTable:
+    ) -> ColorList:
         j = [float(i) for i in range(3)]
 
         r, g, b, k = map(list, zip(*stock_values))

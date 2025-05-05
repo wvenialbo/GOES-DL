@@ -8,8 +8,7 @@ from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .shared import (
     ColorSegments,
-    ContinuousColorList,
-    ContinuousColorTable,
+    ColorTable,
     DiscreteColorList,
     DomainData,
     GColorValue,
@@ -22,6 +21,7 @@ from .shared import (
     RGBValue,
     SegmentData,
     SegmentDataRow,
+    UniformColorList,
 )
 
 
@@ -30,7 +30,7 @@ class BaseColormap:
     keypoints: KeypointList
     name: str
     ncolors: int
-    color_table: ContinuousColorTable
+    color_table: ColorTable
 
     under: RGBValue
     over: RGBValue
@@ -41,7 +41,7 @@ class BaseColormap:
     def __init__(
         self,
         name: str,
-        color_table: ContinuousColorTable,
+        color_table: ColorTable,
         keypoints: KeypointList,
         ncolors: int,
     ) -> None:
@@ -73,7 +73,7 @@ class BaseColormap:
         self.domain = domain
 
     @staticmethod
-    def _get_keypoints(color_table: ContinuousColorTable) -> KeypointList:
+    def _get_keypoints(color_table: ColorTable) -> KeypointList:
         return sorted({x for x, _ in color_table})
 
 
@@ -91,12 +91,12 @@ class SegmentedColormap(BaseColormap):
         super().__init__(name, color_table, [], ncolors)
 
     @staticmethod
-    def _get_color_table(segment_data: SegmentData) -> ContinuousColorTable:
+    def _get_color_table(segment_data: SegmentData) -> ColorTable:
         segments: list[ColorSegments] = [
             segment_data[component] for component in COLOR_COMPONENTS
         ]
 
-        color_table: ContinuousColorTable = []
+        color_table: ColorTable = []
 
         for x, r0, r1, _, g0, g1, _, b0, b1 in zip(*segments):
             color_table.extend(((x, (r0, g0, b0)), (x, (r1, g1, b1))))
@@ -240,7 +240,7 @@ class SegmentedColormap(BaseColormap):
 class ContinuousColormap(BaseColormap):
 
     def __init__(
-        self, name: str, color_table: ContinuousColorTable, ncolors: int = 256
+        self, name: str, color_table: ColorTable, ncolors: int = 256
     ) -> None:
         super().__init__(name, color_table, [], ncolors)
 
@@ -250,7 +250,7 @@ class _ListBasedColormap(BaseColormap):
     @classmethod
     def _copy_listed_colors(
         cls, listed_colors: GListedColors
-    ) -> ContinuousColorList:
+    ) -> UniformColorList:
         try:
             return cls._do_copy_listed_colors(listed_colors)
 
@@ -260,7 +260,7 @@ class _ListBasedColormap(BaseColormap):
     @classmethod
     def _do_copy_listed_colors(
         cls, listed_colors: GListedColors
-    ) -> ContinuousColorList:
+    ) -> UniformColorList:
         return list(map(cls._to_rgb, listed_colors))
 
     @staticmethod
@@ -282,8 +282,8 @@ class UniformColormap(_ListBasedColormap):
 
     @staticmethod
     def _get_color_table(
-        listed_colors: ContinuousColorList,
-    ) -> ContinuousColorTable:
+        listed_colors: UniformColorList,
+    ) -> ColorTable:
         ncolors = len(listed_colors)
         return [(i / ncolors, x) for i, x in enumerate(listed_colors)]
 
@@ -302,7 +302,7 @@ class DiscreteColormap(_ListBasedColormap):
     @staticmethod
     def _get_color_table(
         listed_colors: DiscreteColorList, ncolors: int
-    ) -> ContinuousColorTable:
+    ) -> ColorTable:
         return [
             ((i + j) / ncolors, x)
             for i, color in enumerate(listed_colors)
@@ -395,9 +395,9 @@ class CombinedColormap(_NamedColormapBased):
         super().__init__(name, combined_color_table, [], ncolors)
 
     def _combine_color_table(
-        self, color_tables: list[ContinuousColorTable]
-    ) -> ContinuousColorTable:
-        combined_color_table: ContinuousColorTable = []
+        self, color_tables: list[ColorTable]
+    ) -> ColorTable:
+        combined_color_table: ColorTable = []
 
         for color_table in color_tables:
             combined_color_table.extend(color_table)
@@ -406,8 +406,8 @@ class CombinedColormap(_NamedColormapBased):
 
     def _extract_color_tables(
         self, colormap_names: Sequence[str]
-    ) -> list[ContinuousColorTable]:
-        color_tables: list[ContinuousColorTable] = []
+    ) -> list[ColorTable]:
+        color_tables: list[ColorTable] = []
 
         for colormap_name in colormap_names:
             colormap = self._get_colormap(colormap_name)
@@ -425,8 +425,8 @@ class CombinedColormap(_NamedColormapBased):
     def _rescale_color_tables(
         self,
         normalized_keypoints: KeypointList,
-        color_tables: list[ContinuousColorTable],
-    ) -> list[ContinuousColorTable]:
+        color_tables: list[ColorTable],
+    ) -> list[ColorTable]:
         for i, color_table in enumerate(color_tables):
             smin, smax = normalized_keypoints[i : i + 2]
 

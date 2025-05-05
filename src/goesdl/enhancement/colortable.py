@@ -5,7 +5,7 @@ from .colormap import BaseColormap
 from .cpt_utility import cpt_utility
 from .et_utility import et_utility
 from .eu_utility import eu_utility
-from .shared import ColorTable, ContinuousColorTable, DomainData
+from .shared import ColorList, ColorTable, DomainData
 
 INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
 INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
@@ -34,12 +34,10 @@ class _ColorTable(ABC, BaseColormap):
     @abstractmethod
     def _from_file(
         cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
+    ) -> tuple[ColorList, ColorList, DomainData, str]: ...
 
     @staticmethod
-    def _make_color_table(
-        color_list: ColorTable, invert: bool
-    ) -> ContinuousColorTable:
+    def _make_color_table(color_list: ColorList, invert: bool) -> ColorTable:
         if invert:
             return [(1 - j, (r, g, b)) for j, r, g, b in reversed(color_list)]
         else:
@@ -51,7 +49,7 @@ class _BinaryColorTable(_ColorTable):
     @classmethod
     def _from_file(
         cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         with open(path, "rb") as file:
             data = file.read()
 
@@ -61,7 +59,7 @@ class _BinaryColorTable(_ColorTable):
     @abstractmethod
     def _parse_binary_file(
         cls, data: bytes
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
+    ) -> tuple[ColorList, ColorList, DomainData, str]: ...
 
 
 class _TextBasedColorTable(_ColorTable):
@@ -69,7 +67,7 @@ class _TextBasedColorTable(_ColorTable):
     @classmethod
     def _from_file(
         cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
@@ -79,7 +77,7 @@ class _TextBasedColorTable(_ColorTable):
     @abstractmethod
     def _parse_text_file(
         cls, lines: list[str]
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
+    ) -> tuple[ColorList, ColorList, DomainData, str]: ...
 
 
 class CPTColorTable(_TextBasedColorTable):
@@ -102,13 +100,13 @@ class CPTColorTable(_TextBasedColorTable):
     @classmethod
     def _parse_text_file(
         cls, lines: list[str]
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         return cls.parse_cpt_table(lines)
 
     @staticmethod
     def parse_cpt_table(
         lines: list[str],
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         try:
             # Try parse a .CPT file
             return *cpt_utility.parse_cpt_table(lines), ""
@@ -140,7 +138,7 @@ class ETColorTable(_BinaryColorTable):
     @classmethod
     def _parse_binary_file(
         cls, data: bytes
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         if not et_utility.is_et_table(
             data[:4]
         ) or not et_utility.has_expected_size(data):
@@ -151,7 +149,7 @@ class ETColorTable(_BinaryColorTable):
     @staticmethod
     def parse_et_table(
         data: bytes,
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         try:
             # Try parse a .ET file
             return *et_utility.parse_et_table(data), ""
@@ -181,7 +179,7 @@ class EUColorTable(_TextBasedColorTable):
     @classmethod
     def _parse_text_file(
         cls, lines: list[str]
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         if not eu_utility.is_eu_table(lines[0]):
             raise ValueError(INVALID_EU_FILE)
 
@@ -190,7 +188,7 @@ class EUColorTable(_TextBasedColorTable):
     @staticmethod
     def parse_eu_table(
         lines: list[str],
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         try:
             # Try parse a .EU file
             return eu_utility.parse_eu_table(lines)
@@ -228,7 +226,7 @@ class ColormapTable(_ColorTable):
     @classmethod
     def _from_file(
         cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         with open(path, "rb") as file:
             data = file.read()
 
@@ -245,13 +243,13 @@ class ColormapTable(_ColorTable):
     @classmethod
     def _parse_binary_file(
         cls, data: bytes
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         return ETColorTable.parse_et_table(data)
 
     @classmethod
     def _parse_text_file(
         cls, lines: list[str]
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
             return EUColorTable.parse_eu_table(lines)

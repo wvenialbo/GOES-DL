@@ -4,11 +4,11 @@ from .colortable import CPTColorTable, ETColorTable, EUColorTable
 from .et_utility import et_utility
 from .eu_utility import eu_utility
 from .shared import (
+    ColorList,
     ColorTable,
-    ContinuousColorList,
-    ContinuousColorTable,
     DomainData,
     RGBValue,
+    UniformColorList,
 )
 
 
@@ -38,8 +38,8 @@ class ColormapGenerator:
     - https://www.generic-mapping-tools.org/
     """
 
-    color_table: ColorTable
-    stock_table: ColorTable
+    color_table: ColorList
+    stock_table: ColorList
     domain: DomainData
     name: str
 
@@ -78,7 +78,7 @@ class ColormapGenerator:
     @classmethod
     def _from_file(
         cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         with open(path, "rb") as file:
             data = file.read()
 
@@ -155,8 +155,8 @@ palette = {{
 
     @staticmethod
     def _make_color_list(
-        color_table: ColorTable, invert: bool
-    ) -> ContinuousColorList:
+        color_table: ColorList, invert: bool
+    ) -> UniformColorList:
         not_a_listed_color_table = "Not a proper listed colour table"
 
         if len(color_table) % 2:
@@ -168,7 +168,7 @@ palette = {{
             else [(r, g, b) for _, r, g, b in color_table]
         )
 
-        color_list: ContinuousColorList = []
+        color_list: UniformColorList = []
 
         for i in range(0, len(listed_color), 2):
             current_clr = listed_color[i]
@@ -181,8 +181,8 @@ palette = {{
 
     @staticmethod
     def _make_color_segment(
-        color_table: ColorTable, invert: bool
-    ) -> ContinuousColorTable:
+        color_table: ColorList, invert: bool
+    ) -> ColorTable:
         return (
             [(1 - j, (r, g, b)) for j, r, g, b in reversed(color_table)]
             if invert
@@ -192,13 +192,13 @@ palette = {{
     @staticmethod
     def _parse_binary_file(
         data: bytes,
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         return ETColorTable.parse_et_table(data)
 
     @staticmethod
     def _parse_text_file(
         lines: list[str],
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
             return EUColorTable.parse_eu_table(lines)

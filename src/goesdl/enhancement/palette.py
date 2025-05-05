@@ -24,16 +24,16 @@ from .colortable import (
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .eu_utility import eu_utility
 from .shared import (
+    ColorList,
     ColorSegments,
     ColorTable,
     ColorValueList,
-    ContinuousColorList,
-    ContinuousColorTable,
     DiscreteColorList,
     GKeypointList,
     GSegmentData,
     KeypointList,
     SegmentData,
+    UniformColorList,
     ValueTable,
 )
 
@@ -67,7 +67,7 @@ class EnhancementPalette(BaseColormap):
 
     @classmethod
     def continuous(
-        cls, name: str, color_table: ContinuousColorTable, ncolors: int = 256
+        cls, name: str, color_table: ColorTable, ncolors: int = 256
     ) -> "EnhancementPalette":
         return cls(ContinuousColormap(name, color_table, ncolors))
 
@@ -170,7 +170,7 @@ class EnhancementPalette(BaseColormap):
 
     @classmethod
     def uniform(
-        cls, name: str, color_list: ContinuousColorList, ncolors: int = 256
+        cls, name: str, color_list: UniformColorList, ncolors: int = 256
     ) -> "EnhancementPalette":
         return cls(UniformColormap(name, color_list, ncolors))
 
@@ -192,12 +192,12 @@ class EnhancementPalette(BaseColormap):
         return x, b, g, r
 
     @classmethod
-    def _cleanup_color_table(cls, color_table: ColorTable) -> None:
+    def _cleanup_color_table(cls, color_table: ColorList) -> None:
         color_table.pop(-1)
         color_table.pop(0)
 
     @classmethod
-    def _create_color_table(cls, segment_data: SegmentData) -> ColorTable:
+    def _create_color_table(cls, segment_data: SegmentData) -> ColorList:
         packed_segments = cls._pack_segment_data(segment_data)
 
         unpacked_segment_valuess = cls._unpack_segment_values(packed_segments)

@@ -13,8 +13,7 @@ from numpy import interp
 from .palette import EnhancementPalette
 from .shared import (
     ColorSegments,
-    ContinuousColorList,
-    ContinuousColorTable,
+    ColorTable,
     DiscreteColorList,
     DomainData,
     GKeypointList,
@@ -23,6 +22,7 @@ from .shared import (
     MSegmentData,
     SegmentData,
     StretchingTable,
+    UniformColorList,
 )
 from .st_stock import st_default, st_stock
 from .stretching import EnhancementStretching
@@ -67,7 +67,7 @@ class EnhancementScale:
 
     @classmethod
     def continuous(
-        cls, name: str, color_table: ContinuousColorTable, ncolors: int = 256
+        cls, name: str, color_table: ColorTable, ncolors: int = 256
     ) -> "EnhancementScale":
         cpal = EnhancementPalette.continuous(name, color_table, ncolors)
         return cls(cpal)
@@ -223,7 +223,7 @@ class EnhancementScale:
     def uniform(
         cls,
         name: str,
-        color_list: ContinuousColorList,
+        color_list: UniformColorList,
         ncolors: int = 256,
     ) -> "EnhancementScale":
         cpal = EnhancementPalette.uniform(name, color_list, ncolors)

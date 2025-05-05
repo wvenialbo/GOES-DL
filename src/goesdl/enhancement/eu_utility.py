@@ -5,7 +5,7 @@ from typing import TextIO
 from .clr_utility import clr_utility
 from .constants import CM_BGR, CM_RGB
 from .shared import (
-    ColorTable,
+    ColorList,
     DomainData,
     ValueTable,
     ValueTableColumn,
@@ -35,7 +35,7 @@ class eu_utility(clr_utility):
         cls,
         path: str | Path,
         name: str,
-        table: ColorTable,
+        table: ColorList,
         rgb: bool = False,
     ) -> None:
         """
@@ -66,7 +66,7 @@ class eu_utility(clr_utility):
         return EU_SIGNATURE in header
 
     @classmethod
-    def _scale_color_table(cls, values: ValueTable) -> ColorTable:
+    def _scale_color_table(cls, values: ValueTable) -> ColorList:
         x, r, g, b = values
 
         # Rescale scale keypoints values
@@ -83,7 +83,7 @@ class eu_utility(clr_utility):
     @classmethod
     def parse_eu_table(
         cls, lines: list[str]
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
         j: ValueTableColumn = []
 
         b: ValueTableColumn = []
@@ -122,7 +122,7 @@ class eu_utility(clr_utility):
             name = lines[0][len(EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        stock_table: ColorTable = [
+        stock_table: ColorList = [
             color_table[0],
             color_table[-1],
             NO_DATA_RGB,
@@ -147,7 +147,7 @@ class eu_utility(clr_utility):
 
     @classmethod
     def _create_eu_table(
-        cls, lines: list[str], table: ColorTable, rgb: bool
+        cls, lines: list[str], table: ColorList, rgb: bool
     ) -> None:
         if rgb:
             table = [(x, r, g, b) for x, b, g, r in table]
@@ -170,7 +170,7 @@ class eu_utility(clr_utility):
     @classmethod
     def _normalize_color_table(
         cls, values: ValueTable
-    ) -> tuple[ColorTable, DomainData]:
+    ) -> tuple[ColorList, DomainData]:
         j, r, g, b = values
 
         # Normalise scale keypoints values

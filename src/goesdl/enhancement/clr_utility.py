@@ -8,7 +8,7 @@ from .constants import (
     HUE_MAX,
 )
 from .shared import (
-    ColorTable,
+    ColorList,
     ColorValueList,
     DomainData,
     KeypointList,
@@ -33,7 +33,7 @@ class clr_utility:
         return hsv_to_rgb(h / HUE_MAX, s / HSV_MAX, v / HSV_MAX)
 
     @classmethod
-    def _make_color_table(cls, values: ValueTable) -> ColorTable:
+    def _make_color_table(cls, values: ValueTable) -> ColorList:
         x, r, g, b = values
         return list(zip(x, r, g, b))
 
