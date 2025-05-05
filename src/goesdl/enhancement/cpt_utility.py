@@ -61,6 +61,9 @@ class cpt_utility(clr_utility):
             # Split line into list of strings of keywords or values
             ls = line.split()
 
+            if len(ls) <= 1:
+                continue
+
             # Check for alternative colour model
             color_model = cls._extract_color_model(color_model, ls)
 
