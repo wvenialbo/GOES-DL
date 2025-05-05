@@ -109,7 +109,7 @@ class eu_utility(clr_utility):
             j.extend(lv[:2])
             b.extend(lv[2:4])
             g.extend(lv[4:6])
-            r.extend(lv[6:2])
+            r.extend(lv[6:8])
 
         # Adjust colour component ordering if necessary
         if color_model == CM_RGB:
