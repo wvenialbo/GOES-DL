@@ -58,10 +58,12 @@ class clr_utility:
         return [round(k * CLR_MAX) for k in y]
 
     @staticmethod
-    def _scale_keypoint_values(x: KeypointList) -> KeypointList:
-        length = len(x) // 2
-        print(length, len(x))
-        return [round(k * length) for k in x]
+    def _scale_keypoint_values(
+        x: KeypointList, domain: DomainData
+    ) -> KeypointList:
+        vmin, vmax = domain
+        length = vmax - vmin
+        return [round(vmin + k * length) for k in x]
 
     @staticmethod
     def _validate_monotonic_keypoints(x: KeypointList) -> None:
