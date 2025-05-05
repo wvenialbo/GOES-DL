@@ -343,7 +343,7 @@ class UniformColormap(_GRadiendBasedColormap):
         super().__init__(name, color_list, ncolors)
 
 
-class DiscreteColormap(ContinuousColormap):
+class DiscreteColormap(_GRadiendBasedColormap):
 
     def __init__(self, name: str, listed_colors: GListedColors) -> None:
         color_list = self._copy_listed_colors(listed_colors)
