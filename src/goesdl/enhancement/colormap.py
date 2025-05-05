@@ -7,6 +7,7 @@ from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .shared import (
+    ColorSegments,
     ContinuousColorList,
     ContinuousColorTable,
     DiscreteColorList,
@@ -85,7 +86,22 @@ class SegmentedColormap(BaseColormap):
 
         segment_data_copy = self._get_full_segment_data(segment_data_copy)
 
-        super().__init__(name, segment_data, [], ncolors, True)
+        color_table = self._get_color_table(segment_data_copy)
+
+        super().__init__(name, color_table, [], ncolors)
+
+    @staticmethod
+    def _get_color_table(segment_data: SegmentData) -> ContinuousColorTable:
+        segments: list[ColorSegments] = [
+            segment_data[component] for component in COLOR_COMPONENTS
+        ]
+
+        color_table: ContinuousColorTable = []
+
+        for x, r0, r1, _, g0, g1, _, b0, b1 in zip(*segments):
+            color_table.extend(((x, (r0, g0, b0)), (x, (r1, g1, b1))))
+
+        return color_table
 
     @staticmethod
     def _add_next_segment(
