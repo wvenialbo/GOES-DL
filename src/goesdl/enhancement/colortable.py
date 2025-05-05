@@ -57,15 +57,15 @@ class _ColorTable(ContinuousColormap):
         return [(j, (r, g, b)) for j, b, g, r in color_table]
 
     @abstractmethod
-    @staticmethod
+    @classmethod
     def _parse_binary_file(
-        data: bytes,
+        cls, data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
     @abstractmethod
-    @staticmethod
+    @classmethod
     def _parse_text_file(
-        lines: list[str],
+        cls, lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
@@ -92,9 +92,9 @@ class CPTColorTable(_ColorTable):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         return cls._from_text_file(path)
 
-    @staticmethod
+    @classmethod
     def _parse_text_file(
-        lines: list[str],
+        cls, lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .CPT file
@@ -130,9 +130,9 @@ class ETColorTable(_ColorTable):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         return cls._from_binary_file(path)
 
-    @staticmethod
+    @classmethod
     def _parse_binary_file(
-        data: bytes,
+        cls, data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not et_utility.is_et_table(
             data[:4]
@@ -170,9 +170,9 @@ class EUColorTable(_ColorTable):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         return cls._from_text_file(path)
 
-    @staticmethod
+    @classmethod
     def _parse_text_file(
-        lines: list[str],
+        cls, lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not eu_utility.is_eu_table(lines[0]):
             raise ValueError(INVALID_EU_FILE)
@@ -227,9 +227,9 @@ class ColormapTable(_ColorTable):
 
         return cls._parse_text_file(lines)
 
-    @staticmethod
+    @classmethod
     def _parse_binary_file(
-        data: bytes,
+        cls, data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .ET file
@@ -238,9 +238,9 @@ class ColormapTable(_ColorTable):
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_ET_FILE) from error
 
-    @staticmethod
+    @classmethod
     def _parse_text_file(
-        lines: list[str],
+        cls, lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
