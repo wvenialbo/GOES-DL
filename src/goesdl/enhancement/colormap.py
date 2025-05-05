@@ -345,12 +345,12 @@ class UniformColormap(_GRadiendBasedColormap):
 
 class DiscreteColormap(ContinuousColormap):
 
-    def __init__(self, name: str, raw_listed_colors: GListedColors) -> None:
-        listed_colors = self._copy_listed_colors(raw_listed_colors)
+    def __init__(self, name: str, listed_colors: GListedColors) -> None:
+        color_list = self._copy_listed_colors(listed_colors)
 
-        ncolors = len(listed_colors)
+        ncolors = len(color_list)
 
-        color_table = self._get_color_table(listed_colors, ncolors)
+        color_table = self._get_color_table(color_list, ncolors)
 
         super().__init__(name, color_table, ncolors)
 
