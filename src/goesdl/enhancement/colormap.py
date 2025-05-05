@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 from copy import deepcopy
-from math import nan
 from typing import cast
 
 from matplotlib import colormaps
@@ -30,7 +29,7 @@ class BaseColormap:
     keypoints: KeypointList
     name: str
     ncolors: int
-    segment_data: SegmentData
+    color_table: ContinuousColorTable
 
     under: RGBValue
     over: RGBValue
@@ -41,20 +40,16 @@ class BaseColormap:
     def __init__(
         self,
         name: str,
-        segment_data: SegmentData,
+        color_table: ContinuousColorTable,
         keypoints: KeypointList,
         ncolors: int,
-        reduce: bool,
     ) -> None:
         if ncolors < 1:
             raise ValueError("'ncolors' must be a positive integer")
 
-        if reduce:
-            segment_data = self._reduce_segment_data(segment_data)
+        self.color_table = color_table
 
-        self.segment_data = segment_data
-
-        self.keypoints = keypoints or self._get_keypoints(segment_data)
+        self.keypoints = keypoints or self._get_keypoints(color_table)
 
         self.ncolors = ncolors
 
@@ -106,22 +101,6 @@ class BaseColormap:
         return current_entry
 
     @staticmethod
-    def _compress_color_segment(
-        color_segments: list[SegmentDataRow],
-    ) -> list[SegmentDataRow]:
-        compressed_color_segments: list[SegmentDataRow] = [color_segments[0]]
-
-        for x_1, y_2_0, y_2_1 in color_segments[1:]:
-            x_0, y_1_0, _ = compressed_color_segments[-1]
-
-            if x_0 == x_1:
-                compressed_color_segments[-1] = (x_0, y_1_0, y_2_1)
-            else:
-                compressed_color_segments.append((x_1, y_2_0, y_2_1))
-
-        return compressed_color_segments
-
-    @staticmethod
     def _decompress_color_segment(
         color_segments: list[SegmentDataRow],
     ) -> list[SegmentDataRow]:
@@ -155,13 +134,8 @@ class BaseColormap:
         return cls._homogenize_segment_data(expanded_segment_data)
 
     @staticmethod
-    def _get_keypoints(segment_data: SegmentData) -> KeypointList:
-        values: set[float] = set()
-
-        for component, segments in segment_data.items():
-            values.update({x for (x, y0, y1) in segments})
-
-        return sorted(values)
+    def _get_keypoints(color_table: ContinuousColorTable) -> KeypointList:
+        return sorted({x for x, _ in color_table})
 
     @classmethod
     def _homogenize_segment_data(
@@ -211,36 +185,6 @@ class BaseColormap:
                 )
 
         return dst_segment_data
-
-    @classmethod
-    def _reduce_segment_data(cls, segment_data: SegmentData) -> SegmentData:
-        reduced_segment_data: SegmentData = {}
-
-        for component in COLOR_COMPONENTS:
-            color_segments = segment_data[component]
-            color_segments = cls._remove_duplicate_color_segment(
-                color_segments
-            )
-            color_segments = cls._compress_color_segment(color_segments)
-            reduced_segment_data[component] = color_segments
-
-        return reduced_segment_data
-
-    @staticmethod
-    def _remove_duplicate_color_segment(
-        color_segments: list[SegmentDataRow],
-    ) -> list[SegmentDataRow]:
-        cleaned_color_segments: list[SegmentDataRow] = []
-
-        previous_color_segment = (nan, nan, nan)
-        for color_segment in color_segments:
-            if color_segment == previous_color_segment:
-                continue
-
-            previous_color_segment = color_segment
-            cleaned_color_segments.append(color_segment)
-
-        return cleaned_color_segments
 
 
 class SegmentedColormap(BaseColormap):
