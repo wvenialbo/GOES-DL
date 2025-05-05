@@ -82,7 +82,9 @@ class EnhacementPalette(BaseColormap):
         return cls(NamedColormap(name, ncolors))
 
     @classmethod
-    def load(cls, path: str | Path, ncolors: int = 256) -> "EnhacementPalette":
+    def load(
+        cls, path: str | Path, ncolors: int = 256, invert: bool = False
+    ) -> "EnhacementPalette":
         """
         Load a McIDAS or GMT enhancement colour table specification.
 
@@ -120,25 +122,25 @@ class EnhacementPalette(BaseColormap):
 
         - https://www.generic-mapping-tools.org/
         """
-        return cls(ColormapTable(path, ncolors))
+        return cls(ColormapTable(path, ncolors, invert))
 
     @classmethod
     def load_cpt(
-        cls, path: str | Path, ncolors: int = 256
+        cls, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> "EnhacementPalette":
-        return cls(CPTColorTable(path, ncolors))
+        return cls(CPTColorTable(path, ncolors, invert))
 
     @classmethod
     def load_et(
-        cls, path: str | Path, ncolors: int = 256
+        cls, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> "EnhacementPalette":
-        return cls(ETColorTable(path, ncolors))
+        return cls(ETColorTable(path, ncolors, invert))
 
     @classmethod
     def load_eu(
-        cls, path: str | Path, ncolors: int = 256
+        cls, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> "EnhacementPalette":
-        return cls(EUColorTable(path, ncolors))
+        return cls(EUColorTable(path, ncolors, invert))
 
     @classmethod
     def segmented(
