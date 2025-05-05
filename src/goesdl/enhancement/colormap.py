@@ -338,9 +338,41 @@ class ContinuousColormap(_GRadiendBasedColormap):
 class UniformColormap(_GRadiendBasedColormap):
 
     def __init__(
-        self, name: str, color_list: ContinuousColorList, ncolors: int = 256
+        self, name: str, listed_colors: GListedColors, ncolors: int = 256
     ) -> None:
-        super().__init__(name, color_list, ncolors)
+        color_list = self._copy_listed_colors(listed_colors)
+
+        color_table = self._get_color_table(color_list)
+
+        super().__init__(name, color_table, ncolors)
+
+    @classmethod
+    def _copy_listed_colors(
+        cls, listed_colors: GListedColors
+    ) -> ContinuousColorList:
+        try:
+            return cls._do_copy_listed_colors(listed_colors)
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @classmethod
+    def _do_copy_listed_colors(
+        cls, listed_colors: GListedColors
+    ) -> ContinuousColorList:
+        return list(map(cls._to_rgb, listed_colors))
+
+    @staticmethod
+    def _get_color_table(
+        listed_colors: ContinuousColorList,
+    ) -> ContinuousColorTable:
+        ncolors = len(listed_colors)
+        return [(i / ncolors, x) for i, x in enumerate(listed_colors)]
+
+    @staticmethod
+    def _to_rgb(rgb_value: GColorValue) -> RGBValue:
+        red, green, blue = map(float, rgb_value)
+        return red, green, blue
 
 
 class DiscreteColormap(_GRadiendBasedColormap):
