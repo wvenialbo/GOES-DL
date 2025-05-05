@@ -10,9 +10,11 @@ from .palette import EnhacementPalette
 from .scale import EnhancementScale
 from .stretching import EnhacementStretching, get_stmap
 from .ticks import ColorbarTicks
+from .generator import ColormapGenerator
 
 __all__ = [
     "ColorbarTicks",
+    "ColormapGenerator",
     "EnhacementPalette",
     "EnhancementScale",
     "EnhacementStretching",
