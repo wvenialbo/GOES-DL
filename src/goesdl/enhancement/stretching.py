@@ -28,7 +28,7 @@ ST_KEYWORD = (
 )
 
 
-class EnhacementStretching:
+class EnhancementStretching:
     """
     Represent a color enhancement stretching mapping.
 
@@ -67,7 +67,7 @@ class EnhacementStretching:
         self.table = table
 
     @classmethod
-    def load(cls, path: str | Path) -> "EnhacementStretching":
+    def load(cls, path: str | Path) -> "EnhancementStretching":
         """
         Create an EnhacementStretching instance from a file.
 
@@ -144,7 +144,7 @@ class EnhacementStretching:
         )
 
 
-def get_stmap(stretching_name: str) -> EnhacementStretching:
+def get_stmap(stretching_name: str) -> EnhancementStretching:
     if stretching_name not in st_names:
         supported_smaps = "'".join(st_names)
         raise ValueError(
@@ -154,4 +154,4 @@ def get_stmap(stretching_name: str) -> EnhacementStretching:
 
     stretching_table = st_stock[stretching_name]
 
-    return EnhacementStretching(stretching_name, stretching_table)
+    return EnhancementStretching(stretching_name, stretching_table)

@@ -10,7 +10,7 @@ from matplotlib.colors import (
 )
 from numpy import interp
 
-from .palette import EnhacementPalette
+from .palette import EnhancementPalette
 from .shared import (
     ColorSegments,
     ContinuousColorList,
@@ -25,14 +25,14 @@ from .shared import (
     StretchingTable,
 )
 from .st_stock import st_default, st_stock
-from .stretching import EnhacementStretching
+from .stretching import EnhancementStretching
 from .ticks import ColorbarTicks
 
 
 class EnhancementScale:
 
-    palette: EnhacementPalette
-    stretching: EnhacementStretching
+    palette: EnhancementPalette
+    stretching: EnhancementStretching
 
     cmap: Colormap
     cnorm: Normalize
@@ -41,12 +41,12 @@ class EnhancementScale:
 
     def __init__(
         self,
-        palette: EnhacementPalette,
-        stretching: EnhacementStretching | None = None,
+        palette: EnhancementPalette,
+        stretching: EnhancementStretching | None = None,
     ) -> None:
         self.palette = palette
 
-        self.stretching = stretching or EnhacementStretching(
+        self.stretching = stretching or EnhancementStretching(
             st_default, st_stock[st_default]
         )
 
@@ -60,7 +60,7 @@ class EnhancementScale:
         name: str = "",
         ncolors: int = 256,
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.combined_from_stock(
+        cpal = EnhancementPalette.combined_from_stock(
             colormap_names, keypoints, name, ncolors
         )
         return cls(cpal)
@@ -69,23 +69,23 @@ class EnhancementScale:
     def continuous(
         cls, name: str, color_table: ContinuousColorTable, ncolors: int = 256
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.continuous(name, color_table, ncolors)
+        cpal = EnhancementPalette.continuous(name, color_table, ncolors)
         return cls(cpal)
 
     def create_stretching(self, name: str, table: StretchingTable) -> None:
-        self.stretching = EnhacementStretching(name, table)
+        self.stretching = EnhancementStretching(name, table)
         self._stretching_updated()
 
     @classmethod
     def discrete(
         cls, name: str, listed_colors: DiscreteColorList
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.discrete(name, listed_colors)
+        cpal = EnhancementPalette.discrete(name, listed_colors)
         return cls(cpal)
 
     @classmethod
     def from_stock(cls, name: str, ncolors: int = 256) -> "EnhancementScale":
-        cpal = EnhacementPalette.from_stock(name, ncolors)
+        cpal = EnhancementPalette.from_stock(name, ncolors)
         return cls(cpal)
 
     @classmethod
@@ -129,28 +129,28 @@ class EnhancementScale:
 
         - https://www.generic-mapping-tools.org/
         """
-        cpal = EnhacementPalette.load(path, ncolors, invert)
+        cpal = EnhancementPalette.load(path, ncolors, invert)
         return cls(cpal)
 
     @classmethod
     def load_cpt(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.load_cpt(path, ncolors, invert)
+        cpal = EnhancementPalette.load_cpt(path, ncolors, invert)
         return cls(cpal)
 
     @classmethod
     def load_et(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.load_et(path, ncolors, invert)
+        cpal = EnhancementPalette.load_et(path, ncolors, invert)
         return cls(cpal)
 
     @classmethod
     def load_eu(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.load_eu(path, ncolors, invert)
+        cpal = EnhancementPalette.load_eu(path, ncolors, invert)
         return cls(cpal)
 
     def load_stretching(self, path: str | Path) -> None:
@@ -167,14 +167,14 @@ class EnhancementScale:
         EnhacementStretching
             An instance of the EnhacementStretching class.
         """
-        self.stretching = EnhacementStretching.load(path)
+        self.stretching = EnhancementStretching.load(path)
         self._stretching_updated()
 
     @classmethod
     def segmented(
         cls, name: str, segment_data: GSegmentData, ncolors: int = 256
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.segmented(name, segment_data, ncolors)
+        cpal = EnhancementPalette.segmented(name, segment_data, ncolors)
         return cls(cpal)
 
     def save(self, path: str | Path, rgb: bool = False) -> None:
@@ -226,14 +226,14 @@ class EnhancementScale:
         color_list: ContinuousColorList,
         ncolors: int = 256,
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.uniform(name, color_list, ncolors)
+        cpal = EnhancementPalette.uniform(name, color_list, ncolors)
         return cls(cpal)
 
-    def update_palette(self, palette: EnhacementPalette) -> None:
+    def update_palette(self, palette: EnhancementPalette) -> None:
         self.palette = palette
         self.cmap = self._get_cmap()
 
-    def update_stretching(self, stretching: EnhacementStretching) -> None:
+    def update_stretching(self, stretching: EnhancementStretching) -> None:
         self.stretching = stretching
         self._stretching_updated()
 

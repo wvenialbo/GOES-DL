@@ -38,7 +38,7 @@ from .shared import (
 )
 
 
-class EnhacementPalette(BaseColormap):
+class EnhancementPalette(BaseColormap):
     """
     Represent a enhancement colour palette.
     """
@@ -62,29 +62,29 @@ class EnhacementPalette(BaseColormap):
         keypoints: GKeypointList,
         name: str = "",
         ncolors: int = 256,
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(CombinedColormap(name, colormap_names, keypoints, ncolors))
 
     @classmethod
     def continuous(
         cls, name: str, color_table: ContinuousColorTable, ncolors: int = 256
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(ContinuousColormap(name, color_table, ncolors))
 
     @classmethod
     def discrete(
         cls, name: str, listed_colors: DiscreteColorList
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(DiscreteColormap(name, listed_colors))
 
     @classmethod
-    def from_stock(cls, name: str, ncolors: int = 256) -> "EnhacementPalette":
+    def from_stock(cls, name: str, ncolors: int = 256) -> "EnhancementPalette":
         return cls(NamedColormap(name, ncolors))
 
     @classmethod
     def load(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         """
         Load a McIDAS or GMT enhancement colour table specification.
 
@@ -127,25 +127,25 @@ class EnhacementPalette(BaseColormap):
     @classmethod
     def load_cpt(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(CPTColorTable(path, ncolors, invert))
 
     @classmethod
     def load_et(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(ETColorTable(path, ncolors, invert))
 
     @classmethod
     def load_eu(
         cls, path: str | Path, ncolors: int = 256, invert: bool = False
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(EUColorTable(path, ncolors, invert))
 
     @classmethod
     def segmented(
         cls, name: str, segment_data: GSegmentData, ncolors: int = 256
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(SegmentedColormap(name, segment_data, ncolors))
 
     def save(self, path: str | Path, rgb: bool = False) -> None:
@@ -171,7 +171,7 @@ class EnhacementPalette(BaseColormap):
     @classmethod
     def uniform(
         cls, name: str, color_list: ContinuousColorList, ncolors: int = 256
-    ) -> "EnhacementPalette":
+    ) -> "EnhancementPalette":
         return cls(UniformColormap(name, color_list, ncolors))
 
     @classmethod
