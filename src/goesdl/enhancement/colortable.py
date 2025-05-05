@@ -34,41 +34,9 @@ class _ColorTable(ContinuousColormap):
         cls, path: str | Path
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
-    @classmethod
-    def _from_binary_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        with open(path, "rb") as file:
-            data = file.read()
-
-        return cls._parse_binary_file(data)
-
-    @classmethod
-    def _from_text_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        with open(path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-
-        return cls._parse_text_file(lines)
-
     @staticmethod
     def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
         return [(j, (r, g, b)) for j, b, g, r in color_table]
-
-    @abstractmethod
-    @classmethod
-    def _parse_binary_file(
-        cls,
-        data: bytes,
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
-
-    @abstractmethod
-    @classmethod
-    def _parse_text_file(
-        cls,
-        lines: list[str],
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
 class _BinaryColorTable(_ColorTable):
@@ -79,6 +47,21 @@ class _BinaryColorTable(_ColorTable):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         return cls._from_binary_file(path)
 
+    @classmethod
+    def _from_binary_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        with open(path, "rb") as file:
+            data = file.read()
+
+        return cls._parse_binary_file(data)
+
+    @abstractmethod
+    @classmethod
+    def _parse_binary_file(
+        cls, data: bytes
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
+
 
 class _TextBasedColorTable(_ColorTable):
 
@@ -87,6 +70,21 @@ class _TextBasedColorTable(_ColorTable):
         cls, path: str | Path
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         return cls._from_text_file(path)
+
+    @classmethod
+    def _from_text_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        with open(path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+        return cls._parse_text_file(lines)
+
+    @abstractmethod
+    @classmethod
+    def _parse_text_file(
+        cls, lines: list[str]
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
 class CPTColorTable(_TextBasedColorTable):
