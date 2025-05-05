@@ -67,12 +67,9 @@ class EnhancementScale:
 
     @classmethod
     def continuous(
-        cls,
-        name: str,
-        listed_colors: ContinuousColorList | ContinuousColorTable,
-        ncolors: int = 256,
+        cls, name: str, color_table: ContinuousColorTable, ncolors: int = 256
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.continuous(name, listed_colors, ncolors)
+        cpal = EnhacementPalette.continuous(name, color_table, ncolors)
         return cls(cpal)
 
     def create_stretching(self, name: str, table: StretchingTable) -> None:
@@ -199,6 +196,16 @@ class EnhancementScale:
         self.ticker = ColorbarTicks(
             self.stretching.domain, nticks, tickstep, offset, scale
         )
+
+    @classmethod
+    def uniform(
+        cls,
+        name: str,
+        listed_colors: ContinuousColorList | ContinuousColorTable,
+        ncolors: int = 256,
+    ) -> "EnhancementScale":
+        cpal = EnhacementPalette.continuous(name, listed_colors, ncolors)
+        return cls(cpal)
 
     def update_palette(self, palette: EnhacementPalette) -> None:
         self.palette = palette
