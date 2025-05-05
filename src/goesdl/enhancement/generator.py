@@ -133,7 +133,7 @@ palette = {{
         segmented_colors_array = ",\n    ".join(segmented_colors)
 
         return f"""\
-from matplotlib.colors import LinearSegmentedColormap
+from goesdl.enhancement import EnhancementPalette
 
 _{self.name}_data = [
     {segmented_colors_array}
@@ -147,8 +147,8 @@ _colormap_data = [
     _{self.name}_data,
 ]
 
-ppaletteal = {{
-    name: LinearSegmentedColormap.from_list(name=name, colors=data, N=256)
+palette = {{
+    name: EnhancementPalette.continuous(name=name, color_table=data, ncolors=256)
     for name, data in zip(_colormap_names, _colormap_data)
 }}
 """
