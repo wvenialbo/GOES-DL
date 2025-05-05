@@ -12,15 +12,12 @@ from numpy import interp
 
 from .palette import EnhancementPalette
 from .shared import (
-    ColorSegments,
     ColorTable,
     DiscreteColorList,
     DomainData,
     GKeypointList,
     GSegmentData,
     KeypointList,
-    MSegmentData,
-    SegmentData,
     StretchingTable,
     UniformColorList,
 )
@@ -177,7 +174,9 @@ class EnhancementScale:
         cpal = EnhancementPalette.segmented(name, segment_data, ncolors)
         return cls(cpal)
 
-    def save(self, path: str | Path, rgb: bool = False) -> None:
+    def save(
+        self, path: str | Path, rgb: bool = False, invert: bool = False
+    ) -> None:
         """
         Save the color table.
 
@@ -191,7 +190,7 @@ class EnhancementScale:
         rgb : bool, optional
             Flag indicating if the color model is RGB, by default False.
         """
-        self.palette.save(path, rgb)
+        self.palette.save(path, rgb, invert)
 
     def save_stretching(self, path: str | Path) -> None:
         """
@@ -238,9 +237,10 @@ class EnhancementScale:
         self._stretching_updated()
 
     def _get_cmap(self) -> Colormap:
-        segment_data = cast(MSegmentData, self.palette.segment_data)
-        return LinearSegmentedColormap(
-            self.name, segment_data, N=self.palette.ncolors
+        return LinearSegmentedColormap.from_list(
+            name=self.name,
+            colors=self.palette.color_table,
+            N=self.palette.ncolors,
         )
 
     def _get_cnorm(self) -> Normalize:
@@ -278,18 +278,6 @@ class EnhancementScale:
         self.cmap = self._get_cmap()
         self.cnorm = self._get_cnorm()
 
-    def _transform_color_segment(
-        self, segment: ColorSegments, xp: KeypointList, yp: KeypointList
-    ) -> ColorSegments:
-        new_segment: ColorSegments = []
-
-        for x0, y0, y1 in segment:
-            x1 = self._transform_keypoint(x0, xp, yp)
-
-            new_segment.append((x1, y0, y1))
-
-        return new_segment
-
     def _transform_keypoint(
         self, x: float, xp: KeypointList, yp: KeypointList
     ) -> float:
@@ -297,15 +285,16 @@ class EnhancementScale:
 
         return cast(float, y_scaled)
 
-    def _transform_segment_data(self) -> MSegmentData:
+    def _transform_color_table(self) -> ColorTable:
         yp, xp = self.stretching.keypoints
 
-        new_segment_data: SegmentData = {
-            component: self._transform_color_segment(segment, xp, yp)
-            for component, segment in self.palette.segment_data.items()
-        }
+        new_color_table: ColorTable = []
 
-        return cast(MSegmentData, new_segment_data)
+        for x0, rgb in self.palette.color_table:
+            x1 = self._transform_keypoint(x0, xp, yp)
+            new_color_table.append((x1, rgb))
+
+        return new_color_table
 
     @property
     def domain(self) -> DomainData:
@@ -325,9 +314,9 @@ class EnhancementScale:
 
     @property
     def tmap(self) -> Colormap:
-        transformed_segment_data = self._transform_segment_data()
-        return LinearSegmentedColormap(
-            self.name, transformed_segment_data, N=self.palette.ncolors
+        transformed_color_table = self._transform_color_table()
+        return LinearSegmentedColormap.from_list(
+            self.name, transformed_color_table, N=self.palette.ncolors
         )
 
     @property
