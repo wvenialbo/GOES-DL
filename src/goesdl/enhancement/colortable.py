@@ -48,7 +48,7 @@ class _ColorTable(ContinuousColormap):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
-class CPTColorTable(ContinuousColormap, _ColorTable):
+class CPTColorTable(_ColorTable):
     """
     Represent a GMT text based colour palette table.
 
@@ -103,7 +103,7 @@ class CPTColorTable(ContinuousColormap, _ColorTable):
             ) from error
 
 
-class ETColorTable(ContinuousColormap, _ColorTable):
+class ETColorTable(_ColorTable):
     """
     Represent a McIDAS binary enhancement colour table.
 
@@ -161,7 +161,7 @@ class ETColorTable(ContinuousColormap, _ColorTable):
             raise ValueError(INVALID_ET_FILE) from error
 
 
-class EUColorTable(ContinuousColormap, _ColorTable):
+class EUColorTable(_ColorTable):
     """
     Represent a McIDAS text based enhancement colour table.
 
@@ -233,7 +233,7 @@ class EUColorTable(ContinuousColormap, _ColorTable):
             raise ValueError(INVALID_EU_FILE) from error
 
 
-class ColormapTable(ContinuousColormap, _ColorTable):
+class ColormapTable(_ColorTable):
     """
     Represent a colour enhancement colour table.
 
