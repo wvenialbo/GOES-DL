@@ -71,9 +71,21 @@ class BaseColormap:
     def set_domain(self, domain: DomainData) -> None:
         self.domain = domain
 
-    @property
-    def full_segment_data(self) -> SegmentData:
-        return self._get_full_segment_data(self.segment_data)
+    @staticmethod
+    def _get_keypoints(color_table: ContinuousColorTable) -> KeypointList:
+        return sorted({x for x, _ in color_table})
+
+
+class SegmentedColormap(BaseColormap):
+
+    def __init__(
+        self, name: str, segment_data: GSegmentData, ncolors: int = 256
+    ) -> None:
+        segment_data_copy = self._copy_segment_data(segment_data)
+
+        segment_data_copy = self._get_full_segment_data(segment_data_copy)
+
+        super().__init__(name, segment_data, [], ncolors, True)
 
     @staticmethod
     def _add_next_segment(
@@ -100,6 +112,14 @@ class BaseColormap:
         dst_segment.append(next_entry)
         return current_entry
 
+    @classmethod
+    def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
+        try:
+            return cls._do_copy(raw_segment_data)
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color segment data: {error}") from error
+
     @staticmethod
     def _decompress_color_segment(
         color_segments: list[SegmentDataRow],
@@ -117,6 +137,19 @@ class BaseColormap:
         return decompressed_color_segments
 
     @classmethod
+    def _do_copy(cls, raw_segment_data: GSegmentData) -> SegmentData:
+        segment_data: SegmentData = {}
+
+        for component in COLOR_COMPONENTS:
+            segment_data[component] = []
+
+            for segment_entry in raw_segment_data[component]:
+                segment_entry = cls._to_segment_entry(segment_entry)
+                segment_data[component].append(segment_entry)
+
+        return segment_data
+
+    @classmethod
     def _expand_segment_data(cls, segment_data: SegmentData) -> SegmentData:
         expanded_segment_data: SegmentData = {}
 
@@ -132,10 +165,6 @@ class BaseColormap:
         expanded_segment_data = cls._expand_segment_data(segment_data)
 
         return cls._homogenize_segment_data(expanded_segment_data)
-
-    @staticmethod
-    def _get_keypoints(color_table: ContinuousColorTable) -> KeypointList:
-        return sorted({x for x, _ in color_table})
 
     @classmethod
     def _homogenize_segment_data(
@@ -186,37 +215,6 @@ class BaseColormap:
 
         return dst_segment_data
 
-
-class SegmentedColormap(BaseColormap):
-
-    def __init__(
-        self, name: str, raw_segment_data: GSegmentData, ncolors: int = 256
-    ) -> None:
-        segment_data = self._copy_segment_data(raw_segment_data)
-
-        super().__init__(name, segment_data, [], ncolors, True)
-
-    @classmethod
-    def _copy_segment_data(cls, raw_segment_data: GSegmentData) -> SegmentData:
-        try:
-            return cls._do_copy(raw_segment_data)
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color segment data: {error}") from error
-
-    @classmethod
-    def _do_copy(cls, raw_segment_data: GSegmentData) -> SegmentData:
-        segment_data: SegmentData = {}
-
-        for component in COLOR_COMPONENTS:
-            segment_data[component] = []
-
-            for segment_entry in raw_segment_data[component]:
-                segment_entry = cls._to_segment_entry(segment_entry)
-                segment_data[component].append(segment_entry)
-
-        return segment_data
-
     @staticmethod
     def _to_segment_entry(raw_segment_entry: GSegmentEntry) -> SegmentDataRow:
         x, y_0, y_1 = map(float, raw_segment_entry)
@@ -231,17 +229,7 @@ class _GRadiendBasedColormap(BaseColormap):
         color_table: ContinuousColorTable,
         ncolors: int = 256,
     ) -> None:
-        colormap = self._get_colormap(color_table)
-
-        segmented_colormap = self._get_segmented_colormap(colormap)
-
-        super().__init__(
-            name,
-            segmented_colormap.segment_data,
-            segmented_colormap.keypoints,
-            ncolors,
-            False,
-        )
+        super().__init__(name, color_table, [], ncolors)
 
 
 class ContinuousColormap(_GRadiendBasedColormap):
