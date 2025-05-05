@@ -58,9 +58,10 @@ class EnhancementScale:
         colormap_names: str | Sequence[str],
         keypoints: GKeypointList,
         name: str = "",
+        ncolors: int = 256,
     ) -> "EnhancementScale":
         cpal = EnhacementPalette.combined_from_stock(
-            colormap_names, keypoints, name
+            colormap_names, keypoints, name, ncolors
         )
         return cls(cpal)
 
