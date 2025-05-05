@@ -310,7 +310,7 @@ class DiscreteColormap(_ListBasedColormap):
         ]
 
 
-class _NamedColormapBased:
+class _NamedColormapBased(BaseColormap):
 
     @staticmethod
     def _get_colormap(colormap_name: str) -> Colormap:
@@ -344,7 +344,7 @@ class _NamedColormapBased:
         raise ValueError(f"Unsupported colormap type: {type(colormap)}")
 
 
-class NamedColormap(BaseColormap, _NamedColormapBased):
+class NamedColormap(_NamedColormapBased):
 
     def __init__(self, name: str, ncolors: int = 256) -> None:
         colormap = self._get_colormap(name)
@@ -361,7 +361,7 @@ class NamedColormap(BaseColormap, _NamedColormapBased):
         )
 
 
-class CombinedColormap(BaseColormap, _NamedColormapBased):
+class CombinedColormap(_NamedColormapBased):
 
     def __init__(
         self,
