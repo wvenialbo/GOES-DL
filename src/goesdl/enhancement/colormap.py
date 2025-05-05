@@ -335,16 +335,7 @@ class ContinuousColormap(_GRadiendBasedColormap):
         super().__init__(name, color_table, ncolors)
 
 
-class UniformColormap(_GRadiendBasedColormap):
-
-    def __init__(
-        self, name: str, listed_colors: GListedColors, ncolors: int = 256
-    ) -> None:
-        color_list = self._copy_listed_colors(listed_colors)
-
-        color_table = self._get_color_table(color_list)
-
-        super().__init__(name, color_table, ncolors)
+class _ListBasedColormap(_GRadiendBasedColormap):
 
     @classmethod
     def _copy_listed_colors(
@@ -363,19 +354,31 @@ class UniformColormap(_GRadiendBasedColormap):
         return list(map(cls._to_rgb, listed_colors))
 
     @staticmethod
+    def _to_rgb(rgb_value: GColorValue) -> RGBValue:
+        red, green, blue = map(float, rgb_value)
+        return red, green, blue
+
+
+class UniformColormap(_ListBasedColormap):
+
+    def __init__(
+        self, name: str, listed_colors: GListedColors, ncolors: int = 256
+    ) -> None:
+        color_list = self._copy_listed_colors(listed_colors)
+
+        color_table = self._get_color_table(color_list)
+
+        super().__init__(name, color_table, ncolors)
+
+    @staticmethod
     def _get_color_table(
         listed_colors: ContinuousColorList,
     ) -> ContinuousColorTable:
         ncolors = len(listed_colors)
         return [(i / ncolors, x) for i, x in enumerate(listed_colors)]
 
-    @staticmethod
-    def _to_rgb(rgb_value: GColorValue) -> RGBValue:
-        red, green, blue = map(float, rgb_value)
-        return red, green, blue
 
-
-class DiscreteColormap(_GRadiendBasedColormap):
+class DiscreteColormap(_ListBasedColormap):
 
     def __init__(self, name: str, listed_colors: GListedColors) -> None:
         color_list = self._copy_listed_colors(listed_colors)
@@ -386,16 +389,6 @@ class DiscreteColormap(_GRadiendBasedColormap):
 
         super().__init__(name, color_table, ncolors)
 
-    @classmethod
-    def _copy_listed_colors(
-        cls, raw_listed_colors: GListedColors
-    ) -> DiscreteColorList:
-        try:
-            return cls._do_copy_listed_colors(raw_listed_colors)
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color list: {error}") from error
-
     @staticmethod
     def _get_color_table(
         listed_colors: DiscreteColorList, ncolors: int
@@ -405,17 +398,6 @@ class DiscreteColormap(_GRadiendBasedColormap):
             for i, color in enumerate(listed_colors)
             for j, x in enumerate((color, color))
         ]
-
-    @classmethod
-    def _do_copy_listed_colors(
-        cls, raw_listed_colors: GListedColors
-    ) -> DiscreteColorList:
-        return list(map(cls._to_rgb, raw_listed_colors))
-
-    @staticmethod
-    def _to_rgb(raw_segment_entry: GColorValue) -> RGBValue:
-        red, green, blue = map(float, raw_segment_entry)
-        return red, green, blue
 
 
 class _NamedColormapBased:
