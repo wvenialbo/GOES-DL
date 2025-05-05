@@ -89,7 +89,7 @@ class _TextBasedColorTable(_ColorTable):
         return cls._from_text_file(path)
 
 
-class CPTColorTable(_ColorTable):
+class CPTColorTable(_TextBasedColorTable):
     """
     Represent a GMT text based colour palette table.
 
@@ -105,12 +105,6 @@ class CPTColorTable(_ColorTable):
 
     - https://www.generic-mapping-tools.org/
     """
-
-    @classmethod
-    def _from_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        return cls._from_text_file(path)
 
     @classmethod
     def _parse_text_file(
@@ -179,7 +173,7 @@ class ETColorTable(_ColorTable):
             raise ValueError(INVALID_ET_FILE) from error
 
 
-class EUColorTable(_ColorTable):
+class EUColorTable(_TextBasedColorTable):
     """
     Represent a McIDAS text based enhancement colour table.
 
@@ -196,12 +190,6 @@ class EUColorTable(_ColorTable):
     - https://www.ssec.wisc.edu/mcidas/
     - https://www.unidata.ucar.edu/software/mcidas/
     """
-
-    @classmethod
-    def _from_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        return cls._from_text_file(path)
 
     @classmethod
     def _parse_text_file(
