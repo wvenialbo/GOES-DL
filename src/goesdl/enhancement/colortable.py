@@ -7,6 +7,7 @@ from .eu_utility import eu_utility
 from .shared import ColorTable, ContinuousColorTable, DomainData
 
 INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
+INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 
 class CPTColorTable(ContinuousColormap):
@@ -192,10 +193,14 @@ class EUColorTable(ContinuousColormap):
     def _parse_table(
         lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        if eu_utility.is_eu_table(lines[0]):
+        if not eu_utility.is_eu_table(lines[0]):
+            raise ValueError(INVALID_EU_FILE)
+        try:
+            # Try parse a .EU file
             return eu_utility.parse_eu_table(lines)
 
-        raise ValueError("Invalid McIDAS 'EU TABLE' (.EU) file")
+        except (ValueError, IndexError, TypeError) as error:
+            raise ValueError(INVALID_EU_FILE) from error
 
     @staticmethod
     def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
