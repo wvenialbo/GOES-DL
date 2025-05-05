@@ -6,6 +6,8 @@ from .et_utility import et_utility
 from .eu_utility import eu_utility
 from .shared import ColorTable, ContinuousColorTable, DomainData
 
+INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
+
 
 class CPTColorTable(ContinuousColormap):
     """
@@ -115,9 +117,13 @@ class ETColorTable(ContinuousColormap):
         if not et_utility.is_et_table(
             data[:4]
         ) or not et_utility.has_expected_size(data):
-            raise ValueError("Invalid McIDAS 'EU TABLE' (.EU) file")
+            raise ValueError(INVALID_ET_FILE)
+        try:
+            # Try parse a .ET file
+            return et_utility.parse_et_table(data)
 
-        return et_utility.parse_et_table(data)
+        except (ValueError, IndexError, TypeError) as error:
+            raise ValueError(INVALID_ET_FILE) from error
 
     @staticmethod
     def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
