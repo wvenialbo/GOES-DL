@@ -78,12 +78,9 @@ class EnhancementScale:
 
     @classmethod
     def discrete(
-        cls,
-        name: str,
-        listed_colors: DiscreteColorList,
-        ncolors: int | None = None,
+        cls, name: str, listed_colors: DiscreteColorList
     ) -> "EnhancementScale":
-        cpal = EnhacementPalette.discrete(name, listed_colors, ncolors)
+        cpal = EnhacementPalette.discrete(name, listed_colors)
         return cls(cpal)
 
     @classmethod
