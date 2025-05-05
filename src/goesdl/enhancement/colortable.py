@@ -59,13 +59,15 @@ class _ColorTable(ContinuousColormap):
     @abstractmethod
     @classmethod
     def _parse_binary_file(
-        cls, data: bytes,
+        cls,
+        data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
     @abstractmethod
     @classmethod
     def _parse_text_file(
-        cls, lines: list[str],
+        cls,
+        lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
@@ -94,7 +96,14 @@ class CPTColorTable(_ColorTable):
 
     @classmethod
     def _parse_text_file(
-        cls, lines: list[str],
+        cls,
+        lines: list[str],
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        return cls.parse_cpt_table(lines)
+
+    @staticmethod
+    def parse_cpt_table(
+        lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .CPT file
@@ -132,7 +141,8 @@ class ETColorTable(_ColorTable):
 
     @classmethod
     def _parse_binary_file(
-        cls, data: bytes,
+        cls,
+        data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not et_utility.is_et_table(
             data[:4]
@@ -172,7 +182,8 @@ class EUColorTable(_ColorTable):
 
     @classmethod
     def _parse_text_file(
-        cls, lines: list[str],
+        cls,
+        lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not eu_utility.is_eu_table(lines[0]):
             raise ValueError(INVALID_EU_FILE)
@@ -229,7 +240,8 @@ class ColormapTable(_ColorTable):
 
     @classmethod
     def _parse_binary_file(
-        cls, data: bytes,
+        cls,
+        data: bytes,
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .ET file
@@ -240,7 +252,8 @@ class ColormapTable(_ColorTable):
 
     @classmethod
     def _parse_text_file(
-        cls, lines: list[str],
+        cls,
+        lines: list[str],
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
@@ -252,11 +265,4 @@ class ColormapTable(_ColorTable):
                 raise ValueError(INVALID_EU_FILE) from error
 
         # Try parse a CPT file
-        try:
-            # Try parse a .CPT file
-            return *cpt_utility.parse_cpt_table(lines), ""
-
-        except (ValueError, IndexError, TypeError) as error:
-            raise ValueError(
-                "Invalid GMT colour palette table (.CPT) file"
-            ) from error
+        return CPTColorTable.parse_cpt_table(lines)
