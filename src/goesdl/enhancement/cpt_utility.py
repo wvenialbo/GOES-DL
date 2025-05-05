@@ -193,7 +193,7 @@ class cpt_utility(clr_utility):
         else:
             raise ValueError(INVALID_COLOR_MODEL)
 
-        color_table = cls._make_color_table((x, r, g, b))
+        color_table = cls._make_color_list((x, r, g, b))
 
         return color_table, domain
 

@@ -42,7 +42,7 @@ class et_utility(clr_utility):
         x, domain = cls._normalize_keypoint_values(keys)
 
         # Create colour table
-        color_table = cls._make_color_table((x, r, g, b))
+        color_table = cls._make_color_list((x, r, g, b))
 
         stock_table: ColorList = [
             color_table[0],

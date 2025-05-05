@@ -21,20 +21,15 @@ from .colortable import (
     ETColorTable,
     EUColorTable,
 )
-from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
+from .constants import UNNAMED_COLORMAP
 from .eu_utility import eu_utility
 from .shared import (
     ColorList,
-    ColorSegments,
     ColorTable,
-    ColorValueList,
     DiscreteColorList,
     GKeypointList,
     GSegmentData,
-    KeypointList,
-    SegmentData,
     UniformColorList,
-    ValueTable,
 )
 
 
@@ -46,10 +41,9 @@ class EnhancementPalette(BaseColormap):
     def __init__(self, colormap: BaseColormap) -> None:
         super().__init__(
             colormap.name,
-            colormap.segment_data,
+            colormap.color_table,
             colormap.keypoints,
             colormap.ncolors,
-            False,
         )
 
         self.set_domain(colormap.domain)
@@ -148,7 +142,9 @@ class EnhancementPalette(BaseColormap):
     ) -> "EnhancementPalette":
         return cls(SegmentedColormap(name, segment_data, ncolors))
 
-    def save(self, path: str | Path, rgb: bool = False) -> None:
+    def save(
+        self, path: str | Path, rgb: bool = False, invert: bool = False
+    ) -> None:
         """
         Save the colour table.
 
@@ -164,9 +160,9 @@ class EnhancementPalette(BaseColormap):
         """
         name = "" if self.name == UNNAMED_COLORMAP else self.name
 
-        color_table = self._create_color_table(self.full_segment_data)
+        color_list = self._make_color_list(self.color_table, invert)
 
-        eu_utility.create_file(path, name, color_table, rgb)
+        eu_utility.create_file(path, name, color_list, rgb)
 
     @classmethod
     def uniform(
@@ -175,56 +171,10 @@ class EnhancementPalette(BaseColormap):
         return cls(UniformColormap(name, color_list, ncolors))
 
     @classmethod
-    def _build_value_tables(
-        cls, unpacked_segment_values: list[tuple[float, ...]]
-    ) -> ValueTable:
-        x: KeypointList = []
-        r: ColorValueList = []
-        g: ColorValueList = []
-        b: ColorValueList = []
-
-        for xi, r0, r1, g0, g1, b0, b1 in unpacked_segment_values:
-            x.extend((xi, xi))
-            r.extend((r0, r1))
-            g.extend((g0, g1))
-            b.extend((b0, b1))
-
-        return x, b, g, r
-
-    @classmethod
-    def _cleanup_color_table(cls, color_table: ColorList) -> None:
-        color_table.pop(-1)
-        color_table.pop(0)
-
-    @classmethod
-    def _create_color_table(cls, segment_data: SegmentData) -> ColorList:
-        packed_segments = cls._pack_segment_data(segment_data)
-
-        unpacked_segment_valuess = cls._unpack_segment_values(packed_segments)
-
-        value_tables = cls._build_value_tables(unpacked_segment_valuess)
-
-        color_table = eu_utility._scale_color_table(value_tables)
-
-        cls._cleanup_color_table(color_table)
-
-        return color_table
-
-    @staticmethod
-    def _pack_segment_data(segment_data: SegmentData) -> list[ColorSegments]:
-        packed_segments: list[ColorSegments] = []
-
-        packed_segments.extend(
-            segment_data[component] for component in COLOR_COMPONENTS
-        )
-
-        return packed_segments
-
-    @classmethod
-    def _unpack_segment_values(
-        cls, packed_segments: list[ColorSegments]
-    ) -> list[tuple[float, ...]]:
-        return [
-            (*red, *green[1:], *blue[1:])
-            for red, green, blue in zip(*packed_segments)
-        ]
+    def _make_color_list(
+        cls, color_table: ColorTable, invert: bool
+    ) -> ColorList:
+        if invert:
+            return [(1 - j, r, g, b) for j, (r, g, b) in reversed(color_table)]
+        else:
+            return [(j, r, g, b) for j, (r, g, b) in color_table]
