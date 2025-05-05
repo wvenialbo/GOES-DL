@@ -86,20 +86,11 @@ class CPTColorTable(_ColorTable):
     - https://www.generic-mapping-tools.org/
     """
 
-    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain, _ = self._from_text_file(path)
-
-        color_list = self._make_color_list(color_table)
-
-        name = Path(path).stem
-
-        super().__init__(name, color_list, ncolors)
-
-        self.set_domain(domain)
-
-        under, over, bad = (entry[1:] for entry in stock_table)
-
-        self.set_stock_colors(under, over, bad)
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        return cls._from_text_file(path)
 
     @staticmethod
     def _parse_text_file(
@@ -133,20 +124,11 @@ class ETColorTable(_ColorTable):
     - https://www.unidata.ucar.edu/software/mcidas/
     """
 
-    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain, _ = self._from_binary_file(path)
-
-        color_list = self._make_color_list(color_table)
-
-        name = Path(path).stem
-
-        super().__init__(name, color_list, ncolors)
-
-        self.set_domain(domain)
-
-        under, over, bad = (entry[1:] for entry in stock_table)
-
-        self.set_stock_colors(under, over, bad)
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        return cls._from_binary_file(path)
 
     @staticmethod
     def _parse_binary_file(
@@ -182,20 +164,11 @@ class EUColorTable(_ColorTable):
     - https://www.unidata.ucar.edu/software/mcidas/
     """
 
-    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain, name = self._from_text_file(path)
-
-        color_list = self._make_color_list(color_table)
-
-        name = name or Path(path).stem
-
-        super().__init__(name, color_list, ncolors)
-
-        self.set_domain(domain)
-
-        under, over, bad = (entry[1:] for entry in stock_table)
-
-        self.set_stock_colors(under, over, bad)
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        return cls._from_text_file(path)
 
     @staticmethod
     def _parse_text_file(
@@ -236,21 +209,6 @@ class ColormapTable(_ColorTable):
 
     - https://www.generic-mapping-tools.org/
     """
-
-    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
-        color_table, stock_table, domain, name = self._from_text_file(path)
-
-        color_list = self._make_color_list(color_table)
-
-        name = name or Path(path).stem
-
-        super().__init__(name, color_list, ncolors)
-
-        self.set_domain(domain)
-
-        under, over, bad = (entry[1:] for entry in stock_table)
-
-        self.set_stock_colors(under, over, bad)
 
     @classmethod
     def _from_file(
