@@ -35,7 +35,8 @@ class eu_utility(clr_utility):
         cls,
         path: str | Path,
         name: str,
-        table: ColorList,
+        color_list: ColorList,
+        domain: DomainData,
         rgb: bool = False,
     ) -> None:
         """
@@ -56,7 +57,9 @@ class eu_utility(clr_utility):
 
         cls._add_eu_table_header(lines, name, rgb)
 
-        cls._create_eu_table(lines, table, rgb)
+        color_list = cls._scale_color_list(color_list, domain)
+
+        cls._create_eu_table(lines, color_list, rgb)
 
         with open(path, "w", encoding="utf-8", newline="\n") as file:
             cls._write_color_table_file(file, lines)
@@ -64,21 +67,6 @@ class eu_utility(clr_utility):
     @staticmethod
     def is_eu_table(header: str) -> bool:
         return EU_SIGNATURE in header
-
-    @classmethod
-    def _scale_color_table(cls, values: ValueTable) -> ColorList:
-        x, r, g, b = values
-
-        # Rescale scale keypoints values
-        cls._validate_monotonic_keypoints(x)
-
-        j = cls._scale_keypoint_values(x)
-
-        # Rescale colour component values
-        r, g, b = map(cls._scale_color_values, (r, g, b))
-
-        # Set the default EU TABLE colour component ordering (BGR)
-        return cls._make_color_table((j, b, g, r))
 
     @classmethod
     def parse_eu_table(
@@ -147,15 +135,15 @@ class eu_utility(clr_utility):
 
     @classmethod
     def _create_eu_table(
-        cls, lines: list[str], table: ColorList, rgb: bool
+        cls, lines: list[str], color_list: ColorList, rgb: bool
     ) -> None:
-        if rgb:
-            table = [(x, r, g, b) for x, b, g, r in table]
+        if not rgb:
+            color_list = [(x, b, g, r) for x, r, g, b in color_list]
 
-        for i in range(0, len(table), 2):
-            x_lo, b_lo, g_lo, r_lo = map(round, table[i])
+        for i in range(0, len(color_list), 2):
+            x_lo, b_lo, g_lo, r_lo = map(round, color_list[i])
 
-            x_hi, b_hi, g_hi, r_hi = map(round, table[i + 1])
+            x_hi, b_hi, g_hi, r_hi = map(round, color_list[i + 1])
 
             if x_lo == x_hi:
                 continue
@@ -181,9 +169,26 @@ class eu_utility(clr_utility):
         # Normalise colour component values
         r, g, b = map(cls._normalize_color_values, (r, g, b))
 
-        color_table = cls._make_color_table((x, r, g, b))
+        color_table = cls._make_color_list((x, r, g, b))
 
         return color_table, domain
+
+    @classmethod
+    def _scale_color_list(
+        cls, color_list: ColorList, domain: DomainData
+    ) -> ColorList:
+        x, r, g, b = map(list[float], zip(*color_list))
+
+        # Rescale scale keypoints values
+        cls._validate_monotonic_keypoints(x)
+
+        j = cls._scale_keypoint_values(x, domain)
+
+        # Rescale colour component values
+        r, g, b = map(cls._scale_color_values, (r, g, b))
+
+        # Set the default EU TABLE colour component ordering (BGR)
+        return cls._make_color_list((j, r, g, b))
 
     @staticmethod
     def _write_color_table_file(file: TextIO, lines: list[str]) -> None:
