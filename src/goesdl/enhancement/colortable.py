@@ -7,6 +7,65 @@ from .eu_utility import eu_utility
 from .shared import ColorTable, ContinuousColorTable, DomainData
 
 
+class CPTColorTable(ContinuousColormap):
+    """
+    Represent a GMT text based colour palette table.
+
+    This class provides methods to load, parse, and process GMT text
+    based colour palette tables (CPT).
+
+    Notes
+    -----
+    The Generic Mapping Tools (GMT) is an open-source collection of
+    tools for manipulating geographic and Cartesian data sets and
+    producing PostScript illustrations ranging from simple x-y plots
+    through maps to complex 3D perspective views.
+
+    - https://www.generic-mapping-tools.org/
+    """
+
+    def __init__(self, path: str | Path, ncolors: int = 256) -> None:
+        color_table, stock_table, domain = self._from_file(path)
+
+        color_list = self._make_color_list(color_table)
+
+        name = Path(path).stem
+
+        super().__init__(name, color_list, ncolors)
+
+        self.set_domain(domain)
+
+        under, over, bad = (entry[1:] for entry in stock_table)
+
+        self.set_stock_colors(under, over, bad)
+
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData]:
+        with open(path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+        return cls._parse_table(lines)
+
+    @staticmethod
+    def _parse_table(
+        lines: list[str],
+    ) -> tuple[ColorTable, ColorTable, DomainData]:
+        try:
+            # Try parse a CPT file
+            return cpt_utility.parse_cpt_table(lines)
+
+        except (ValueError, IndexError, TypeError) as error:
+            raise ValueError(
+                "Invalid GMT colour palette table (.CPT) file"
+            ) from error
+
+    @staticmethod
+    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
+        return [(j, (r, g, b)) for j, b, g, r in color_table]
+
+
 class ETColorTable(ContinuousColormap):
     """
     Represent a McIDAS binary enhancement colour table.
