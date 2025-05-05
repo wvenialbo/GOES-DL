@@ -95,8 +95,6 @@ class ColormapGenerator:
     def _generate_listed_colormap_code(self, invert: bool) -> str:
         color_list = self._make_color_list(self.color_table, invert)
 
-        ncolors = len(color_list)
-
         listed_colors = [
             f"({r:.6f}, {g:.6f}, {b:.6f})" for r, g, b in color_list
         ]
@@ -104,7 +102,7 @@ class ColormapGenerator:
         listed_color_array = ",\n    ".join(listed_colors)
 
         return f"""\
-from matplotlib.colors import ListedColormap
+from goesdl.enhancement import EnhancementPalette
 
 _{self.name}_data = [
     {listed_color_array}
@@ -119,7 +117,7 @@ _colormap_data = [
 ]
 
 palette = {{
-    name: ListedColormap(colors=data, name=name, N={ncolors})
+    name: EnhancementPalette.discrete(name=name, listed_colors=data)
     for name, data in zip(_colormap_names, _colormap_data)
 }}
 """
