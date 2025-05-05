@@ -45,12 +45,6 @@ class _BinaryColorTable(_ColorTable):
     def _from_file(
         cls, path: str | Path
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        return cls._from_binary_file(path)
-
-    @classmethod
-    def _from_binary_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         with open(path, "rb") as file:
             data = file.read()
 
