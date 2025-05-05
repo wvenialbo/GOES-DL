@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 from .colormap import ContinuousColormap
@@ -11,7 +11,7 @@ INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
 INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 
-class _ColorTable(ContinuousColormap):
+class _ColorTable(ABC, ContinuousColormap):
 
     def __init__(self, path: str | Path, ncolors: int = 256) -> None:
         color_table, stock_table, domain, name = self._from_file(path)
@@ -28,8 +28,8 @@ class _ColorTable(ContinuousColormap):
 
         self.set_stock_colors(under, over, bad)
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def _from_file(
         cls, path: str | Path
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
@@ -50,8 +50,8 @@ class _BinaryColorTable(_ColorTable):
 
         return cls._parse_binary_file(data)
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def _parse_binary_file(
         cls, data: bytes
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
@@ -68,8 +68,8 @@ class _TextBasedColorTable(_ColorTable):
 
         return cls._parse_text_file(lines)
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def _parse_text_file(
         cls, lines: list[str]
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
