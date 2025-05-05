@@ -380,46 +380,41 @@ class CombinedColormap(BaseColormap, _NamedColormapBased):
         normalized_keypoints = self._normalize_keypoints(keypoints)
 
         # Get the segment data of each sub-colormap
-        segment_data_list = self._extract_subsegment_data(colormap_names)
+        color_tables = self._extract_color_tables(colormap_names)
 
         # Rescale segment values for concatenation
-        segment_data_list = self._rescale_segment_values(
-            normalized_keypoints, segment_data_list
+        color_tables = self._rescale_color_tables(
+            normalized_keypoints, color_tables
         )
 
         # Create the combined color segment data
-        combined_segment_data = self._combine_segment_data(segment_data_list)
+        combined_color_table = self._combine_color_table(color_tables)
 
         name = name or "+".join(colormap_names)
 
-        super().__init__(name, combined_segment_data, [], ncolors)
+        super().__init__(name, combined_color_table, [], ncolors)
 
-    def _combine_segment_data(
-        self, segment_data_list: list[SegmentData]
-    ) -> SegmentData:
-        combined_segment_data: SegmentData = {}
+    def _combine_color_table(
+        self, color_tables: list[ContinuousColorTable]
+    ) -> ContinuousColorTable:
+        combined_color_table: ContinuousColorTable = []
 
-        for component in COLOR_COMPONENTS:
-            segments: list[SegmentDataRow] = []
+        for color_table in color_tables:
+            combined_color_table.extend(color_table)
 
-            for segment_data in segment_data_list:
-                segments.extend(segment_data[component])
+        return combined_color_table
 
-            combined_segment_data[component] = segments
-
-        return combined_segment_data
-
-    def _extract_subsegment_data(
+    def _extract_color_tables(
         self, colormap_names: Sequence[str]
-    ) -> list[SegmentData]:
-        segment_data_list: list[SegmentData] = []
+    ) -> list[ContinuousColorTable]:
+        color_tables: list[ContinuousColorTable] = []
 
         for colormap_name in colormap_names:
             colormap = self._get_colormap(colormap_name)
             segmented_colormap, _ = self._get_segmented_colormap(colormap)
-            segment_data_list.append(segmented_colormap.segment_data)
+            color_tables.append(segmented_colormap.color_table)
 
-        return segment_data_list
+        return color_tables
 
     def _normalize_keypoints(self, keypoints: GKeypointList) -> KeypointList:
         vmin, vmax = min(keypoints), max(keypoints)
@@ -427,24 +422,21 @@ class CombinedColormap(BaseColormap, _NamedColormapBased):
         norm = vmax - vmin
         return [(keypoint - vmin) / norm for keypoint in keypoints]
 
-    def _rescale_segment_values(
+    def _rescale_color_tables(
         self,
         normalized_keypoints: KeypointList,
-        segment_data_list: list[SegmentData],
-    ) -> list[SegmentData]:
-        for i, segment_data in enumerate(segment_data_list):
+        color_tables: list[ContinuousColorTable],
+    ) -> list[ContinuousColorTable]:
+        for i, color_table in enumerate(color_tables):
             smin, smax = normalized_keypoints[i : i + 2]
 
-            for component, segments in segment_data.items():
-                for j, (x, y1, y2) in enumerate(segments):
-                    x = smin * (1.0 - x) + smax * x
-                    segments[j] = x, y1, y2
+            for j, (x, rgb) in enumerate(color_table):
+                x = smin * (1.0 - x) + smax * x
+                color_table[j] = x, rgb
 
-                segment_data[component] = segments
+            color_tables[i] = color_table
 
-            segment_data_list[i] = segment_data
-
-        return segment_data_list
+        return color_tables
 
     def _validate_keypoints(
         self, colormap_names: Sequence[str], keypoints: GKeypointList
@@ -458,5 +450,5 @@ class CombinedColormap(BaseColormap, _NamedColormapBased):
 
         # Validate keypoints disposition
         for i in range(1, len(keypoints)):
-            if keypoints[i] <= keypoints[i - 1]:
-                raise ValueError("Keypoints must be monotonically increasing")
+            if keypoints[i] >= keypoints[i - 1]:
+                raise ValueError("Keypoints must be monotonically decreasing")
