@@ -343,20 +343,16 @@ class UniformColormap(_GRadiendBasedColormap):
         super().__init__(name, color_list, ncolors)
 
 
-class DiscreteColormap(BaseColormap):
+class DiscreteColormap(ContinuousColormap):
 
     def __init__(self, name: str, raw_listed_colors: GListedColors) -> None:
         listed_colors = self._copy_listed_colors(raw_listed_colors)
 
-        segmented_colormap = self._get_segmented_colormap(listed_colors)
+        ncolors = len(listed_colors)
 
-        super().__init__(
-            name,
-            segmented_colormap.segment_data,
-            segmented_colormap.keypoints,
-            segmented_colormap.ncolors,
-            False,
-        )
+        color_table = self._get_color_table(listed_colors, ncolors)
+
+        super().__init__(name, color_table, ncolors)
 
     @classmethod
     def _copy_listed_colors(
@@ -369,18 +365,14 @@ class DiscreteColormap(BaseColormap):
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _get_segmented_colormap(
-        listed_colors: DiscreteColorList,
-    ) -> BaseColormap:
-        ncolors = len(listed_colors)
-
-        color_table: ContinuousColorTable = [
+    def _get_color_table(
+        listed_colors: DiscreteColorList, ncolors: int
+    ) -> ContinuousColorTable:
+        return [
             ((i + j) / ncolors, x)
             for i, color in enumerate(listed_colors)
             for j, x in enumerate((color, color))
         ]
-
-        return ContinuousColormap(UNNAMED_COLORMAP, color_table, ncolors)
 
     @classmethod
     def _do_copy_listed_colors(
