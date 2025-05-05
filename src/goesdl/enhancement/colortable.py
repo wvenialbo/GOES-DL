@@ -13,6 +13,13 @@ INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
 class _ColorTable(ContinuousColormap):
 
+    @abstractmethod
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        ...
+
     @classmethod
     def _from_binary_file(
         cls, path: str | Path
