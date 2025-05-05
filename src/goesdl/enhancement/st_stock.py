@@ -29,3 +29,23 @@ st_tables = [
 st_stock = dict(zip(st_names, st_tables))
 
 st_default = st_names[st_default_i]
+
+st_extended = {
+    "cira_ircimss2": [
+        (159.0, 255.0),
+        (240.0, 174.0),
+        (327.0, 0.0),
+    ],
+    "smn_ircimss2": [
+        (164.2, 255.0),
+        (193.2, 226.0),
+        (203.2, 216.0),
+        (213.2, 206.0),
+        (223.2, 194.0),
+        (233.2, 182.0),
+        (243.2, 170.0),
+        (323.2, 0.0),
+    ],
+}
+
+st_stock |= st_extended
