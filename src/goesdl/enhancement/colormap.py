@@ -284,10 +284,10 @@ class _GRadiendBasedColormap(BaseColormap):
     def __init__(
         self,
         name: str,
-        listed_colors: ContinuousColorList | ContinuousColorTable,
+        color_table: ContinuousColorTable,
         ncolors: int = 256,
     ) -> None:
-        colormap = self._get_colormap(listed_colors)
+        colormap = self._get_colormap(color_table)
 
         segmented_colormap = self._get_segmented_colormap(colormap)
 
@@ -298,33 +298,6 @@ class _GRadiendBasedColormap(BaseColormap):
             ncolors,
             False,
         )
-
-    @staticmethod
-    def _get_colormap(listed_colors: GListedColors) -> Colormap:
-        try:
-            return LinearSegmentedColormap.from_list(
-                UNNAMED_COLORMAP, listed_colors
-            )
-
-        except (TypeError, ValueError) as error:
-            raise ValueError(
-                f"Invalid colour list specification: {error}"
-            ) from error
-
-    @staticmethod
-    def _get_segmented_colormap(colormap: Colormap) -> BaseColormap:
-        if not isinstance(colormap, LinearSegmentedColormap):
-            raise ValueError(f"Unsupported colormap type: {type(colormap)}")
-
-        try:
-            raw_segment_data = getattr(colormap, "_segmentdata")
-            return SegmentedColormap(colormap.name, raw_segment_data)
-
-        except AttributeError as error:
-            raise ValueError(
-                "Unable to create the colour map segment data, "
-                "probably due to Matplotlib version issues"
-            ) from error
 
 
 class ContinuousColormap(_GRadiendBasedColormap):
