@@ -77,7 +77,18 @@ class BaseColormap:
         return sorted({x for x, _ in color_table})
 
 
-class SegmentedColormap(BaseColormap):
+class _GradientBasedColormap(BaseColormap):
+
+    @staticmethod
+    def _get_granularity(color_table: ColorTable) -> float:
+        non_zero_diff = {
+            color_table[i + 1][0] - color_table[i][0]
+            for i in range(len(color_table) - 1)
+        } - {0.0}
+        return min(non_zero_diff)
+
+
+class SegmentedColormap(_GradientBasedColormap):
 
     def __init__(
         self, name: str, segment_data: GSegmentData, ncolors: int = 256
@@ -89,6 +100,10 @@ class SegmentedColormap(BaseColormap):
         color_table = self._get_color_table(segment_data_copy)
 
         super().__init__(name, color_table, [], ncolors)
+
+        grain_size = self._get_granularity(color_table)
+
+        self.set_domain((0, round(1.0 / grain_size, 0)))
 
     @staticmethod
     def _get_color_table(segment_data: SegmentData) -> ColorTable:
@@ -237,12 +252,16 @@ class SegmentedColormap(BaseColormap):
         return x, y_0, y_1
 
 
-class ContinuousColormap(BaseColormap):
+class ContinuousColormap(_GradientBasedColormap):
 
     def __init__(
         self, name: str, color_table: ColorTable, ncolors: int = 256
     ) -> None:
         super().__init__(name, color_table, [], ncolors)
+
+        grain_size = self._get_granularity(color_table)
+
+        self.set_domain((0, round(1.0 / grain_size, 0)))
 
 
 class _ListBasedColormap(BaseColormap):
@@ -280,6 +299,8 @@ class UniformColormap(_ListBasedColormap):
 
         super().__init__(name, color_table, [], ncolors)
 
+        self.set_domain((0, len(listed_colors) - 1))
+
     @staticmethod
     def _get_color_table(
         listed_colors: UniformColorList,
@@ -298,6 +319,8 @@ class DiscreteColormap(_ListBasedColormap):
         color_table = self._get_color_table(color_list, ncolors)
 
         super().__init__(name, color_table, [], ncolors)
+
+        self.set_domain((0, ncolors))
 
     @staticmethod
     def _get_color_table(
