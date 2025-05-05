@@ -162,7 +162,7 @@ class EnhancementPalette(BaseColormap):
 
         color_list = self._make_color_list(self.color_table, invert)
 
-        eu_utility.create_file(path, name, color_list, rgb)
+        eu_utility.create_file(path, name, color_list, self.domain, rgb)
 
     @classmethod
     def uniform(
