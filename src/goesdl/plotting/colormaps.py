@@ -29,6 +29,8 @@ LUMA_ALGORITHMS = {
     # You can add other models here if needed
 }
 
+ALL_CHANNELS = {"red", "green", "blue"}
+
 COLOR_INDEX = "Color Index"
 
 
@@ -518,8 +520,23 @@ def plot_brightness_profile(
 
 
 def plot_color_profile(
-    scale: EnhancementScale, save_path: str | Path = "", show: bool = True
+    scale: EnhancementScale,
+    save_path: str | Path = "",
+    channels: str | set[str] = "all",
+    show: bool = True,
 ) -> None:
+    if isinstance(channels, str):
+        channels = ALL_CHANNELS if channels == "all" else {channels}
+    elif not channels:
+        raise ValueError("'channels' can not be empty")
+    if invalid := channels - ALL_CHANNELS:
+        allowed_channels = "', '".join(ALL_CHANNELS)
+        invalid_channels = "', '".join(invalid)
+        raise ValueError(
+            f"'channels' contains invalid values: '{invalid_channels}', "
+            f"allowed values are: '{allowed_channels}'"
+        )
+
     # Referece rectangle
     # - units in pixel per dimension
     rect = Rect(486, 568, 100)
@@ -611,6 +628,8 @@ def plot_color_profile(
 
     # Plot the colours intensity curves
     for i, color_name in enumerate(["blue", "green", "red"]):
+        if color_name not in channels:
+            continue
         y_intensity = y_intensities[i]
         ax.plot(
             x_indices,
