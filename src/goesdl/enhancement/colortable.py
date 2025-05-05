@@ -71,6 +71,15 @@ class _ColorTable(ContinuousColormap):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]: ...
 
 
+class _TextBasedColorTable(_ColorTable):
+
+    @classmethod
+    def _from_file(
+        cls, path: str | Path
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
+        return cls._from_text_file(path)
+
+
 class CPTColorTable(_ColorTable):
     """
     Represent a GMT text based colour palette table.
