@@ -59,7 +59,9 @@ class clr_utility:
 
     @staticmethod
     def _scale_keypoint_values(x: KeypointList) -> KeypointList:
-        return [round(k * CLR_MAX) for k in x]
+        length = len(x) // 2
+        print(length, len(x))
+        return [round(k * length) for k in x]
 
     @staticmethod
     def _validate_monotonic_keypoints(x: KeypointList) -> None:
