@@ -273,7 +273,7 @@ class EnhancementScale:
 
         return _Normalize()
 
-    def _stretching_updated(self):
+    def _stretching_updated(self) -> None:
         self.ticker = ColorbarTicks(self.stretching.domain)
         self.cmap = self._get_cmap()
         self.cnorm = self._get_cnorm()
