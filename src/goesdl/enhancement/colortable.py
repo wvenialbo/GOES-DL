@@ -17,7 +17,7 @@ class _ColorTable:
         return [(j, (r, g, b)) for j, b, g, r in color_table]
 
 
-class CPTColorTable(ContinuousColormap):
+class CPTColorTable(ContinuousColormap, _ColorTable):
     """
     Represent a GMT text based colour palette table.
 
@@ -71,12 +71,8 @@ class CPTColorTable(ContinuousColormap):
                 "Invalid GMT colour palette table (.CPT) file"
             ) from error
 
-    @staticmethod
-    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
-        return [(j, (r, g, b)) for j, b, g, r in color_table]
 
-
-class ETColorTable(ContinuousColormap):
+class ETColorTable(ContinuousColormap, _ColorTable):
     """
     Represent a McIDAS binary enhancement colour table.
 
@@ -133,12 +129,8 @@ class ETColorTable(ContinuousColormap):
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_ET_FILE) from error
 
-    @staticmethod
-    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
-        return [(j, (r, g, b)) for j, b, g, r in color_table]
 
-
-class EUColorTable(ContinuousColormap):
+class EUColorTable(ContinuousColormap, _ColorTable):
     """
     Represent a McIDAS text based enhancement colour table.
 
@@ -209,12 +201,8 @@ class EUColorTable(ContinuousColormap):
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_EU_FILE) from error
 
-    @staticmethod
-    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
-        return [(j, (r, g, b)) for j, b, g, r in color_table]
 
-
-class ColormapTable(ContinuousColormap):
+class ColormapTable(ContinuousColormap, _ColorTable):
     """
     Represent a colour enhancement colour table.
 
@@ -274,17 +262,6 @@ class ColormapTable(ContinuousColormap):
         color_table, name = cls._parse_table(lines)
 
         return color_table, name
-
-    @staticmethod
-    def _make_color_list(color_table: ColorTable) -> ContinuousColorTable:
-        gradient_table: ContinuousColorTable = []
-
-        for j, b, g, r in color_table:
-            gradient_row = j, (r, g, b)
-
-            gradient_table.append(gradient_row)
-
-        return gradient_table
 
     @staticmethod
     def _parse_table(lines: list[str]) -> tuple[ColorTable, str]:
