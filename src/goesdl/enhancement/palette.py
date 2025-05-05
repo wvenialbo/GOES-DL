@@ -67,18 +67,13 @@ class EnhacementPalette(BaseColormap):
 
     @classmethod
     def continuous(
-        cls,
-        name: str,
-        color_table: ContinuousColorTable,
-        ncolors: int = 256,
+        cls, name: str, color_table: ContinuousColorTable, ncolors: int = 256
     ) -> "EnhacementPalette":
         return cls(ContinuousColormap(name, color_table, ncolors))
 
     @classmethod
     def discrete(
-        cls,
-        name: str,
-        listed_colors: DiscreteColorList,
+        cls, name: str, listed_colors: DiscreteColorList
     ) -> "EnhacementPalette":
         return cls(DiscreteColormap(name, listed_colors))
 
@@ -173,10 +168,7 @@ class EnhacementPalette(BaseColormap):
 
     @classmethod
     def uniform(
-        cls,
-        name: str,
-        color_list: ContinuousColorList,
-        ncolors: int = 256,
+        cls, name: str, color_list: ContinuousColorList, ncolors: int = 256
     ) -> "EnhacementPalette":
         return cls(UniformColormap(name, color_list, ncolors))
 
