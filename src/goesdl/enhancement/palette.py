@@ -1,5 +1,5 @@
 """
-Provide the EnhacementPalette class for handling color enhancement
+Provide the EnhacementPalette class for handling colour enhancement
 palettes.
 """
 
@@ -15,7 +15,12 @@ from .colormap import (
     SegmentedColormap,
     UniformColormap,
 )
-from .colortable import ColormapTable
+from .colortable import (
+    ColormapTable,
+    CPTColorTable,
+    ETColorTable,
+    EUColorTable,
+)
 from .constants import COLOR_COMPONENTS, UNNAMED_COLORMAP
 from .eu_utility import eu_utility
 from .shared import (
@@ -35,15 +40,7 @@ from .shared import (
 
 class EnhacementPalette(BaseColormap):
     """
-    Represent a enhancement color palette.
-
-    Methods
-    -------
-    from_file(path)
-        Load a McIDAS or GMT enhancement color palette specification and
-        create an EnhacementPalette instance.
-    save_to_file(path, name, rgb)
-        Save the enhancement color palette.
+    Represent a enhancement colour palette.
     """
 
     def __init__(self, colormap: BaseColormap) -> None:
@@ -92,16 +89,18 @@ class EnhacementPalette(BaseColormap):
     @classmethod
     def load(cls, path: str | Path, ncolors: int = 256) -> "EnhacementPalette":
         """
-        Load a McIDAS or GMT enhancement color table specification.
+        Load a McIDAS or GMT enhancement colour table specification.
 
-        Parse a McIDAS enhancement utility table (EU TABLE) or GMT color
-        palette table (CPT TABLE) text file and create color dictionary
-        for a Matplotlib colormap.
+        Parse a McIDAS binary and text based enhancement utility colour
+        tables (EU TABLE and .ET files) or GMT colour palette table
+        (.CPT files).
 
         Parameters
         ----------
-        path : str or Path
-            Path to the color table specification text file.
+        path : str | Path
+            Path to the colour table specification text file.
+        ncolors : int
+            Number of colours to instantiate. Default: 256.
 
         Returns
         -------
@@ -129,6 +128,24 @@ class EnhacementPalette(BaseColormap):
         return cls(ColormapTable(path, ncolors))
 
     @classmethod
+    def load_cpt(
+        cls, path: str | Path, ncolors: int = 256
+    ) -> "EnhacementPalette":
+        return cls(CPTColorTable(path, ncolors))
+
+    @classmethod
+    def load_et(
+        cls, path: str | Path, ncolors: int = 256
+    ) -> "EnhacementPalette":
+        return cls(ETColorTable(path, ncolors))
+
+    @classmethod
+    def load_eu(
+        cls, path: str | Path, ncolors: int = 256
+    ) -> "EnhacementPalette":
+        return cls(EUColorTable(path, ncolors))
+
+    @classmethod
     def segmented(
         cls, name: str, segment_data: GSegmentData, ncolors: int = 256
     ) -> "EnhacementPalette":
@@ -136,17 +153,17 @@ class EnhacementPalette(BaseColormap):
 
     def save(self, path: str | Path, rgb: bool = False) -> None:
         """
-        Save the color table.
+        Save the colour table.
 
-        Save the color table to a McIDAS enhancement utility table (EU
+        Save the colour table to a McIDAS enhancement utility table (EU
         TABLE) text file.
 
         Parameters
         ----------
         path : str or Path
-            Path to the file where the color table will be saved.
+            Path to the file where the colour table will be saved.
         rgb : bool, optional
-            Flag indicating if the color model is RGB, by default False.
+            Flag indicating if the colour model is RGB, by default False.
         """
         name = "" if self.name == UNNAMED_COLORMAP else self.name
 
