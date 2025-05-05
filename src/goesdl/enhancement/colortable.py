@@ -187,6 +187,12 @@ class EUColorTable(_ColorTable):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not eu_utility.is_eu_table(lines[0]):
             raise ValueError(INVALID_EU_FILE)
+        return cls.parse_eu_table(lines)
+
+    @staticmethod
+    def parse_eu_table(
+        lines: list[str],
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .EU file
             return eu_utility.parse_eu_table(lines)
@@ -257,12 +263,7 @@ class ColormapTable(_ColorTable):
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
-            try:
-                # Try parse a .EU file
-                return eu_utility.parse_eu_table(lines)
-
-            except (ValueError, IndexError, TypeError) as error:
-                raise ValueError(INVALID_EU_FILE) from error
+            return EUColorTable.parse_eu_table(lines)
 
         # Try parse a CPT file
         return CPTColorTable.parse_cpt_table(lines)
