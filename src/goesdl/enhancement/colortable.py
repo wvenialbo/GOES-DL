@@ -96,8 +96,7 @@ class CPTColorTable(_ColorTable):
 
     @classmethod
     def _parse_text_file(
-        cls,
-        lines: list[str],
+        cls, lines: list[str]
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         return cls.parse_cpt_table(lines)
 
@@ -141,13 +140,19 @@ class ETColorTable(_ColorTable):
 
     @classmethod
     def _parse_binary_file(
-        cls,
-        data: bytes,
+        cls, data: bytes
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not et_utility.is_et_table(
             data[:4]
         ) or not et_utility.has_expected_size(data):
             raise ValueError(INVALID_ET_FILE)
+
+        return cls.parse_et_table(data)
+
+    @staticmethod
+    def parse_et_table(
+        data: bytes,
+    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         try:
             # Try parse a .ET file
             return *et_utility.parse_et_table(data), ""
@@ -182,11 +187,11 @@ class EUColorTable(_ColorTable):
 
     @classmethod
     def _parse_text_file(
-        cls,
-        lines: list[str],
+        cls, lines: list[str]
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         if not eu_utility.is_eu_table(lines[0]):
             raise ValueError(INVALID_EU_FILE)
+
         return cls.parse_eu_table(lines)
 
     @staticmethod
@@ -246,20 +251,13 @@ class ColormapTable(_ColorTable):
 
     @classmethod
     def _parse_binary_file(
-        cls,
-        data: bytes,
+        cls, data: bytes
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        try:
-            # Try parse a .ET file
-            return *et_utility.parse_et_table(data), ""
-
-        except (ValueError, IndexError, TypeError) as error:
-            raise ValueError(INVALID_ET_FILE) from error
+        return ETColorTable.parse_et_table(data)
 
     @classmethod
     def _parse_text_file(
-        cls,
-        lines: list[str],
+        cls, lines: list[str]
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         # Try parse a EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
