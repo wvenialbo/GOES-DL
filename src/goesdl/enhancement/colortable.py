@@ -69,12 +69,6 @@ class _TextBasedColorTable(_ColorTable):
     def _from_file(
         cls, path: str | Path
     ) -> tuple[ColorTable, ColorTable, DomainData, str]:
-        return cls._from_text_file(path)
-
-    @classmethod
-    def _from_text_file(
-        cls, path: str | Path
-    ) -> tuple[ColorTable, ColorTable, DomainData, str]:
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
