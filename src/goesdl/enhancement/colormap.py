@@ -221,26 +221,15 @@ class SegmentedColormap(BaseColormap):
         return x, y_0, y_1
 
 
-class _GRadiendBasedColormap(BaseColormap):
-
-    def __init__(
-        self,
-        name: str,
-        color_table: ContinuousColorTable,
-        ncolors: int = 256,
-    ) -> None:
-        super().__init__(name, color_table, [], ncolors)
-
-
-class ContinuousColormap(_GRadiendBasedColormap):
+class ContinuousColormap(BaseColormap):
 
     def __init__(
         self, name: str, color_table: ContinuousColorTable, ncolors: int = 256
     ) -> None:
-        super().__init__(name, color_table, ncolors)
+        super().__init__(name, color_table, [], ncolors)
 
 
-class _ListBasedColormap(_GRadiendBasedColormap):
+class _ListBasedColormap(BaseColormap):
 
     @classmethod
     def _copy_listed_colors(
@@ -273,7 +262,7 @@ class UniformColormap(_ListBasedColormap):
 
         color_table = self._get_color_table(color_list)
 
-        super().__init__(name, color_table, ncolors)
+        super().__init__(name, color_table, [], ncolors)
 
     @staticmethod
     def _get_color_table(
@@ -292,7 +281,7 @@ class DiscreteColormap(_ListBasedColormap):
 
         color_table = self._get_color_table(color_list, ncolors)
 
-        super().__init__(name, color_table, ncolors)
+        super().__init__(name, color_table, [], ncolors)
 
     @staticmethod
     def _get_color_table(
@@ -350,10 +339,9 @@ class NamedColormap(BaseColormap, _NamedColormapBased):
 
         super().__init__(
             segmented_colormap.name,
-            segmented_colormap.segment_data,
+            segmented_colormap.color_table,
             segmented_colormap.keypoints,
             ncolors,
-            False,
         )
 
 
@@ -388,7 +376,7 @@ class CombinedColormap(BaseColormap, _NamedColormapBased):
 
         name = name or "+".join(colormap_names)
 
-        super().__init__(name, combined_segment_data, [], ncolors, True)
+        super().__init__(name, combined_segment_data, [], ncolors)
 
     def _combine_segment_data(
         self, segment_data_list: list[SegmentData]
