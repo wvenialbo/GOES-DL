@@ -50,8 +50,9 @@ class clr_utility:
         x: KeypointList,
     ) -> tuple[KeypointList, DomainData]:
         x_min, x_max = tuple(sorted((x[0], x[-1])))
-        length = x_max - x_min
-        return [(k - x_min) / length for k in x], (x_min, x_max)
+        x_lo, x_hi = x[0], x[-1]
+        length = x_hi - x_lo
+        return [(k - x_lo) / length for k in x], (x_min, x_max)
 
     @staticmethod
     def _scale_color_values(y: ColorValueList) -> ColorValueList:
