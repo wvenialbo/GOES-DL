@@ -30,6 +30,8 @@ class clr_utility:
 
     @classmethod
     def _is_lut(cls, x: KeypointList) -> bool:
+        if len(x) % 2:
+            return False
         separation = cls._segment_separation(x)
         return len(separation) == 1 and separation[0] == 1
 
