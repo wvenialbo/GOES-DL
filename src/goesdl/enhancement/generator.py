@@ -156,29 +156,52 @@ palette = {{
 
     @staticmethod
     def _make_color_list(
-        color_table: ColorList, invert: bool
+        color_list: ColorList, invert: bool
     ) -> UniformColorList:
         not_a_listed_color_table = "Not a proper listed colour table"
 
-        if len(color_table) % 2:
+        # Verify that the colour list have an even number of entries
+        if len(color_list) % 2:
+            raise ValueError(not_a_listed_color_table)
+
+        # Verify that all segments have the same separation
+        separation: set[float] = set()
+        for i in range(2, len(color_list), 2):
+            j = color_list[i - 2][0]
+            k = color_list[i][0]
+            separation.add(k - j)
+
+        if len(separation) > 1:
+            raise ValueError(not_a_listed_color_table)
+
+        # Verify that all segments have the same width
+        width: set[float] = set()
+        for i in range(1, len(color_list), 2):
+            j = color_list[i - 1][0]
+            k = color_list[i][0]
+            width.add(k - j)
+
+        if len(width) > 1:
             raise ValueError(not_a_listed_color_table)
 
         listed_color = (
-            [(r, g, b) for _, r, g, b in reversed(color_table)]
+            [(r, g, b) for _, r, g, b in reversed(color_list)]
             if invert
-            else [(r, g, b) for _, r, g, b in color_table]
+            else [(r, g, b) for _, r, g, b in color_list]
         )
 
-        color_list: UniformColorList = []
+        # Create the colour list
+        uniform_list: UniformColorList = []
 
         for i in range(0, len(listed_color), 2):
             current_clr = listed_color[i]
             next_clr = listed_color[i + 1]
-            color_list.append(current_clr)
+            # Verify that the segment is not a colour gradient
             if current_clr != next_clr:
                 raise ValueError(not_a_listed_color_table)
+            uniform_list.append(current_clr)
 
-        return color_list
+        return uniform_list
 
     @staticmethod
     def _make_color_segment(
