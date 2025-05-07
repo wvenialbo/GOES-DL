@@ -37,7 +37,7 @@ class et_utility(clr_utility):
         r, g, b = map(cls._normalize_color_values, (red, green, blue))
 
         # Create and normalise keypoints
-        keys = [float(x) for v in range(256) for x in (v, v + 1)]
+        keys = [float(x) for v in range(256) for x in (v, v)]
 
         x, domain = cls._normalize_keypoint_values(keys)
 
