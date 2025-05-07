@@ -57,6 +57,8 @@ class eu_utility(clr_utility):
 
         cls._add_eu_table_header(lines, name, rgb)
 
+        domain = cls._adjust_domain(domain)
+
         color_list = cls._scale_color_list(color_list, domain)
 
         cls._create_eu_table(lines, color_list, rgb)
@@ -133,6 +135,11 @@ class eu_utility(clr_utility):
         hdr = f"{EU_KEYWORD[8]} {EU_KEYWORD[8]}"
         lines.append(f"{hdr:>9}{hdr:>10}{hdr:>10}{hdr:>10}")
 
+    @staticmethod
+    def _adjust_domain(domain: DomainData) -> DomainData:
+        xmin, xmax = domain
+        return 0, min(xmax - xmin, 255)
+
     @classmethod
     def _create_eu_table(
         cls, lines: list[str], color_list: ColorList, rgb: bool
@@ -144,9 +151,6 @@ class eu_utility(clr_utility):
             x_lo, b_lo, g_lo, r_lo = map(round, color_list[i])
 
             x_hi, b_hi, g_hi, r_hi = map(round, color_list[i + 1])
-
-            if x_lo == x_hi:
-                continue
 
             line = (
                 f"{x_lo:>5}{x_hi:>4}{b_lo:>6}{b_hi:>4}"
