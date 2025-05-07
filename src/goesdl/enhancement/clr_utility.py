@@ -28,9 +28,18 @@ class clr_utility:
             (1.0 - y / CMYK_MAX) * b,
         )
 
+    @staticmethod
+    def _is_list(color_list: ColorList) -> bool:
+        for i in range(0, len(color_list), 2):
+            current_clr = color_list[i][1:]
+            next_clr = color_list[i + 1][1:]
+            if current_clr != next_clr:
+                return False
+        return True
+
     @classmethod
-    def _is_lut(cls, x: KeypointList) -> bool:
-        if len(x) % 2:
+    def _is_lut(cls, x: KeypointList, color_list: ColorList) -> bool:
+        if len(x) % 2 or not cls._is_list(color_list):
             return False
         separation = cls._segment_separation(x)
         return len(separation) == 1 and separation[0] == 1
