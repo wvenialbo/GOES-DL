@@ -193,9 +193,19 @@ class cpt_utility(clr_utility):
         else:
             raise ValueError(INVALID_COLOR_MODEL)
 
-        color_table = cls._make_color_list((x, r, g, b))
+        color_list = cls._make_color_list((x, r, g, b))
 
-        return color_table, domain
+        if not cls._is_lut(j, color_list):
+            return color_list, domain
+
+        j.clear()
+        for i in range(*(int(i) for i in domain)):
+            j.extend((i, i))
+
+        x, domain = cls._normalize_keypoint_values(j)
+        color_list = cls._make_color_list((x, r, g, b))
+
+        return color_list, domain
 
     @classmethod
     def _process_cpt_stock(
