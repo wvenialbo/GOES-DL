@@ -148,7 +148,7 @@ _colormap_data = [
 ]
 
 palette = {{
-    name: EnhancementPalette.continuous(name=name, color_table=data, ncolors=256)
+    name: EnhancementPalette.continuous(name=name, color_table=data)
     for name, data in zip(_colormap_names, _colormap_data)
 }}
 """
