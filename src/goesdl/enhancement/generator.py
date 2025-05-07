@@ -62,9 +62,9 @@ class ColormapGenerator:
         self.bad = bad
 
     def save_as_listed_colormap(
-        self, path: str | Path, invert: bool = False
+        self, path: str | Path, prec: int = 6, invert: bool = False
     ) -> None:
-        generated_code = self._generate_listed_colormap_code(invert)
+        generated_code = self._generate_listed_colormap_code(prec, invert)
 
         self._save_generated_code(path, generated_code)
 
@@ -92,11 +92,12 @@ class ColormapGenerator:
 
         return cls._parse_text_file(lines)
 
-    def _generate_listed_colormap_code(self, invert: bool) -> str:
+    def _generate_listed_colormap_code(self, prec: int, invert: bool) -> str:
         color_list = self._make_color_list(self.color_table, invert)
 
         listed_colors = [
-            f"({r:.6f}, {g:.6f}, {b:.6f})" for r, g, b in color_list
+            f"({', '.join((f'{c:{prec+2}.{prec}f}' for c in rgb))})"
+            for rgb in color_list
         ]
 
         listed_color_array = ",\n    ".join(listed_colors)
