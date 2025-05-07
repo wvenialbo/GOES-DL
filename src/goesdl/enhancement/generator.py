@@ -93,7 +93,9 @@ class ColormapGenerator:
         return cls._parse_text_file(lines)
 
     def _generate_listed_colormap_code(self, prec: int, invert: bool) -> str:
-        color_list = self._make_color_list(self.color_table, invert)
+        color_list = self._make_color_list(
+            self.color_table, self.domain, invert
+        )
 
         listed_colors = [
             f"({', '.join((f'{c:{prec+2}.{prec}f}' for c in rgb))})"
@@ -156,7 +158,7 @@ palette = {{
 
     @staticmethod
     def _make_color_list(
-        color_list: ColorList, invert: bool
+        color_list: ColorList, domain: DomainData, invert: bool
     ) -> UniformColorList:
         not_a_listed_color_table = "Not a proper listed colour table"
 
@@ -164,21 +166,25 @@ palette = {{
         if len(color_list) % 2:
             raise ValueError(not_a_listed_color_table)
 
+        vmin, vmax = domain
+        length = vmax - vmin
+        cp = [round(vmin + k * length) for k, _, _, _ in color_list]
+
         # Verify that all segments have the same separation
-        separation: set[float] = set()
-        for i in range(2, len(color_list), 2):
-            j = color_list[i - 2][0]
-            k = color_list[i][0]
+        separation: set[int] = set()
+        for i in range(2, len(cp), 2):
+            j = cp[i - 2]
+            k = cp[i]
             separation.add(k - j)
 
-        if len(separation) > 1:
+        if len(separation) > 1 or list(separation)[0] != 1:
             raise ValueError(not_a_listed_color_table)
 
         # Verify that all segments have the same width
         width: set[float] = set()
-        for i in range(1, len(color_list), 2):
-            j = color_list[i - 1][0]
-            k = color_list[i][0]
+        for i in range(1, len(cp), 2):
+            j = cp[i - 1]
+            k = cp[i]
             width.add(k - j)
 
         if len(width) > 1:
