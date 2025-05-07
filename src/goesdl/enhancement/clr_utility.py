@@ -28,6 +28,11 @@ class clr_utility:
             (1.0 - y / CMYK_MAX) * b,
         )
 
+    @classmethod
+    def _is_lut(cls, x: KeypointList) -> bool:
+        separation = cls._segment_separation(x)
+        return len(separation) == 1 and separation[0] == 1
+
     @staticmethod
     def _hsv_to_rgb(h: float, s: float, v: float) -> RGBValue:
         return hsv_to_rgb(h / HUE_MAX, s / HSV_MAX, v / HSV_MAX)
@@ -65,6 +70,16 @@ class clr_utility:
         vmin, vmax = domain
         length = vmax - vmin
         return [round(vmin + k * length) for k in x]
+
+    @staticmethod
+    def _segment_separation(x: KeypointList) -> list[float]:
+        separation = {x[i] - x[i - 2] for i in range(2, len(x), 2)}
+        return list(separation)
+
+    @staticmethod
+    def _segment_width(x: KeypointList) -> list[float]:
+        width = {x[i] - x[i - 1] for i in range(1, len(x), 2)}
+        return list(width)
 
     @staticmethod
     def _validate_monotonic_keypoints(x: KeypointList) -> None:
