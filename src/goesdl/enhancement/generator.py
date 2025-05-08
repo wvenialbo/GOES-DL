@@ -69,9 +69,9 @@ class ColormapGenerator:
         self._save_generated_code(path, generated_code)
 
     def save_as_segmented_colormap(
-        self, path: str | Path, invert: bool = False
+        self, path: str | Path, prec: int = 6, invert: bool = False
     ) -> None:
-        generated_code = self._generate_segmented_colormap_code(invert)
+        generated_code = self._generate_segmented_colormap_code(prec, invert)
 
         self._save_generated_code(path, generated_code)
 
@@ -125,12 +125,15 @@ palette = {{
 }}
 """
 
-    def _generate_segmented_colormap_code(self, invert: bool) -> str:
+    def _generate_segmented_colormap_code(
+        self, prec: int, invert: bool
+    ) -> str:
         color_segment = self._make_color_segment(self.color_table, invert)
 
         segmented_colors = [
-            f"({x:.6f}, ({r:.6f}, {g:.6f}, {b:.6f}))"
-            for x, (r, g, b) in color_segment
+            f"({x:{prec+2}.{prec}f}, "
+            f"({', '.join((f'{c:{prec+2}.{prec}f}' for c in rgb))}))"
+            for x, rgb in color_segment
         ]
 
         segmented_colors_array = ",\n    ".join(segmented_colors)
