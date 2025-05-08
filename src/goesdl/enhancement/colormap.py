@@ -354,8 +354,18 @@ class _NamedColormapBased(BaseColormap):
     ) -> tuple[BaseColormap, bool]:
         try:
             if isinstance(colormap, LinearSegmentedColormap):
-                raw_segment_data = getattr(colormap, "_segmentdata")
-                return SegmentedColormap(colormap.name, raw_segment_data), True
+                segment_data = getattr(colormap, "_segmentdata")
+
+                is_function = False
+                for _, component in segment_data.items():
+                    is_function = is_function or callable(component)
+
+                if not is_function:
+                    return SegmentedColormap(colormap.name, segment_data), True
+
+                color_list = [colormap(i / 255)[:3] for i in range(256)]
+
+                return UniformColormap(colormap.name, color_list), True
 
             if isinstance(colormap, ListedColormap):
                 listed_colors = cast(GListedColors, colormap.colors)
