@@ -471,10 +471,17 @@ class CombinedColormap(_NamedColormapBased):
         keypoints_size = len(colormap_names) + 1
         if len(keypoints) != keypoints_size:
             raise ValueError(
-                f"Expected {keypoints_size} keypoints, got {len(keypoints)}"
+                f"Expected {keypoints_size} keypoints, "
+                f"got {len(keypoints)}"
+            )
+
+        # Validate the full range
+        if keypoints[0] != 0 or keypoints[-1] != 255:
+            raise ValueError(
+                "Control points must start with 0 and end with 255"
             )
 
         # Validate keypoints disposition
         for i in range(1, len(keypoints)):
-            if keypoints[i] >= keypoints[i - 1]:
-                raise ValueError("Keypoints must be monotonically decreasing")
+            if keypoints[i] <= keypoints[i - 1]:
+                raise ValueError("Control points must be in increasing order")
