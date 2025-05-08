@@ -426,7 +426,7 @@ class CombinedColormap(_NamedColormapBased):
         combined_color_table: ColorTable = []
 
         for color_table in color_tables:
-            combined_color_table.extend(color_table)
+            combined_color_table.extend(color_table[1:-1])
 
         return combined_color_table
 
