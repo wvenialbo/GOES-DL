@@ -111,9 +111,12 @@ class SegmentedColormap(_GradientBasedColormap):
             segment_data[component] for component in COLOR_COMPONENTS
         ]
 
+        if len({len(segment) for segment in segments}) != 1:
+            raise ValueError("Non homogeneous segment data")
+
         color_table: ColorTable = []
 
-        for x, r0, r1, _, g0, g1, _, b0, b1 in zip(*segments):
+        for (x, r0, r1), (_, g0, g1), (_, b0, b1) in zip(*segments):
             color_table.extend(((x, (r0, g0, b0)), (x, (r1, g1, b1))))
 
         return color_table
