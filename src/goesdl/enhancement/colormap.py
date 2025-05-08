@@ -426,7 +426,13 @@ class CombinedColormap(_NamedColormapBased):
         combined_color_table: ColorTable = []
 
         for color_table in color_tables:
-            combined_color_table.extend(color_table[1:-1])
+            if (
+                color_table[0] == color_table[1]
+                and color_table[-2] == color_table[-1]
+            ):
+                combined_color_table.extend(color_table[1:-1])
+            else:
+                combined_color_table.extend(color_table)
 
         return combined_color_table
 
