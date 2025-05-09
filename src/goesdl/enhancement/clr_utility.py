@@ -54,6 +54,11 @@ class clr_utility:
         return list(zip(x, r, g, b))
 
     @staticmethod
+    def _make_value_table(color_list: ColorList) -> ValueTable:
+        x, r, g, b = map(list, zip(*color_list))
+        return x, r, g, b
+
+    @staticmethod
     def _normalize_color_values(y: ColorValueList) -> ColorValueList:
         return [k / CLR_MAX for k in y]
 
