@@ -29,6 +29,10 @@ class clr_utility:
         )
 
     @staticmethod
+    def _combine_lists(a: ColorList, b: ColorList) -> ColorList:
+        return sorted(a + b, key=lambda x: x[0])
+
+    @staticmethod
     def _is_list(color_list: ColorList) -> bool:
         for i in range(0, len(color_list), 2):
             current_clr = color_list[i][1:]
