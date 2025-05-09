@@ -7,7 +7,7 @@ from .constants import CM_BGR, CM_RGB
 from .shared import (
     ColorList,
     DomainData,
-    ValueTable,
+    KeypointList,
     ValueTableColumn,
 )
 
@@ -105,7 +105,13 @@ class eu_utility(clr_utility):
         if color_model == CM_RGB:
             r, b = b, r
 
-        color_table, domain = cls._normalize_color_table((j, r, g, b))
+        input_table = cls._make_color_list((j, r, g, b))
+
+        fill_table = cls._fill_in(j)
+
+        full_table = cls._combine_lists(input_table, fill_table)
+
+        color_table, domain = cls._normalize_color_table(full_table)
 
         name = ""
         if len(lines[0]) > len(EU_SIGNATURE):
@@ -159,11 +165,52 @@ class eu_utility(clr_utility):
 
             lines.append(line)
 
+    @staticmethod
+    def _fill_in(original: KeypointList) -> ColorList:
+        # Get the actual segment bounds
+        actual = [int(j) for j in original]
+
+        # Create the full range of values
+        complete = set(range(actual[-1] + 1))
+
+        # Get the actual segments full range
+        filled: set[int] = set()
+        for i in range(1, len(actual), 2):
+            filled.update(range(actual[i - 1], actual[i] + 1))
+
+        # Find the missing indices
+        missing = sorted(complete - filled)
+
+        # Group consecutive sequences
+        groups: list[list[int]] = []
+        current_group: list[int] = []
+        for index in missing:
+            if not current_group or index == current_group[-1] + 1:
+                current_group.append(index)
+            else:
+                groups.append(current_group)
+                current_group = [index]
+
+        if current_group:
+            groups.append(current_group)
+
+        # Get each new segment bounds
+        new_segments = []
+        for segment in groups:
+            new_segments.append(segment[0])
+            if len(segment) > 1:
+                new_segments.append(segment[-1])
+            else:
+                new_segments.append(segment[0])
+
+        # Create the grayscale tuples for each segment bound
+        return [(float(i), float(i), float(i), float(i)) for i in new_segments]
+
     @classmethod
     def _normalize_color_table(
-        cls, values: ValueTable
+        cls, color_list: ColorList
     ) -> tuple[ColorList, DomainData]:
-        j, r, g, b = values
+        j, r, g, b = cls._make_value_table(color_list)
 
         # Normalise scale keypoints values
         cls._validate_monotonic_keypoints(j)
