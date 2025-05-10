@@ -66,6 +66,10 @@ class EnhancementStretching:
         self.name = name
         self.table = table
 
+    def __str__(self) -> str:
+        name = "" if self.name == UNNAMED_TABLE else self.name
+        return st_utility.to_string(name, self.table)
+
     @classmethod
     def load(cls, path: str | Path) -> "EnhancementStretching":
         """
