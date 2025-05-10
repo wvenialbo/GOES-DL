@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from contextlib import suppress
 from pathlib import Path
 
 from .colormap import BaseColormap
@@ -286,9 +287,19 @@ class ColormapTable(_ColorTable):
     def _parse_text_file(
         cls, lines: list[str]
     ) -> tuple[ColorList, ColorList, DomainData, str]:
-        # Try parse a EU file first (if EU file detected)
+        # Try parse a .EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
             return EUColorTable.parse_eu_table(lines)
 
-        # Try parse a CPT file
-        return CPTColorTable.parse_cpt_table(lines)
+        # Try parse a .CPT file
+        with suppress(ValueError):
+            return CPTColorTable.parse_cpt_table(lines)
+
+        # Try parse a .TXT file
+        try:
+            return PlainColorTable.parse_plain_table(lines)
+
+        except ValueError as error:
+            raise ValueError(
+                "Invalid or unsupported colour table file"
+            ) from error
