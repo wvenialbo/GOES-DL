@@ -1,18 +1,8 @@
 from math import isnan, nan
 
 from .clr_utility import clr_utility
-from .constants import (
-    CM_CMYK,
-    CM_GRAY,
-    CM_HSV,
-    CM_RGB,
-)
-from .shared import (
-    ColorList,
-    DomainData,
-    ValueTable,
-    ValueTableColumn,
-)
+from .constants import CM_CMYK, CM_GRAY, CM_HSV, CM_RGB, NO_DATA_RGB
+from .shared import ColorList, DomainData, ValueTable, ValueTableColumn
 
 CMYKValue = tuple[float, float, float, float]
 
@@ -32,8 +22,6 @@ COLOR_MODEL = GMT_CPT_KEYWORD[1]
 GMT_CPT_COLOR_MODEL = {CM_CMYK, CM_GRAY, CM_HSV, CM_RGB}
 
 INVALID_COLOR_MODEL = "Invalid colour model"
-
-NO_DATA_RGB = nan, 1.0, 0.0, 1.0
 
 
 class cpt_utility(clr_utility):
