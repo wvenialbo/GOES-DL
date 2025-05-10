@@ -1,4 +1,3 @@
-from math import nan
 from pathlib import Path
 from typing import TextIO
 
@@ -24,8 +23,6 @@ EU_KEYWORD = (
 )
 
 EU_SIGNATURE = f"{EU_KEYWORD[0]} {EU_KEYWORD[1]}"
-
-NO_DATA_RGB = nan, 1.0, 0.0, 1.0
 
 
 class eu_utility(clr_utility):
@@ -73,7 +70,7 @@ class eu_utility(clr_utility):
     @classmethod
     def parse_eu_table(
         cls, lines: list[str]
-    ) -> tuple[ColorList, ColorList, DomainData, str]:
+    ) -> tuple[ColorList, DomainData, str]:
         j: ValueTableColumn = []
 
         b: ValueTableColumn = []
@@ -118,13 +115,7 @@ class eu_utility(clr_utility):
             name = lines[0][len(EU_SIGNATURE) + 1 :]
             name = name.strip()
 
-        stock_table: ColorList = [
-            color_table[0],
-            color_table[-1],
-            NO_DATA_RGB,
-        ]
-
-        return color_table, stock_table, domain, name
+        return color_table, domain, name
 
     @staticmethod
     def _add_eu_table_header(lines: list[str], name: str, rgb: bool) -> None:
