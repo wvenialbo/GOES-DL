@@ -65,6 +65,12 @@ class st_utility:
 
         return table, name
 
+    @classmethod
+    def to_string(cls, name: str, table: StretchingTable) -> str:
+        lines = cls._build_lines(name, table)
+
+        return "\n".join(f"{line:<85}" for line in lines)
+
     @staticmethod
     def _add_stretching_table_header(lines: list[str], name: str) -> None:
         lines.extend(
