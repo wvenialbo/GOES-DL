@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from contextlib import suppress
 from pathlib import Path
 
+from .ap_utility import ap_utility
 from .colormap import BaseColormap
 from .constants import NO_DATA_RGB
 from .cpt_utility import cpt_utility
@@ -10,6 +11,7 @@ from .eu_utility import eu_utility
 from .pt_utility import pt_utility
 from .shared import ColorList, ColorTable, DomainData
 
+INVALID_AP_FILE = "Invalid Astroart Palette table (.PAL) file"
 INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
 INVALID_EU_FILE = "Invalid McIDAS enhancement utility (.EU) file"
 
@@ -85,6 +87,34 @@ class _TextBasedColorTable(_ColorTable):
     def _parse_text_file(
         cls, lines: list[str]
     ) -> tuple[ColorList, ColorList, DomainData, str]: ...
+
+
+class APColorTable(_TextBasedColorTable):
+    """
+    Represent an Astroart colour table.
+    """
+
+    @classmethod
+    def _parse_text_file(
+        cls, lines: list[str]
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
+        if not ap_utility.is_ap_table(lines[0]):
+            raise ValueError(INVALID_AP_FILE)
+
+        return cls.parse_ap_table(lines)
+
+    @classmethod
+    def parse_ap_table(
+        cls, lines: list[str]
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
+        try:
+            # Try parse a .PAL file
+            color_list, domain = ap_utility.parse_ap_table(lines)
+            stock_list = cls._create_stock_colors(color_list)
+            return color_list, stock_list, domain, ""
+
+        except (ValueError, IndexError, TypeError) as error:
+            raise ValueError(INVALID_AP_FILE) from error
 
 
 class CPTColorTable(_TextBasedColorTable):
