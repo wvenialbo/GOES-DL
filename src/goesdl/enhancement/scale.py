@@ -207,6 +207,10 @@ class EnhancementScale:
         """
         self.stretching.save(path)
 
+    def set_stretching(self, table: StretchingTable) -> None:
+        self.stretching.table = table
+        self._stretching_updated()
+
     def set_ticks(
         self,
         nticks: int | None = None,
