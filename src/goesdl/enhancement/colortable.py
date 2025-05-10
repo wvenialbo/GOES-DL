@@ -321,6 +321,10 @@ class ColormapTable(_ColorTable):
         if eu_utility.is_eu_table(lines[0]):
             return EUColorTable.parse_eu_table(lines)
 
+        # Then try parse a .PAL file (if AP file detected)
+        if ap_utility.is_ap_table(lines[0]):
+            return APColorTable.parse_ap_table(lines)
+
         # Try parse a .CPT file
         with suppress(ValueError):
             return CPTColorTable.parse_cpt_table(lines)
