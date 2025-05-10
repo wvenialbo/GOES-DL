@@ -49,6 +49,11 @@ class EnhancementPalette(BaseColormap):
         self.set_domain(colormap.domain)
         self.set_stock_colors(colormap.under, colormap.over, colormap.bad)
 
+    def __str__(self) -> str:
+        name = "" if self.name == UNNAMED_COLORMAP else self.name
+        color_list = self._make_color_list(self.color_table, False)
+        return eu_utility.to_string(name, color_list)
+
     @classmethod
     def combined_from_stock(
         cls,
