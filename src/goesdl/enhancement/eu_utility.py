@@ -114,22 +114,6 @@ class eu_utility(clr_utility):
 
         return "\n".join(f"{line:<85}" for line in lines)
 
-    @classmethod
-    def _build_lines(
-        cls, name: str, color_list: ColorList, domain: DomainData, rgb: bool
-    ) -> list[str]:
-        lines: list[str] = []
-
-        cls._add_eu_table_header(lines, name, rgb)
-
-        domain = cls._adjust_domain(domain)
-
-        color_list = cls._scale_color_list(color_list, domain)
-
-        cls._create_eu_table(lines, color_list, rgb)
-
-        return lines
-
     @staticmethod
     def _add_eu_table_header(lines: list[str], name: str, rgb: bool) -> None:
         lines.append(f"{EU_SIGNATURE} {name}")
@@ -149,6 +133,22 @@ class eu_utility(clr_utility):
     def _adjust_domain(domain: DomainData) -> DomainData:
         xmin, xmax = domain
         return 0, min(xmax - xmin, 255)
+
+    @classmethod
+    def _build_lines(
+        cls, name: str, color_list: ColorList, domain: DomainData, rgb: bool
+    ) -> list[str]:
+        lines: list[str] = []
+
+        cls._add_eu_table_header(lines, name, rgb)
+
+        domain = cls._adjust_domain(domain)
+
+        color_list = cls._scale_color_list(color_list, domain)
+
+        cls._create_eu_table(lines, color_list, rgb)
+
+        return lines
 
     @classmethod
     def _create_eu_table(
