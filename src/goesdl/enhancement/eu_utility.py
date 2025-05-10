@@ -50,18 +50,9 @@ class eu_utility(clr_utility):
         rgb : bool, optional
             Flag indicating if the color model is RGB, by default False.
         """
-        lines: list[str] = []
+        lines = cls._build_lines(name, color_list, domain, rgb)
 
-        cls._add_eu_table_header(lines, name, rgb)
-
-        domain = cls._adjust_domain(domain)
-
-        color_list = cls._scale_color_list(color_list, domain)
-
-        cls._create_eu_table(lines, color_list, rgb)
-
-        with open(path, "w", encoding="utf-8", newline="\n") as file:
-            cls._write_color_table_file(file, lines)
+        cls._save_to_file(path, lines)
 
     @staticmethod
     def is_eu_table(header: str) -> bool:
@@ -116,6 +107,28 @@ class eu_utility(clr_utility):
             name = name.strip()
 
         return color_table, domain, name
+
+    @classmethod
+    def to_string(cls, name: str, color_list: ColorList) -> str:
+        lines = cls._build_lines(name, color_list, (0.0, 255.0), False)
+
+        return "\n".join(f"{line:<85}" for line in lines)
+
+    @classmethod
+    def _build_lines(
+        cls, name: str, color_list: ColorList, domain: DomainData, rgb: bool
+    ) -> list[str]:
+        lines: list[str] = []
+
+        cls._add_eu_table_header(lines, name, rgb)
+
+        domain = cls._adjust_domain(domain)
+
+        color_list = cls._scale_color_list(color_list, domain)
+
+        cls._create_eu_table(lines, color_list, rgb)
+
+        return lines
 
     @staticmethod
     def _add_eu_table_header(lines: list[str], name: str, rgb: bool) -> None:
@@ -223,6 +236,11 @@ class eu_utility(clr_utility):
         color_table = cls._make_color_list((x, r, g, b))
 
         return color_table, domain
+
+    @classmethod
+    def _save_to_file(cls, path: str | Path, lines: list[str]) -> None:
+        with open(path, "w", encoding="utf-8", newline="\n") as file:
+            cls._write_color_table_file(file, lines)
 
     @classmethod
     def _scale_color_list(
