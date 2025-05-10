@@ -1,5 +1,7 @@
 """Provide constants for the enhancement utility module."""
 
+from math import nan
+
 BRG_MAX = 255.0
 CLR_MAX = 255.0
 CMYK_MAX = 100.0
@@ -20,3 +22,5 @@ COLOR_COMPONENTS = ["red", "green", "blue"]
 CBTICKS_NMAX = 16
 CBTICKS_SMIN = 5
 CBTICKS_STEP = 0
+
+NO_DATA_RGB = nan, 1.0, 0.0, 1.0
