@@ -18,16 +18,6 @@ ST_SIGNATURE = f"{ST_KEYWORD[0]} {ST_KEYWORD[1]}"
 
 class st_utility:
 
-    @staticmethod
-    def _add_stretching_table_header(lines: list[str], name: str) -> None:
-        lines.extend(
-            (
-                f"{ST_SIGNATURE} {name}",
-                f"{ST_KEYWORD[2]:>6}{ST_KEYWORD[3]:>8}",
-                f"{ST_KEYWORD[4]:>6}{ST_KEYWORD[5]:>8}",
-            )
-        )
-
     @classmethod
     def create_file(
         cls, path: str | Path, name: str, table: StretchingTable
@@ -55,12 +45,6 @@ class st_utility:
         with open(path, "w", encoding="utf-8", newline="\n") as file:
             cls._write_stretching_table_file(file, lines)
 
-    @staticmethod
-    def _create_stretching_table(
-        lines: list[str], table: StretchingTable
-    ) -> None:
-        lines.extend(f"{round(x,1):>6.1f}{round(y):>8d}" for x, y in table)
-
     @classmethod
     def parse_table(cls, lines: list[str]) -> tuple[StretchingTable, str]:
         if ST_SIGNATURE not in lines[0]:
@@ -85,6 +69,22 @@ class st_utility:
             table.append((x, y))
 
         return table, name
+
+    @staticmethod
+    def _add_stretching_table_header(lines: list[str], name: str) -> None:
+        lines.extend(
+            (
+                f"{ST_SIGNATURE} {name}",
+                f"{ST_KEYWORD[2]:>7}{ST_KEYWORD[3]:>9}",
+                f"{ST_KEYWORD[4]:>8}{ST_KEYWORD[5]:>8}",
+            )
+        )
+
+    @staticmethod
+    def _create_stretching_table(
+        lines: list[str], table: StretchingTable
+    ) -> None:
+        lines.extend(f"{x:>8.2f}{round(y):>8d}" for x, y in table)
 
     @staticmethod
     def _write_stretching_table_file(file: TextIO, lines: list[str]) -> None:
