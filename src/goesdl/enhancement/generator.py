@@ -1,6 +1,12 @@
+import contextlib
 from pathlib import Path
 
-from .colortable import CPTColorTable, ETColorTable, EUColorTable
+from .colortable import (
+    CPTColorTable,
+    ETColorTable,
+    EUColorTable,
+    PlainColorTable,
+)
 from .et_utility import et_utility
 from .eu_utility import eu_utility
 from .shared import (
@@ -232,12 +238,22 @@ palette = {{
     def _parse_text_file(
         lines: list[str],
     ) -> tuple[ColorList, ColorList, DomainData, str]:
-        # Try parse a EU file first (if EU file detected)
+        # Try parse a .EU file first (if EU file detected)
         if eu_utility.is_eu_table(lines[0]):
             return EUColorTable.parse_eu_table(lines)
 
-        # Try parse a CPT file
-        return CPTColorTable.parse_cpt_table(lines)
+        # Try parse a .CPT file
+        with contextlib.suppress(ValueError):
+            return CPTColorTable.parse_cpt_table(lines)
+
+        # Try parse a .TXT file
+        try:
+            return PlainColorTable.parse_plain_table(lines)
+
+        except ValueError as error:
+            raise ValueError(
+                "Invalid or unsupported colour table file"
+            ) from error
 
     @staticmethod
     def _save_generated_code(path: str | Path, generated_code: str) -> None:
