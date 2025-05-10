@@ -41,21 +41,6 @@ class st_utility:
         cls._save_to_file(path, lines)
 
     @classmethod
-    def _build_lines(cls, name: str, table: StretchingTable) -> list[str]:
-        lines: list[str] = []
-
-        cls._add_stretching_table_header(lines, name)
-
-        cls._create_stretching_table(lines, table)
-
-        return lines
-
-    @classmethod
-    def _save_to_file(cls, path: str | Path, lines: list[str]) -> None:
-        with open(path, "w", encoding="utf-8", newline="\n") as file:
-            cls._write_stretching_table_file(file, lines)
-
-    @classmethod
     def parse_table(cls, lines: list[str]) -> tuple[StretchingTable, str]:
         if ST_SIGNATURE not in lines[0]:
             raise ValueError("Invalid stretching table")
@@ -90,11 +75,26 @@ class st_utility:
             )
         )
 
+    @classmethod
+    def _build_lines(cls, name: str, table: StretchingTable) -> list[str]:
+        lines: list[str] = []
+
+        cls._add_stretching_table_header(lines, name)
+
+        cls._create_stretching_table(lines, table)
+
+        return lines
+
     @staticmethod
     def _create_stretching_table(
         lines: list[str], table: StretchingTable
     ) -> None:
         lines.extend(f"{x:>8.2f}{round(y):>8d}" for x, y in table)
+
+    @classmethod
+    def _save_to_file(cls, path: str | Path, lines: list[str]) -> None:
+        with open(path, "w", encoding="utf-8", newline="\n") as file:
+            cls._write_stretching_table_file(file, lines)
 
     @staticmethod
     def _write_stretching_table_file(file: TextIO, lines: list[str]) -> None:
