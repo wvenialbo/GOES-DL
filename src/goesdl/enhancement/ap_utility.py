@@ -28,17 +28,27 @@ class ap_utility:
         except TypeError as error:
             raise ValueError(INVALID_ASTROART_PALETTE_FILE) from error
 
+        indices: set[float] = set()
         raw_color_list: ColorList = []
         for line in lines[2:]:
             ls = line.split()
             xrgb = tuple(map(float, [a.strip(",") for a in ls[:4]]))
+            indices.add(xrgb[0])
             raw_color_list.append(cast(ColorListRow, xrgb))
 
         if ncolors != len(raw_color_list):
             raise ValueError(INVALID_ASTROART_PALETTE_FILE)
 
+        vmin, vmax = min(indices), max(indices)
+
+        if vmin != 0:
+            raw_color_list.append((0.0, 0.0, 0.0, 0.0))
+
+        if vmax != 255:
+            raw_color_list.append((255.0, 255.0, 255.0, 255.0))
+
         color_list = [
-            tuple(v / 255.0 for v in xrgb) for xrgb in raw_color_list
+            tuple(v / 255.0 for v in xrgb) for xrgb in sorted(raw_color_list)
         ]
 
         color_table = [color_list[0]]
