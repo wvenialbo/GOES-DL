@@ -146,7 +146,7 @@ class EnhancementStretching:
 
 def get_stmap(stretching_name: str) -> EnhancementStretching:
     if stretching_name not in st_names:
-        supported_smaps = "'".join(st_names)
+        supported_smaps = "', '".join(st_names)
         raise ValueError(
             f"'{stretching_name}' is not a valid stretching table name, "
             f"supported values are: '{supported_smaps}'"
