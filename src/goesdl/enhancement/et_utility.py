@@ -1,4 +1,3 @@
-from math import nan
 from struct import unpack
 
 from .clr_utility import clr_utility
@@ -7,8 +6,6 @@ from .shared import ColorList, DomainData
 WORD_SIZE = 4
 NUMBER_OF_WORDS = 817
 EXPECTED_SIZE = NUMBER_OF_WORDS * WORD_SIZE
-
-NO_DATA_RGB = nan, 1.0, 0.0, 1.0
 
 
 class et_utility(clr_utility):
@@ -22,9 +19,7 @@ class et_utility(clr_utility):
         return len(data) == EXPECTED_SIZE
 
     @classmethod
-    def parse_et_table(
-        cls, data: bytes
-    ) -> tuple[ColorList, ColorList, DomainData]:
+    def parse_et_table(cls, data: bytes) -> tuple[ColorList, DomainData]:
         # Unpack all words as 32-bit big-endian integers
         words: tuple[int, ...] = unpack(">817I", data)
 
@@ -44,10 +39,4 @@ class et_utility(clr_utility):
         # Create colour table
         color_table = cls._make_color_list((x, r, g, b))
 
-        stock_table: ColorList = [
-            color_table[0],
-            color_table[-1],
-            NO_DATA_RGB,
-        ]
-
-        return color_table, stock_table, domain
+        return color_table, domain
