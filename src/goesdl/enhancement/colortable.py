@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from .colormap import BaseColormap
+from .constants import NO_DATA_RGB
 from .cpt_utility import cpt_utility
 from .et_utility import et_utility
 from .eu_utility import eu_utility
@@ -42,6 +43,10 @@ class _ColorTable(ABC, BaseColormap):
             return [(1 - j, (r, g, b)) for j, r, g, b in reversed(color_list)]
         else:
             return [(j, (r, g, b)) for j, r, g, b in color_list]
+
+    @staticmethod
+    def _create_stock_colors(color_table: ColorList) -> ColorList:
+        return [color_table[0], color_table[-1], NO_DATA_RGB]
 
 
 class _BinaryColorTable(_ColorTable):
@@ -146,13 +151,15 @@ class ETColorTable(_BinaryColorTable):
 
         return cls.parse_et_table(data)
 
-    @staticmethod
+    @classmethod
     def parse_et_table(
-        data: bytes,
+        cls, data: bytes
     ) -> tuple[ColorList, ColorList, DomainData, str]:
         try:
             # Try parse a .ET file
-            return *et_utility.parse_et_table(data), ""
+            color_list, domain = et_utility.parse_et_table(data)
+            stock_list = cls._create_stock_colors(color_list)
+            return color_list, stock_list, domain, ""
 
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_ET_FILE) from error
@@ -185,13 +192,15 @@ class EUColorTable(_TextBasedColorTable):
 
         return cls.parse_eu_table(lines)
 
-    @staticmethod
+    @classmethod
     def parse_eu_table(
-        lines: list[str],
+        cls, lines: list[str]
     ) -> tuple[ColorList, ColorList, DomainData, str]:
         try:
             # Try parse a .EU file
-            return eu_utility.parse_eu_table(lines)
+            color_list, domain, name = eu_utility.parse_eu_table(lines)
+            stock_list = cls._create_stock_colors(color_list)
+            return color_list, stock_list, domain, name
 
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_EU_FILE) from error
