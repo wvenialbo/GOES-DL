@@ -49,6 +49,9 @@ class EnhancementScale:
 
         self._stretching_updated()
 
+    def __str__(self) -> str:
+        return f"{self.palette}\n\n{self.stretching}"
+
     @classmethod
     def combined_from_stock(
         cls,
