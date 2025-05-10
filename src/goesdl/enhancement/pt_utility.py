@@ -20,6 +20,6 @@ class pt_utility:
         color_table: ColorList = [
             (i / vmax, *rgb) for i, rgb in enumerate(color_list)
         ]
-        domain = 0, vmax
+        domain = 0.0, float(vmax)
 
         return color_table, domain
