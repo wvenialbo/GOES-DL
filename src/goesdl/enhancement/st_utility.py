@@ -36,12 +36,22 @@ class st_utility:
             A list of tuples representing the enhancement stretching
             table.
         """
+        lines = cls._build_lines(name, table)
+
+        cls._save_to_file(path, lines)
+
+    @classmethod
+    def _build_lines(cls, name: str, table: StretchingTable) -> list[str]:
         lines: list[str] = []
 
         cls._add_stretching_table_header(lines, name)
 
         cls._create_stretching_table(lines, table)
 
+        return lines
+
+    @classmethod
+    def _save_to_file(cls, path: str | Path, lines: list[str]) -> None:
         with open(path, "w", encoding="utf-8", newline="\n") as file:
             cls._write_stretching_table_file(file, lines)
 
