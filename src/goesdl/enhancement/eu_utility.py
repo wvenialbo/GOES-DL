@@ -165,6 +165,15 @@ class eu_utility(clr_utility):
 
             lines.append(line)
 
+    @classmethod
+    def _fill_out(
+        cls, original: KeypointList
+    ) -> tuple[KeypointList, ColorList]:
+        if offset := 255 - original[-1]:
+            original = [a + offset for a in original]
+        fill_table = cls._fill_in(original)
+        return original, fill_table
+
     @staticmethod
     def _fill_in(original: KeypointList) -> ColorList:
         # Get the actual segment bounds
