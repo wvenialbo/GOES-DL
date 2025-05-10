@@ -6,6 +6,7 @@ from .constants import NO_DATA_RGB
 from .cpt_utility import cpt_utility
 from .et_utility import et_utility
 from .eu_utility import eu_utility
+from .pt_utility import pt_utility
 from .shared import ColorList, ColorTable, DomainData
 
 INVALID_ET_FILE = "Invalid McIDAS enhancement table (.ET) file"
@@ -204,6 +205,32 @@ class EUColorTable(_TextBasedColorTable):
 
         except (ValueError, IndexError, TypeError) as error:
             raise ValueError(INVALID_EU_FILE) from error
+
+
+class PlainColorTable(_TextBasedColorTable):
+    """
+    Represent a plaint text based colour palette table.
+    """
+
+    @classmethod
+    def _parse_text_file(
+        cls, lines: list[str]
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
+        return cls.parse_plain_table(lines)
+
+    @classmethod
+    def parse_plain_table(
+        cls,
+        lines: list[str],
+    ) -> tuple[ColorList, ColorList, DomainData, str]:
+        try:
+            # Try parse a .TXT file
+            color_list, domain = pt_utility.parse_plain_text(lines)
+            stock_list = cls._create_stock_colors(color_list)
+            return color_list, stock_list, domain, ""
+
+        except (ValueError, IndexError, TypeError) as error:
+            raise ValueError("Invalid plain-text colour table file") from error
 
 
 class ColormapTable(_ColorTable):
