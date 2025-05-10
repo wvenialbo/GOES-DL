@@ -1,4 +1,4 @@
-import contextlib
+from contextlib import suppress
 from pathlib import Path
 
 from .colortable import (
@@ -243,7 +243,7 @@ palette = {{
             return EUColorTable.parse_eu_table(lines)
 
         # Try parse a .CPT file
-        with contextlib.suppress(ValueError):
+        with suppress(ValueError):
             return CPTColorTable.parse_cpt_table(lines)
 
         # Try parse a .TXT file
