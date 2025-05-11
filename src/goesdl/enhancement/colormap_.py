@@ -1,6 +1,9 @@
 ColorValue = tuple[int, int, int]
 ColorList = list[ColorValue]
 
+UniformColorValue = tuple[float, float, float]
+UniformColorList = list[UniformColorValue]
+
 
 class BaseColormap:
 
@@ -39,3 +42,16 @@ class BaseColormap:
                     f"range [0, 255], component #{n%3} in entry #{n//3} "
                     f"has value={value}"
                 )
+
+    @classmethod
+    def _normalize_color_list(cls, color_list: ColorList) -> UniformColorList:
+        try:
+            return list(map(cls._to_rgb, color_list))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @staticmethod
+    def _to_rgb(rgb_value: ColorValue) -> UniformColorValue:
+        red, green, blue = map(lambda x: x / 255.0, rgb_value)
+        return red, green, blue
