@@ -35,7 +35,7 @@ class BaseColormap:
         expanded_list: list[int] = [v for entry in color_list for v in entry]
         for n, value in enumerate(expanded_list):
             is_integer = isinstance(value, int)
-            in_range = value < 0 or value > 255
+            in_range = 0 <= value <= 255
 
             if not is_integer:
                 raise ValueError(
