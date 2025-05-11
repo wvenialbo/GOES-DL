@@ -1,3 +1,5 @@
+from matplotlib.colors import Colormap
+
 ColorValue = tuple[int, int, int]
 ColorList = list[ColorValue]
 
@@ -6,6 +8,11 @@ UniformColorList = list[UniformColorValue]
 
 
 class BaseColormap:
+
+    colormap: Colormap
+
+    def __init__(self, colormap: Colormap) -> None:
+        self.colormap = colormap
 
     @staticmethod
     def _validate_color_list(color_list: ColorList) -> None:
