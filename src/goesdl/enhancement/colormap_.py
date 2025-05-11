@@ -1,4 +1,6 @@
-from matplotlib.colors import Colormap
+from types import NoneType
+
+from matplotlib.colors import Colormap, ListedColormap
 
 ColorValue = tuple[int, int, int]
 ColorList = list[ColorValue]
@@ -62,3 +64,27 @@ class BaseColormap:
     def _normalize_color(rgb_value: ColorValue) -> UniformColorValue:
         red, green, blue = map(lambda x: x / 255.0, rgb_value)
         return red, green, blue
+
+
+class DiscreteColormap(BaseColormap):
+
+    def __init__(
+        self, name: str, color_list: ColorList, ncolors: int | None = None
+    ) -> None:
+        normalized_color_list = self._normalize_color_list(color_list)
+
+        is_expected_type = isinstance(ncolors, (int, NoneType))
+
+        if ncolors is None:
+            ncolors = len(color_list)
+
+        in_range = 2 <= ncolors <= 256
+
+        if not is_expected_type or not in_range:
+            raise ValueError(
+                "'ncolors' must be an integer in the range [2, 256] or None"
+            )
+
+        colormap = ListedColormap(normalized_color_list, name)
+
+        super().__init__(colormap)
