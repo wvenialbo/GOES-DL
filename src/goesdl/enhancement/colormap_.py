@@ -71,6 +71,8 @@ class DiscreteColormap(BaseColormap):
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int | None = None
     ) -> None:
+        self._validate_color_list(color_list)
+
         normalized_color_list = self._normalize_color_list(color_list)
 
         is_expected_type = isinstance(ncolors, (int, NoneType))
