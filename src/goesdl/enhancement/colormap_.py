@@ -46,12 +46,12 @@ class BaseColormap:
     @classmethod
     def _normalize_color_list(cls, color_list: ColorList) -> UniformColorList:
         try:
-            return list(map(cls._to_rgb, color_list))
+            return list(map(cls._normalize_color, color_list))
 
         except (IndexError, TypeError, ValueError) as error:
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _to_rgb(rgb_value: ColorValue) -> UniformColorValue:
+    def _normalize_color(rgb_value: ColorValue) -> UniformColorValue:
         red, green, blue = map(lambda x: x / 255.0, rgb_value)
         return red, green, blue
