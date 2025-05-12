@@ -22,14 +22,14 @@ class BaseColormap:
     @classmethod
     def _normalize_color_list(cls, color_list: ColorList) -> RealColorList:
         try:
-            return list(map(cls._normalize_color, color_list))
+            return list(map(cls._normalize_color_value, color_list))
 
         except (IndexError, TypeError, ValueError) as error:
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _normalize_color(rgb_value: ColorValue) -> RealColorValue:
-        red, green, blue = map(lambda x: x / 255.0, rgb_value)
+    def _normalize_color_value(value: ColorValue) -> RealColorValue:
+        red, green, blue = map(lambda x: x / 255.0, value)
         return red, green, blue
 
     @staticmethod
