@@ -370,6 +370,52 @@ class SegmentedColormap(_SegmentedBasedColormap):
 class _SegregatedBasedColormap(BaseColormap):
 
     @classmethod
+    def _create_color_table(
+        cls, colormap: LinearSegmentedColormap
+    ) -> ColorTable:
+        color_table = cls._make_color_table(colormap)
+        return SegmentedColormap._create_color_table(color_table)
+
+    @staticmethod
+    def _make_color_table(colormap: LinearSegmentedColormap) -> ColorTable:
+        segment_data: RealColorSegments = getattr(colormap, "_segmentdata")
+        x_values = {
+            endpoint[0]
+            for endpoint_list in segment_data.values()
+            for endpoint in endpoint_list
+        }
+
+        cm = colormap.resampled(512)
+
+        def imap(x: float) -> int:
+            return round(255 * x)
+
+        def cmap(x: float) -> ColorValue:
+            value = tuple(map(imap, iter(cm(x)[:3])))
+            return cast(ColorValue, value)
+
+        eps = 1.0e-6
+
+        color_table: ColorTable = []
+        for x in sorted(x_values):
+            if x in {0.0, 1.0}:
+                color_value = imap(x), cmap(x)
+                color_table.append(color_value)
+                continue
+
+            value_left = cmap(x - eps)
+            value_right = cmap(x + eps)
+
+            if value_left == value_right:
+                color_value = imap(x), value_left
+                color_table.append(color_value)
+            else:
+                index = imap(x)
+                color_table.extend(((index, value_left), (index, value_right)))
+
+        return color_table
+
+    @classmethod
     def _normalize_color_segments(
         cls, color_segments: ColorSegments
     ) -> RealColorSegments:
@@ -583,48 +629,7 @@ class _NamedColormapBased(BaseColormap):
         if is_functional:
             return cls._uniform_color_table(colormap)
 
-        return cls._segregated_color_table(colormap)
-
-    @staticmethod
-    def _segregated_color_table(
-        colormap: LinearSegmentedColormap,
-    ) -> ColorTable:
-        segment_data: RealColorSegments = getattr(colormap, "_segmentdata")
-        x_values = {
-            endpoint[0]
-            for endpoint_list in segment_data.values()
-            for endpoint in endpoint_list
-        }
-
-        cm = colormap.resampled(512)
-
-        def imap(x: float) -> int:
-            return round(255 * x)
-
-        def cmap(x: float) -> ColorValue:
-            value = tuple(map(imap, iter(cm(x)[:3])))
-            return cast(ColorValue, value)
-
-        eps = 1.0e-6
-
-        color_table: ColorTable = []
-        for x in sorted(x_values):
-            if x in {0.0, 1.0}:
-                color_value = imap(x), cmap(x)
-                color_table.append(color_value)
-                continue
-
-            value_left = cmap(x - eps)
-            value_right = cmap(x + eps)
-
-            if value_left == value_right:
-                color_value = imap(x), value_left
-                color_table.append(color_value)
-            else:
-                index = imap(x)
-                color_table.extend(((index, value_left), (index, value_right)))
-
-        return color_table
+        return SegregatedColormap._create_color_table(colormap)
 
     @classmethod
     def _uniform_color_table(
