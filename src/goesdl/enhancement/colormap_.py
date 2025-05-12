@@ -30,9 +30,24 @@ class BaseColormap:
         except (IndexError, TypeError, ValueError) as error:
             raise ValueError(f"Invalid color list: {error}") from error
 
+    @classmethod
+    def _normalize_color_point(cls, point: ColorPoint) -> RealColorPoint:
+        index, value = point
+        location = index / 255
+        rgb = cls._normalize_color_value(value)
+        return location, rgb
+
+    @classmethod
+    def _normalize_color_table(cls, color_table: ColorTable) -> RealColorTable:
+        try:
+            return list(map(cls._normalize_color_point, color_table))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color table: {error}") from error
+
     @staticmethod
     def _normalize_color_value(value: ColorValue) -> RealColorValue:
-        red, green, blue = map(lambda x: x / 255.0, value)
+        red, green, blue = map(lambda x: x / 255, value)
         return red, green, blue
 
     @staticmethod
