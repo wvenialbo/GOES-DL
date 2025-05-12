@@ -125,6 +125,13 @@ class BaseColormap:
 
     @staticmethod
     def _validate_monotonic_indices(x: IndexList) -> None:
+        is_list = isinstance(x, list)
+
+        if not is_list:
+            raise ValueError(
+                f"'x' is expected to be a `list`, got `{type(x)}`"
+            )
+
         if len(x) < 2:
             raise ValueError("At least 2 control points are expected")
 
