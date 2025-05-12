@@ -344,6 +344,7 @@ class SegmentedColormap(_SegmentedBasedColormap):
     ) -> None:
         self._validate_color_table(color_table)
         self._validate_ncolors(ncolors, False)
+        self._validate_monotonic_indices([x for x, _ in color_table])
 
         normalized_color_table = self._normalize_color_table(color_table)
 
@@ -494,6 +495,11 @@ class _SegregatedBasedColormap(BaseColormap):
 
         for n, endpoint in enumerate(endpoint_list):
             cls._validate_endpoint(n, endpoint, segment_name)
+
+    @classmethod
+    def _validate_segment_indices(cls, color_segments: ColorSegments) -> None:
+        for endpoint_list in color_segments.values():
+            cls._validate_monotonic_indices([x for x, _, _ in endpoint_list])
 
 
 class SegregatedColormap(_SegregatedBasedColormap):
