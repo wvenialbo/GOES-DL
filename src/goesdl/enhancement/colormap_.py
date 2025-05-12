@@ -205,9 +205,10 @@ class _ListBasedColormap(BaseColormap):
         if ncolors is None:
             ncolors = list_size
 
-        in_range = 2 <= ncolors <= 256
+        def in_range(x: int) -> bool:
+            return 2 <= x <= 256
 
-        if not is_expected_type or not in_range:
+        if not is_expected_type or not in_range(ncolors):
             raise ValueError(
                 "'ncolors' must be an integer in the range [2, 256] or None"
             )
