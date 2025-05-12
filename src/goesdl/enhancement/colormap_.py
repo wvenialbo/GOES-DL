@@ -66,11 +66,11 @@ class BaseColormap:
         return red, green, blue
 
 
-class DiscreteColormap(BaseColormap):
+class _ListBasedColormap(BaseColormap):
 
-    def __init__(
-        self, name: str, color_list: ColorList, ncolors: int | None = None
-    ) -> None:
+    def _init_color_list(
+        self, color_list: ColorList, ncolors: int | None = None
+    ) -> UniformColorList:
         self._validate_color_list(color_list)
 
         normalized_color_list = self._normalize_color_list(color_list)
@@ -86,32 +86,28 @@ class DiscreteColormap(BaseColormap):
             raise ValueError(
                 "'ncolors' must be an integer in the range [2, 256] or None"
             )
+
+        return normalized_color_list
+
+
+class DiscreteColormap(_ListBasedColormap):
+
+    def __init__(
+        self, name: str, color_list: ColorList, ncolors: int | None = None
+    ) -> None:
+        normalized_color_list = self._init_color_list(color_list)
 
         colormap = ListedColormap(normalized_color_list, name)
 
         super().__init__(colormap)
 
 
-class UniformColormap(BaseColormap):
+class UniformColormap(_ListBasedColormap):
 
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int | None = None
     ) -> None:
-        self._validate_color_list(color_list)
-
-        normalized_color_list = self._normalize_color_list(color_list)
-
-        is_expected_type = isinstance(ncolors, (int, NoneType))
-
-        if ncolors is None:
-            ncolors = len(color_list)
-
-        in_range = 2 <= ncolors <= 256
-
-        if not is_expected_type or not in_range:
-            raise ValueError(
-                "'ncolors' must be an integer in the range [2, 256] or None"
-            )
+        normalized_color_list = self._init_color_list(color_list)
 
         colormap = LinearSegmentedColormap.from_list(
             name, normalized_color_list
