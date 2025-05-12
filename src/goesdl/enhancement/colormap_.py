@@ -266,3 +266,31 @@ class UniformColormap(BaseColormap):
             color_table.extend((first, last))
 
         return color_table
+
+
+class SegmentedColormap(BaseColormap):
+
+    def __init__(
+        self, name: str, color_table: ColorTable, ncolors: int = 256
+    ) -> None:
+        self._validate_color_table(color_table)
+        self._validate_ncolors(ncolors, False)
+
+        normalized_color_table = self._normalize_color_table(color_table)
+
+        colormap = LinearSegmentedColormap.from_list(
+            name, normalized_color_table, N=ncolors
+        )
+
+        super().__init__(colormap)
+
+    @staticmethod
+    def _create_color_table(src_color_table: ColorTable) -> ColorTable:
+        color_table = src_color_table[:1]
+
+        for point in src_color_table:
+            color_table.extend((point,) * 2)
+
+        color_table.append(src_color_table[-1])
+
+        return color_table
