@@ -633,7 +633,7 @@ class _NamedColormapBased(BaseColormap):
         cm = colormap.resampled(512)
         colors = cast(RealColorList, cm([i / 255 for i in range(256)]))
         color_list = cls._rescale_color_list(colors[:3])
-        return DiscreteColormap._create_color_table(color_list)
+        return UniformColormap._create_color_table(color_list)
 
 
 class NamedColormap(_NamedColormapBased):
