@@ -124,7 +124,7 @@ class BaseColormap:
             )
 
     @staticmethod
-    def _validate_monotonic_indices(x: IndexList) -> None:
+    def _validate_monotonic_indices(x: IndexList, vmax: int) -> None:
         is_list = isinstance(x, list)
 
         if not is_list:
@@ -138,9 +138,9 @@ class BaseColormap:
         k_min = x[0]
         k_max = x[-1]
 
-        if k_min != 0 or k_max != 255:
+        if k_min != 0 or k_max != vmax:
             raise ValueError(
-                "Control points must start with x=0 and end with x=255"
+                f"Control points must start with x=0 and end with x={vmax}"
             )
 
         for i in range(len(x) - 1):
@@ -351,7 +351,7 @@ class SegmentedColormap(_SegmentedBasedColormap):
         self, name: str, color_table: ColorTable, ncolors: int = 256
     ) -> None:
         self._validate_color_table(color_table)
-        self._validate_monotonic_indices([x for x, _ in color_table])
+        self._validate_monotonic_indices([x for x, _ in color_table], 255)
         self._validate_ncolors(ncolors, False)
 
         normalized_color_table = self._normalize_color_table(color_table)
@@ -553,7 +553,9 @@ class _SegregatedBasedColormap(BaseColormap):
     @classmethod
     def _validate_segment_indices(cls, color_segments: ColorSegments) -> None:
         for endpoint_list in color_segments.values():
-            cls._validate_monotonic_indices([x for x, _, _ in endpoint_list])
+            cls._validate_monotonic_indices(
+                [x for x, _, _ in endpoint_list], 255
+            )
 
 
 class SegregatedColormap(_SegregatedBasedColormap):
