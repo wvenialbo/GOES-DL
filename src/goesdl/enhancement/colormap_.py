@@ -21,14 +21,6 @@ class BaseColormap:
         self.colormap = colormap
 
     @classmethod
-    def _normalize_color_list(cls, color_list: ColorList) -> RealColorList:
-        try:
-            return list(map(cls._normalize_color_value, color_list))
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color list: {error}") from error
-
-    @classmethod
     def _normalize_color_point(cls, point: ColorPoint) -> RealColorPoint:
         index, value = point
         location = index / 255
@@ -85,29 +77,6 @@ class BaseColormap:
                 f"Index {n} in 'color_list' must be in "
                 f"range [0, 255], got {index}"
             )
-
-    @classmethod
-    def _validate_color_list(cls, color_list: ColorList) -> None:
-        is_list = isinstance(color_list, list)
-
-        if not is_list:
-            raise ValueError(
-                "'color_list' is expected to be a `list`, "
-                f"got `{type(color_list)}`"
-            )
-
-        ncolors = len(color_list)
-
-        if ncolors == 0:
-            raise ValueError("'color_list' can not be empty")
-
-        if ncolors > 256:
-            raise ValueError(
-                f"'color_list' can not exceed 256 entries, got {ncolors}"
-            )
-
-        for n, value in enumerate(color_list):
-            cls._validate_color_value(n, value, "color_list")
 
     @classmethod
     def _validate_color_point(cls, n: int, point: ColorPoint) -> None:
@@ -197,7 +166,41 @@ class BaseColormap:
             )
 
 
-class DiscreteColormap(BaseColormap):
+class _ListBasedColormap(BaseColormap):
+
+    @classmethod
+    def _normalize_color_list(cls, color_list: ColorList) -> RealColorList:
+        try:
+            return list(map(cls._normalize_color_value, color_list))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @classmethod
+    def _validate_color_list(cls, color_list: ColorList) -> None:
+        is_list = isinstance(color_list, list)
+
+        if not is_list:
+            raise ValueError(
+                "'color_list' is expected to be a `list`, "
+                f"got `{type(color_list)}`"
+            )
+
+        ncolors = len(color_list)
+
+        if ncolors == 0:
+            raise ValueError("'color_list' can not be empty")
+
+        if ncolors > 256:
+            raise ValueError(
+                f"'color_list' can not exceed 256 entries, got {ncolors}"
+            )
+
+        for n, value in enumerate(color_list):
+            cls._validate_color_value(n, value, "color_list")
+
+
+class DiscreteColormap(_ListBasedColormap):
 
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int | None = None
@@ -234,7 +237,7 @@ class DiscreteColormap(BaseColormap):
         return color_table
 
 
-class UniformColormap(BaseColormap):
+class UniformColormap(_ListBasedColormap):
 
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int = 256
