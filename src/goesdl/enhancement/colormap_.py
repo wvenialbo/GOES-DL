@@ -549,7 +549,8 @@ class _NamedColormapBased(BaseColormap):
     @staticmethod
     def _get_colormap(colormap_name: str) -> Colormap:
         try:
-            return colormaps.get_cmap(colormap_name)
+            colormap = colormaps.get_cmap(colormap_name)
+            return colormap.copy()
 
         except (KeyError, ValueError) as error:
             raise ValueError(
