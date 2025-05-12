@@ -20,6 +20,28 @@ class BaseColormap:
     def __init__(self, colormap: Colormap) -> None:
         self.colormap = colormap
 
+    def set_bad(self, color: ColorValue) -> None:
+        rgb = self._normalize_color_value(color)
+        self.colormap.set_bad(rgb)
+
+    def set_extremes(
+        self, *, bad: ColorValue, under: ColorValue, over: ColorValue
+    ) -> None:
+        bad_color = self._normalize_color_value(bad)
+        under_color = self._normalize_color_value(under)
+        over_color = self._normalize_color_value(over)
+        self.colormap.set_extremes(
+            bad=bad_color, under=under_color, over=over_color
+        )
+
+    def set_over(self, color: ColorValue) -> None:
+        rgb = self._normalize_color_value(color)
+        self.colormap.set_over(rgb)
+
+    def set_under(self, color: ColorValue) -> None:
+        rgb = self._normalize_color_value(color)
+        self.colormap.set_under(rgb)
+
     @staticmethod
     def _normalize_color_value(value: ColorValue) -> RealColorValue:
         red, green, blue = map(lambda x: x / 255, value)
