@@ -213,7 +213,7 @@ class UniformColormap(_ListBasedColormap):
         return color_table
 
 
-class _GradientBasedColormap(BaseColormap):
+class _SegmentedBasedColormap(BaseColormap):
 
     @staticmethod
     def _normalize_color_index(index: int) -> float:
@@ -300,7 +300,7 @@ class _GradientBasedColormap(BaseColormap):
             cls._validate_color_point(n, point)
 
 
-class SegmentedColormap(_GradientBasedColormap):
+class SegmentedColormap(_SegmentedBasedColormap):
 
     def __init__(
         self, name: str, color_table: ColorTable, ncolors: int = 256
