@@ -163,7 +163,7 @@ class DiscreteColormap(_ListBasedColormap):
 class UniformColormap(_ListBasedColormap):
 
     def __init__(
-        self, name: str, color_list: ColorList, ncolors: int | None = None
+        self, name: str, color_list: ColorList, ncolors: int = 256
     ) -> None:
         normalized_color_list, ncolors = self._init_data(color_list, ncolors)
 
