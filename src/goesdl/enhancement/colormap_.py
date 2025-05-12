@@ -193,10 +193,14 @@ class UniformColormap(_ListBasedColormap):
 
 class _GradientBasedColormap(BaseColormap):
 
+    @staticmethod
+    def _normalize_color_index(index: int) -> float:
+        return index / 255
+
     @classmethod
     def _normalize_color_point(cls, point: ColorPoint) -> RealColorPoint:
         index, value = point
-        location = index / 255
+        location = cls._normalize_color_index(index)
         rgb = cls._normalize_color_value(value)
         return location, rgb
 
