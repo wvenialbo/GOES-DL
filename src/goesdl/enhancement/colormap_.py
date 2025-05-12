@@ -374,12 +374,110 @@ class _SegregatedBasedColormap(BaseColormap):
 
         return normalized_endpoint_list
 
+    @classmethod
+    def _validate_color_segments(cls, color_segments: ColorSegments) -> None:
+        is_dictionary = isinstance(color_segments, dict)
+
+        if not is_dictionary:
+            raise ValueError(
+                "'color_segments' is expected to be a `dict`, "
+                f"got `{type(color_segments)}`"
+            )
+
+        for color_name in color_segments:
+            if color_name not in COLOR_COMPONENTS:
+                allowed_components = "', '".join(COLOR_COMPONENTS)
+                raise ValueError(
+                    f"Unknown '{color_name}' component, "
+                    f"allowed components are: '{allowed_components}'"
+                )
+
+        for color_name in COLOR_COMPONENTS:
+            if color_name not in color_segments:
+                raise ValueError(
+                    f"Missing '{color_name}' component in 'color_segments'"
+                )
+
+            endpoint_list = color_segments[color_name]
+
+            cls._validate_endpoint_list(endpoint_list, color_name)
+
+    @classmethod
+    def _validate_endpoint(
+        cls, n: int, endpoint: ColorEndpoint, segment_name: str
+    ) -> None:
+        is_tuple = isinstance(endpoint, tuple)
+
+        if not is_tuple:
+            raise ValueError(
+                f"Value {n} of '{segment_name}' is expected to be a `tuple`, "
+                f"got `{type(endpoint)}`"
+            )
+
+        ncomponents = len(endpoint)
+
+        if ncomponents != 3:
+            raise ValueError(
+                f"Value {n} of '{segment_name}' must have 3 components, "
+                f"got {ncomponents}"
+            )
+
+        for m, component in enumerate(endpoint):
+            cls._validate_endpoint_item(n, m, component, segment_name)
+
+    @staticmethod
+    def _validate_endpoint_item(
+        n: int, m: int, value: int, segment_name: str
+    ) -> None:
+        is_integer = isinstance(value, int)
+
+        if not is_integer:
+            raise ValueError(
+                f"Component ({n}, {m}) of '{segment_name}' must be an integer, "
+                f"got {type(value)}"
+            )
+
+        in_range = 0 <= value <= 255
+
+        if not in_range:
+            raise ValueError(
+                f"Component ({n}, {m}) of '{segment_name}' must be in "
+                f"range [0, 255], got {value}"
+            )
+
+    @classmethod
+    def _validate_endpoint_list(
+        cls, endpoint_list: ColorEndpointList, color_name: str
+    ) -> None:
+        is_list = isinstance(endpoint_list, list)
+
+        segment_name = f'color_segments["{color_name}"]'
+        if not is_list:
+            raise ValueError(
+                f"'{segment_name}' is expected to be a `list`, "
+                f"got `{type(endpoint_list)}`"
+            )
+
+        ncolors = len(endpoint_list)
+
+        if ncolors == 0:
+            raise ValueError(f"'{segment_name}' can not be empty")
+
+        if ncolors > 256:
+            raise ValueError(
+                f"'{segment_name}' can not exceed 256 entries, got {ncolors}"
+            )
+
+        for n, endpoint in enumerate(endpoint_list):
+            cls._validate_endpoint(n, endpoint, segment_name)
+
 
 class SegregatedColormap(_SegregatedBasedColormap):
 
     def __init__(
         self, name: str, color_segments: ColorSegments, ncolors: int = 256
     ) -> None:
+        self._validate_color_segments(color_segments)
         self._validate_ncolors(ncolors, False)
 
         normalized_segments = self._normalize_color_segments(color_segments)
