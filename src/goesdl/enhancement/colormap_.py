@@ -146,3 +146,20 @@ class UniformColormap(_ListBasedColormap):
         )
 
         super().__init__(colormap)
+
+    @staticmethod
+    def _create_color_table(color_list: ColorList) -> ColorTable:
+        max_index = len(color_list) - 1
+
+        color_table: ColorTable = []
+
+        for i in range(max_index):
+            j = i + 1
+            begin = round(255 * i / max_index)
+            end = round(255 * j / max_index)
+            first = begin, color_list[i]
+            last = end, color_list[j]
+
+            color_table.extend((first, last))
+
+        return color_table
