@@ -23,7 +23,7 @@ class BaseColormap:
     def _validate_color_list(color_list: ColorList) -> None:
         ncolors = len(color_list)
 
-        if ncolors:
+        if not ncolors:
             raise ValueError("Colour list can not be empty")
 
         if ncolors > 256:
