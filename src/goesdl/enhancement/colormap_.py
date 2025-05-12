@@ -11,6 +11,9 @@ ColorTable = list[ColorPoint]
 RealColorValue = tuple[float, float, float]
 RealColorList = list[RealColorValue]
 
+RealColorPoint = tuple[float, RealColorValue]
+RealColorTable = list[RealColorPoint]
+
 
 class BaseColormap:
 
