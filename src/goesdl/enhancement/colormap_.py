@@ -1,4 +1,9 @@
+from typing import cast
+
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
+
+from .constants import COLOR_COMPONENTS
+from .shared import MSegmentData
 
 ColorValue = tuple[int, int, int]
 ColorList = list[ColorValue]
@@ -11,6 +16,14 @@ RealColorList = list[RealColorValue]
 
 RealColorPoint = tuple[float, RealColorValue]
 RealColorTable = list[RealColorPoint]
+
+ColorEndpoint = tuple[int, int, int]
+ColorEndpointList = list[ColorEndpoint]
+ColorSegments = dict[str, ColorEndpointList]
+
+RealColorEndpoint = tuple[float, float, float]
+RealColorEndpointList = list[RealColorEndpoint]
+RealColorSegments = dict[str, RealColorEndpointList]
 
 
 class BaseColormap:
@@ -326,3 +339,53 @@ class SegmentedColormap(_SegmentedBasedColormap):
         color_table.append(src_color_table[-1])
 
         return color_table
+
+
+class _SegregatedBasedColormap(BaseColormap):
+
+    @classmethod
+    def _normalize_color_segments(
+        cls, color_segments: ColorSegments
+    ) -> RealColorSegments:
+        normalized_segments: RealColorSegments = {}
+
+        for color_name in COLOR_COMPONENTS:
+            endpoin_tlist = color_segments[color_name]
+            normalized_segments[color_name] = cls._normalize_enpoint_list(
+                endpoin_tlist
+            )
+
+        return normalized_segments
+
+    @classmethod
+    def _normalize_enpoint(cls, endpoint: ColorEndpoint) -> RealColorEndpoint:
+        location, end, begin = map(lambda x: x / 255, endpoint)
+        return location, end, begin
+
+    @classmethod
+    def _normalize_enpoint_list(
+        cls, endpoint_list: ColorEndpointList
+    ) -> RealColorEndpointList:
+        normalized_endpoint_list: RealColorEndpointList = []
+
+        for endpoint in endpoint_list:
+            normalized_endpoint = cls._normalize_enpoint(endpoint)
+            normalized_endpoint_list.append(normalized_endpoint)
+
+        return normalized_endpoint_list
+
+
+class SegregatedColormap(_SegregatedBasedColormap):
+
+    def __init__(
+        self, name: str, color_segments: ColorSegments, ncolors: int = 256
+    ) -> None:
+        self._validate_ncolors(ncolors, False)
+
+        normalized_segments = self._normalize_color_segments(color_segments)
+
+        segment_data = cast(MSegmentData, normalized_segments)
+
+        colormap = LinearSegmentedColormap(name, segment_data, N=ncolors)
+
+        super().__init__(colormap)
