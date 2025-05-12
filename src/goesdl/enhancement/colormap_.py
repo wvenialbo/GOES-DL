@@ -1,5 +1,3 @@
-from types import NoneType
-
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 ColorValue = tuple[int, int, int]
@@ -181,47 +179,35 @@ class BaseColormap:
         for m, component in enumerate(value):
             cls._validate_color_component(n, m, component, varname)
 
-
-class _ListBasedColormap(BaseColormap):
-
-    def _init_color_list(self, color_list: ColorList) -> RealColorList:
-        self._validate_color_list(color_list)
-
-        return self._normalize_color_list(color_list)
-
-    def _init_data(
-        self, color_list: ColorList, ncolors: int | None
-    ) -> tuple[RealColorList, int]:
-        normalized_color_list = self._init_color_list(color_list)
-
-        ncolors = self._init_ncolors(ncolors, len(color_list))
-
-        return normalized_color_list, ncolors
-
     @staticmethod
-    def _init_ncolors(ncolors: int | None, list_size: int) -> int:
-        is_expected_type = isinstance(ncolors, (int, NoneType))
+    def _validate_ncolors(ncolors: int | None, accept_none: bool) -> None:
+        if ncolors is None and accept_none:
+            return
 
-        if ncolors is None:
-            ncolors = list_size
+        or_none = " or None" if accept_none else ""
 
-        def in_range(x: int) -> bool:
-            return 2 <= x <= 256
-
-        if not is_expected_type or not in_range(ncolors):
+        if not isinstance(ncolors, int):
             raise ValueError(
-                "'ncolors' must be an integer in the range [2, 256] or None"
+                f"'ncolors' must be an integer{or_none}, got {type(ncolors)}"
             )
 
-        return ncolors
+        if not (2 <= ncolors <= 256):
+            raise ValueError(
+                f"'ncolors' must be in range [2, 256]{or_none}, got {ncolors}"
+            )
 
 
-class DiscreteColormap(_ListBasedColormap):
+class DiscreteColormap(BaseColormap):
 
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int | None = None
     ) -> None:
-        normalized_color_list, ncolors = self._init_data(color_list, ncolors)
+        self._validate_color_list(color_list)
+        self._validate_ncolors(ncolors, True)
+
+        normalized_color_list = self._normalize_color_list(color_list)
+
+        ncolors = ncolors or len(color_list)
 
         colormap = ListedColormap(normalized_color_list, name, N=ncolors)
 
@@ -248,12 +234,15 @@ class DiscreteColormap(_ListBasedColormap):
         return color_table
 
 
-class UniformColormap(_ListBasedColormap):
+class UniformColormap(BaseColormap):
 
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int = 256
     ) -> None:
-        normalized_color_list, ncolors = self._init_data(color_list, ncolors)
+        self._validate_color_list(color_list)
+        self._validate_ncolors(ncolors, False)
+
+        normalized_color_list = self._normalize_color_list(color_list)
 
         colormap = LinearSegmentedColormap.from_list(
             name, normalized_color_list, N=ncolors
