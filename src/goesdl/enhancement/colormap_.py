@@ -5,6 +5,9 @@ from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 ColorValue = tuple[int, int, int]
 ColorList = list[ColorValue]
 
+ColorPoint = tuple[int, ColorValue]
+ColorTable = list[ColorPoint]
+
 UniformColorValue = tuple[float, float, float]
 UniformColorList = list[UniformColorValue]
 
@@ -109,6 +112,26 @@ class DiscreteColormap(_ListBasedColormap):
         colormap = ListedColormap(normalized_color_list, name, N=ncolors)
 
         super().__init__(colormap)
+
+    @staticmethod
+    def _create_color_table(color_list: ColorList) -> ColorTable:
+        ncolors = len(color_list)
+        width = 256 / ncolors
+
+        i = 0
+        location = 0.0
+        color_table: ColorTable = []
+
+        while location <= 255:
+            begin = round(location)
+            location += width
+            end = round(location) - 1
+            first = begin, color_list[i]
+            last = end, color_list[i]
+
+            color_table.extend((first, last))
+
+        return color_table
 
 
 class UniformColormap(_ListBasedColormap):
