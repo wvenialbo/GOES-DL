@@ -328,9 +328,9 @@ class _SegmentedBasedColormap(BaseColormap):
         if ncolors == 0:
             raise ValueError("'color_table' can not be empty")
 
-        if ncolors > 256:
+        if ncolors > 510:
             raise ValueError(
-                f"'color_table' can not exceed 256 entries, got {ncolors}"
+                f"'color_table' can not exceed 510 entries, got {ncolors}"
             )
 
         for n, point in enumerate(color_table):
@@ -488,9 +488,9 @@ class _SegregatedBasedColormap(BaseColormap):
         if ncolors == 0:
             raise ValueError(f"'{segment_name}' can not be empty")
 
-        if ncolors > 256:
+        if ncolors > 510:
             raise ValueError(
-                f"'{segment_name}' can not exceed 256 entries, got {ncolors}"
+                f"'{segment_name}' can not exceed 510 entries, got {ncolors}"
             )
 
         for n, endpoint in enumerate(endpoint_list):
