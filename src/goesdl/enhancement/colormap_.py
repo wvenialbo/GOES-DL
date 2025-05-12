@@ -11,6 +11,8 @@ ColorList = list[ColorValue]
 ColorPoint = tuple[int, ColorValue]
 ColorTable = list[ColorPoint]
 
+IndexList = list[int]
+
 RealColorValue = tuple[float, float, float]
 RealColorList = list[RealColorValue]
 
@@ -119,6 +121,28 @@ class BaseColormap:
             raise ValueError(
                 f"'ncolors' must be in range [2, 256]{or_none}, got {ncolors}"
             )
+
+    @staticmethod
+    def _validate_monotonic_indices(x: IndexList) -> None:
+        if len(x) < 2:
+            raise ValueError("At least 2 control points are expected")
+
+        k_min = x[0]
+        k_max = x[-1]
+
+        if k_min != 0 or k_max != 255:
+            raise ValueError(
+                "Control points must start with x=0 and end with x=255"
+            )
+
+        for i in range(len(x) - 1):
+            k_current = x[i]
+            k_next = x[i + 1]
+
+            if k_current > k_next:
+                raise ValueError(
+                    "Control points must have x in increasing order"
+                )
 
 
 class _ListBasedColormap(BaseColormap):
