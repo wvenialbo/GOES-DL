@@ -19,41 +19,67 @@ class BaseColormap:
     def __init__(self, colormap: Colormap) -> None:
         self.colormap = colormap
 
-    @staticmethod
-    def _validate_color_list(color_list: ColorList) -> None:
+    @classmethod
+    def _validate_color_list(cls, color_list: ColorList) -> None:
+        is_list = isinstance(color_list, list)
+
+        if not is_list:
+            raise ValueError(
+                "'color_list' is expected to be a `list`, "
+                f"got `{type(color_list)}`"
+            )
+
         ncolors = len(color_list)
 
-        if not ncolors:
-            raise ValueError("Colour list can not be empty")
+        if ncolors == 0:
+            raise ValueError("'color_list' can not be empty")
 
         if ncolors > 256:
-            raise ValueError("Colour list can not have more than 256 colours")
+            raise ValueError(
+                f"'color_list' can not exceed 256 entries, got {ncolors}"
+            )
 
         for n, entry in enumerate(color_list):
-            ncomponents = len(entry)
-            if ncomponents != 3:
-                raise ValueError(
-                    "Entries in colour list must have 3 components, "
-                    f"entry #{n} have {ncomponents} components"
-                )
+            cls._validate_color_value(n, entry)
 
-        expanded_list: list[int] = [v for entry in color_list for v in entry]
-        for n, value in enumerate(expanded_list):
-            is_integer = isinstance(value, int)
-            in_range = 0 <= value <= 255
+    @classmethod
+    def _validate_color_value(cls, n: int, entry: ColorValue) -> None:
+        is_tuple = isinstance(entry, tuple)
 
-            if not is_integer:
-                raise ValueError(
-                    f"Colour components must be integers, component #{n%3} "
-                    f"in entry #{n // 3} is of type {type(value)}"
-                )
+        if not is_tuple:
+            raise ValueError(
+                f"Entry {n} of 'color_list' is expected to be a `tuple`, "
+                f"got `{type(entry)}`"
+            )
 
-            if not in_range:
-                raise ValueError(
-                    "Entries in colour list must be integers in the "
-                    f"range [0, 255], component #{n%3} in entry #{n//3} "
-                    f"has value={value}"
-                )
+        ncomponents = len(entry)
+
+        if ncomponents != 3:
+            raise ValueError(
+                f"Entry {n} of 'color_list' must have 3 components, "
+                f"got {ncomponents}"
+            )
+
+        for m, value in enumerate(entry):
+            cls._validate_color_component(n, m, value)
+
+    @staticmethod
+    def _validate_color_component(n: int, m: int, value: int) -> None:
+        is_integer = isinstance(value, int)
+
+        if not is_integer:
+            raise ValueError(
+                f"Component ({n}, {m}) of 'color_list' must be an integer, "
+                f"got {type(value)}"
+            )
+
+        in_range = 0 <= value <= 255
+
+        if not in_range:
+            raise ValueError(
+                f"Component ({n}, {m}) of 'color_list' must be in "
+                f"range [0, 255], got {value}"
+            )
 
     @classmethod
     def _normalize_color_list(cls, color_list: ColorList) -> UniformColorList:
