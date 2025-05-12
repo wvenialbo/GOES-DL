@@ -20,21 +20,6 @@ class BaseColormap:
     def __init__(self, colormap: Colormap) -> None:
         self.colormap = colormap
 
-    @classmethod
-    def _normalize_color_point(cls, point: ColorPoint) -> RealColorPoint:
-        index, value = point
-        location = index / 255
-        rgb = cls._normalize_color_value(value)
-        return location, rgb
-
-    @classmethod
-    def _normalize_color_table(cls, color_table: ColorTable) -> RealColorTable:
-        try:
-            return list(map(cls._normalize_color_point, color_table))
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color table: {error}") from error
-
     @staticmethod
     def _normalize_color_value(value: ColorValue) -> RealColorValue:
         red, green, blue = map(lambda x: x / 255, value)
@@ -59,71 +44,6 @@ class BaseColormap:
                 f"Component ({n}, {m}) of '{varname}' must be in "
                 f"range [0, 255], got {value}"
             )
-
-    @staticmethod
-    def _validate_color_index(n: int, index: int) -> None:
-        is_integer = isinstance(index, int)
-
-        if not is_integer:
-            raise ValueError(
-                f"Index {n} in 'color_list' must be an integer, "
-                f"got {type(index)}"
-            )
-
-        in_range = 0 <= index <= 255
-
-        if not in_range:
-            raise ValueError(
-                f"Index {n} in 'color_list' must be in "
-                f"range [0, 255], got {index}"
-            )
-
-    @classmethod
-    def _validate_color_point(cls, n: int, point: ColorPoint) -> None:
-        is_tuple = isinstance(point, tuple)
-
-        if not is_tuple:
-            raise ValueError(
-                f"Entry {n} of 'color_table' is expected to be a `tuple`, "
-                f"got `{type(point)}`"
-            )
-
-        nelements = len(point)
-
-        if nelements != 2:
-            raise ValueError(
-                f"Entry {n} of 'color_table' must have 2 elements, "
-                f"got {nelements}"
-            )
-
-        index, value = point
-
-        cls._validate_color_index(n, index)
-
-        cls._validate_color_value(n, value, "color_table")
-
-    @classmethod
-    def _validate_color_table(cls, color_table: ColorTable) -> None:
-        is_list = isinstance(color_table, list)
-
-        if not is_list:
-            raise ValueError(
-                "'color_table' is expected to be a `list`, "
-                f"got `{type(color_table)}`"
-            )
-
-        ncolors = len(color_table)
-
-        if ncolors == 0:
-            raise ValueError("'color_table' can not be empty")
-
-        if ncolors > 256:
-            raise ValueError(
-                f"'color_table' can not exceed 256 entries, got {ncolors}"
-            )
-
-        for n, point in enumerate(color_table):
-            cls._validate_color_point(n, point)
 
     @classmethod
     def _validate_color_value(
@@ -271,7 +191,90 @@ class UniformColormap(_ListBasedColormap):
         return color_table
 
 
-class SegmentedColormap(BaseColormap):
+class _GradientBasedColormap(BaseColormap):
+
+    @classmethod
+    def _normalize_color_point(cls, point: ColorPoint) -> RealColorPoint:
+        index, value = point
+        location = index / 255
+        rgb = cls._normalize_color_value(value)
+        return location, rgb
+
+    @classmethod
+    def _normalize_color_table(cls, color_table: ColorTable) -> RealColorTable:
+        try:
+            return list(map(cls._normalize_color_point, color_table))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color table: {error}") from error
+
+    @staticmethod
+    def _validate_color_index(n: int, index: int) -> None:
+        is_integer = isinstance(index, int)
+
+        if not is_integer:
+            raise ValueError(
+                f"Index {n} in 'color_list' must be an integer, "
+                f"got {type(index)}"
+            )
+
+        in_range = 0 <= index <= 255
+
+        if not in_range:
+            raise ValueError(
+                f"Index {n} in 'color_list' must be in "
+                f"range [0, 255], got {index}"
+            )
+
+    @classmethod
+    def _validate_color_point(cls, n: int, point: ColorPoint) -> None:
+        is_tuple = isinstance(point, tuple)
+
+        if not is_tuple:
+            raise ValueError(
+                f"Entry {n} of 'color_table' is expected to be a `tuple`, "
+                f"got `{type(point)}`"
+            )
+
+        nelements = len(point)
+
+        if nelements != 2:
+            raise ValueError(
+                f"Entry {n} of 'color_table' must have 2 elements, "
+                f"got {nelements}"
+            )
+
+        index, value = point
+
+        cls._validate_color_index(n, index)
+
+        cls._validate_color_value(n, value, "color_table")
+
+    @classmethod
+    def _validate_color_table(cls, color_table: ColorTable) -> None:
+        is_list = isinstance(color_table, list)
+
+        if not is_list:
+            raise ValueError(
+                "'color_table' is expected to be a `list`, "
+                f"got `{type(color_table)}`"
+            )
+
+        ncolors = len(color_table)
+
+        if ncolors == 0:
+            raise ValueError("'color_table' can not be empty")
+
+        if ncolors > 256:
+            raise ValueError(
+                f"'color_table' can not exceed 256 entries, got {ncolors}"
+            )
+
+        for n, point in enumerate(color_table):
+            cls._validate_color_point(n, point)
+
+
+class SegmentedColormap(_GradientBasedColormap):
 
     def __init__(
         self, name: str, color_table: ColorTable, ncolors: int = 256
