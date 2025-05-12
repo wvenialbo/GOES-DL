@@ -132,22 +132,39 @@ class BaseColormap:
                 f"'x' is expected to be a `list`, got `{type(x)}`"
             )
 
-        if len(x) < 2:
+        nindices = len(x)
+
+        if nindices < 2:
             raise ValueError("At least 2 control points are expected")
 
-        k_min = x[0]
-        k_max = x[-1]
+        if nindices > vmax + 1:
+            raise ValueError(
+                f"Control points can not exceed {vmax + 1} entries, "
+                f"got {nindices}"
+            )
 
-        if k_min != 0 or k_max != vmax:
+        for n, i in enumerate(x):
+            is_integer = isinstance(i, int)
+
+            if not is_integer:
+                raise ValueError(
+                    f"Control point {n} is expected to be an `int`, "
+                    f"got `{type(i)}`"
+                )
+
+        x_min = x[0]
+        x_max = x[-1]
+
+        if x_min != 0 or x_max != vmax:
             raise ValueError(
                 f"Control points must start with x=0 and end with x={vmax}"
             )
 
         for i in range(len(x) - 1):
-            k_current = x[i]
-            k_next = x[i + 1]
+            x_current = x[i]
+            x_next = x[i + 1]
 
-            if k_current > k_next:
+            if x_current > x_next:
                 raise ValueError(
                     "Control points must have x in increasing order"
                 )
