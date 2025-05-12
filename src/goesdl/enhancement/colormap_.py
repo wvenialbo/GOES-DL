@@ -68,17 +68,26 @@ class BaseColormap:
 
 class _ListBasedColormap(BaseColormap):
 
-    def _init_color_list(
-        self, color_list: ColorList, ncolors: int | None = None
-    ) -> UniformColorList:
+    def _init_color_list(self, color_list: ColorList) -> UniformColorList:
         self._validate_color_list(color_list)
 
-        normalized_color_list = self._normalize_color_list(color_list)
+        return self._normalize_color_list(color_list)
 
+    def _init_data(
+        self, color_list: ColorList, ncolors: int | None
+    ) -> tuple[UniformColorList, int]:
+        normalized_color_list = self._init_color_list(color_list)
+
+        ncolors = self._init_ncolors(ncolors, len(color_list))
+
+        return normalized_color_list, ncolors
+
+    @staticmethod
+    def _init_ncolors(ncolors: int | None, list_size: int) -> int:
         is_expected_type = isinstance(ncolors, (int, NoneType))
 
         if ncolors is None:
-            ncolors = len(color_list)
+            ncolors = list_size
 
         in_range = 2 <= ncolors <= 256
 
@@ -87,7 +96,7 @@ class _ListBasedColormap(BaseColormap):
                 "'ncolors' must be an integer in the range [2, 256] or None"
             )
 
-        return normalized_color_list
+        return ncolors
 
 
 class DiscreteColormap(_ListBasedColormap):
@@ -95,9 +104,9 @@ class DiscreteColormap(_ListBasedColormap):
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int | None = None
     ) -> None:
-        normalized_color_list = self._init_color_list(color_list)
+        normalized_color_list, ncolors = self._init_data(color_list, ncolors)
 
-        colormap = ListedColormap(normalized_color_list, name)
+        colormap = ListedColormap(normalized_color_list, name, N=ncolors)
 
         super().__init__(colormap)
 
@@ -107,10 +116,10 @@ class UniformColormap(_ListBasedColormap):
     def __init__(
         self, name: str, color_list: ColorList, ncolors: int | None = None
     ) -> None:
-        normalized_color_list = self._init_color_list(color_list)
+        normalized_color_list, ncolors = self._init_data(color_list, ncolors)
 
         colormap = LinearSegmentedColormap.from_list(
-            name, normalized_color_list
+            name, normalized_color_list, N=ncolors
         )
 
         super().__init__(colormap)
