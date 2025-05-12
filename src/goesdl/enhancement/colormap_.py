@@ -1,5 +1,6 @@
 from typing import cast
 
+from matplotlib import colormaps
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 from .constants import COLOR_COMPONENTS
@@ -517,3 +518,127 @@ class SegregatedColormap(_SegregatedBasedColormap):
         colormap = LinearSegmentedColormap(name, segment_data, N=ncolors)
 
         super().__init__(colormap)
+
+
+class _NamedColormapBased(BaseColormap):
+
+    @classmethod
+    def _create_color_table(cls, colormap: Colormap) -> ColorTable:
+        try:
+            if isinstance(colormap, LinearSegmentedColormap):
+                return cls._segmented_color_table(colormap)
+
+            if isinstance(colormap, ListedColormap):
+                return cls._discrete_color_table(colormap)
+
+        except AttributeError as error:
+            raise ValueError(
+                "Unable to create colour table, "
+                "probably due to Matplotlib version issues"
+            ) from error
+
+        raise ValueError(f"Unsupported colormap type: {type(colormap)}")
+
+    @classmethod
+    def _discrete_color_table(cls, colormap: ListedColormap) -> ColorTable:
+        colors = cast(RealColorList, colormap.colors)
+        color_list = cls._rescale_color_list(colors[:3])
+        return DiscreteColormap._create_color_table(color_list)
+
+    @staticmethod
+    def _get_colormap(colormap_name: str) -> Colormap:
+        try:
+            return colormaps.get_cmap(colormap_name)
+
+        except (KeyError, ValueError) as error:
+            raise ValueError(
+                f"Invalid colormap '{colormap_name}': {error}"
+            ) from error
+
+    @classmethod
+    def _rescale_color_list(cls, color_list: RealColorList) -> ColorList:
+        try:
+            return list(map(cls._rescale_color_value, color_list))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @staticmethod
+    def _rescale_color_value(value: RealColorValue) -> ColorValue:
+        red, green, blue = map(lambda x: round(x * 255), value)
+        return red, green, blue
+
+    @classmethod
+    def _segmented_color_table(
+        cls, colormap: LinearSegmentedColormap
+    ) -> ColorTable:
+        segment_data = getattr(colormap, "_segmentdata")
+
+        is_functional = False
+        for _, component in segment_data.items():
+            is_functional = is_functional or callable(component)
+
+        if is_functional:
+            return cls._uniform_color_table(colormap)
+
+        return cls._segregated_color_table(colormap)
+
+    @classmethod
+    def _segregated_color_table(
+        cls, colormap: LinearSegmentedColormap
+    ) -> ColorTable:
+        segment_data: RealColorSegments = getattr(colormap, "_segmentdata")
+        x_values = {
+            endpoint[0]
+            for endpoint_list in segment_data.values()
+            for endpoint in endpoint_list
+        }
+
+        cm = colormap.resampled(512)
+
+        def imap(x: float) -> int:
+            return round(255 * x)
+
+        def cmap(x: float) -> ColorValue:
+            value = tuple(map(imap, iter(cm(x)[:3])))
+            return cast(ColorValue, value)
+
+        eps = 1.0e-6
+
+        color_table: ColorTable = []
+        for x in sorted(x_values):
+            if x in {0.0, 1.0}:
+                color_value = imap(x), cmap(x)
+                color_table.append(color_value)
+                continue
+
+            value_left = cmap(x - eps)
+            value_right = cmap(x + eps)
+
+            if value_left == value_right:
+                color_value = imap(x), value_left
+                color_table.append(color_value)
+            else:
+                index = imap(x)
+                color_table.extend(((index, value_left), (index, value_right)))
+
+        return color_table
+
+    @classmethod
+    def _uniform_color_table(
+        cls, colormap: LinearSegmentedColormap
+    ) -> ColorTable:
+        cm = colormap.resampled(512)
+        colors = cast(RealColorList, cm([i / 255 for i in range(256)]))
+        color_list = cls._rescale_color_list(colors[:3])
+        return DiscreteColormap._create_color_table(color_list)
+
+
+class NamedColormap(_NamedColormapBased):
+
+    def __init__(self, name: str, ncolors: int = 256) -> None:
+        self._validate_ncolors(ncolors, False)
+
+        colormap = self._get_colormap(name)
+
+        super().__init__(colormap.resampled(ncolors))
