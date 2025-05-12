@@ -20,6 +20,57 @@ class BaseColormap:
         self.colormap = colormap
 
     @classmethod
+    def _normalize_color_list(cls, color_list: ColorList) -> UniformColorList:
+        try:
+            return list(map(cls._normalize_color, color_list))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @staticmethod
+    def _normalize_color(rgb_value: ColorValue) -> UniformColorValue:
+        red, green, blue = map(lambda x: x / 255.0, rgb_value)
+        return red, green, blue
+
+    @staticmethod
+    def _validate_color_component(
+        n: int, m: int, value: int, varname: str
+    ) -> None:
+        is_integer = isinstance(value, int)
+
+        if not is_integer:
+            raise ValueError(
+                f"Component ({n}, {m}) of '{varname}' must be an integer, "
+                f"got {type(value)}"
+            )
+
+        in_range = 0 <= value <= 255
+
+        if not in_range:
+            raise ValueError(
+                f"Component ({n}, {m}) of '{varname}' must be in "
+                f"range [0, 255], got {value}"
+            )
+
+    @staticmethod
+    def _validate_color_index(n: int, index: int) -> None:
+        is_integer = isinstance(index, int)
+
+        if not is_integer:
+            raise ValueError(
+                f"Index {n} in 'color_list' must be an integer, "
+                f"got {type(index)}"
+            )
+
+        in_range = 0 <= index <= 255
+
+        if not in_range:
+            raise ValueError(
+                f"Index {n} in 'color_list' must be in "
+                f"range [0, 255], got {index}"
+            )
+
+    @classmethod
     def _validate_color_list(cls, color_list: ColorList) -> None:
         is_list = isinstance(color_list, list)
 
@@ -39,60 +90,78 @@ class BaseColormap:
                 f"'color_list' can not exceed 256 entries, got {ncolors}"
             )
 
-        for n, entry in enumerate(color_list):
-            cls._validate_color_value(n, entry)
+        for n, value in enumerate(color_list):
+            cls._validate_color_value(n, value, "color_list")
 
     @classmethod
-    def _validate_color_value(cls, n: int, entry: ColorValue) -> None:
-        is_tuple = isinstance(entry, tuple)
+    def _validate_color_point(cls, n: int, point: ColorPoint) -> None:
+        is_tuple = isinstance(point, tuple)
 
         if not is_tuple:
             raise ValueError(
-                f"Entry {n} of 'color_list' is expected to be a `tuple`, "
-                f"got `{type(entry)}`"
+                f"Entry {n} of 'color_table' is expected to be a `tuple`, "
+                f"got `{type(point)}`"
             )
 
-        ncomponents = len(entry)
+        nelements = len(point)
+
+        if nelements != 2:
+            raise ValueError(
+                f"Entry {n} of 'color_table' must have 2 elements, "
+                f"got {nelements}"
+            )
+
+        index, value = point
+
+        cls._validate_color_index(n, index)
+
+        cls._validate_color_value(n, value, "color_table")
+
+    @classmethod
+    def _validate_color_table(cls, color_table: ColorTable) -> None:
+        is_list = isinstance(color_table, list)
+
+        if not is_list:
+            raise ValueError(
+                "'color_table' is expected to be a `list`, "
+                f"got `{type(color_table)}`"
+            )
+
+        ncolors = len(color_table)
+
+        if ncolors == 0:
+            raise ValueError("'color_table' can not be empty")
+
+        if ncolors > 256:
+            raise ValueError(
+                f"'color_table' can not exceed 256 entries, got {ncolors}"
+            )
+
+        for n, point in enumerate(color_table):
+            cls._validate_color_point(n, point)
+
+    @classmethod
+    def _validate_color_value(
+        cls, n: int, value: ColorValue, varname: str
+    ) -> None:
+        is_tuple = isinstance(value, tuple)
+
+        if not is_tuple:
+            raise ValueError(
+                f"Value {n} of '{varname}' is expected to be a `tuple`, "
+                f"got `{type(value)}`"
+            )
+
+        ncomponents = len(value)
 
         if ncomponents != 3:
             raise ValueError(
-                f"Entry {n} of 'color_list' must have 3 components, "
+                f"Value {n} of '{varname}' must have 3 components, "
                 f"got {ncomponents}"
             )
 
-        for m, value in enumerate(entry):
-            cls._validate_color_component(n, m, value)
-
-    @staticmethod
-    def _validate_color_component(n: int, m: int, value: int) -> None:
-        is_integer = isinstance(value, int)
-
-        if not is_integer:
-            raise ValueError(
-                f"Component ({n}, {m}) of 'color_list' must be an integer, "
-                f"got {type(value)}"
-            )
-
-        in_range = 0 <= value <= 255
-
-        if not in_range:
-            raise ValueError(
-                f"Component ({n}, {m}) of 'color_list' must be in "
-                f"range [0, 255], got {value}"
-            )
-
-    @classmethod
-    def _normalize_color_list(cls, color_list: ColorList) -> UniformColorList:
-        try:
-            return list(map(cls._normalize_color, color_list))
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color list: {error}") from error
-
-    @staticmethod
-    def _normalize_color(rgb_value: ColorValue) -> UniformColorValue:
-        red, green, blue = map(lambda x: x / 255.0, rgb_value)
-        return red, green, blue
+        for m, component in enumerate(value):
+            cls._validate_color_component(n, m, component, varname)
 
 
 class _ListBasedColormap(BaseColormap):
