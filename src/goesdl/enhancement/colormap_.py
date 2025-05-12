@@ -1,6 +1,6 @@
 from types import NoneType
 
-from matplotlib.colors import Colormap, ListedColormap
+from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 ColorValue = tuple[int, int, int]
 ColorList = list[ColorValue]
@@ -88,5 +88,33 @@ class DiscreteColormap(BaseColormap):
             )
 
         colormap = ListedColormap(normalized_color_list, name)
+
+        super().__init__(colormap)
+
+
+class UniformColormap(BaseColormap):
+
+    def __init__(
+        self, name: str, color_list: ColorList, ncolors: int | None = None
+    ) -> None:
+        self._validate_color_list(color_list)
+
+        normalized_color_list = self._normalize_color_list(color_list)
+
+        is_expected_type = isinstance(ncolors, (int, NoneType))
+
+        if ncolors is None:
+            ncolors = len(color_list)
+
+        in_range = 2 <= ncolors <= 256
+
+        if not is_expected_type or not in_range:
+            raise ValueError(
+                "'ncolors' must be an integer in the range [2, 256] or None"
+            )
+
+        colormap = LinearSegmentedColormap.from_list(
+            name, normalized_color_list
+        )
 
         super().__init__(colormap)
