@@ -585,9 +585,9 @@ class _NamedColormapBased(BaseColormap):
 
         return cls._segregated_color_table(colormap)
 
-    @classmethod
+    @staticmethod
     def _segregated_color_table(
-        cls, colormap: LinearSegmentedColormap
+        colormap: LinearSegmentedColormap,
     ) -> ColorTable:
         segment_data: RealColorSegments = getattr(colormap, "_segmentdata")
         x_values = {
