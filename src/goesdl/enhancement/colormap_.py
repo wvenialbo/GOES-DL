@@ -8,8 +8,8 @@ ColorList = list[ColorValue]
 ColorPoint = tuple[int, ColorValue]
 ColorTable = list[ColorPoint]
 
-UniformColorValue = tuple[float, float, float]
-UniformColorList = list[UniformColorValue]
+RealColorValue = tuple[float, float, float]
+RealColorList = list[RealColorValue]
 
 
 class BaseColormap:
@@ -20,7 +20,7 @@ class BaseColormap:
         self.colormap = colormap
 
     @classmethod
-    def _normalize_color_list(cls, color_list: ColorList) -> UniformColorList:
+    def _normalize_color_list(cls, color_list: ColorList) -> RealColorList:
         try:
             return list(map(cls._normalize_color, color_list))
 
@@ -28,7 +28,7 @@ class BaseColormap:
             raise ValueError(f"Invalid color list: {error}") from error
 
     @staticmethod
-    def _normalize_color(rgb_value: ColorValue) -> UniformColorValue:
+    def _normalize_color(rgb_value: ColorValue) -> RealColorValue:
         red, green, blue = map(lambda x: x / 255.0, rgb_value)
         return red, green, blue
 
@@ -166,14 +166,14 @@ class BaseColormap:
 
 class _ListBasedColormap(BaseColormap):
 
-    def _init_color_list(self, color_list: ColorList) -> UniformColorList:
+    def _init_color_list(self, color_list: ColorList) -> RealColorList:
         self._validate_color_list(color_list)
 
         return self._normalize_color_list(color_list)
 
     def _init_data(
         self, color_list: ColorList, ncolors: int | None
-    ) -> tuple[UniformColorList, int]:
+    ) -> tuple[RealColorList, int]:
         normalized_color_list = self._init_color_list(color_list)
 
         ncolors = self._init_ncolors(ncolors, len(color_list))
