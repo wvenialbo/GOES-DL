@@ -107,23 +107,6 @@ class BaseColormap:
             cls._validate_color_component(n, m, component, varname)
 
     @staticmethod
-    def _validate_ncolors(ncolors: int | None, accept_none: bool) -> None:
-        if ncolors is None and accept_none:
-            return
-
-        or_none = " or None" if accept_none else ""
-
-        if not isinstance(ncolors, int):
-            raise ValueError(
-                f"'ncolors' must be an integer{or_none}, got {type(ncolors)}"
-            )
-
-        if not (2 <= ncolors <= 256):
-            raise ValueError(
-                f"'ncolors' must be in range [2, 256]{or_none}, got {ncolors}"
-            )
-
-    @staticmethod
     def _validate_monotonic_indices(x: IndexList, vmax: int) -> None:
         is_list = isinstance(x, list)
 
@@ -168,6 +151,23 @@ class BaseColormap:
                 raise ValueError(
                     "Control points must have x in increasing order"
                 )
+
+    @staticmethod
+    def _validate_ncolors(ncolors: int | None, accept_none: bool) -> None:
+        if ncolors is None and accept_none:
+            return
+
+        or_none = " or None" if accept_none else ""
+
+        if not isinstance(ncolors, int):
+            raise ValueError(
+                f"'ncolors' must be an integer{or_none}, got {type(ncolors)}"
+            )
+
+        if not (2 <= ncolors <= 256):
+            raise ValueError(
+                f"'ncolors' must be in range [2, 256]{or_none}, got {ncolors}"
+            )
 
 
 class _ListBasedColormap(BaseColormap):
