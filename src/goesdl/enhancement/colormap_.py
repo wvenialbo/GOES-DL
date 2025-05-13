@@ -181,6 +181,19 @@ class _ListBasedColormap(BaseColormap):
             raise ValueError(f"Invalid color list: {error}") from error
 
     @classmethod
+    def _rescale_color_list(cls, color_list: RealColorList) -> ColorList:
+        try:
+            return list(map(cls._rescale_color_value, color_list))
+
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError(f"Invalid color list: {error}") from error
+
+    @staticmethod
+    def _rescale_color_value(value: RealColorValue) -> ColorValue:
+        red, green, blue = map(lambda x: round(x * 255), value)
+        return red, green, blue
+
+    @classmethod
     def _validate_color_list(cls, color_list: ColorList) -> None:
         is_list = isinstance(color_list, list)
 
@@ -593,7 +606,7 @@ class SegregatedColormap(_SegregatedBasedColormap):
         super().__init__(colormap)
 
 
-class _NamedColormapBased(BaseColormap):
+class _NamedColormapBased(_ListBasedColormap):
 
     @classmethod
     def _create_color_table(cls, colormap: Colormap) -> ColorTable:
@@ -628,19 +641,6 @@ class _NamedColormapBased(BaseColormap):
             raise ValueError(
                 f"Invalid colormap '{colormap_name}': {error}"
             ) from error
-
-    @classmethod
-    def _rescale_color_list(cls, color_list: RealColorList) -> ColorList:
-        try:
-            return list(map(cls._rescale_color_value, color_list))
-
-        except (IndexError, TypeError, ValueError) as error:
-            raise ValueError(f"Invalid color list: {error}") from error
-
-    @staticmethod
-    def _rescale_color_value(value: RealColorValue) -> ColorValue:
-        red, green, blue = map(lambda x: round(x * 255), value)
-        return red, green, blue
 
     @classmethod
     def _segmented_color_table(
