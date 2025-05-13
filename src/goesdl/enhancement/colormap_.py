@@ -662,8 +662,9 @@ class _NamedColormapBased(BaseColormap):
         cls, colormap: LinearSegmentedColormap
     ) -> ColorTable:
         cm = colormap.resampled(512)
-        colors = cast(RealColorList, cm([i / 255 for i in range(256)]))
-        color_list = cls._rescale_color_list(colors[:3])
+        color_array = cm([i / 255 for i in range(256)])
+        colors = cast(RealColorList, color_array[:, :3])
+        color_list = cls._rescale_color_list(colors)
         return UniformColormap._create_color_table(color_list)
 
 
