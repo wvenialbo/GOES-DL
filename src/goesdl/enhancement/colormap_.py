@@ -638,8 +638,10 @@ class _NamedColormapBased(_ListBasedColormap):
 
     @classmethod
     def _discrete_color_table(cls, colormap: ListedColormap) -> ColorTable:
-        colors = cast(RealColorList, colormap.colors)
-        color_list = cls._rescale_color_list(colors[:3])
+        ncolors = colormap.N
+        color_array = colormap([i / (ncolors - 1) for i in range(ncolors)])
+        colors = cast(RealColorList, color_array[:, :3])
+        color_list = cls._rescale_color_list(colors)
         return DiscreteColormap._create_color_table(color_list)
 
     @classmethod
