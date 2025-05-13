@@ -59,6 +59,17 @@ class BaseColormap:
         self.colormap.set_under(rgb)
 
     @staticmethod
+    def _get_colormap(colormap_name: str) -> Colormap:
+        try:
+            colormap = colormaps.get_cmap(colormap_name)
+            return colormap.copy()
+
+        except (KeyError, ValueError) as error:
+            raise ValueError(
+                f"Invalid colormap '{colormap_name}': {error}"
+            ) from error
+
+    @staticmethod
     def _normalize_color_value(value: ColorValue) -> RealColorValue:
         red, green, blue = map(lambda x: x / 255, value)
         return red, green, blue
@@ -630,17 +641,6 @@ class _NamedColormapBased(_ListBasedColormap):
         colors = cast(RealColorList, colormap.colors)
         color_list = cls._rescale_color_list(colors[:3])
         return DiscreteColormap._create_color_table(color_list)
-
-    @staticmethod
-    def _get_colormap(colormap_name: str) -> Colormap:
-        try:
-            colormap = colormaps.get_cmap(colormap_name)
-            return colormap.copy()
-
-        except (KeyError, ValueError) as error:
-            raise ValueError(
-                f"Invalid colormap '{colormap_name}': {error}"
-            ) from error
 
     @classmethod
     def _segmented_color_table(
