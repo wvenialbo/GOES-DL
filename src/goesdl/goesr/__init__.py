@@ -40,6 +40,7 @@ from .locator_pp import (
     GOESProductLocatorCMIP,
     GOESProductLocatorRad,
 )
+from .projection import GOESGlobe, GOESImagerProjection, GOESOrbitGeometry
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
 GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC
@@ -52,9 +53,12 @@ __all__ = [
     "GOESDatasetInfo",
     "GOESDerivedProductLocator",
     "GOESDerivedWithCannelProductLocator",
+    "GOESGlobe",
     "GOESImage",
+    "GOESImagerProjection",
     "GOESLatLonGrid",
     "GOESLightningMapperProductLocator",
+    "GOESOrbitGeometry",
     "GOESPrimaryMultibandProductLocator",
     "GOESPrimaryProductLocator",
     "GOESProductLocatorABI",
