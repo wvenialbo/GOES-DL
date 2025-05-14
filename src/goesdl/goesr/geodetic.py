@@ -39,7 +39,7 @@ class GOESGeodeticInfo(HasStrHelp):
 
         self.globe = Globe(
             semimajor_axis=proj.semi_major_axis,
-            semiminor_axis=proj.semi_major_axis,
+            semiminor_axis=proj.semi_minor_axis,
             inverse_flattening=proj.inverse_flattening,
         )
 
