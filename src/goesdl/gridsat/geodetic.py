@@ -10,6 +10,7 @@ from ..netcdf import DatasetView, HasStrHelp, variable
 from ..protocols.geodetic import IndexRange
 from ..utils.array import ArrayFloat32
 from .metadata import CoordinateMetadata, VariableMetadata
+from .projection import GSImagerProjection
 
 MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 
@@ -17,6 +18,29 @@ MetadataType = dict[str, CoordinateMetadata | VariableMetadata]
 class _DatasetInfo(DatasetView):
 
     cdm_data_type: str
+
+
+class GSGeodeticInfo(HasStrHelp):
+
+    crs: Projection
+    globe: Globe
+
+    def __init__(self, dataframe: Dataset) -> None:
+        # Create the source projection (Geostationary projection on
+        # GRS80 ellipsoid)
+
+        proj = GSImagerProjection(dataframe)
+
+        self.globe = Globe(
+            semimajor_axis=proj.semi_major_axis,
+            semiminor_axis=proj.semi_minor_axis,
+            inverse_flattening=proj.inverse_flattening,
+        )
+
+        # Create the source projection (Platé-Carrée projection on GOES
+        # ellipsoid)
+
+        self.crs = PlateCarree(central_longitude=0.0, globe=self.globe)
 
 
 class GSLatLonData(HasStrHelp):
@@ -37,6 +61,7 @@ class GSLatLonGrid(GSLatLonData):
     metadata: MetadataType
 
     crs: Projection
+    globe: Globe
 
     def __init__(
         self,
@@ -76,9 +101,11 @@ class GSLatLonGrid(GSLatLonData):
         # Create the source projection (Platé-Carrée projection on GRS80
         # ellipsoid)
 
-        source_globe = Globe(ellipse="GRS80")
+        geoinfo = GSGeodeticInfo(dataframe)
 
-        self.crs = PlateCarree(central_longitude=0.0, globe=source_globe)
+        self.globe = geoinfo.globe
+
+        self.crs = geoinfo.crs
 
         self.metadata = self._get_metadata(dataframe)
 
@@ -296,7 +323,3 @@ class GSLatLonGrid(GSLatLonData):
                     f"Field '{field}' does not have "
                     f"the required dimensions ({dim})"
                 )
-
-    @property
-    def globe(self) -> Globe:
-        return self.crs.globe
