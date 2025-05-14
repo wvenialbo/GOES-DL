@@ -25,7 +25,38 @@ class _DatasetInfo(DatasetView):
     dataset_name: str
 
 
-class GOESLatLonGrid(HasStrHelp):
+class GOESGeodeticInfo(HasStrHelp):
+
+    crs: Projection
+    geos: Projection
+    globe: Globe
+
+    def __init__(self, dataframe: Dataset) -> None:
+        # Create the source projection (Geostationary projection on
+        # GRS80 ellipsoid)
+
+        proj = GOESImagerProjection(dataframe)
+
+        self.globe = Globe(
+            semimajor_axis=proj.semi_major_axis,
+            semiminor_axis=proj.semi_major_axis,
+            inverse_flattening=proj.inverse_flattening,
+        )
+
+        self.geos = Geostationary(
+            central_longitude=proj.longitude_of_projection_origin,
+            satellite_height=proj.perspective_point_height,
+            sweep_axis=proj.sweep_angle_axis,
+            globe=self.globe,
+        )
+
+        # Create the source projection (Platé-Carrée projection on GOES
+        # ellipsoid)
+
+        self.crs = PlateCarree(central_longitude=0.0, globe=self.globe)
+
+
+class GOESLatLonGrid(GOESGeodeticInfo):
 
     _region: RectangularRegion
 
@@ -36,10 +67,6 @@ class GOESLatLonGrid(HasStrHelp):
 
     lon_limits: IndexRange
     lat_limits: IndexRange
-
-    crs: Projection
-
-    geos: Projection
 
     def __init__(
         self,
@@ -74,28 +101,7 @@ class GOESLatLonGrid(HasStrHelp):
 
         self.lon_limits, self.lat_limits = limits[:2], limits[2:4]
 
-        # Create the source projection (Geostationary projection on
-        # GRS80 ellipsoid)
-
-        proj = GOESImagerProjection(dataframe)
-
-        source_globe = Globe(
-            semimajor_axis=proj.semi_major_axis,
-            semiminor_axis=proj.semi_major_axis,
-            inverse_flattening=proj.inverse_flattening,
-        )
-
-        self.geos = Geostationary(
-            central_longitude=proj.longitude_of_projection_origin,
-            satellite_height=proj.perspective_point_height,
-            sweep_axis=proj.sweep_angle_axis,
-            globe=source_globe,
-        )
-
-        # Create the source projection (Platé-Carrée projection on GOES
-        # ellipsoid)
-
-        self.crs = PlateCarree(central_longitude=0.0, globe=source_globe)
+        super().__init__(dataframe)
 
     @classmethod
     def _extract(
@@ -256,10 +262,6 @@ class GOESLatLonGrid(HasStrHelp):
                 f"The dataset '{dinfo.dataset_name}' does not contain "
                 "any geodetic grid information"
             )
-
-    @property
-    def globe(self) -> Globe:
-        return self.crs.globe
 
     @property
     def region(self) -> RectangularRegion:

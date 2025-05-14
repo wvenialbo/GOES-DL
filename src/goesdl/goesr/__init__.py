@@ -23,7 +23,7 @@ Classes:
 
 from .dataset_info import GOESDatasetInfo
 from .dataset_time import GOESCoverageTime
-from .geodetic import GOESLatLonGrid
+from .geodetic import GOESGeodeticInfo, GOESLatLonGrid
 from .image import GOESImage
 from .locator_abi import GOESProductLocatorABI
 from .locator_dc import (
@@ -53,6 +53,7 @@ __all__ = [
     "GOESDatasetInfo",
     "GOESDerivedProductLocator",
     "GOESDerivedWithCannelProductLocator",
+    "GOESGeodeticInfo",
     "GOESGlobe",
     "GOESImage",
     "GOESImagerProjection",
