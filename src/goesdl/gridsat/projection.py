@@ -10,7 +10,7 @@ from .databook_gc import (
 
 class GSOrbitGeometry(DatasetView):
     """
-    Represent GOES series satellite orbit geometry information.
+    Represent GridSat-GOES dataset orbit geometry information.
     """
 
     # Information about the projection
@@ -42,6 +42,9 @@ class GSOrbitGeometry(DatasetView):
 
 
 class GSGlobe(HasStrHelp):
+    """
+    Represent GridSat-GOES dataset globe definition.
+    """
 
     # Information about the globe
 
@@ -58,4 +61,10 @@ class GSGlobe(HasStrHelp):
     inverse_flattening: float = GRS80_INVERSE_FLATTENING
     """
     Inverse flattening (a / (a - b)) of the ellipsoid.
+    """
+
+
+class GSImagerProjection(GSOrbitGeometry, GSGlobe):
+    """
+    Represent GridSat-GOES dataset Imager Projection information.
     """
