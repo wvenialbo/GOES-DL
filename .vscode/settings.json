@@ -185,6 +185,7 @@
     "python.analysis.inlayHints.variableTypes": true,
     "python.analysis.persistAllIndices": true,
     "python.analysis.supportDocstringTemplate": true,
+    "python.analysis.typeCheckingMode": "strict",
     "python.analysis.typeEvaluation.strictDictionaryInference": true,
     "python.analysis.typeEvaluation.strictListInference": true,
     "python.analysis.typeEvaluation.enableReachabilityAnalysis": true,
