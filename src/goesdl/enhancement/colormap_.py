@@ -1,4 +1,5 @@
-from typing import cast
+from collections.abc import Sequence
+from typing import Any, cast
 
 from matplotlib import colormaps
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
@@ -678,3 +679,83 @@ class NamedColormap(_NamedColormapBased):
         colormap = self._get_colormap(name)
 
         super().__init__(colormap.resampled(ncolors))
+
+
+class CombinedColormap(UniformColormap):
+
+    def __init__(
+        self,
+        name: str,
+        colormaps: Sequence[Colormap],
+        bounds: IndexList,
+        ncolors: int = 256,
+    ) -> None:
+        self._validate_monotonic_indices(bounds, 256)
+        self._validate_ncolors(ncolors, False)
+
+        self._validate_bounds(colormaps, bounds)
+
+        color_list = self._create_color_list(colormaps, bounds)
+
+        super().__init__(name, color_list, ncolors)
+
+    @classmethod
+    def combined_from_stock(
+        cls,
+        name: str,
+        colormap_names: Sequence[str],
+        bounds: IndexList,
+        ncolors: int = 256,
+    ) -> "CombinedColormap":
+        cls._validate_colormap_names(colormap_names)
+
+        if isinstance(colormap_names, str):
+            colormap_names = [colormap_names]
+
+        colormaps: list[Colormap] = []
+
+        for colormap_name in colormap_names:
+            colormap = cls._get_colormap(colormap_name)
+            colormaps.append(colormap)
+
+        return cls(name, colormaps, bounds, ncolors)
+
+    @classmethod
+    def _create_color_list(
+        cls, colormaps: Sequence[Colormap], bounds: IndexList
+    ) -> ColorList:
+        color_list: RealColorList = []
+
+        for i, colormap in enumerate(colormaps):
+            x_0 = bounds[i]
+            x_1 = bounds[i + 1]
+            control_points = [j / 255 for j in range(x_0, x_1)]
+            colors = cast(RealColorList, colormap(control_points)[:, :3])
+            color_list.extend(colors)
+
+        return cls._rescale_color_list(color_list)
+
+    def _validate_bounds(
+        self, colormaps: Sequence[Colormap], bounds: IndexList
+    ) -> None:
+        nbounds = len(bounds)
+        bounds_size = len(colormaps) + 1
+        if nbounds != bounds_size:
+            raise ValueError(
+                f"Expected {bounds_size} bound points, got {nbounds}"
+            )
+
+    @staticmethod
+    def _validate_colormap_names(colormap_names: Sequence[Any]) -> None:
+        if not isinstance(colormap_names, (list, tuple)):
+            raise ValueError(
+                "'colormap_names' is expected to be a `list` or `tuple`, "
+                f"got {type(colormap_names)}"
+            )
+
+        for n, name in enumerate(colormap_names):
+            if not isinstance(name, str):
+                raise ValueError(
+                    f"Item {n} of 'colormap_names' is expected to be a `str`, "
+                    f"got `{type(name)}`"
+                )
