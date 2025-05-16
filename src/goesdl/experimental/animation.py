@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from matplotlib import colormaps
 from PIL import Image as PImage
+from PIL.PngImagePlugin import PngInfo
 
 
 def create_animation_file(path, filelist):
