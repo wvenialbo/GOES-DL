@@ -367,6 +367,9 @@
         },
         {
             "scope": "plotting"
+        },
+        {
+            "scope": "fileio"
         }
     ],
     // AI assistance tools settings
