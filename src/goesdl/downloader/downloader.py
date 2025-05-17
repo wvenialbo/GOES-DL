@@ -14,7 +14,7 @@ from pathlib import Path
 
 from ..dataset import ProductLocator
 from ..datasource import Datasource
-from ..utils import FileRepository
+from ..fileio import FileRepository
 from .constants import ISO_TIMESTAMP_FORMAT, TIME_TOLERANCE_DEFAULT
 from .downloader_base import DownloaderBase
 

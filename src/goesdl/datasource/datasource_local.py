@@ -9,7 +9,7 @@ import contextlib
 import os
 from pathlib import Path
 
-from ..utils import FileRepository
+from ..fileio import FileRepository
 from .datasource_base import DatasourceBase
 from .datasource_cache import DatasourceCache
 
