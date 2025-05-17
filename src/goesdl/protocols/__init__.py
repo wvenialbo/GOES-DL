@@ -11,8 +11,10 @@ and can be processed correctly.
 from .dataset_info import DatasetInfo
 from .geodetic import GeodeticGrid, GeodeticRegion
 from .image import SatImageData
+from .time import CoverageTime
 
 __all__ = [
+    "CoverageTime",
     "DatasetInfo",
     "GeodeticGrid",
     "GeodeticRegion",
