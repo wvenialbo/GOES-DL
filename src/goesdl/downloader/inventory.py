@@ -7,9 +7,9 @@ from netCDF4 import Dataset
 
 from ..dataset import ProductLocator
 from ..datasource import DatasourceLocal
-from ..downloader.constants import ISO_TIMESTAMP_FORMAT
-from ..downloader.downloader import Downloader
-from ..protocols.time import CoverageTime
+from ..protocols import CoverageTime
+from .constants import ISO_TIMESTAMP_FORMAT
+from .downloader import Downloader
 
 
 class DatasetInventory:

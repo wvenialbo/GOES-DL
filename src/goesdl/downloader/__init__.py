@@ -11,5 +11,6 @@ Downloader
 """
 
 from .downloader import Downloader
+from .inventory import DatasetInventory
 
-__all__ = ["Downloader"]
+__all__ = ["DatasetInventory", "Downloader"]
