@@ -122,7 +122,7 @@ class DatasetInventory:
     ) -> list[str]:
         available_files = self.locate_files(start=start, end=end)
 
-        sequence: list[str] = []
+        sequence: list[str] = [""] * len(timestamps)
 
         i = 0
         for path in available_files:
@@ -136,12 +136,11 @@ class DatasetInventory:
             abs_diff = abs(timestamp - timestamps[i])
 
             while abs_diff > self.tolerance:
-                sequence.append("")
                 i += 1
                 abs_diff = abs(timestamp - timestamps[i])
 
             if abs_diff <= self.tolerance:
-                sequence.append(str(path))
+                sequence[i] = str(path)
                 i += 1
 
         return sequence
