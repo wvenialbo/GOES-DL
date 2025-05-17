@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from glob import glob
 from os.path import isfile, join, relpath
 from pathlib import Path
@@ -15,6 +15,7 @@ from .downloader import Downloader
 class DatasetInventory:
 
     locator: ProductLocator
+    coverage: type[CoverageTime] | None
     interval: int
     tolerance: int
     dateformat: str
@@ -25,19 +26,41 @@ class DatasetInventory:
         repository: str | Path,
         *,
         locator: ProductLocator,
-        interval: int = 600,
-        tolerance: int = 90,
+        coverage: type[CoverageTime] | None = None,
+        interval: tuple[int, int] = (600, 90),
         dateformat: str = ISO_TIMESTAMP_FORMAT,
     ) -> None:
         self.locator = locator
-        self.interval = interval
-        self.tolerance = tolerance
+        self.coverage = coverage
+        self.interval = interval[0]
+        self.tolerance = interval[1]
         self.dateformat = dateformat
         self.repository = Path(repository)
 
+    def get_missing_entries(
+        self,
+        *,
+        start: str,
+        end: str = "",
+        relative: bool = False,
+        use_end: bool = False,
+    ) -> list[datetime]:
+        sequence = self.get_sequence(
+            start=start, end=end, relative=relative, use_end=use_end
+        )
+        return self.filter_missing_entries(*sequence)
+
+    def filter_missing_entries(
+        self, paths: list[str], timestamps: list[float]
+    ) -> list[datetime]:
+        return [
+            datetime.fromtimestamp(timestamp, UTC)
+            for path, timestamp in zip(paths, timestamps)
+            if not path
+        ]
+
     def get_sequence(
         self,
-        coverage_class: type[CoverageTime],
         *,
         start: str,
         end: str = "",
@@ -46,9 +69,7 @@ class DatasetInventory:
     ) -> tuple[list[str], list[float]]:
         timestamps = self._get_timestamps(start, end)
 
-        sequence = self._build_sequence(
-            coverage_class, start, end, timestamps, use_end
-        )
+        sequence = self._build_sequence(start, end, timestamps, use_end)
 
         # Get the relative paths
         if relative:
@@ -114,12 +135,16 @@ class DatasetInventory:
 
     def _build_sequence(
         self,
-        coverage_class: type[CoverageTime],
         start: str,
         end: str,
         timestamps: list[float],
         use_end: bool,
     ) -> list[str]:
+        if self.coverage is None:
+            raise ValueError("CoverageTime inspector class is not set")
+
+        coverage_class = self.coverage
+
         available_files = self.locate_files(start=start, end=end)
 
         sequence: list[str] = [""] * len(timestamps)
