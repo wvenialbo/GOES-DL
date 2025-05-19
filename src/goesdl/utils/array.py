@@ -7,6 +7,7 @@ from numpy import (
     int16,
     int32,
     ndarray,
+    uint8,
     uint16,
     uint32,
 )
@@ -16,6 +17,7 @@ ArrayBool = ndarray[tuple[int, ...], dtype[bool_]]
 ArrayInt8 = ndarray[tuple[int, ...], dtype[int8]]
 ArrayInt16 = ndarray[tuple[int, ...], dtype[int16]]
 ArrayInt32 = ndarray[tuple[int, ...], dtype[int32]]
+ArrayUint8 = ndarray[tuple[int, ...], dtype[uint8]]
 ArrayUint16 = ndarray[tuple[int, ...], dtype[uint16]]
 ArrayUint32 = ndarray[tuple[int, ...], dtype[uint32]]
 ArrayFloat32 = ndarray[tuple[int, ...], dtype[float32]]
