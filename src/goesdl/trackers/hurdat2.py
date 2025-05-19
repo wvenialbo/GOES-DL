@@ -32,7 +32,7 @@ from .validation import validate_dataset_file
 
 class TrackParserHurdat2:
 
-    ID = "HURDAT2"
+    ID: str = "HURDAT2"
 
     path: Path
 

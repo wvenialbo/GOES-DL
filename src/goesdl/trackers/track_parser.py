@@ -5,6 +5,7 @@ from .track_info import TrackInfo
 
 
 class TrackParser(Protocol):
+
     ID: str
 
     def __init__(self, path: Path) -> None: ...
