@@ -370,6 +370,9 @@
         },
         {
             "scope": "fileio"
+        },
+        {
+            "scope": "trackers"
         }
     ],
     // AI assistance tools settings
