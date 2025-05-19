@@ -2,6 +2,7 @@ class Rect:
 
     dpi: int
     figsize: tuple[float, float]
+    rectangle: tuple[float, float, float, float]
 
     def __init__(self, width: int, height: int, dpi: int) -> None:
         self.figsize = self._calculate_figsize((width, height), dpi)
@@ -14,7 +15,7 @@ class Rect:
 
     def corners(self, left: int, bottom: int, right: int, top: int) -> None:
         margins = self._calculate_corners((left, bottom, right, top))
-        self.rect = self._get_rectangle(margins)
+        self.rectangle = self._get_rectangle(margins)
 
     def margins(
         self, left: int, bottom: int, right: int, top: int
