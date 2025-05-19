@@ -2,10 +2,11 @@ from pathlib import Path
 from typing import cast
 
 from matplotlib.colors import Colormap
+from numpy import uint8
 from PIL.Image import Dither, Exif, Image, new, open
 from PIL.PngImagePlugin import PngInfo
 
-from ..utils.array import ArrayFloat64, uint8
+from ..utils.array import ArrayFloat64
 
 GIF_SUFFIX = ".gif"
 PNG_SUFFIX = ".png"
@@ -27,6 +28,7 @@ class Animation:
         self.interval = self._validate_fps(fps)
         self.loop = loop
         self.filelist = []
+        self.colormap = None
 
     def append(self, path: str | Path) -> None:
         self.filelist.append(Path(path))
@@ -99,7 +101,7 @@ class Animation:
         else:
             raise ValueError(f"Unexpected format '{path.suffix}'")
 
-    def _create_gif_animation(self, path: Path, images: list[Image]):
+    def _create_gif_animation(self, path: Path, images: list[Image]) -> None:
         if not images:
             raise ValueError("Empty image list, cannot create GIF animation")
 
@@ -127,7 +129,7 @@ class Animation:
                 f"Unable to create GIF animation: {error}"
             ) from error
 
-    def _create_png_animation(self, path: Path, images: list[Image]):
+    def _create_png_animation(self, path: Path, images: list[Image]) -> None:
         if not images:
             raise ValueError("Empty image list, cannot create PNG animation")
 
@@ -157,7 +159,7 @@ class Animation:
                 f"Unable to create PNG animation: {error}"
             ) from error
 
-    def _create_webp_animation(self, path: Path, images: list[Image]):
+    def _create_webp_animation(self, path: Path, images: list[Image]) -> None:
         if not images:
             raise ValueError("Empty image list, cannot create WEBP animation")
 
