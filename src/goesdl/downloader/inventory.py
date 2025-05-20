@@ -17,7 +17,6 @@ class DatasetInventory:
     locator: ProductLocator
     coverage: type[CoverageTime] | None
     interval: int
-    tolerance: int
     dateformat: str
     repository: Path
 
@@ -27,15 +26,23 @@ class DatasetInventory:
         *,
         locator: ProductLocator,
         coverage: type[CoverageTime] | None = None,
-        interval: tuple[int, int] = (600, 90),
+        interval: int = 600,
         dateformat: str = ISO_TIMESTAMP_FORMAT,
     ) -> None:
         self.locator = locator
         self.coverage = coverage
-        self.interval = interval[0]
-        self.tolerance = interval[1]
+        self.interval = interval
         self.dateformat = dateformat
         self.repository = Path(repository)
+
+    def filter_missing_entries(
+        self, paths: list[str], timestamps: list[float]
+    ) -> tuple[list[datetime], int]:
+        return [
+            datetime.fromtimestamp(timestamp, UTC)
+            for path, timestamp in zip(paths, timestamps)
+            if not path
+        ], len(paths)
 
     def get_missing_entries(
         self,
@@ -44,20 +51,11 @@ class DatasetInventory:
         end: str = "",
         relative: bool = False,
         use_end: bool = False,
-    ) -> list[datetime]:
+    ) -> tuple[list[datetime], int]:
         sequence = self.get_sequence(
             start=start, end=end, relative=relative, use_end=use_end
         )
         return self.filter_missing_entries(*sequence)
-
-    def filter_missing_entries(
-        self, paths: list[str], timestamps: list[float]
-    ) -> list[datetime]:
-        return [
-            datetime.fromtimestamp(timestamp, UTC)
-            for path, timestamp in zip(paths, timestamps)
-            if not path
-        ]
 
     def get_sequence(
         self,
@@ -147,10 +145,14 @@ class DatasetInventory:
 
         available_files = self.locate_files(start=start, end=end)
 
-        sequence: list[str] = [""] * len(timestamps)
+        total_expected = len(timestamps)
 
-        i = 0
+        sequence: list[str] = [""] * total_expected
+
+        i = 0  # Index for expected timestamps
+
         for path in available_files:
+            # Get the file timestamp
             with Dataset(path, "r") as dataframe:
                 coverage = coverage_class(dataframe)
 
@@ -158,15 +160,35 @@ class DatasetInventory:
                 coverage.timestamp_end if use_end else coverage.timestamp_start
             )
 
-            abs_diff = abs(timestamp - timestamps[i])
-
-            while abs_diff > self.tolerance:
+            # Advance the index until the correct interval is found
+            while i < total_expected and timestamps[i] <= timestamp:
                 i += 1
-                abs_diff = abs(timestamp - timestamps[i])
 
-            if abs_diff <= self.tolerance:
-                sequence[i] = str(path)
-                i += 1
+            # This is completely unexpected and should not happen
+            if i == 0:
+                raise ValueError(
+                    f"File '{path}' is before the start time {start}"
+                )
+
+            j = -1  # Index for the insertion of the file path
+
+            # Assign the file path to the correct interval lower bound
+            if i < total_expected or timestamps[j] + self.interval > timestamp:
+                j = i - 1
+
+            # This is completely unexpected and should not happen
+            if j < 0:
+                raise ValueError(f"File '{path}' is after the end time {end}")
+
+            # Throw and error if a file path is already set
+            if sequence[j]:
+                raise ValueError(
+                    f"File '{path}' is in the same interval as '{sequence[j]}', "
+                    "set a smaller interval"
+                )
+
+            # Assign the file path to the correct interval lower bound
+            sequence[j] = str(path)
 
         return sequence
 
@@ -180,10 +202,19 @@ class DatasetInventory:
 
         start_ts = start_dt.timestamp()
         end_ts = end_dt.timestamp()
-        count = int((end_ts - start_ts) // self.interval)
+
+        ninterval = (end_ts - start_ts) / self.interval
+
+        if not ninterval.is_integer():
+            raise ValueError(
+                f"Start and end times are not aligned with the interval "
+                f"of {self.interval} seconds"
+            )
+
+        count = int(ninterval + 1)
 
         timestamps: list[float] = [
-            start_ts + i * self.interval for i in range(count + 1)
+            start_ts + i * self.interval for i in range(count)
         ]
 
         return timestamps
