@@ -345,10 +345,10 @@ class NaNInterpolator:
     using sparse spline interpolation.
     """
 
-    sampling_rate: int
     control_points: int
-    sample_step: int
     half_interval: int
+    sampling_rate: int
+    sample_step: int
     signal_data: ArrayFloat64
     total_samples: int
 
@@ -371,14 +371,14 @@ class NaNInterpolator:
         self.signal_data: ArrayFloat64 = empty(0, dtype=float64)
         self.total_samples: int = 0
 
-    def fill(self, signal_data: ArrayFloat64) -> ArrayFloat64:
+    def fill(self, signal: ArrayFloat64) -> ArrayFloat64:
         """
         Fills NaN values in a signal using sparse cubic spline
         interpolation.
 
         Parameters
         ----------
-        signal_data :ArrayFloat64
+        signal :ArrayFloat64
             The input signal data which may contain NaN values.
 
         Returns:
@@ -386,6 +386,8 @@ class NaNInterpolator:
         """
         # Set signal_data and total_samples as instance variables for
         # use by helper methods
+        signal_data = asarray(signal, copy=False, dtype=float64)
+
         self.signal_data = signal_data
         self.total_samples = len(signal_data)
 
