@@ -214,7 +214,7 @@ class FourierAnalysis:
 
         self.frequency_order = argsort(power_subset)[::-1] + 1
 
-    def recontruct_signal(self, nfirst: int) -> ArrayFloat64:
+    def reconstruct_signal(self, nfirst: int) -> ArrayFloat64:
         if nfirst <= 0 or nfirst > len(self.frequency_order):
             raise ValueError(
                 "`nfirst` must be between "
