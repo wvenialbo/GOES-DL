@@ -29,18 +29,14 @@ from ..utils.array import ArrayComplex128, ArrayFloat64, ArrayInt64
 # > from scipy.fft import fft, ifft, rfft, rfftfreq
 # > from scipy.signal.windows import bartlett, blackman, hamming, hanning
 
-SUPPORTED_FILL_METHODS = {
-    "interpolate",
-    "mean",
-    "median",
-    "none",
-}
+SUPPORTED_FILL_METHODS = {"mean", "median"}
 
 SUPPORTED_WINDOW_FUNCTIONS = {
     "bartlett",
     "blackman",
+    "boxcar",
     "hamming",
-    "hanning",
+    "hann",
     "none",
 }
 
@@ -80,17 +76,17 @@ class FourierAnalysis:
 
     amplitudes: ArrayFloat64
     fft: ArrayComplex128
+    fft_size: int
     frequencies: ArrayFloat64
     frequency_order: ArrayInt64
+    has_nyquist: bool
     power_spectrum: ArrayFloat64
     sampling_rate: float
     signal: ArrayFloat64
     window_function: str
 
     def __init__(
-        self,
-        sampling_rate: float,
-        window_function: str = "hanning",
+        self, sampling_rate: float, window_function: str = "hann"
     ) -> None:
         """
         Initialize the FourierAnalysis object.
@@ -102,9 +98,9 @@ class FourierAnalysis:
             per hour.
         window_function : str, optional
             The window function to apply to the signal. Supported
-            methods are: 'hanning' (default), 'hamming', 'blackman',
-            'bartlett', and 'none'. If 'none' is selected, the function
-            will not apply any windowing to the signal.
+            methods are: 'hann' (default), 'hamming', 'blackman',
+            'bartlett', and 'none' or 'boxcar'. If 'none' is selected,
+            the function will not apply any windowing to the signal.
         """
         if sampling_rate <= 0:
             raise ValueError("Sampling rate must be positive number")
@@ -118,8 +114,10 @@ class FourierAnalysis:
 
         self.amplitudes = empty(0, dtype=float64)
         self.fft = empty(0, dtype=complex128)
+        self.fft_size = 0
         self.frequencies = empty(0, dtype=float64)
         self.frequency_order = empty(0, dtype=int64)
+        self.has_nyquist = False
         self.power_spectrum = empty(0, dtype=float64)
         self.sampling_rate = sampling_rate
         self.signal = empty(0, dtype=float64)
@@ -166,36 +164,52 @@ class FourierAnalysis:
         """
         self.signal = self._validate_signal(signal)
 
-        fft_size = self._validate_fft_size(signal.size, fft_size)
+        self.fft_size = self._validate_fft_size(signal.size, fft_size)
 
-        has_nyquist = signal.size % 2 == 0
+        self.has_nyquist = self.fft_size % 2 == 0
         sampling_period = 1 / self.sampling_rate
 
         # Apply a window to the signal to reduce spectral leakage
         window = self._get_window_function(signal.size)
         windowed_signal = self.signal * window
+
+        # Sum of window for normalization
         window_sum = sum(window)
 
         # Compute the normalised unilateral FFT of the signal
-        self.fft = cast(ArrayComplex128, rfft(windowed_signal, fft_size))
+        #
+        # Note: rfft will zero-pad if fft_size > len(windowed_signal)
+        self.fft = cast(ArrayComplex128, rfft(windowed_signal, self.fft_size))
+
+        # Normalize by window sum to account for the windowing effect
         fft_result = self.fft / window_sum
 
-        # Compute the normalised magnitudes of the unilateral FFT
+        # Compute the normalised magnitudes (amplitudes)
         self.amplitudes: ArrayFloat64 = abs(fft_result)
 
         # Compute the normalised unilateral power spectrum
         self.power_spectrum: ArrayFloat64 = self.amplitudes**2
 
-        if has_nyquist:
-            self.power_spectrum[1:-1] *= 2  # Exclude DC and Nyquist
+        # Adjust power spectrum for unilateral representation
+        #
+        # Note: DC component (index 0) and Nyquist component (if
+        # present) are not doubled.
+        if self.has_nyquist:
+            # Exclude DC (0) and Nyquist (last element) for even signal
+            # size
+            self.power_spectrum[1:-1] *= 2
+            # power_subset for sorting should also exclude DC and
+            # Nyquist
             power_subset = self.power_spectrum[1:-1]
         else:
-            self.power_spectrum[1:] *= 2  # Exclude DC only
+            # Exclude DC (0) only for odd signal size
+            self.power_spectrum[1:] *= 2
+            # power_subset for sorting should exclude DC
             power_subset = self.power_spectrum[1:]
 
-        # Compute the frequency (in cycles/hour) bins
+        # Compute the frequency (in sampling_period units) bins
         self.frequencies = cast(
-            ArrayFloat64, rfftfreq(signal.size, d=sampling_period)
+            ArrayFloat64, rfftfreq(self.fft_size, d=sampling_period)
         )
 
         self.frequency_order = argsort(power_subset)[::-1] + 1
@@ -218,10 +232,10 @@ class FourierAnalysis:
         return irfft(fft_filtered).astype(float64)
 
     def _get_window_function(self, sampling_size: int) -> ArrayFloat64:
-        if self.window_function == "none":
+        if self.window_function in {"none", "boxcar"}:
             window = ones(sampling_size)
 
-        elif self.window_function == "hanning":
+        elif self.window_function == "hann":
             window = hanning(sampling_size)
 
         elif self.window_function == "hamming":
@@ -249,23 +263,12 @@ class FourierAnalysis:
         )
 
     def _validate_signal(self, signal: ArrayFloat64) -> ArrayFloat64:
-        # Ensure the signal is a 1D array
-        signal = asarray(signal, copy=False, dtype=float64)
+        signal_data = _validate_1d_signal(signal)
 
-        # Validate the signal dimensions and size
-        if signal.ndim != 1:
-            raise ValueError("Input signal must be a 1D array.")
+        if isnan(signal_data).any():
+            raise ValueError("Input signal contains NaN values")
 
-        if signal.size == 0:
-            raise ValueError("Input signal is empty.")
-
-        if isnan(signal).any():
-            raise ValueError(
-                "Input signal contains NaN values, "
-                "use 'mean' or 'median' to fill missing data"
-            )
-
-        return signal
+        return signal_data
 
     @property
     def dominant_frequencies(self) -> ArrayFloat64:
@@ -295,6 +298,7 @@ class FourierAnalysis:
 class NaNFill:
 
     fill_method: str
+    signal_data: ArrayFloat64
 
     def __init__(self, fill_method: str = "mean") -> None:
         """
@@ -317,26 +321,30 @@ class NaNFill:
 
         self.fill_method = fill_method
 
+        self.signal_data: ArrayFloat64 = empty(0, dtype=float64)
+
     def fill(self, signal: ArrayFloat64) -> ArrayFloat64:
-        missing_mask = isnan(signal)
+        signal_data = self._validate_signal(signal)
+
+        self.signal_data = signal_data
+
+        signal_filled = signal_data.copy()
+
+        missing_mask = isnan(signal_data)
 
         if self.fill_method == "mean":
-            signal[missing_mask] = nanmean(signal)
+            signal_filled[missing_mask] = nanmean(signal_data)
 
         elif self.fill_method == "median":
-            signal[missing_mask] = nanmedian(signal)
-
-        elif self.fill_method == "none":
-            if missing_mask.any():
-                raise ValueError(
-                    "Input signal contains NaN values, "
-                    "use 'mean' or 'median' to fill missing data"
-                )
+            signal_filled[missing_mask] = nanmedian(signal_data)
 
         else:
             raise ValueError("Invalid fill method")
 
-        return signal
+        return signal_filled
+
+    def _validate_signal(self, signal: ArrayFloat64) -> ArrayFloat64:
+        return _validate_1d_signal(signal)
 
 
 class NaNInterpolator:
@@ -386,7 +394,7 @@ class NaNInterpolator:
         """
         # Set signal_data and total_samples as instance variables for
         # use by helper methods
-        signal_data = asarray(signal, copy=False, dtype=float64)
+        signal_data = self._validate_signal(signal)
 
         self.signal_data = signal_data
         self.total_samples = len(signal_data)
@@ -425,23 +433,6 @@ class NaNInterpolator:
 
         return signal_filled
 
-    def _find_known_points(
-        self, start_idx: int, step_direction: int, boundary: int
-    ) -> list[int]:
-        known_points: list[int] = []
-        current_idx = start_idx + step_direction
-
-        while (
-            len(known_points) < self.half_interval
-            and (step_direction >= 0 or current_idx >= boundary)
-            and (step_direction <= 0 or current_idx < boundary)
-        ) and 0 <= current_idx < self.total_samples:
-            if not isnan(self.signal_data[current_idx]):
-                known_points.append(current_idx)
-            current_idx += step_direction
-
-        return known_points
-
     def _apply_interpolation_or_fill(
         self,
         nan_idx: int,
@@ -471,6 +462,40 @@ class NaNInterpolator:
                 "Not enough known points to fill NaN values. "
                 "Consider using a smaller sampling interval."
             )
+
+    def _find_known_points(
+        self, start_idx: int, step_direction: int, boundary: int
+    ) -> list[int]:
+        known_points: list[int] = []
+        current_idx = start_idx + step_direction
+
+        while (
+            len(known_points) < self.half_interval
+            and (step_direction >= 0 or current_idx >= boundary)
+            and (step_direction <= 0 or current_idx < boundary)
+        ) and 0 <= current_idx < self.total_samples:
+            if not isnan(self.signal_data[current_idx]):
+                known_points.append(current_idx)
+            current_idx += step_direction
+
+        return known_points
+
+    def _validate_signal(self, signal: ArrayFloat64) -> ArrayFloat64:
+        return _validate_1d_signal(signal)
+
+
+def _validate_1d_signal(signal: ArrayFloat64) -> ArrayFloat64:
+    # Ensure the signal is a 1D array
+    signal_data = asarray(signal, copy=False, dtype=float64)
+
+    # Validate the signal dimensions and size
+    if signal_data.ndim != 1:
+        raise ValueError("Input signal must be a 1D array.")
+
+    if signal_data.size == 0:
+        raise ValueError("Input signal is empty.")
+
+    return signal_data
 
 
 def parabolic_interpolation(power_spectrum: ArrayFloat64, peak_index: int):
