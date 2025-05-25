@@ -1,23 +1,29 @@
 import math
+from typing import cast
 
 import gudhi as gd
 import matplotlib.pyplot as plt
-import numpy as np
+from numpy import count_nonzero
 from scipy import ndimage
 
+from ..utils.array import ArrayInt32
 
-def remove_small_blobs(binary_image, size):
-    labeled, nobject = ndimage.label(1 - binary_image)
-    for label in range(0, nobject):
-        masked = labeled == label
-        area = np.count_nonzero(masked)
+
+def remove_small_blobs(binary_image: ArrayInt32, size: int) -> ArrayInt32:
+    labeled_array, num_features = cast(
+        tuple[ArrayInt32, int], ndimage.label(1 - binary_image)
+    )
+
+    for label in range(1, num_features + 1):
+        masked = labeled_array == label
+        area = count_nonzero(masked)
         if area <= size:
             binary_image[masked] = 1
 
     return binary_image
 
 
-def create_complex(field_map, verbose=False):
+def create_complex(field_map: ArrayInt32, verbose: bool = False):
     # Crear el complejo cúbico
     cubical_complex = gd.CubicalComplex(top_dimensional_cells=field_map)
 
