@@ -484,9 +484,10 @@ class NaNInterpolator:
         return _validate_1d_signal(signal)
 
 
-def _validate_1d_signal(signal: ArrayFloat64) -> ArrayFloat64:
+def _validate_1d_signal(signal: ArrayFloat64 | list[float]) -> ArrayFloat64:
     # Ensure the signal is a 1D array
-    signal_data = asarray(signal, copy=False, dtype=float64)
+    allow_copy = isinstance(signal, list)
+    signal_data = asarray(signal, copy=allow_copy, dtype=float64)
 
     # Validate the signal dimensions and size
     if signal_data.ndim != 1:
