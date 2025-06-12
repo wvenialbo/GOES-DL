@@ -157,6 +157,9 @@
     "python.analysis.autoFormatStrings": true,
     "python.analysis.autoImportCompletions": true,
     "python.analysis.completeFunctionParens": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnknownMemberType": "none"
+    },
     "python.analysis.enableSyncServer": false,
     "python.analysis.exclude": [
         "**/.venv",
@@ -249,7 +252,7 @@
             "source.organizeImports": "always",
         },
         "editor.colorDecorators": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "vscode.json-language-features",
     },
     "[jsonc]": {
         "editor.codeActionsOnSave": {

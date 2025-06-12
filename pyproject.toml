@@ -762,6 +762,9 @@
     # This one can be tricky to get passing if you use a lot of untyped libraries
     warn_return_any = true
 
+    # Custom type stubs
+    mypy_path = "$MYPY_CONFIG_FILE_DIR/typings"
+
   [tool.pydoclint]
     style                = 'numpy'
     allow-init-docstring = true
