@@ -1,136 +1,130 @@
-import matplotlib.pyplot as plt
+from typing import Any, Literal, cast
+
+from matplotlib import pyplot as plt
+from numpy import floating
+from numpy.typing import NDArray
+
+_Array = NDArray[floating[Any]]
+_Series = list[_Array]
+_Settings = dict[str, Any]
+_Loc = Literal["left", "center", "right"] | None
+_Title = tuple[str, _Loc]
 
 
-def plot_difference(
-    matrices,
-    filename=None,
-    captions=None,
-    cmap="viridis",
-    figsize=(8, 8),
-    figdpi=200,
-    imgdpi=200,
-    title=None,
-    subtitle=None,
-    show=True,
-):
-    """
-    Plots four matrices (interpreted as images) in two rows.
-    
-    Args:
-        titles: An optional list of three strings, specifying the titles for each plot.
-            Defaults to None (no titles).
-        cmap: The colormap to use for displaying the matrices. Defaults to 'viridis'.
-            See matplotlib documentation for available colormaps.
-    """
-    if isinstance(cmap, tuple):
-        cmap = list(cmap)
+class _PlotConfig:
+    config: _Settings
+    params: _Settings
+    ncount: int
 
-    if isinstance(cmap, str):
-        cmap = [cmap] * 4
-    elif len(cmap) == 1:
-        cmap = cmap * 4
-    elif len(cmap) == 2:
-        cmap = [cmap[0]] * 3 + [cmap[1]] * 2
-    elif len(cmap) == 3:
-        cmap = [cmap[0]] * 2 + cmap[1:]
+    def __init__(
+        self, config: _Settings, params: _Settings, ncount: int
+    ) -> None:
+        self.config = config
+        self.params = params
+        self.ncount = ncount
 
-    fig, axes = plt.subplots(2, 2, figsize=figsize, dpi=figdpi)
+    def __getitem__(self, name: str) -> list[Any]:
+        if name in self.params:
+            value = self.params[name]
+        elif name in self.config:
+            value = self.config[name]
+        else:
+            value = None
+        if isinstance(value, list):
+            return cast(list[Any], value)  # type: ignore
+        return [value for _ in range(self.ncount)]
 
-    if captions is None:
-        captions = []
-    elif isinstance(captions, str):
-        captions = [captions]
+    def get(self, name: str, all: bool = False) -> Any:
+        if all:
+            return self.get_all(name)
+        if name in self.params:
+            return self.params[name]
+        return self.config[name] if name in self.config else None
 
-    title_size = 7
-    subtitle_size = 4.5
-    caption_size = 4.5
-    label_size = 4
-    tick_size = 3.5
-    axis_size = 4
-    y_title = 0.93
+    def get_all(self, name: str) -> Any:
+        from_config: list[Any] = (
+            self.config[name] if name in self.config else []
+        )
+        from_params: list[Any] = (
+            self.params[name] if name in self.params else []
+        )
+        return from_config + from_params
 
-    if subtitle:
-        y_title = 0.95
-        fig.text(0.5, 0.903, subtitle, ha='center', va='bottom', fontsize=subtitle_size)
 
-    if title:
-        fig.suptitle(title, fontsize=title_size, y=y_title)
+def plot_timeseries_item(series: _Series, config: _PlotConfig) -> None:
+    xarray: list[_Array] = config["xarray"]
+    label: list[str] = config["label"]
+    markersize: list[float] = config["markersize"]
+    alpha: list[float] = config["alpha"]
+    linewidth: list[float] = config["linewidth"]
+    linestyle: list[str] = config["linestyle"]
+    color: list[str] = config["color"]
+    xlim: tuple[float, float] = config.get("xlim")
 
-    if len(captions) == 1:
-        fig.text(0.5, 0.92, captions[0], ha='center', va='bottom', fontsize=caption_size)
-    elif len(captions) == 2:
-        fig.text(0.5, 0.92, captions[0], ha='center', va='bottom', fontsize=caption_size)
-        fig.text(0.5, 0.50, captions[1], ha='center', va='bottom', fontsize=caption_size)
-    elif len(captions) == 3:
-        fig.text(0.5, 0.92, captions[0], ha='center', va='bottom', fontsize=caption_size)
-        axes[1, 0].set_title(captions[1], fontsize=caption_size)
-        axes[1, 1].set_title(captions[2], fontsize=caption_size)
-    elif len(captions) == 4:
-        axes[0, 0].set_title(captions[0], fontsize=caption_size)
-        axes[0, 1].set_title(captions[1], fontsize=caption_size)
-        axes[1, 0].set_title(captions[2], fontsize=caption_size)
-        axes[1, 1].set_title(captions[3], fontsize=caption_size)
+    for i, yarray in enumerate(series):
+        plt.plot(
+            xarray[i],
+            yarray,
+            linestyle[i],
+            color=color[i],
+            alpha=alpha[i],
+            label=label[i],
+            markersize=markersize[i],
+            linewidth=linewidth[i],
+        )
 
-    plt.subplots_adjust(right=0.85, hspace=0.3, wspace=1.0)
+    plt.xlim(*xlim)
 
-    vmin = (200, 200, -90, 0)
-    vmax = (300, 300, +90, 1)
+    # Set titles
+    titles = config.get("title", True)
 
-    # Plot the matrices
-    for i in range(2):
-        for j in range(2):
-            k = i * 2 + j
-            ax = axes[i, j]
-            im = ax.imshow(matrices[k], cmap=cmap[k], vmin=vmin[k], vmax=vmax[k])
+    for title, loc in titles:
+        plt.title(title, loc=loc)
 
-            ax.tick_params(
-                left=True,
-                right=False,
-                bottom=True,
-                top=False,
-                labelleft=True,
-                labelright=False,
-                labelbottom=True,
-                labeltop=False,
-                length=1.1,
-                width=0.3,
-                labelsize=tick_size,
-                pad=1.1,
-                labelcolor="black",
-            )
-            ax.set_xlabel("Pixel indices", color="black", fontsize=axis_size, labelpad=1.0)
-            ax.set_ylabel("Pixel indices", color="black", fontsize=axis_size, labelpad=0.5)
+    # Set axis labels
+    if xlabel := config.get("xlabel"):
+        plt.xlabel(xlabel)
 
-            [x.set_linewidth(0.3) for x in ax.spines.values()]
+    if ylabel := config.get("ylabel"):
+        plt.ylabel(ylabel)
 
-            cb_width = 0.05
-            cb_left = 1.07
-            cb_bottom = 0
-            cb_height = 1.0
+    # Show legend
+    if legend := config.get("legend"):
+        lgnd_alpha = legend[0]
+        lgnd = plt.legend()
+        lgnd.get_frame().set_alpha(lgnd_alpha)
 
-            # Crear un nuevo eje para la barra de color
-            cax = ax.inset_axes([cb_left, cb_bottom, cb_width, cb_height])
+    # Show grid
+    if grid := config.get("grid"):
+        visible, which, axis = grid
+        plt.grid(visible, which, axis)
 
-            # Añadir la barra de color al nuevo eje
-            cb = fig.colorbar(im, cax=cax)
-            cax.tick_params(
-                length=1.1,
-                width=0.3,
-                labelsize=label_size,
-            )
-            # cb.set_label(label="K", size=label_size, color="black", weight="normal")
-            
-            [x.set_linewidth(0.3) for x in cax.spines.values()]
 
-    # Adjust layout to prevent overlapping titles
+def plot_timeseries(
+    groups: list[_Series],
+    settings: _Settings,
+    parameters: list[_Settings],
+    plot_id: str,
+) -> None:
+    nplots = len(groups)
+
+    plotting_config: _Settings = settings["plotting"]
+    config: _Settings = plotting_config[plot_id]
+
+    width: int = config["width"]
+    height: list[int] = config["height"]
+
+    figsize = width, height[nplots - 1]
+
+    plt.figure(figsize=figsize)
+
+    if suptitle := config["suptitle"]:
+        plt.suptitle(suptitle)
+
+    for i, series in enumerate(groups):
+        group_config = _PlotConfig(config, parameters[i], len(series))
+        plt.subplot(nplots, 1, i + 1)
+        plot_timeseries_item(series, group_config)
+
     plt.tight_layout()
-    
-    # Show the media file
-    if filename:
-        plt.savefig(filename, dpi=imgdpi, bbox_inches='tight')
-    
-    # Show the plot
-    if show:
-        plt.show()
-    else:
-        plt.close(fig)
+    plt.show()

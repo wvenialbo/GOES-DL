@@ -765,6 +765,17 @@
     # Custom type stubs
     mypy_path = "$MYPY_CONFIG_FILE_DIR/typings"
 
+    # Arguments migrated from settings.json:
+    follow_imports         = "silent"
+    ignore_missing_imports = false
+    follow_untyped_imports = false
+
+    disable_error_code = ["import-untyped"]
+
+    [[tool.mypy.overrides]]
+      module                 = ["statsmodels.*"]
+      follow_untyped_imports = false
+
   [tool.pydoclint]
     style                = 'numpy'
     allow-init-docstring = true

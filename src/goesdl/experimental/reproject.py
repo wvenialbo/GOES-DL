@@ -1,32 +1,33 @@
 import math
+from typing import cast
 
-import cartopy.crs as ccrs
 import numpy as np
+from cartopy.crs import PlateCarree, Projection
+from numpy import float32
+from numpy.ma import MaskedArray
 from scipy.spatial import cKDTree
 
+from ..utils.array import ArrayBool, ArrayFloat32, MaskedFloat32
 from .geodesy import get_extent_metre
 
 
 def calculate_image_size(
-    extent_deg,
-    resolution_m,
-    target_crs,
-    dpi,
-):
+    extent_deg: tuple[float, float],
+    resolution_m: float,
+    target_crs: Projection,
+) -> tuple[int, int]:
     n_rows, n_cols, _, _ = calculate_matrix_size(
         extent_deg, resolution_m, target_crs
     )
 
-    width_in, height_in = n_cols / dpi, n_rows / dpi
-
-    return width_in, height_in
+    return n_cols, n_rows
 
 
 def calculate_matrix_size(
-    extent_deg,
-    resolution_m,
-    target_crs,
-):
+    extent_deg: tuple[float, float],
+    resolution_m: float,
+    target_crs: Projection,
+) -> tuple[int, int, float, float]:
     # Compute the extent size in metres
     width_m, height_m = get_extent_metre(extent_deg, target_crs)
 
@@ -38,13 +39,13 @@ def calculate_matrix_size(
 
 
 def create_matrix(
-    data,
-    lat,
-    lon,
-    extent_deg,
-    resolution_m,
-    target_crs,
-):
+    data: MaskedFloat32 | ArrayFloat32,
+    lat: ArrayFloat32,
+    lon: ArrayFloat32,
+    extent_deg: tuple[float, float],
+    resolution_m: float,
+    target_crs: Projection,
+) -> ArrayFloat32:
     n_rows, n_cols, height_m, width_m = calculate_matrix_size(
         extent_deg, resolution_m, target_crs
     )
@@ -58,18 +59,29 @@ def create_matrix(
     x_target_grid, y_target_grid = np.meshgrid(x_target, y_target)
 
     # Define the source projection
-    source_crs = ccrs.PlateCarree(globe=target_crs.globe)
+    source_crs = PlateCarree(globe=target_crs.globe)
 
     # Transform the target grid coordinates to lat/lon
-    points = source_crs.transform_points(
-        target_crs, x_target_grid, y_target_grid
+    points = cast(
+        ArrayFloat32,
+        source_crs.transform_points(target_crs, x_target_grid, y_target_grid),
     )
     lon_grid, lat_grid = points[..., 0], points[..., 1]
 
+    if isinstance(data, MaskedArray):
+        valid_mask = cast(ArrayBool, ~data.mask)
+        field_value = data.data[valid_mask]
+        roi_lat = lat[valid_mask]
+        roi_lon = lon[valid_mask]
+    else:
+        field_value = data
+        roi_lat = lat
+        roi_lon = lon
+
     # Flatten the grids
     target_points = np.vstack((lon_grid.ravel(), lat_grid.ravel())).T
-    source_points = np.vstack((lon.ravel(), lat.ravel())).T
-    data_flat = data.ravel()
+    source_points = np.vstack((roi_lon.ravel(), roi_lat.ravel())).T
+    data_flat = cast(ArrayFloat32, field_value.ravel())
 
     # Build KDTree and interpolate
     tree = cKDTree(source_points)
@@ -82,7 +94,10 @@ def create_matrix(
     weights /= np.sum(weights, axis=1, keepdims=True)  # Normalize weights
 
     # Compute interpolated values
-    reprojected_data_flat = np.sum(data_flat[idx] * weights, axis=1)
+    reprojected_data_flat = np.sum(
+        data_flat[idx] * weights, axis=1, dtype=float32
+    )
+    reprojected_data_flat=reprojected_data_flat.reshape((n_rows, n_cols))
 
     # Reshape to grid
-    return reprojected_data_flat.reshape((n_rows, n_cols))
+    return cast(ArrayFloat32, reprojected_data_flat)

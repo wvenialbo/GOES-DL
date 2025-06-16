@@ -32,7 +32,7 @@ default_plot_margin = MarginGeometry(88, 150, 24, 50)
 default_cbar_box = BoxGeometry(88, 64, 600, 16)
 
 
-class GSPlot:
+class AZPlot:
 
     # The figure/image resolution (in number of dots per inch)
     fig_dpi: int = 100
@@ -85,7 +85,7 @@ class GSPlot:
         ax = fig.add_subplot(1, 1, 1, projection=self.crs)
         ax.set_position(self.axes_box)
 
-        self._add_grid_rect(ax, image.region, param)
+        self._add_grid_cent(fig, ax, image.region, param)
 
         self._add_map_features(ax, param)
 

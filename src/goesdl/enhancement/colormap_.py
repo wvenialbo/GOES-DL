@@ -640,8 +640,8 @@ class _NamedColormapBased(_ListBasedColormap):
     @classmethod
     def _discrete_color_table(cls, colormap: ListedColormap) -> ColorTable:
         ncolors = colormap.N
-        color_array = colormap([i / (ncolors - 1) for i in range(ncolors)])
-        colors = cast(RealColorList, color_array[:, :3])
+        control_points = [i / (ncolors - 1) for i in range(ncolors)]
+        colors = cast(RealColorList, colormap(control_points)[:, :3])
         color_list = cls._rescale_color_list(colors)
         return DiscreteColormap._create_color_table(color_list)
 
@@ -664,9 +664,9 @@ class _NamedColormapBased(_ListBasedColormap):
     def _uniform_color_table(
         cls, colormap: LinearSegmentedColormap
     ) -> ColorTable:
+        control_points = [i / 255 for i in range(256)]
         cm = colormap.resampled(512)
-        color_array = cm([i / 255 for i in range(256)])
-        colors = cast(RealColorList, color_array[:, :3])
+        colors = cast(RealColorList, cm(control_points)[:, :3])
         color_list = cls._rescale_color_list(colors)
         return UniformColormap._create_color_table(color_list)
 

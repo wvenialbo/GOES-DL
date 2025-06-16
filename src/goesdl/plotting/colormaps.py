@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,7 +10,8 @@ from matplotlib.spines import Spine
 from ..enhancement.clr_utility import clr_utility
 from ..enhancement.scale import EnhancementScale
 from ..enhancement.shared import ColorValueList, DiscreteColorList
-from .helpers import Rect, Size
+from ..utils.array import ArrayFloat64
+from .helpers import Rect, Size, set_outline
 
 LUMA_COEFFICIENTS = {
     "rec240": (0.212, 0.701, 0.087),  # Adobe
@@ -62,7 +64,7 @@ def preview_colormap(
     # Set the plot box ouline style
     for spine in ["top", "bottom", "left", "right"]:
         axes_outline = ax.spines[spine]
-        _set_outline(axes_outline, size.pt(0.6))
+        set_outline(axes_outline, size.pt(0.6))
 
     # Set the x-axis label
     ax.set_xlabel(
@@ -106,7 +108,7 @@ def preview_colormap(
 
     # Set the colour bar box ouline style
     cbar_outline: Spine = cbar.ax.spines["outline"]
-    _set_outline(cbar_outline, size.pt(0.6))
+    set_outline(cbar_outline, size.pt(0.6))
 
     # Set the colorbar caption
     cbar.set_label(
@@ -187,7 +189,7 @@ def preview_stretching(
     # Set the plot box ouline style
     for spine in ["top", "bottom", "left", "right"]:
         axes_outline = ax.spines[spine]
-        _set_outline(axes_outline, size.pt(0.8))
+        set_outline(axes_outline, size.pt(0.8))
 
     measurement = measurement or "Measurement"
 
@@ -245,19 +247,22 @@ def preview_stretching(
 
     # Prepare the plotting data
     x_indices = np.linspace(xmin, xmax, ncolors, endpoint=True)
-    y_output = scale.cnorm(x_indices)
+    y_output = cast(ArrayFloat64, scale.cnorm(x_indices).data)
     y_indices = (ymax - ymin) * y_output
 
     # Color the area under the curve using thin bars
     bar_width = (xmax - xmin) / (ncolors - 1)
     pad_offset = -0.3 * bar_width
     for i in range(ncolors):
+        color: tuple[float, ...] = cast(
+            tuple[float, ...], scale.cmap(y_output[i])
+        )
         ax.bar(
             x_indices[i] + pad_offset,
             y_indices[i],
             width=bar_width,
-            color=scale.cmap(y_output[i]),
             align="edge",
+            color=color,
         )
 
     # Plot the stretching curve
@@ -289,7 +294,7 @@ def preview_stretching(
 
     # Set the colour bar box ouline style
     cbar_outline: Spine = cbar.ax.spines["outline"]
-    _set_outline(cbar_outline, size.pt(0.6))
+    set_outline(cbar_outline, size.pt(0.6))
 
     # Set the colorbar caption
     cbar.set_label(
@@ -427,7 +432,7 @@ def plot_brightness_profile(
     # Set the plot box ouline style
     for spine in ["top", "bottom", "left", "right"]:
         axes_outline = ax.spines[spine]
-        _set_outline(axes_outline, size.pt(0.8))
+        set_outline(axes_outline, size.pt(0.8))
 
     # Set the x-axis label
     ax.set_xlabel(
@@ -559,7 +564,7 @@ def plot_color_profile(
     # Set the plot box ouline style
     for spine in ["top", "bottom", "left", "right"]:
         axes_outline = ax.spines[spine]
-        _set_outline(axes_outline, size.pt(0.8))
+        set_outline(axes_outline, size.pt(0.8))
 
     # Set the x-axis label
     ax.set_xlabel(
@@ -619,7 +624,7 @@ def plot_color_profile(
 
     # Compute colour component intensity
     intensities = [
-        clr_utility._scale_color_values(component) for component in components
+        clr_utility.scale_color_values(component) for component in components
     ]
 
     # Prepare the plotting data
@@ -659,7 +664,7 @@ def plot_color_profile(
 
     # Set the colour bar box ouline style
     cbar_outline: Spine = cbar.ax.spines["outline"]
-    _set_outline(cbar_outline, size.pt(0.6))
+    set_outline(cbar_outline, size.pt(0.6))
 
     # Set the colorbar caption
     cbar.set_label(
@@ -764,9 +769,3 @@ def _rgb_to_brightness(
         brightness.append(gray_value * brightness_max)
 
     return brightness
-
-
-def _set_outline(outline: Spine, linewidth: float) -> None:
-    outline.set_linewidth(linewidth)
-    outline.set_color("black")
-    outline.set_alpha(1.0)

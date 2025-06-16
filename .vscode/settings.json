@@ -89,16 +89,9 @@
     ],
     "bandit.importStrategy": "fromEnvironment",
     "mypy-type-checker.args": [
-        "--check-untyped-defs",
-        "--follow-imports=silent",
-        "--ignore-missing-imports",
-        "--no-pretty",
-        "--show-column-numbers",
+        "--config-file=${workspaceFolder}/pyproject.toml"
     ],
-    "mypy-type-checker.ignorePatterns": [
-        "**/experimental",
-        "**/experimental/**"
-    ],
+    "mypy-type-checker.ignorePatterns": [],
     "mypy-type-checker.importStrategy": "fromEnvironment",
     "pylint.importStrategy": "fromEnvironment",
     "pylint.enabled": true,
@@ -158,7 +151,8 @@
     "python.analysis.autoImportCompletions": true,
     "python.analysis.completeFunctionParens": true,
     "python.analysis.diagnosticSeverityOverrides": {
-        "reportUnknownMemberType": "none"
+        "reportUnknownMemberType": "none",
+        "reportMissingTypeStubs": "none",
     },
     "python.analysis.enableSyncServer": false,
     "python.analysis.exclude": [
@@ -243,7 +237,7 @@
         }
     },
     // Python general tools settings
-    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv",
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     "python.globalModuleInstallation": false,
     // JSON editor settings
     "[json]": {

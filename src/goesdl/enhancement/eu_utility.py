@@ -254,7 +254,7 @@ class eu_utility(clr_utility):
         j = cls._scale_keypoint_values(x, domain)
 
         # Rescale colour component values
-        r, g, b = map(cls._scale_color_values, (r, g, b))
+        r, g, b = map(cls.scale_color_values, (r, g, b))
 
         # Set the default EU TABLE colour component ordering (BGR)
         return cls._make_color_list((j, r, g, b))

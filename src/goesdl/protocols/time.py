@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import Protocol
+from typing import Any, Protocol
 
 from netCDF4 import Dataset
 
 
 class CoverageTime(Protocol):
 
-    def __init__(self, dataframe: Dataset) -> None: ...
+    def __init__(self, record: Dataset, **kwargs: Any) -> None: ...
 
     @property
     def datetime_start(self) -> datetime: ...

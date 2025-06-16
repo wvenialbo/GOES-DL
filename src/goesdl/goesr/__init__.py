@@ -41,6 +41,7 @@ from .locator_pp import (
     GOESProductLocatorRad,
 )
 from .projection import GOESGlobe, GOESImagerProjection, GOESOrbitGeometry
+from .utilities import filter_by_interval
 
 GOESDerivedProductLocator = GOESProductLocatorABIDP
 GOESDerivedWithCannelProductLocator = GOESProductLocatorABIDC
@@ -49,6 +50,7 @@ GOESPrimaryMultibandProductLocator = GOESProductLocatorABIPM
 GOESPrimaryProductLocator = GOESProductLocatorABIPP
 
 __all__ = [
+    "filter_by_interval",
     "GOESCoverageTime",
     "GOESDatasetInfo",
     "GOESDerivedProductLocator",

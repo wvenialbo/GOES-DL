@@ -50,6 +50,7 @@ class GeodeticRegion(Protocol):
         (min_lon, max_lon) and the second coordinate range is the
         latitude range (min_lat, max_lat).
         """
+        ...
 
     @property
     def extent(self) -> RegionExtent:
@@ -57,6 +58,7 @@ class GeodeticRegion(Protocol):
         The extent of the region of interest as a tuple of (min_lon,
         max_lon, min_lat, max_lat).
         """
+        ...
 
     @property
     def lat_bounds(self) -> CoordRange:
@@ -64,6 +66,7 @@ class GeodeticRegion(Protocol):
         The latitude bounds of the region of interest as a tuple of
         (min_lat, max_lat).
         """
+        ...
 
     @property
     def lon_bounds(self) -> CoordRange:
@@ -71,6 +74,7 @@ class GeodeticRegion(Protocol):
         The longitude bounds of the region of interest as a tuple of
         (min_lon, max_lon).
         """
+        ...
 
     @property
     def xticks(self) -> ArrayFloat32:
@@ -78,6 +82,7 @@ class GeodeticRegion(Protocol):
         The x-ticks of the region of interest. Helper for plotting.
         The x-ticks are the longitude values of the region of interest.
         """
+        ...
 
     @property
     def yticks(self) -> ArrayFloat32:
@@ -85,6 +90,7 @@ class GeodeticRegion(Protocol):
         The y-ticks of the region of interest. Helper for plotting.
         The y-ticks are the latitude values of the region of interest.
         """
+        ...
 
 
 class GeodeticGrid(Protocol):
@@ -125,13 +131,15 @@ class GeodeticGrid(Protocol):
         The projection of the data. The projection is used to transform
         the data.
         """
- 
+        ...
+
     @property
     def lat(self) -> ArrayFloat32:
         """
         A 2D array containing the sliced values of the latitude grid
         data.
         """
+        ...
 
     @property
     def lat_limits(self) -> IndexRange:
@@ -140,6 +148,7 @@ class GeodeticGrid(Protocol):
         and maximum latitude values of the grid data. The limits are
         used to slice the data.
         """
+        ...
 
     @property
     def lon(self) -> ArrayFloat32:
@@ -147,6 +156,7 @@ class GeodeticGrid(Protocol):
         A 2D array containing the sliced values of the longitude grid
         data.
         """
+        ...
 
     @property
     def lon_limits(self) -> IndexRange:
@@ -155,6 +165,7 @@ class GeodeticGrid(Protocol):
         and maximum longitude values of the grid data. The limits are
         used to slice the data.
         """
+        ...
 
     @property
     def region(self) -> GeodeticRegion:
@@ -162,3 +173,4 @@ class GeodeticGrid(Protocol):
         The region of interest. The region is used to find the array
         indices to slice the data.
         """
+        ...

@@ -80,7 +80,7 @@ class clr_utility:
         return [(k - x_lo) / length for k in x], (x_min, x_max)
 
     @staticmethod
-    def _scale_color_values(y: ColorValueList) -> ColorValueList:
+    def scale_color_values(y: ColorValueList) -> ColorValueList:
         return [round(k * CLR_MAX) for k in y]
 
     @staticmethod
