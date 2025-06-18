@@ -1,9 +1,9 @@
-from logging import INFO, WARNING, Logger, StreamHandler, getLogger
-from math import ceil, floor
+from datetime import datetime, timedelta
+from math import ceil, floor, inf, nan
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, TypeGuard, cast
 
-from numpy import floating, integer
+from numpy import abs, arange, float64, floating, integer, max, min, std, zeros
 from numpy.typing import NDArray
 
 _Array = NDArray[floating[Any]]
@@ -20,155 +20,23 @@ _dependencies: dict[str, str] = {
     "yaml": "pyyaml",
 }
 
-_logger_name = ""
+_gridsatb_datasets = {"GridSat-B1"}
+
+_gridsatg_datasets = {"GridSat-CONUS", "GridSat-GOES", "GridSat-GOES/CONUS"}
+
+_goesr_datasets = {
+    "GOES",
+    "GOES-R",
+    "GOES-16",
+    "GOES-17",
+    "GOES-18",
+    "GOES-19",
+}
+
 _prof_suffix = ".npz"
-_sepbar = "=" * 50
 
 
-def notify(level: int, message: str) -> None:
-    if not _logger_name:
-        return
-    logger = getLogger(_logger_name)
-    logger.log(level, message)
-
-
-def get_algorithm_info(
-    settings: _Settings,
-) -> tuple[float, float, float, float]:
-    algorithm_param: dict[str, float] = settings["algorithm"]
-    central_mask = algorithm_param["central_mask"]
-    windows_size = algorithm_param["windows_size"]
-    radius_min = algorithm_param["radius_min"]
-    radius_step = algorithm_param["radius_step"]
-
-    return central_mask, windows_size, radius_min, radius_step
-
-
-def get_algorithm_extra(
-    settings: _Settings,
-) -> tuple[float, int, bool, str]:
-    algorithm_param: _Settings = settings["algorithm"]
-    delta: float = algorithm_param["delta"]
-    sampling_rate: int = algorithm_param["sampling_rate"]
-    invert_difference: bool = algorithm_param["invert_difference"]
-    diff_mode = "reversed" if invert_difference else "direct"
-
-    return delta, sampling_rate, invert_difference, diff_mode
-
-
-def get_event_info(
-    settings: _Settings, flat_time: bool = False
-) -> tuple[str, str, str]:
-    event_settings: dict[str, str] = settings["event"]
-    event_name = event_settings["name"]
-    time_start = event_settings["time_start"]
-    time_end = event_settings["time_end"]
-
-    if flat_time:
-        time_start = time_start.replace("-", "").replace(":", "")
-        time_end = time_end.replace("-", "").replace(":", "")
-
-    return event_name, time_start, time_end
-
-
-def _move_legacy(old_reprojection: Path, reprojection: Path) -> None:
-    notify(WARNING, "Renombrando archivos heredados...")
-    new_reprojection = old_reprojection.parent / reprojection.name
-    old_reprojection.rename(new_reprojection)
-
-    cfg_sfx = ".cfg"
-
-    old_reprojection = old_reprojection.with_suffix(cfg_sfx)
-    old_reprojection.rename(new_reprojection.with_suffix(cfg_sfx))
-
-
-def setup_logging(level: int, name: str = "__laboratory__") -> None:
-    global _logger_name
-    _logger_name = name
-
-    logger = getLogger(name)
-    logger.setLevel(level)
-
-    if not logger.handlers:
-        from sys import stdout
-
-        handler = StreamHandler(stdout)
-        handler.setLevel(level)
-        logger.addHandler(handler)
-
-
-def set_logger(logger: Logger | str) -> None:
-    global _logger_name
-    _logger_name = logger.name if isinstance(logger, Logger) else logger
-
-
-def initialize_data(settings: _Settings) -> None:
-    """Extrae el archivo ZIP de perfiles si existe en Google Colab."""
-    from zipfile import ZipFile
-
-    if not is_colab():
-        notify(INFO, _sepbar)
-        return
-
-    notify(INFO, "Inicializando datos en Google Colab...")
-
-    data_archives = ["reprojection", "differences", "profiles"]
-
-    event_name: str = settings["event"]["name"]
-    repository_path: Path = settings["repository"]["path"]
-
-    for archive in data_archives:
-        zipfile_path = Path(f"./{event_name}_{archive}.zip")
-        if zipfile_path.exists():
-            notify(
-                INFO, f"Detectado archivo ZIP '{zipfile_path}'. Extrayendo..."
-            )
-            with ZipFile(zipfile_path, "r") as zip_ref:
-                zip_ref.extractall(
-                    repository_path
-                )  # Extraer al repositorio de datos
-            notify(
-                INFO,
-                f"ZIP file '{zipfile_path}' extraído en '{repository_path}'!",
-            )
-
-    notify(INFO, "Datos inicializados...")
-    notify(INFO, _sepbar)
-
-
-def initialize_settings(
-    default_settings: _Settings, event_settings: _Settings
-) -> _Settings:
-    settings = default_settings | event_settings
-
-    event_name: str = settings["event"]["name"]
-    repo_settings: _Settings = settings["repository"]
-
-    # Set the root path to the data repositories
-    root = Path(repo_settings["root"])
-    repo_settings["root"] = root
-
-    # Set the path of the datasets repository for the event
-    path = root / event_name
-    repo_settings["path"] = path
-
-    # Set the path for the difference matrix files
-    repo_settings["differences"] = path / "differences"
-
-    # Set the path for the radial profile array files
-    repo_settings["profiles"] = path / "profiles"
-
-    # Set the path for the reprojected matrix files
-    reprojection = path / "reprojection"
-    repo_settings["reprojection"] = reprojection
-
-    old_reprojection = path / "reprojected"
-    if not reprojection.exists() and old_reprojection.exists():
-        _move_legacy(old_reprojection, reprojection)
-
-    notify(INFO, "Configuración inicializada...")
-
-    return settings
+# ---------- Environment tool utilities ----------
 
 
 def is_colab() -> bool:
@@ -178,45 +46,359 @@ def is_colab() -> bool:
     return bool(getenv("COLAB_RELEASE_TAG"))
 
 
-def load_config(filepath: Path | str = "config.yaml") -> _Settings:
-    """Carga la configuración desde un archivo YAML."""
-    from yaml import YAMLError, safe_load
-
-    try:
-        filepath = Path(filepath)
-        with open(filepath, "r") as file:
-            config = safe_load(file)
-        notify(INFO, f"Configuración cargada desde '{filepath.name}'...")
-        return cast(_Settings, config)
-    except FileNotFoundError as error:
-        raise ValueError(
-            f"Error: El archivo de configuración '{filepath}' no se encontró"
-        ) from error
-    except YAMLError as error:
-        raise ValueError(
-            f"Error al parsear el archivo YAML: {error}"
-        ) from error
+# ---------- Report printing utilities ----------
 
 
-def setup_environment(logger: Logger | str = "") -> None:
-    """Configura el entorno (instalaciones de librerías)."""
+def print_separator(char: str = "=", length: int = 50) -> None:
+    """Prints a customizable separator line."""
+    print(char * length)
+
+
+def print_line(length: int = 50) -> None:
+    print_separator(char="-", length=length)
+
+
+def print_bar(length: int = 50) -> None:
+    print_separator(char="=", length=length)
+
+
+def print_event_report(settings: _Settings) -> None:
+    event_config: dict[str, str] = settings.get("event", {})
+
+    # Extract values
+    event_name = event_config.get("name", "N/A")
+    time_start = event_config.get("time_start", "N/A")
+    time_end = event_config.get("time_end", "N/A")
+
+    # Print values
+    print(f"Event name              : {event_name}")
+    print(f"Coverage start time     : {time_start}")
+    print(f"Coverage end time       : {time_end}")
+
+
+def print_datasource_report(settings: _Settings) -> None:
+    datasource_config: _Settings = settings.get("datasource", {})
+
+    # Extract values
+    project = datasource_config.get("project", "N/A")
+    origin = ", ".join(datasource_config.get("origin", ["N/A"]))
+    channel = datasource_config.get("channel", "N/A")
+    scene = datasource_config.get("scene", "N/A")
+    spatial_resolution = datasource_config.get("spatial_resolution", "N/A")
+    time_resolution = datasource_config.get("time_resolution", "N/A")
+
+    # Print values
+    print(f"Datasets                : {project}")
+    print(f"Satellite               : {origin}")
+    print(f"Channel                 : {channel}")
+    print(f"Scene                   : {scene}")
+    print(f"Spatial resolution      : {spatial_resolution:>2.1f} km/pixel")
+    print(f"Time resolution         : {time_resolution:>3d} frames/hour")
+
+
+def print_repository_report(settings: _Settings) -> None:
+    repo_config: dict[str, str] = settings.get("repository", {})
+
+    # Extract values
+    root_path = repo_config.get("root", "N/A")
+    dataset_path = repo_config.get("path", "N/A")
+    difference_directory = repo_config.get("difference", "N/A")
+    profile_directory = repo_config.get("profile", "N/A")
+    reprojection_directory = repo_config.get("reprojection", "N/A")
+
+    # Print values
+    print(f"Repository root path    : {root_path}")
+    print(f"Dataset directory path  : {dataset_path}")
+    print(f"Difference files path   : {difference_directory}")
+    print(f"Profile files path      : {profile_directory}")
+    print(f"Reprojection files path : {reprojection_directory}")
+
+
+def print_setup_report(settings: _Settings) -> None:
+    print_bar()
+    print("Project configuration values")
+    print_line()
+
+    # Event configuration
+    print_event_report(settings)
+
+    print_line()
+
+    # Datasource configuration
+    print_datasource_report(settings)
+
+    print_line()
+
+    # Repository configuration
+    print_repository_report(settings)
+
+    print_bar()
+
+
+def print_derived_parameters_report(
+    settings: _Settings, params: _Settings
+) -> None:
+    vmax: float = params["vmax"]
+    vmin: float = params["vmin"]
+
+    print_bar()
+    print("Computed Parameters")
+    print_line()
+
+    print(f"Minimum BT           : {vmin:>4.0f} K")
+    print(f"Maximum BT           : {vmax:>4.0f} K")
+    print_line()
+
+    algorithm_config: _Settings = settings.get("algorithm", {})
+    sampling_rate: int = algorithm_config["sampling_rate"]
+
+    datasource_config: _Settings = settings.get("datasource", {})
+    time_resolution: int = datasource_config["time_resolution"]
+
+    resolution_ratio = f"{sampling_rate:>0.0f}:{time_resolution:>0.0f}"
+
+    sequence_length: int = params["sequence_length"]
+    sequence_step: int = params["sequence_step"]
+    series_length: int = params["series_length"]
+
+    print(f"Sequence length      : {sequence_length:>4d} data points")
+    print(f"Sequence interval    : {sequence_step:>4d} data points")
+    print(f"Time series lenght   : {series_length:>4d} data points")
+    print(
+        f"Ser./data res. ratio : {resolution_ratio:>4} data points/h",
+    )
+    print_line()
+
+    ignore: int = params["ignore"]
+    window: int = params["window"]
+
+    x_min: float = params["x_min"]
+    x_max: float = params["x_max"]
+
+    print(
+        f"Central mask         : {ignore:>4d} pixels   (~{x_min:.0f}-km)",
+    )
+    print(
+        f"Analysis window      : {window:>4d} pixels   (~{x_max:.0f}-km)",
+    )
+    print_line()
+
+    label, sep = "Analysis radii", ":"
+
+    radii: list[float] = params["radii"]
+    radii_km: list[float] = params["radii_km"]
+
+    for radius, radius_km in zip(radii, radii_km):
+        print(f"{label:<21}{sep} {radius:>4d}-th pixel (~{radius_km:.0f}-km)")
+        label, sep = "", " "
+
+
+def print_algorithm_parameters_report(settings: _Settings) -> None:
+    """
+    Prints a formatted report of the algorithm configuration.
+
+    Args:
+        config_data (dict): A dictionary containing the loaded configuration.
+    """
+    print_bar()
+    print("Algorithm Parameters")
+
+    algo_config: _Settings = settings.get("algorithm", {})
+
+    # Extract values
+    delta = algo_config.get("delta", "N/A")
+    radius_min = algo_config.get("radius_min", "N/A")
+    radius_step = algo_config.get("radius_step", "N/A")
+    central_mask = algo_config.get("central_mask", "N/A")
+    windows_size = algo_config.get("windows_size", "N/A")
+    fft_size = algo_config.get("fft_size", "N/A")
+    sampling_rate = algo_config.get("sampling_rate", "N/A")
+    invert_difference = algo_config.get("invert_difference", "N/A")
+    window_function = algo_config.get("window_function", "N/A")
+    filter_frequency = algo_config.get("filter_frequency", "N/A")
+    filter_bandwidth = algo_config.get("filter_bandwidth", "N/A")
+    filter_order = algo_config.get("filter_order", "N/A")
+    control_samples = algo_config.get("control_samples", "N/A")
+    analytic_samples = algo_config.get("analytic_samples", "N/A")
+    analytic_offset = algo_config.get("analytic_offset", "N/A")
+    nperseg = algo_config.get("nperseg", "N/A")
+    noverlap = algo_config.get("noverlap", "N/A")
+
+    # Print values
+    print_line()
+    print(f"Profile difference offset     : {delta} hours")
+    print(f"Invert profile difference     : {invert_difference}")
+    print_line()
+    print(f"Minimum analysis radius       : {radius_min} km")
+    print(f"Analysis radius increment     : {radius_step} km")
+    print_line()
+    print(f"Central mask extent           : {central_mask}%")
+    print(f"Analysis window extent        : {windows_size}%")
+    print_line()
+    print(f"FFT analysis block size       : {fft_size}")
+    print(f"FFT window function           : {window_function}")
+    print(f"FFT sampling rate             : {sampling_rate} frames/hour")
+    print_line()
+    print(f"Welch periodogram nperseg     : {nperseg}")
+    print(f"Welch periodogram noverlap    : {noverlap}")
+    print_line()
+    print(f"Filter frequency (central)    : {filter_frequency} cycles/day")
+    print(f"Filter bandwidth              : {filter_bandwidth} cycles/day")
+    print(f"Filter order                  : {filter_order}")
+    print_line()
+    print(f"Interpolation control samples : {control_samples} samples/day")
+    print(f"Spectral analytic samples     : {analytic_samples} samples/day")
+    print(f"Analytic offset               : {analytic_offset} samples")
+
+    print_bar()
+
+
+# ---------- Settings information retrieval utilities ----------
+
+
+def get_algorithm_info(
+    settings: _Settings,
+) -> tuple[float, float, float, float]:
+    algorithm_config: dict[str, float] = settings.get("algorithm", {})
+
+    # Extract values
+    central_mask = algorithm_config.get("central_mask", nan)
+    windows_size = algorithm_config.get("windows_size", nan)
+    radius_min = algorithm_config.get("radius_min", nan)
+    radius_step = algorithm_config.get("radius_step", nan)
+
+    return central_mask, windows_size, radius_min, radius_step
+
+
+def get_algorithm_extra(
+    settings: _Settings,
+) -> tuple[float, int, bool, str]:
+    algorithm_config: _Settings = settings.get("algorithm", {})
+
+    # Extract values
+    delta: float = algorithm_config.get("delta", nan)
+    sampling_rate: int = algorithm_config.get("sampling_rate", 0)
+    invert_difference: bool = algorithm_config.get("invert_difference", False)
+    diff_mode = "reversed" if invert_difference else "direct"
+
+    return delta, sampling_rate, invert_difference, diff_mode
+
+
+def get_event_info(
+    settings: _Settings, flat_time: bool = False
+) -> tuple[str, str, str]:
+    event_config: dict[str, str] = settings.get("event", {})
+
+    # Extract values
+    event_name = event_config.get("name", "N/A")
+    time_start = event_config.get("time_start", "N/A")
+    time_end = event_config.get("time_end", "N/A")
+
+    if flat_time:
+        time_start = time_start.replace("-", "").replace(":", "")
+        time_end = time_end.replace("-", "").replace(":", "")
+
+    return event_name, time_start, time_end
+
+
+# ---------- Profile loading utilities ----------
+
+
+def load_profile(profile_directory: Path, path: str) -> _Array:
+    # Load the profile data
+    profile_data = load_profile_data(profile_directory, path)
+
+    profile: _Array = profile_data["profile"]
+
+    return profile
+
+
+def load_profile_data(profile_directory: Path, path: str) -> _Settings:
+    from numpy import load
+
+    # Create the profile file path
+    profile_path = Path(path)
+    profile_path = profile_path.with_suffix(_prof_suffix)
+    profile_path = profile_directory / profile_path.name
+
+    # Load the profile data
+    profile_data: _Settings = load(profile_path)
+
+    return profile_data
+
+
+# ---------- Project initialisation ----------
+
+
+def initialize_project(
+    event_settings_filepath: Path | str,
+    config_settings_filepath: Path | str,
+    verbose: bool = True,
+) -> _Settings:
+    if verbose:
+        print_bar()
+        print("Initialising project...")
+
+    # --- Setup the environment
+    _setup_environment(verbose)
+
+    if verbose:
+        print("Loading configuration files...")
+
+    # --- load default settings
+    default_settings = _load_config(config_settings_filepath, verbose)
+
+    # --- load event settings
+    event_settings = _load_config(event_settings_filepath, verbose)
+
+    # --- Initialise settings
+    settings = _initialize_settings(default_settings, event_settings, verbose)
+
+    # --- Initialise data (for remote environments)
+    _initialize_data(settings, verbose)
+
+    if verbose:
+        print("Project initialised!")
+        print_setup_report(settings)
+
+    return settings
+
+
+def reload_project(
+    event_settings_filepath: Path | str,
+    config_settings_filepath: Path | str,
+    verbose: bool = True,
+) -> _Settings:
+    if verbose:
+        print_bar()
+        print("Loading configuration files...")
+
+    # --- load default settings
+    default_settings = _load_config(config_settings_filepath, verbose)
+
+    # --- load event settings
+    event_settings = _load_config(event_settings_filepath, verbose)
+
+    # --- Initialise settings
+    settings = _initialize_settings(default_settings, event_settings, verbose)
+
+    if verbose:
+        print("Project reloaded!")
+        print_setup_report(settings)
+
+    return settings
+
+
+def _setup_environment(verbose: bool) -> None:
+    """Sets up the environment (library installations)."""
     from importlib.util import find_spec
 
-    print(_sepbar)
-    print("Configurando entorno...")
-
-    if isinstance(logger, Logger):
-        set_logger(logger)
-
-    elif logger:
-        setup_logging(INFO, logger)
-
-    if _logger_name:
-        print(f"Usando registro de eventos '{_logger_name}'...")
+    if verbose:
+        print("Setting up environment...")
 
     if find_spec("IPython") is None:
         raise RuntimeError(
-            "No está instalado el entorno 'IPython': pip install ipython"
+            "The 'IPython' environment is not installed: pip install ipython"
         )
 
     from IPython.core.getipython import get_ipython
@@ -224,9 +406,7 @@ def setup_environment(logger: Logger | str = "") -> None:
     ipython = get_ipython()  # type: ignore
 
     if not ipython:
-        raise RuntimeError(
-            "No hay ninguna instancia de InteractiveShell registrada"
-        )
+        raise RuntimeError("No InteractiveShell instance is registered")
 
     dependencies = list(_dependencies.keys())
 
@@ -236,34 +416,256 @@ def setup_environment(logger: Logger | str = "") -> None:
                 ipython.system(f"pip install {_dependencies[dependency]}")
             except NameError as error:
                 raise RuntimeError(
-                    f"No se pudo instalar '{dependency}', "
-                    "asegúrate de ejecutar esto en Jupyter"
+                    f"Could not install '{dependency}', "
+                    "ensure you are running this in Jupyter or Colab"
                 ) from error
 
-    notify(INFO, "Entorno configurado...")
+    if verbose:
+        print("Environment configured...")
 
 
-def _load_inventory_gr(
-    settings: _Settings,
-) -> tuple[list[str], list[float]]:
+def _load_config(settings_filepath: Path | str, verbose: bool) -> _Settings:
+    """Loads the configuration from a YAML file."""
+    from yaml import YAMLError, safe_load
+
+    try:
+        settings_filepath = Path(settings_filepath)
+        with open(settings_filepath, "r") as file:
+            config = safe_load(file)
+        if verbose:
+            print(f"... configuration loaded from '{settings_filepath.name}'")
+        return cast(_Settings, config)
+    except FileNotFoundError as error:
+        raise ValueError(
+            f"The configuration file '{settings_filepath}' was not found"
+        ) from error
+    except YAMLError as error:
+        raise ValueError(f"Error parsing the YAML file: {error}") from error
+
+
+def _initialize_settings(
+    default_settings: _Settings, event_settings: _Settings, verbose: bool
+) -> _Settings:
+    if verbose:
+        print("Initialising configuration...")
+
+    settings = default_settings | event_settings
+
+    _initialize_paths(settings, verbose)
+
+    if verbose:
+        print("Configuration initialised...")
+
+    return settings
+
+
+def _initialize_paths(settings: _Settings, verbose: bool) -> None:
+    if verbose:
+        print("Initiliasing repository paths...")
+
+    event_config: dict[str, str] = settings.get("event", {})
+    repository_config: _Settings = settings.get("repository", {})
+
+    # Extract values
+    event_name = event_config["name"]
+
+    # Set the root path to the data repositories
+    root = Path(repository_config["root"])
+    repository_config["root"] = root
+
+    # Set the path of the datasets repository for the event
+    path = root / event_name
+    repository_config["path"] = path
+
+    # Set the path for the difference matrix files
+    repository_config["difference"] = path / "difference"
+
+    # Set the path for the radial profile array files
+    repository_config["profile"] = path / "profile"
+
+    # Set the path for the reprojected matrix files
+    repository_config["reprojection"] = path / "reprojection"
+
+    _rename_legacy_paths(settings, verbose)
+
+    if verbose:
+        print("Repository paths initialised...")
+
+
+def _rename_legacy_paths(settings: _Settings, verbose: bool) -> None:
+    if verbose:
+        print("Updating legacy paths...")
+
+    repository_config: dict[str, Path] = settings.get("repository", {})
+
+    legacy_map = {
+        "difference": "differences",
+        "profile": "profiles",
+        "reprojection": "reprojected",
+    }
+
+    cfg_suffix = ".cfg"
+
+    path = repository_config["path"]
+
+    for new_folder_name, old_folder_name in legacy_map.items():
+        new_folder = repository_config[new_folder_name]
+        old_folder = path / old_folder_name
+        if old_folder.exists() and not new_folder.exists():
+            _move_legacy(old_folder, new_folder, verbose)
+
+        new_file = new_folder.with_suffix(cfg_suffix)
+        old_file = old_folder.with_suffix(cfg_suffix)
+        if old_file.exists() and not new_file.exists():
+            _move_legacy(old_file, new_file, verbose)
+
+    if verbose:
+        print("Legacy paths updated...")
+
+
+def _move_legacy(old_folder: Path, new_folder: Path, verbose: bool) -> None:
+    if verbose:
+        print(f"... renaming '{old_folder}'")
+        print(f"... to '{new_folder}'")
+
+    old_folder.rename(new_folder)
+
+
+def _initialize_data(settings: _Settings, verbose: bool) -> None:
+    """Extracts the data ZIP file if it exists in Google Colab."""
+    from zipfile import ZipFile
+
+    if not is_colab():
+        return
+
+    if verbose:
+        print("Mounting uploaded data...")
+
+    event_config: dict[str, str] = settings.get("event", {})
+    repository_config: _Settings = settings.get("repository", {})
+
+    event_name = event_config["name"]
+    repository_path: Path = repository_config["path"]
+
+    data_archives = ["reprojection", "difference", "profile"]
+
+    for archive in data_archives:
+        zipfile_path = Path(f"./{event_name}_{archive}.zip")
+        if zipfile_path.exists():
+            if verbose:
+                print(f"ZIP file '{zipfile_path}' detected, extracting...")
+            with ZipFile(zipfile_path, "r") as zip_ref:
+                zip_ref.extractall(
+                    repository_path
+                )  # Extract to the data repository
+            if verbose:
+                print(
+                    f"ZIP file '{zipfile_path}' "
+                    f"extracted to '{repository_path}'...",
+                )
+
+    if verbose:
+        print("Uploaded data mounted...")
+
+
+# ---------- Inventory loading ----------
+
+
+def load_inventory(settings: _Settings) -> tuple[list[str], list[float]]:
+    from goesdl.fileio import load_metadata, save_metadata
+
+    print_bar()
+
+    print("Loading dataset inventory...")
+
+    inventory_filename = _get_inventory_filename(settings)
+
+    # Retrieve the datasets inventory
+
+    inventory_data: tuple[list[str], list[float]]
+
+    if inventory_filename.exists():
+        # Just retrieve the preloaded inventory
+        print("... retrieving preloaded inventory")
+
+        inventory_data = load_metadata(inventory_filename)
+        dataset_paths, _ = inventory_data
+
+    else:
+        # Load the inventory from local repository
+        print("... creating inventory from local repository")
+        inventory_data = _load_inventory_any(settings)
+        dataset_paths, _ = inventory_data
+
+        save_metadata(inventory_filename, inventory_data)
+
+    total_files = len(dataset_paths)
+    available_files = sum(path != "" for path in dataset_paths)
+    missing_files = total_files - available_files
+
+    print("Dataset inventory loaded!")
+
+    print_line()
+
+    if available_files > 0:
+        print(
+            f"Found {available_files} datasets of {total_files}, "
+            f"missing {missing_files} datasets",
+        )
+    else:
+        print(
+            "Unable to acquire files: no datasets "
+            "found in the specified date range",
+        )
+
+    print_bar()
+
+    return inventory_data
+
+
+def _load_inventory_any(settings: _Settings) -> tuple[list[str], list[float]]:
+    datasource_config: dict[str, str] = settings.get("datasource", {})
+
+    project = datasource_config["project"]
+
+    if project in _goesr_datasets:
+        # Load the inventory using GOES-R machinery
+        return _load_inventory_gr(settings)
+
+    if project in _gridsatb_datasets:
+        # Load the inventory using GridSat-B1 machinery
+        return _load_inventory_gb(settings)
+
+    if project in _gridsatg_datasets:
+        # Load the inventory using GridSat-GOES/CONUS machinery
+        return _load_inventory_gs(settings)
+
+    raise ValueError(f"Unknown dataset project: '{project}'")
+
+
+def _load_inventory_gr(settings: _Settings) -> tuple[list[str], list[float]]:
     # Import the coverage time info, locator, and dataset inventory
     from goesdl.downloader import DatasetInventory
     from goesdl.goesr import GOESCoverageTime, GOESProductLocatorCMIP
 
-    datasource_settings: _Settings = settings["datasource"]
-    channel: str = datasource_settings["channel"]
-    origin: str = datasource_settings["origin"]
-    scene: str = datasource_settings["scene"]
+    print("... using GOES-R imagery product locator")
+
+    datasource_config: _Settings = settings.get("datasource", {})
+    channel: str = datasource_config["channel"]
+    origin: str = datasource_config["origin"]
+    scene: str = datasource_config["scene"]
 
     # Initialize the product locator for GOES-R datasets
     grlocator = GOESProductLocatorCMIP(
         scene=scene, channels=channel, origin=origin
     )
 
-    repo_settings: _Settings = settings["repository"]
-    repository_path: Path = repo_settings["path"]
-    time_resolution: int = datasource_settings["time_resolution"]
-    date_format: str = settings["date_format"]["input"]
+    repository_config: _Settings = settings.get("repository", {})
+    repository_path: Path = repository_config["path"]
+    time_resolution: int = datasource_config["time_resolution"]
+
+    format_config = settings.get("date_format", {})
+    date_format: str = format_config["input"]
 
     # Initialize the inventory manager
     inventory = DatasetInventory(
@@ -274,11 +676,52 @@ def _load_inventory_gr(
         dateformat=date_format,
     )
 
-    notify(INFO, "Loading dataset inventory...\n")
+    event_config: dict[str, str] = settings.get("event", {})
+    time_start = event_config["time_start"]
+    time_end = event_config["time_end"]
 
-    event_settings: dict[str, str] = settings["event"]
-    time_start = event_settings["time_start"]
-    time_end = event_settings["time_end"]
+    # Load the dataset inventory within a given date range
+    dataset_paths, dataset_times = inventory.get_sequence(
+        start=time_start, end=time_end, use_end=True
+    )
+
+    return dataset_paths, dataset_times
+
+
+def _load_inventory_gb(
+    settings: _Settings,
+) -> tuple[list[str], list[float]]:
+    # Import inventory loader, the GridSat product locator, and the
+    # coverage time info loader
+    from goesdl.downloader import DatasetInventory
+    from goesdl.gridsat import GridSatProductLocatorB1, GSCoverageTime
+
+    print("... using GridSat-B1 imagery product locator")
+
+    datasource_config: _Settings = settings.get("datasource", {})
+
+    # Initialize the product locator for GridSat datasets
+    gslocator = GridSatProductLocatorB1()
+
+    repository_config: _Settings = settings.get("repository", {})
+    repository_path: Path = repository_config["path"]
+    time_resolution: int = datasource_config["time_resolution"]
+
+    format_config = settings.get("date_format", {})
+    date_format: str = format_config["input"]
+
+    # Initialize the inventory manager
+    inventory = DatasetInventory(
+        repository=repository_path,
+        locator=gslocator,
+        coverage=GSCoverageTime,
+        interval=3600 // time_resolution,
+        dateformat=date_format,
+    )
+
+    event_config: dict[str, str] = settings.get("event", {})
+    time_start = event_config["time_start"]
+    time_end = event_config["time_end"]
 
     # Load the dataset inventory within a given date range
     dataset_paths, dataset_times = inventory.get_sequence(
@@ -296,17 +739,21 @@ def _load_inventory_gs(
     from goesdl.downloader import DatasetInventory
     from goesdl.gridsat import GridSatProductLocatorGC, GSCoverageTime
 
-    datasource_settings: _Settings = settings["datasource"]
-    origin: list[str] = datasource_settings["origin"]
-    scene: str = datasource_settings["scene"]
+    print("... using GridSat-GOES/CONUS imagery product locator")
+
+    datasource_config: _Settings = settings.get("datasource", {})
+    origin: list[str] = datasource_config["origin"]
+    scene: str = datasource_config["scene"]
 
     # Initialize the product locator for GridSat datasets
     gslocator = GridSatProductLocatorGC(scene=scene, origins=origin)
 
-    repo_settings: _Settings = settings["repository"]
-    repository_path: Path = repo_settings["path"]
-    time_resolution: int = datasource_settings["time_resolution"]
-    date_format: str = settings["date_format"]["input"]
+    repository_config: _Settings = settings.get("repository", {})
+    repository_path: Path = repository_config["path"]
+    time_resolution: int = datasource_config["time_resolution"]
+
+    format_config = settings.get("date_format", {})
+    date_format: str = format_config["input"]
 
     # Initialize the inventory manager
     inventory = DatasetInventory(
@@ -317,11 +764,9 @@ def _load_inventory_gs(
         dateformat=date_format,
     )
 
-    notify(INFO, "Loading dataset inventory...\n")
-
-    event_settings: dict[str, str] = settings["event"]
-    time_start = event_settings["time_start"]
-    time_end = event_settings["time_end"]
+    event_config: dict[str, str] = settings.get("event", {})
+    time_start = event_config["time_start"]
+    time_end = event_config["time_end"]
 
     # Load the dataset inventory within a given date range
     dataset_paths, dataset_times = inventory.get_sequence(
@@ -337,101 +782,74 @@ def _get_inventory_filename(settings: _Settings) -> Path:
     filename_base = f"s{time_start}_e{time_end}"
     filename = f"{event_name}_inventory_{filename_base}.dat"
 
-    repo_settings: dict[str, Path] = settings["repository"]
-    repository_path = repo_settings["path"]
+    repository_config: dict[str, Path] = settings.get("repository", {})
+    repository_path = repository_config["path"]
 
     return repository_path / filename
 
 
-def load_inventory(settings: _Settings) -> tuple[list[str], list[float]]:
+# ---------- Derived parameters computation or retrieval  ----------
+
+
+def get_computed_parameters(
+    settings: _Settings, dataset_paths: list[str]
+) -> _Settings:
     from goesdl.fileio import load_metadata, save_metadata
 
-    event_name, time_start, time_end = get_event_info(settings)
+    print_bar()
 
-    notify(INFO, _sepbar)
-    notify(INFO, f"Event name              : {event_name}")
-    notify(INFO, f"Coverage UTC start time : {time_start}")
-    notify(INFO, f"Coverage UTC end time   : {time_end}")
-    notify(INFO, _sepbar)
+    # Retrieve or calculate derived parameters
+    parameters_filename = _get_parameters_filename(settings)
 
-    inventory_filename = _get_inventory_filename(settings)
+    parameters_data: _Settings
 
-    datasource_settings: dict[str, str] = settings["datasource"]
-    project = datasource_settings["project"]
+    if parameters_filename.exists():
+        # Just retrieve the precomputed parameters
+        print("Retrieving precomputed parameters...")
 
-    # Retrieve the datasets inventory
+        parameters_data = load_metadata(parameters_filename)
 
-    inventory_data: tuple[list[str], list[float]]
-
-    if inventory_filename.exists():
-        # Just retrieve the preloaded inventory
-        notify(INFO, "Retrieving dataset inventory...")
-
-        inventory_data = load_metadata(inventory_filename)
-        dataset_paths, _ = inventory_data
-
-    elif project == "GridSat":
-        # Load the inventory from local repository
-        inventory_data = _load_inventory_gs(settings)
-        dataset_paths, _ = inventory_data
-
-        save_metadata(inventory_filename, inventory_data)
-
-    elif project == "GOES-R":
-        # Load the inventory from local repository
-        inventory_data = _load_inventory_gr(settings)
-        dataset_paths, _ = inventory_data
-
-        save_metadata(inventory_filename, inventory_data)
+        print("Precomputed parameters retrieved!")
 
     else:
-        raise ValueError(f"Base de datos '{project}' desconocida")
+        # Compute parameters with values derived from data and other
+        # parameters
+        print("Computing derived parameters...")
 
-    total_files = len(dataset_paths)
-    available_files = sum(path != "" for path in dataset_paths)
-    missing_files = total_files - available_files
+        parameters_data = _compute_parameters(settings, dataset_paths)
 
-    FILES_AVAILABLE = available_files > 0
+        save_metadata(parameters_filename, parameters_data)
 
-    if FILES_AVAILABLE:
-        notify(
-            INFO,
-            f"Found {available_files} datasets of {total_files}, "
-            f"missing {missing_files} datasets",
-        )
-    else:
-        notify(
-            INFO,
-            "Unable to acquire files: no datasets "
-            "found in the specified date range",
-        )
-    notify(INFO, _sepbar)
+        print("Derived parameters computed!")
 
-    return inventory_data
+    print_derived_parameters_report(settings, parameters_data)
+
+    print_bar()
+
+    return parameters_data
 
 
 def _compute_parameters(
     settings: _Settings, dataset_paths: list[str]
 ) -> _Settings:
-    from numpy import inf, load, nanmax, nanmin
+    from numpy import inf, nanmax, nanmin
 
-    algo_settings: _Settings = settings["algorithm"]
-    central_mask: float = algo_settings["central_mask"]
-    windows_size: float = algo_settings["windows_size"]
-    radius_min: float = algo_settings["radius_min"]
-    radius_step: float = algo_settings["radius_step"]
-    delta_hours: float = algo_settings["delta"]
-    sampling_rate: int = algo_settings["sampling_rate"]
-    filter_frequency: float = algo_settings["filter_frequency"]
-    filter_bandwidth: float = algo_settings["filter_bandwidth"]
+    algorithm_config: _Settings = settings.get("algorithm", {})
+    central_mask: float = algorithm_config["central_mask"]
+    windows_size: float = algorithm_config["windows_size"]
+    radius_min: float = algorithm_config["radius_min"]
+    radius_step: float = algorithm_config["radius_step"]
+    delta_hours: float = algorithm_config["delta"]
+    sampling_rate: int = algorithm_config["sampling_rate"]
+    filter_frequency: float = algorithm_config["filter_frequency"]
+    filter_bandwidth: float = algorithm_config["filter_bandwidth"]
 
-    repo_settings: dict[str, Path] = settings["repository"]
+    datasource_config: _Settings = settings.get("datasource", {})
+    spatial_resolution: float = datasource_config["spatial_resolution"]
+    time_resolution: int = datasource_config["time_resolution"]
 
-    datasource_settings: _Settings = settings["datasource"]
-    spatial_resolution: float = datasource_settings["spatial_resolution"]
-    time_resolution: int = datasource_settings["time_resolution"]
-
-    profiles_path: Path = repo_settings["profiles"]
+    repository_config: dict[str, Path] = settings.get("repository", {})
+    profile_directory: Path = repository_config["profile"]
 
     # Retrieve or calculate the derived parameters
 
@@ -451,13 +869,8 @@ def _compute_parameters(
         if not dataset_path:
             continue
 
-        # Create the profile file path
-        profile_path = Path(dataset_path)
-        profile_path = profile_path.with_suffix(_prof_suffix)
-        profile_path = profiles_path / profile_path.name
-
         # Load the profile data
-        profile_data = load(profile_path)
+        profile_data = load_profile_data(profile_directory, dataset_path)
 
         if radius == 0:
             radius = profile_data["radius"]
@@ -492,7 +905,7 @@ def _compute_parameters(
     # Sequence and time series lengths, and step size
     sequence_length = len(dataset_paths) - time_offset
     sequence_step = int(sampling_interval)
-    series_lenght = ceil(sequence_length / sequence_step)
+    series_length = ceil(sequence_length / sequence_step)
 
     if sampling_interval != sequence_step or sequence_step > time_resolution:
         raise ValueError(
@@ -504,15 +917,18 @@ def _compute_parameters(
     filter_highcut = (filter_frequency + 0.5 * filter_bandwidth) / 24
     filter_lowcut = (filter_frequency - 0.5 * filter_bandwidth) / 24
 
+    radii_km = [spatial_resolution * r for r in radii]
+
     return {
         "filter_highcut": filter_highcut,
         "filter_lowcut": filter_lowcut,
         "ignore": ignore,
         "radii": radii,
+        "radii_km": radii_km,
         "radius": radius,
         "sequence_length": sequence_length,
         "sequence_step": sequence_step,
-        "series_lenght": series_lenght,
+        "series_length": series_length,
         "time_offset": time_offset,
         "vmax": vmax,
         "vmin": vmin,
@@ -529,9 +945,9 @@ def _get_parameters_filename(settings: _Settings) -> Path:
         settings
     )
 
-    algo_settings: dict[str, float] = settings["algorithm"]
-    filter_frequency = algo_settings["filter_frequency"]
-    filter_bandwidth = algo_settings["filter_bandwidth"]
+    algorithm_config: dict[str, float] = settings.get("algorithm", {})
+    filter_frequency = algorithm_config["filter_frequency"]
+    filter_bandwidth = algorithm_config["filter_bandwidth"]
 
     filename_parts = [
         f"s{time_start}_e{time_end}",
@@ -543,103 +959,13 @@ def _get_parameters_filename(settings: _Settings) -> Path:
     filename_base = "_".join(filename_parts)
     filename = f"{event_name}_parameters_{filename_base}.dat"
 
-    repo_settings: dict[str, Path] = settings["repository"]
-    repository_path = repo_settings["path"]
+    repository_config: dict[str, Path] = settings.get("repository", {})
+    repository_path = repository_config["path"]
 
     return repository_path / filename
 
 
-def _report_parameters(settings: _Settings, params: _Settings) -> None:
-    vmax: float = params["vmax"]
-    vmin: float = params["vmin"]
-
-    notify(INFO, _sepbar)
-    notify(INFO, f"Minimum BT           : {vmin:>4.0f} K")
-    notify(INFO, f"Maximum BT           : {vmax:>4.0f} K")
-
-    algo_settings: _Settings = settings["algorithm"]
-    sampling_rate: int = algo_settings["sampling_rate"]
-
-    datasource_settings: _Settings = settings["datasource"]
-    time_resolution: int = datasource_settings["time_resolution"]
-
-    resolution_ratio = f"{sampling_rate:>0.0f}:{time_resolution:>0.0f}"
-
-    sequence_length: int = params["sequence_length"]
-    sequence_step: int = params["sequence_step"]
-    series_lenght: int = params["series_lenght"]
-
-    notify(INFO, f"Sequence length      : {sequence_length:>4d} data points")
-    notify(INFO, f"Sequence interval    : {sequence_step:>4d} data points")
-    notify(INFO, f"Time series lenght   : {series_lenght:>4d} data points")
-    notify(
-        INFO,
-        f"Ser./data res. ratio : {resolution_ratio:>4} data points/h",
-    )
-
-    spatial_resolution: float = datasource_settings["spatial_resolution"]
-
-    ignore: int = params["ignore"]
-    window: int = params["window"]
-
-    x_min: float = params["x_min"]
-    x_max: float = params["x_max"]
-
-    notify(
-        INFO,
-        f"Central mask         : {ignore:>4d} pixels (~{x_min:.0f}-km)",
-    )
-    notify(
-        INFO,
-        f"Analysis window      : {window:>4d} pixels (~{x_max:.0f}-km)",
-    )
-
-    label, sep = "Analysis radii", ":"
-
-    radii: list[int] = params["radii"]
-
-    for r in radii:
-        radius_km = spatial_resolution * r
-        notify(
-            INFO, f"{label:<21}{sep} {r:>4d}-th pixel (~{radius_km:.0f}-km)"
-        )
-        label, sep = "", " "
-
-
-def get_computed_parameters(
-    settings: _Settings, dataset_paths: list[str]
-) -> _Settings:
-    from goesdl.fileio import load_metadata, save_metadata
-
-    notify(INFO, _sepbar)
-
-    # Retrieve or calculate derived parameters
-    parameters_filename = _get_parameters_filename(settings)
-
-    parameters_data: _Settings
-
-    if parameters_filename.exists():
-        # Just retrieve the precomputed parameters
-        notify(INFO, "Retrieving precomputed parameters...")
-
-        parameters_data = load_metadata(parameters_filename)
-
-        notify(INFO, "Precomputed parameters retrieved!")
-
-    else:
-        # Compute parameters with values derived from data and other
-        # parameters
-        parameters_data = _compute_parameters(settings, dataset_paths)
-
-        save_metadata(parameters_filename, parameters_data)
-
-        notify(INFO, "Derived parameters computed!")
-
-    _report_parameters(settings, parameters_data)
-
-    notify(INFO, _sepbar)
-
-    return parameters_data
+# ---------- Time series handling utilities ----------
 
 
 def trim_timeseries(
@@ -647,36 +973,36 @@ def trim_timeseries(
 ) -> _Series:
     from goesdl.experimental.sequence import Sequencer
 
-    notify(INFO, _sepbar)
-    notify(INFO, "Trimming timeseries...")
+    print_bar()
+    print("Trimming timeseries...")
 
     begin_offset = None
-    series_lenght = 0
+    series_length = 0
     output_series: _Series = []
 
     for time_series in input_series:
         trimmed_time_series, start, _ = Sequencer.trim(time_series)
         if begin_offset is None:
             begin_offset = start
-            series_lenght = len(trimmed_time_series)
+            series_length = len(trimmed_time_series)
         output_series.append(cast(_Array, trimmed_time_series))
 
     # Update affected parameters
     params["begin_offset"] = begin_offset
-    params["series_lenght"] = series_lenght
+    params["series_length"] = series_length
 
-    notify(INFO, "Trimming finished!")
+    print("Trimming finished!")
 
     if begin_offset:
-        notify(INFO, _sepbar)
+        print_bar()
         sequence_length: int = params["sequence_length"]
-        notify(INFO, f"Sequence length    : {sequence_length:>4d} data points")
-        notify(INFO, f"Begin offset       : {begin_offset:>4d} data points")
-        notify(INFO, f"Time series lenght : {series_lenght:>4d} data points")
+        print(f"Sequence length    : {sequence_length:>4d} data points")
+        print(f"Begin offset       : {begin_offset:>4d} data points")
+        print(f"Time series lenght : {series_length:>4d} data points")
     else:
-        notify(INFO, "No change in series length")
+        print("No change in series length")
 
-    notify(INFO, _sepbar)
+    print_bar()
 
     return output_series
 
@@ -687,12 +1013,12 @@ def fill_timeseries(
     from goesdl.experimental.imputation import SignalImputator
     from goesdl.experimental.sequence import Sequencer
 
-    notify(INFO, _sepbar)
-    notify(INFO, "Imputing timeseries...")
+    print_bar()
+    print("Imputing timeseries...")
 
-    algo_settings: _Settings = settings["algorithm"]
-    control_samples: int = algo_settings["control_samples"]
-    sampling_rate: int = algo_settings["sampling_rate"]
+    algorithm_config: _Settings = settings.get("algorithm", {})
+    control_samples: int = algorithm_config["control_samples"]
+    sampling_rate: int = algorithm_config["sampling_rate"]
 
     # Sampling rate is in samples/hour
     samples_per_day = int(24 * sampling_rate)
@@ -711,15 +1037,15 @@ def fill_timeseries(
 
     gap_indices = sequencer.gap_indices(input_series[0])
 
-    notify(INFO, "Imputing finished!")
+    print("Imputing finished!")
 
     if gap_indices.size:
-        notify(INFO, _sepbar)
-        notify(INFO, f"Imputed values : {gap_indices.size:>4d} data points")
+        print_bar()
+        print(f"Imputed values : {gap_indices.size:>4d} data points")
     else:
-        notify(INFO, "No change in series content")
+        print("No change in series content")
 
-    notify(INFO, _sepbar)
+    print_bar()
 
     return output_series, gap_indices
 
@@ -727,12 +1053,12 @@ def fill_timeseries(
 def subsample_timeseries(
     input_series: _Series, settings: _Settings, params: _Settings
 ) -> _Series:
-    notify(INFO, _sepbar)
+    print_bar()
 
-    algo_settings: _Settings = settings["algorithm"]
-    analytic_samples: int = algo_settings["analytic_samples"]
-    analytic_offset: int = algo_settings["analytic_offset"]
-    sampling_rate: int = algo_settings["sampling_rate"]
+    algorithm_config: _Settings = settings.get("algorithm", {})
+    analytic_samples: int = algorithm_config["analytic_samples"]
+    analytic_offset: int = algorithm_config["analytic_offset"]
+    sampling_rate: int = algorithm_config["sampling_rate"]
 
     datasource_settings: _Settings = settings["datasource"]
     time_resolution: int = datasource_settings["time_resolution"]
@@ -751,47 +1077,47 @@ def subsample_timeseries(
             else "No subsampling required!"
         )
 
-        notify(INFO, message)
+        print(message)
         output_series = [time_series.copy() for time_series in input_series]
 
         begin_offset = params["begin_offset"]
-        series_lenght = params["series_lenght"]
+        series_length = params["series_length"]
 
     else:
-        notify(INFO, "Subsampling timeseries...")
+        print("Subsampling timeseries...")
 
         # Sampling rate is in samples/hour
         samples_per_day = int(24 * time_resolution)
 
         step = samples_per_day // analytic_samples
         begin = analytic_offset
-        end: int = params["series_lenght"] + step
+        end: int = params["series_length"] + step
 
         output_series = [
             time_series[begin:end:step] for time_series in input_series
         ]
 
-        notify(INFO, "Subsampling finished!")
+        print("Subsampling finished!")
 
         # Update affected parameters
         begin_offset = params["begin_offset"]
         begin_offset += analytic_offset
-        series_lenght = len(output_series[0])
+        series_length = len(output_series[0])
 
         params["begin_offset"] = begin_offset
-        params["series_lenght"] = series_lenght
+        params["series_length"] = series_length
 
         sampling_rate = new_sampling_rate
 
-    notify(INFO, _sepbar)
+    print_bar()
 
     params["sampling_rate"] = sampling_rate
 
-    notify(INFO, f"Sampling rate      : {sampling_rate:>4d} samples/h")
-    notify(INFO, f"Begin offset       : {begin_offset:>4d} data points")
-    notify(INFO, f"Time series lenght : {series_lenght:>4d} data points")
+    print(f"Sampling rate      : {sampling_rate:>4d} samples/h")
+    print(f"Begin offset       : {begin_offset:>4d} data points")
+    print(f"Time series lenght : {series_length:>4d} data points")
 
-    notify(INFO, _sepbar)
+    print_bar()
 
     return output_series
 
@@ -799,8 +1125,8 @@ def subsample_timeseries(
 def detrend_timeseries(input_series: _Series) -> tuple[_Series, _Series]:
     from goesdl.experimental.sequence import Sequencer
 
-    notify(INFO, _sepbar)
-    notify(INFO, "Detrending timeseries...")
+    print_bar()
+    print("Detrending timeseries...")
 
     output_series: _Series = []
     output_tendencies: _Series = []
@@ -812,8 +1138,8 @@ def detrend_timeseries(input_series: _Series) -> tuple[_Series, _Series]:
         tendency_component = time_series - detrended_time_series
         output_tendencies.append(tendency_component)
 
-    notify(INFO, "Detrending finished!")
-    notify(INFO, _sepbar)
+    print("Detrending finished!")
+    print_bar()
 
     return output_series, output_tendencies
 
@@ -827,11 +1153,11 @@ def calculate_mean_timeseries(
     from goesdl.experimental.align import SignalAligner
     from goesdl.experimental.sequence import Sequencer
 
-    notify(INFO, _sepbar)
-    notify(INFO, "Computing mean timeseries...")
+    print_bar()
+    print("Computing mean timeseries...")
 
-    algo_settings: _Settings = settings["algorithm"]
-    sampling_rate: int = algo_settings["sampling_rate"]
+    algorithm_config: _Settings = settings.get("algorithm", {})
+    sampling_rate: int = algorithm_config["sampling_rate"]
 
     # Calculate the incoherent mean time series
     incoherent_mean_timeseries = Sequencer.average(original_time_series)
@@ -843,7 +1169,7 @@ def calculate_mean_timeseries(
     event_settings: dict[str, int] = settings["event"]
     reference_series = event_settings["reference_series"]
 
-    filter_order: int = algo_settings["filter_order"]
+    filter_order: int = algorithm_config["filter_order"]
 
     filter_params = None
 
@@ -864,8 +1190,8 @@ def calculate_mean_timeseries(
         "coherent_mean_timeseries": coherent_mean_timeseries,
     }
 
-    notify(INFO, "Mean timeseries computed successfully!")
-    notify(INFO, _sepbar)
+    print("Mean timeseries computed successfully!")
+    print_bar()
 
     return mean_timeseries
 
@@ -874,29 +1200,29 @@ def filter_timeseries(
     detrended_timeseries: _Series,
     mean_timeseries: dict[str, _Array],
     settings: _Settings,
-    parameters: dict[str, float],
+    parameters: _Settings,
 ) -> tuple[_Series, dict[str, _Array]]:
     from goesdl.experimental.sequence import Sequencer
 
-    algo_settings: dict[str, int] = settings["algorithm"]
-    filter_frequency = algo_settings["filter_frequency"]
+    algorithm_config: dict[str, int] = settings["algorithm"]
+    filter_frequency = algorithm_config["filter_frequency"]
 
-    notify(INFO, _sepbar)
+    print_bar()
 
     mean_series: dict[str, _Array] = {}
 
     if filter_frequency == 0:
-        notify(INFO, "No filtering required!")
-        notify(INFO, _sepbar)
+        print("No filtering required!")
+        print_bar()
         return detrended_timeseries.copy(), mean_timeseries.copy()
 
-    notify(INFO, "Filtering timeseries...")
+    print("Filtering timeseries...")
 
-    sampling_rate = algo_settings["sampling_rate"]
-    filter_bandwidth = algo_settings["filter_bandwidth"]
-    filter_order = algo_settings["filter_order"]
-    filter_lowcut = parameters["filter_lowcut"]
-    filter_highcut = parameters["filter_highcut"]
+    sampling_rate = algorithm_config["sampling_rate"]
+    filter_bandwidth = algorithm_config["filter_bandwidth"]
+    filter_order = algorithm_config["filter_order"]
+    filter_lowcut: float = parameters["filter_lowcut"]
+    filter_highcut: float = parameters["filter_highcut"]
 
     sequencer = Sequencer(sampling_rate)
 
@@ -914,47 +1240,352 @@ def filter_timeseries(
         )
         mean_series[key] = cast(_Array, filtered_time_series)
 
-    notify(INFO, "Filtering finished!")
-    notify(INFO, _sepbar)
+    print("Filtering finished!")
+    print_bar()
 
     print(f"Central frequency : {filter_frequency:>4.1f} c/d")
     print(f"Bandpass width    : {filter_bandwidth:>4.1f} c/d")
     print(f"Butterworth order : {filter_order:>4}th")
-    notify(INFO, _sepbar)
+    print_bar()
 
     return output_series, mean_series
 
 
-def compute_spectra(
+# ---------- Spectrum analysis utilities ----------
+
+
+def analyze_spectra(
     detrended_timeseries: _Series,
     mean_timeseries: dict[str, _Array],
     settings: _Settings,
-    parameters: dict[str, float],
+    parameters: _Settings,
 ) -> tuple[_Spectra, dict[str, _Spectrum]]:
     from goesdl.experimental.fourier import FourierAnalysis
+
+    print_bar()
+    print("Analysing timeseries spectra...")
+
+    algorithm_config: dict[str, Any] = settings["algorithm"]
+    sampling_rate: int = algorithm_config["sampling_rate"]
+    fft_size: int | None = algorithm_config["fft_size"]
+    window_function: str = algorithm_config["window_function"]
+    noise: str = algorithm_config["noise_type"]
+
+    series_length: int = parameters["series_length"]
+
+    nperseg, noverlap = _get_welch_params(settings, parameters)
 
     analysers: _Spectra = []
     mean_analysers: dict[str, _Spectrum] = {}
 
-    nperseg = None  # None (for periodogram) or min(4 * 24 * SERIES_RESOLUTION, series_lenght)
-    noverlap = nperseg // 4 if nperseg else 0
+    actual_fft_size: int | None = None
 
     # Perform Fourier Analysis
-    for filtered_time_series in bt_detrended_time_series + [
-        aligner.signal,
-        aligner_f.signal,
-        detrended_reduced_time_series,
-    ]:
+    for time_series in detrended_timeseries:
         analyser = FourierAnalysis(
-            sampling_rate=SERIES_RESOLUTION,
-            signal_size=series_lenght,
-            fft_size=FREQUENCY_SAMPLING_RATE,
-            window=WINDOW_FUNCTION,
+            sampling_rate=sampling_rate,
+            signal_size=series_length,
+            fft_size=fft_size,
+            window=window_function,
             dewindow_threshold=0.1,
         )
 
-        analyser.apply(filtered_time_series, nperseg, noverlap)
+        analyser.apply(time_series, nperseg, noverlap, noise)
 
         analysers.append(analyser)
 
+        if actual_fft_size is None:
+            actual_fft_size = analyser.fft_size
+
+    for key, time_series in mean_timeseries.items():
+        analyser = FourierAnalysis(
+            sampling_rate=sampling_rate,
+            signal_size=series_length,
+            fft_size=fft_size,
+            window=window_function,
+            dewindow_threshold=0.1,
+        )
+
+        analyser.apply(time_series, nperseg, noverlap, noise)
+
+        mean_analysers[key] = analyser
+
+    print("Spectra analysis finished!")
+    print_bar()
+
+    required_fft_size = f"{fft_size:>4d}" if fft_size else "(automatic)"
+    effective_fft_size = (
+        f"{actual_fft_size:>4d}" if actual_fft_size else "(unknown)"
+    )
+
+    print(f"Required FFT spectrum size  : {required_fft_size}")
+    print(f"Effective FFT spectrum size : {effective_fft_size}")
+
+    print_bar()
+
     return analysers, mean_analysers
+
+
+def _get_welch_params(
+    settings: _Settings, parameters: _Settings
+) -> tuple[int | None, int | None]:
+    algorithm_config: dict[str, Any] = settings["algorithm"]
+    nperseg = algorithm_config["nperseg"]
+    noverlap = algorithm_config["noverlap"]
+    sampling_rate: int = algorithm_config["sampling_rate"]
+
+    series_length: int = parameters["series_length"]
+
+    def valid_nproportion(x: Any) -> TypeGuard[float]:
+        return isinstance(x, float) and 0 < x <= 1.0
+
+    def valid_block(x: Any) -> TypeGuard[int]:
+        if not isinstance(x, int):
+            return False
+        block_size = floor(x * 24 * sampling_rate)
+        return 0 < block_size <= series_length
+
+    def valid_oproportion(x: Any) -> TypeGuard[float]:
+        return isinstance(x, float) and 0 <= x <= 0.75
+
+    def valid_overlap(x: Any) -> TypeGuard[int]:
+        if not isinstance(x, int) or not isinstance(nperseg, int):
+            return False
+        return 0 <= x < nperseg
+
+    if nperseg is None:
+        nperseg = None
+    elif valid_nproportion(nperseg):
+        nperseg = floor(nperseg * series_length)
+    elif valid_block(nperseg):
+        nperseg = floor(nperseg * 24 * sampling_rate)
+    else:
+        raise ValueError("Invalid `nperseg` value")
+
+    if noverlap is None:
+        noverlap = None
+    elif valid_oproportion(noverlap) and isinstance(nperseg, int):
+        noverlap = floor(noverlap * nperseg)
+    elif not valid_overlap(noverlap):
+        raise ValueError("Invalid `noverlap` value")
+
+    return nperseg, noverlap
+
+
+def _find_diurnal_cycle(input_analyser: Any) -> _Array:
+    from goesdl.experimental.fourier import FourierAnalysis
+
+    analyser = cast(FourierAnalysis, input_analyser)
+
+    if not (diurnal := analyser.find_frequency(1.0 / 24)):
+        return zeros((analyser.signal_size,), dtype=float64)
+
+    diurnal_index = diurnal[0]
+
+    time_series = analyser.reconstruct_components(diurnal_index)
+
+    return cast(_Array, time_series)
+
+
+def find_diurnal_cycle(
+    analysers: _Spectra, input_mean_analysers: dict[str, _Spectrum]
+) -> tuple[_Series, dict[str, _Array]]:
+    diurnal_cycles: _Series = []
+
+    for analyser in analysers:
+        diurnal_cycle = _find_diurnal_cycle(analyser)
+        diurnal_cycles.append(diurnal_cycle)
+
+    mean_diurnal_cycles: dict[str, _Array] = {}
+
+    for key, analyser in input_mean_analysers.items():
+        diurnal_cycle = _find_diurnal_cycle(analyser)
+        mean_diurnal_cycles[key] = diurnal_cycle
+
+    return diurnal_cycles, mean_diurnal_cycles
+
+
+def get_dominant_cycle(
+    input_analysers: _Spectra, input_mean_analysers: dict[str, _Spectrum]
+) -> tuple[_Series, dict[str, _Array]]:
+    from goesdl.experimental.fourier import FourierAnalysis
+
+    analysers = cast(list[FourierAnalysis], input_analysers)
+    mean_analysers = cast(dict[str, FourierAnalysis], input_mean_analysers)
+
+    dominant_cycles: _Series = []
+
+    for analyser in analysers:
+        dominant_cycle = analyser.reconstruct_components(indices=0)
+        dominant_cycles.append(cast(_Array, dominant_cycle))
+
+    mean_dominant_cycles: dict[str, _Array] = {}
+
+    for key, analyser in mean_analysers.items():
+        dominant_cycle = analyser.reconstruct_components(indices=0)
+        mean_dominant_cycles[key] = cast(_Array, dominant_cycle)
+
+    return dominant_cycles, mean_dominant_cycles
+
+
+# ---------- Plotting helpers ----------
+
+
+def get_time_ticks(
+    settings: _Settings, parameters: _Settings, tick_interval: int = 6
+) -> tuple[_Array, list[int], float]:
+    event_config: dict[str, str] = settings.get("event", {})
+    time_start = event_config.get("time_start", "N/A")
+
+    format_config: dict[str, str] = settings.get("date_format", {})
+    date_format = format_config["input"]
+
+    algorithm_config: dict[str, float] = settings.get("algorithm", {})
+    sampling_rate = algorithm_config["sampling_rate"]
+
+    begin_offset: float = parameters["begin_offset"]
+    series_length: float = parameters["series_length"]
+
+    dt_start = datetime.strptime(time_start, date_format)
+    dt_start += timedelta(hours=begin_offset / sampling_rate)
+    dt_end = dt_start + timedelta(hours=series_length / sampling_rate)
+
+    time_hours = (dt_end - dt_start).total_seconds() / 3600
+    duration_per_point_hours = 1 / sampling_rate
+
+    start_hour_of_day = dt_start.hour
+
+    first_real_tick_hour_of_day = (
+        start_hour_of_day // tick_interval
+    ) * tick_interval
+
+    if first_real_tick_hour_of_day < start_hour_of_day:
+        first_real_tick_hour_of_day += tick_interval
+
+    first_tick_position_on_x_axis = (
+        first_real_tick_hour_of_day - start_hour_of_day
+    )
+
+    tick_position = arange(
+        first_tick_position_on_x_axis,
+        time_hours + duration_per_point_hours,
+        tick_interval,
+    )
+
+    tick_label = [
+        (int(first_real_tick_hour_of_day + i * tick_interval)) % 24
+        for i in range(len(tick_position))
+    ]
+
+    return tick_position, tick_label, time_hours
+
+
+def get_date_markers(
+    settings: _Settings, parameters: _Settings, label_format: str = "%Y-%m-%d"
+) -> tuple[list[float], list[str]]:
+    event_config: dict[str, str] = settings.get("event", {})
+    time_start = event_config.get("time_start", "N/A")
+
+    format_config: dict[str, str] = settings.get("date_format", {})
+    date_format = format_config["input"]
+
+    algorithm_config: dict[str, float] = settings.get("algorithm", {})
+    sampling_rate = algorithm_config["sampling_rate"]
+
+    begin_offset: float = parameters["begin_offset"]
+    series_length: float = parameters["series_length"]
+
+    dt_start = datetime.strptime(time_start, date_format)
+    dt_start_offsetted = dt_start + timedelta(
+        hours=begin_offset / sampling_rate
+    )
+    dt_end = dt_start_offsetted + timedelta(
+        hours=series_length / sampling_rate
+    )
+
+    time_hours = (dt_end - dt_start_offsetted).total_seconds() / 3600
+
+    hours_since_last_midnight = (
+        dt_start_offsetted.hour + dt_start_offsetted.minute / 60.0
+    )
+    hours_to_next_midnight = (24 - hours_since_last_midnight) % 24
+
+    if (
+        hours_to_next_midnight == 0
+        and dt_start_offsetted.hour == 0
+        and dt_start_offsetted.minute == 0
+    ):
+        first_midnight_position = 0.0
+    else:
+        first_midnight_position = hours_to_next_midnight
+
+    midnight_pos = [
+        first_midnight_position + (j * 24)
+        for j in range(int(ceil(time_hours / 24)) + 2)
+    ]
+
+    midnight_pos = [pos for pos in midnight_pos if 0 <= pos <= time_hours]
+
+    date_labels: list[str] = []
+    for pos in midnight_pos:
+        current_datetime = dt_start_offsetted + timedelta(hours=pos)
+        date_labels.append(current_datetime.strftime(label_format))
+
+    return midnight_pos, date_labels
+
+
+def combine_tick_labels(
+    tick_positions: list[float],
+    tick_labels_hours: list[int],
+    midnight_positions: list[float],
+    midnight_labels_dates: list[str],
+) -> list[str]:
+    final_tick_labels: list[str] = []
+
+    midnight_label_index = 0
+
+    for i, pos in enumerate(tick_positions):
+        label_hour = tick_labels_hours[i]
+
+        if label_hour == 0 and midnight_label_index < len(midnight_positions):
+            if abs(pos - midnight_positions[midnight_label_index]) < 0.1:
+                final_tick_labels.append(
+                    midnight_labels_dates[midnight_label_index]
+                )
+                midnight_label_index += 1
+            else:
+                final_tick_labels.append(f"{label_hour:02d}:00h")
+        else:
+            final_tick_labels.append(f"{label_hour:02d}:00h")
+
+    return final_tick_labels
+
+
+def calculate_global_limits(
+    input_series: _Series,
+) -> tuple[float, float, float, float]:
+    max_abs_val = 0.0
+    max_std_val = 0.0
+
+    global_min_val = inf
+    global_max_val = -inf
+
+    for series in input_series:
+        current_series_max_abs = max(abs(series))
+        if current_series_max_abs > max_abs_val:
+            max_abs_val = float(current_series_max_abs)
+
+        current_series_max_std = std(series)
+        if current_series_max_std > max_std_val:
+            max_std_val = float(current_series_max_std)
+
+        current_series_min = min(series)
+        current_series_max = max(series)
+
+        if current_series_min < global_min_val:
+            global_min_val = float(current_series_min)
+
+        if current_series_max > global_max_val:
+            global_max_val = float(current_series_max)
+
+    return global_min_val, global_max_val, max_abs_val, max_std_val

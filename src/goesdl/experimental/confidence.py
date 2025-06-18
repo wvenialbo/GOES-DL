@@ -1,7 +1,7 @@
 from math import floor, inf
 from typing import Any, cast
 
-from numpy import clip, corrcoef, cos, full_like, pi, sqrt, sum, var
+from numpy import clip, corrcoef, cos, full_like, pi, sqrt, sum, var, where
 from scipy.linalg import LinAlgError
 from scipy.signal import correlate, get_window
 from scipy.stats import chi2
@@ -213,3 +213,15 @@ def calculate_confidence_level(
     chi2_factor_level = chi2.ppf(level, dof) / dof
 
     return null_curve * chi2_factor_level
+
+
+def calculate_p_values(
+    psd_observed: ArrayFloat, psd_null: ArrayFloat, dof: float
+) -> ArrayFloat:
+    null_curve_safe = where(psd_null < 1e-9, 1e-9, psd_null)
+
+    chi2_stat = dof * psd_observed / null_curve_safe
+
+    p_values = 1 - chi2.cdf(chi2_stat, df=dof)
+
+    return cast(ArrayFloat, p_values)

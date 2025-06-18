@@ -1,4 +1,3 @@
-from logging import INFO
 from pathlib import Path
 from typing import Any, cast
 
@@ -9,43 +8,55 @@ from .utilities import (
     get_algorithm_extra,
     get_algorithm_info,
     get_event_info,
-    notify,
+    load_profile,
+    print_algorithm_parameters_report,
+    print_bar,
 )
 
 _Array = NDArray[floating[Any]]
 _Settings = dict[str, Any]
 
 _prof_suffix = ".npz"
-_sepbar = "=" * 50
 
 
-def _load_profile(profiles_path: Path, path: str) -> _Array:
-    from numpy import load
-
-    # Create the profile file path
-    profile_path = Path(path)
-    profile_path = profile_path.with_suffix(_prof_suffix)
-    profile_path = profiles_path / profile_path.name
-
-    # Load the profile data
-    profile_data = load(profile_path)
-    profile: _Array = profile_data["profile"]
-
-    return profile
+# ---------- Radial profile difference time series algorithm ----------
+# ----------     (author: Waldemar Villamayor-Venialbo)      ----------
 
 
-def _fill_missing_profile_values(profile: _Array, ignore: int) -> _Array:
-    from numpy import isnan, nanmean
+def run_algorithm_w(
+    settings: _Settings, params: _Settings, dataset_paths: list[str]
+) -> list[list[float]]:
+    from goesdl.fileio import load_metadata, save_metadata
 
-    # Fill missing values
-    invalid_data = isnan(profile)
-    mean_data = cast(float, nanmean(profile))
-    profile[invalid_data] = mean_data
+    print_algorithm_parameters_report(settings)
 
-    # Set ignored central region to the next value in the profile
-    profile[:ignore] = profile[ignore]
+    # Retrieve or build the time series
+    timeseries_filename = _get_timeseries_filename(settings)
 
-    return profile
+    raw_time_series: list[list[float]]
+
+    if timeseries_filename.exists():
+        # Just retrieve the precomputed time series
+        print("Retrieving timeseries data...")
+
+        raw_time_series = load_metadata(timeseries_filename)
+
+        print("Time series retrieved!")
+
+    else:
+        # Compute parameters with values derived from data and other
+        # parameters
+        print("Generating time series...")
+
+        raw_time_series = _run_algorithm_w(settings, params, dataset_paths)
+
+        save_metadata(timeseries_filename, raw_time_series)
+
+        print("Time series generation finished!")
+
+    print_bar()
+
+    return raw_time_series
 
 
 def _run_algorithm_w(
@@ -68,7 +79,7 @@ def _run_algorithm_w(
     ignore: int = params["ignore"]
 
     repo_settings: dict[str, Path] = settings["repository"]
-    profiles_path = repo_settings["profiles"]
+    profile_directory = repo_settings["profile"]
 
     algo_settings: _Settings = settings["algorithm"]
     invert_difference: bool = algo_settings["invert_difference"]
@@ -81,20 +92,18 @@ def _run_algorithm_w(
         rhs_path = rhs_sequence[i]
 
         if verbose:
-            notify(
-                INFO, f"Generating data point {i + 1} of {sequence_length}\n"
-            )
+            print(f"Generating data point {i + 1} of {sequence_length}\n")
 
         if not lhs_path or not rhs_path:
             if verbose:
-                notify(INFO, "... no data available\n")
+                print("... no data available\n")
             for k in range(len(radii)):
                 raw_time_series[k].append(nan)
             continue
 
         # Load the profile
-        lhs_profile = _load_profile(profiles_path, lhs_path)
-        rhs_profile = _load_profile(profiles_path, rhs_path)
+        lhs_profile = load_profile(profile_directory, lhs_path)
+        rhs_profile = load_profile(profile_directory, rhs_path)
 
         # Fill missing values
         lhs_profile = _fill_missing_profile_values(lhs_profile, ignore)
@@ -113,6 +122,20 @@ def _run_algorithm_w(
             raw_time_series[k].append(value_at_radius)
 
     return raw_time_series
+
+
+def _fill_missing_profile_values(profile: _Array, ignore: int) -> _Array:
+    from numpy import isnan, nanmean
+
+    # Fill missing values
+    invalid_data = isnan(profile)
+    mean_data = cast(float, nanmean(profile))
+    profile[invalid_data] = mean_data
+
+    # Set ignored central region to the next value in the profile
+    profile[:ignore] = profile[ignore]
+
+    return profile
 
 
 def _get_timeseries_filename(settings: _Settings) -> Path:
@@ -134,43 +157,7 @@ def _get_timeseries_filename(settings: _Settings) -> Path:
     filename_base = "_".join(filename_parts)
     filename = f"{event_name}_timeseries_{filename_base}.dat"
 
-    repo_settings: dict[str, Path] = settings["repository"]
-    repository_path = repo_settings["path"]
+    repository_config: dict[str, Path] = settings.get("repository", {})
+    repository_path = repository_config["path"]
 
     return repository_path / filename
-
-
-def run_algorithm_w(
-    settings: _Settings, params: _Settings, dataset_paths: list[str]
-) -> list[list[float]]:
-    from goesdl.fileio import load_metadata, save_metadata
-
-    notify(INFO, _sepbar)
-
-    # Retrieve or build the time series
-    timeseries_filename = _get_timeseries_filename(settings)
-
-    raw_time_series: list[list[float]]
-
-    if timeseries_filename.exists():
-        # Just retrieve the precomputed time series
-        notify(INFO, "Retrieving timeseries data...")
-
-        raw_time_series = load_metadata(timeseries_filename)
-
-        notify(INFO, "Time series retrieved!")
-
-    else:
-        # Compute parameters with values derived from data and other
-        # parameters
-        notify(INFO, "Generating time series...")
-
-        raw_time_series = _run_algorithm_w(settings, params, dataset_paths)
-
-        save_metadata(timeseries_filename, raw_time_series)
-
-        notify(INFO, "Time series generation finished!")
-
-    notify(INFO, _sepbar)
-
-    return raw_time_series

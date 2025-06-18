@@ -1,4 +1,4 @@
-from math import ceil, log2, sqrt
+from math import ceil, log2, nan, sqrt
 from typing import Any, cast
 
 from numpy import (
@@ -17,13 +17,15 @@ from numpy import (
     nonzero,
     split,
     sum,
+    where,
     zeros,
     zeros_like,
 )
-from scipy.fft import irfft, rfft, rfftfreq
+from scipy.fft import irfft, rfft
 from scipy.signal import get_window, periodogram, welch
 
 from ..utils.array import (
+    ArrayBool,
     ArrayComplex,
     ArrayComplex128,
     ArrayFloat,
@@ -33,8 +35,13 @@ from ..utils.array import (
     ToFloat,
     ToInt,
 )
+from .confidence import (
+    calculate_confidence_level,
+    calculate_p_values,
+    degrees_of_freedom,
+    null_hypothesis,
+)
 from .helper import parabolic_interpolation_y, validate_1d_signal
-from .sequence import Sequencer
 
 SUPPORTED_WINDOW_FUNCTIONS = {
     "bartlett",
@@ -70,6 +77,10 @@ class FourierAnalysis:
     peak_boundaries: ArrayInt
     peak_indices: ArrayInt
     peak_values: ArrayFloat
+
+    null: ArrayFloat
+    p_value: ArrayFloat
+    dof: float
 
     def __init__(
         self,
@@ -142,11 +153,16 @@ class FourierAnalysis:
         self.peak_indices = empty(0, dtype=int64)
         self.peak_values = empty((0, 2), dtype=float64)
 
+        self.null = zeros(nyquist_size, dtype=float64)
+        self.p_value = zeros(nyquist_size, dtype=float64)
+        self.dof = nan
+
     def apply(
         self,
         signal: SequenceFloat,
         nperseg: ToInt | None = None,
         noverlap: ToInt | None = None,
+        noise: str = "white",
     ) -> None:
         """
         Perform Fourier Analysis on the input signal.
@@ -188,6 +204,8 @@ class FourierAnalysis:
         windowed_signal = signal * window
 
         if nperseg is None:
+            nperseg = self.signal_size
+            noverlap = 0
             frequencies, density_spectrum = periodogram(
                 x=signal,
                 fs=self.sampling_rate,
@@ -218,38 +236,23 @@ class FourierAnalysis:
 
         self._perform_analysis(self.density_spectrum)
 
-    def average(
-        self, analyzers: list["FourierAnalysis"], ignore_phase: bool = True
-    ) -> None:
-        average_fft: ArrayComplex
-        sequencer = Sequencer(self.sampling_rate)
-        if ignore_phase:
-            amplitudes = [abs(analyzer.fft) for analyzer in analyzers]
-            average_amplitude = sequencer.average(amplitudes)
-            average_fft = average_amplitude.astype(complex128)
+        nsamples = self.signal_size
+        window_type = self.window
 
-        else:
-            ffts = [analyzer.fft for analyzer in analyzers]
-            average_fft = sequencer.average_complex(ffts)
-            average_amplitude = abs(average_fft)
+        dof = degrees_of_freedom(nsamples, int(nperseg), noverlap, window_type)
+        self.dof = dof
 
-        sampling_interval = 1 / self.sampling_rate
-        frequencies = rfftfreq(self.fft_size, d=sampling_interval)
+        sampling_rate = self.sampling_rate
 
-        win_id = cast(Any, self.window)
-        window = get_window(win_id, self.signal_size, False)
-        window_energy = sum(window**2)
+        psd_null = null_hypothesis(signal, frequencies, sampling_rate, noise)
+        self.null = psd_null
 
-        scale = 1 / window_energy / self.sampling_rate
-        density_spectrum = average_amplitude**2 * scale
-        start, end = 1, -1 if self.has_nyquist else None
-        density_spectrum[start:end] *= 2.0
+        psd_observed = density_spectrum
 
-        self.fft = average_fft
-        self.density_spectrum = density_spectrum
-        self.frequencies = frequencies
+        self.p_value = calculate_p_values(psd_observed, psd_null, dof)
 
-        self._perform_analysis(self.density_spectrum)
+    def confidence_threshold(self, level: float) -> ArrayFloat:
+        return calculate_confidence_level(level, self.null, self.dof)
 
     def find_frequency(
         self, frequencies: list[float] | float | int, tolerance: float = 0.1
@@ -315,6 +318,40 @@ class FourierAnalysis:
         windowed_signal = self._reconstruct_fft_signal(fft_filtered)
 
         return self._remove_window(windowed_signal)
+
+    def significant_densities(
+        self, level: float, upper: float = 0.0
+    ) -> ArrayFloat:
+        peak_densities = self.dominant_densities
+        is_dominant = self._is_dominant(level, upper)
+        return peak_densities[is_dominant]
+
+    def significant_frequencies(
+        self, level: float, upper: float = 0.0
+    ) -> ArrayFloat:
+        peak_frequencies = self.dominant_frequencies
+        is_dominant = self._is_dominant(level, upper)
+        return peak_frequencies[is_dominant]
+
+    def significant_peaks(self, level: float) -> ArrayFloat:
+        psd_observed = self.density_spectrum
+        threshold = self.confidence_threshold(level)
+        return where(psd_observed > threshold, psd_observed, nan)
+
+    def _is_dominant(self, level: float, upper: float) -> ArrayBool:
+        threshold = self.confidence_threshold(level)
+        peak_indices = self.peak_indices
+        peak_densities = self.dominant_densities
+
+        is_dominant = peak_densities > threshold[peak_indices]
+
+        if upper > level:
+            threshold = self.confidence_threshold(upper)
+            is_dominant = is_dominant & (
+                peak_densities <= threshold[peak_indices]
+            )
+
+        return is_dominant
 
     def _perform_analysis(self, spectrum: ArrayFloat) -> None:
         # Subset for sorting should exclude DC and Nyquist, if present
