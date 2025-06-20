@@ -3,7 +3,10 @@ from math import ceil, floor, inf, nan
 from pathlib import Path
 from typing import Any, TypeGuard, cast
 
-from numpy import abs, arange, float64, floating, integer, max, min, std, zeros
+from numpy import abs, arange, float64, floating, integer
+from numpy import max as npmax
+from numpy import min as npmin
+from numpy import std, zeros
 from numpy.typing import NDArray
 
 _Array = NDArray[floating[Any]]
@@ -1544,7 +1547,8 @@ def combine_tick_labels(
 
     midnight_label_index = 0
 
-    for i, pos in enumerate(tick_positions):
+    for i, pos_ in enumerate(tick_positions):
+        pos = cast(float, pos_)
         label_hour = tick_labels_hours[i]
 
         if label_hour == 0 and midnight_label_index < len(midnight_positions):
@@ -1571,7 +1575,7 @@ def calculate_global_limits(
     global_max_val = -inf
 
     for series in input_series:
-        current_series_max_abs = max(abs(series))
+        current_series_max_abs = npmax(abs(series))
         if current_series_max_abs > max_abs_val:
             max_abs_val = float(current_series_max_abs)
 
@@ -1579,8 +1583,8 @@ def calculate_global_limits(
         if current_series_max_std > max_std_val:
             max_std_val = float(current_series_max_std)
 
-        current_series_min = min(series)
-        current_series_max = max(series)
+        current_series_min = npmin(series)
+        current_series_max = npmax(series)
 
         if current_series_min < global_min_val:
             global_min_val = float(current_series_min)
