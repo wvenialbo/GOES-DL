@@ -1,6 +1,10 @@
+from typing import Any
+
 import numpy as np
 
 from ..utils.array import ArrayFloat, ArrayIndex, ToIndex
+
+_Settings = dict[str, Any]
 
 
 def interpretar_p_valores(
@@ -227,8 +231,8 @@ def interpretar_p_valores(
                 if n_extremos > n_count:
                     print(f"       ... y {n_extremos-n_count} más")
         print(
-            "\n⚠️  Advertencia: Las frecuencias estadísticamente "
-            "significativas pueden diferir ligeramente de las "
+            "\n⚠️ Advertencia: Las frecuencias estadísticamente "
+            "significativas\n\u2800\u2800 pueden diferir ligeramente de las "
             "físicamente significativas."
         )
     else:
@@ -254,3 +258,364 @@ def interpretar_p_valores(
             print("   • Considerar aumentar resolución espectral")
 
     print("\n" + "=" * 60)
+
+
+def crear_espectrogramas(
+    analysers_: Any,
+    average_analysers_: Any,
+    settings: _Settings,
+    parameters: _Settings,
+) -> None:
+    from goesdl.experimental.fourier import FourierAnalysis
+    from goesdl.experimental.plotting import get_template, render_template
+    from goesdl.experimental.report import interpretar_p_valores
+
+    analysers: list[FourierAnalysis] = analysers_
+    average_analysers: dict[str, FourierAnalysis] = average_analysers_
+
+    mean_analyser = average_analysers["coherent_mean_timeseries"]
+
+    frequencies = 24 * analysers[0].frequencies
+    noise_type = settings["algorithm"]["noise_type"]
+    noise_map = {"red": "rojo", "white": "blanco"}
+
+    global_dominant_frequency = mean_analyser.dominant_frequencies[0] * 24
+    global_dominant_density = mean_analyser.dominant_densities[0]
+
+    # > settings = reload_project("../event.yaml", "../settings.yaml", False)
+
+    selected_analysers = analysers + [mean_analyser]
+
+    for i, analyser in enumerate(selected_analysers):
+        radius_km = (
+            parameters["radii_km"][i] if analyser is not mean_analyser else 0.0
+        )
+
+        significant_frequencies = 24 * analyser.significant_frequencies(
+            0.95, 0.99
+        )
+        significant_densities = analyser.significant_densities(0.95, 0.99)
+        very_significant_frequencies = 24 * analyser.significant_frequencies(
+            0.99
+        )
+        very_significant_densities = analyser.significant_densities(0.99)
+
+        template = get_template(settings, "spectrogram")
+        periodogram = template["subplots"]["periodogram"]
+        plot = periodogram["plot"]
+
+        plot[0] |= {"x": frequencies, "y": analyser.density_spectrum}
+        if analyser is not mean_analyser:
+            plot[0]["label"] = plot[0]["label"] % radius_km
+
+        plot[1] |= {"x": frequencies, "y": mean_analyser.density_spectrum}
+
+        plot[2] |= {"x": frequencies, "y": analyser.null}
+        plot[3] |= {"x": frequencies, "y": analyser.confidence_threshold(0.90)}
+        plot[4] |= {"x": frequencies, "y": analyser.confidence_threshold(0.95)}
+        plot[5] |= {"x": frequencies, "y": analyser.confidence_threshold(0.99)}
+
+        plot[6] |= {"x": frequencies, "y": analyser.significant_peaks(0.95)}
+
+        plot[7] |= {"x": significant_frequencies, "y": significant_densities}
+        plot[8] |= {
+            "x": very_significant_frequencies,
+            "y": very_significant_densities,
+        }
+        plot[9] |= {
+            "x": global_dominant_frequency,
+            "y": global_dominant_density,
+        }
+
+        if analyser is mean_analyser:
+            plot.pop(0)
+            plot[0]["linestyle"] = "-"
+
+        x_min = periodogram["xlim"]["left"]
+        x_max = periodogram["xlim"]["right"]
+        x_range = x_max - x_min
+        x_offset = 0.01 * x_range
+
+        y_min = periodogram["ylim"]["bottom"]
+        y_max = float(
+            max(analyser.dominant_densities[0], global_dominant_density)
+        )
+        y_range = y_max - y_min
+        y_offset = 0.01 * y_range
+
+        periodogram["ylim"]["top"] = 1.10 * y_max
+
+        significant_frequencies = 24 * analyser.significant_frequencies(0.95)
+        significant_densities = analyser.significant_densities(0.95)
+        significant_p_values = analyser.significant_p_values(0.95)
+
+        periodogram["text"] = []
+        for frequency, density in zip(
+            significant_frequencies, significant_densities
+        ):
+            x_loc = frequency + x_offset
+            y_loc = density + y_offset
+            llabel = periodogram["local_text"] | {"x": x_loc, "y": y_loc}
+            llabel["s"] = llabel["s"] % frequency
+            periodogram["text"].append(llabel)
+
+        x_loc = global_dominant_frequency + x_offset
+        y_loc = global_dominant_density + y_offset
+        glabel = periodogram["global_text"] | {"x": x_loc, "y": y_loc}
+        glabel["s"] = glabel["s"] % global_dominant_frequency
+        periodogram["text"].append(glabel)
+
+        if len(significant_frequencies) == 0:
+            significant_frequencies = 24 * analyser.dominant_frequencies
+            significant_p_values = analyser.dominant_p_values
+
+        dominant_frequency = significant_frequencies[0]
+        dominant_period = 24 / dominant_frequency
+        dominant_p_value = significant_p_values[0]
+
+        title = periodogram["title"]
+        if analyser is not mean_analyser:
+            title[0]["label"] = title[0]["label"] % radius_km
+        else:
+            title[0]["label"] = periodogram["global_title"]
+        title[1]["label"] = title[1]["label"] % (
+            dominant_frequency,
+            dominant_period,
+            dominant_p_value,
+            noise_map[noise_type],
+            analyser.dof,
+        )
+
+        p_valuegram = template["subplots"]["p_valuegram"]
+        plot = p_valuegram["plot"]
+
+        plot[0] |= {"x": frequencies, "y": analyser.p_value}
+        if analyser is not mean_analyser:
+            plot[0]["label"] = plot[0]["label"] % radius_km
+        else:
+            plot[0]["label"] = p_valuegram["global_title"]
+
+        for k in range(len(p_valuegram["fill_between"])):
+            fill = p_valuegram["fill_between"][k]
+            p_valuegram["fill_between"][k] = fill | {"x": frequencies}
+
+        title = p_valuegram["title"]
+        if analyser is not mean_analyser:
+            title["label"] = title["label"] % radius_km
+        else:
+            title["label"] = p_valuegram["global_title"]
+
+        frequencies_report = frequencies.copy()
+        frequencies_report[analyser.peak_indices] = (
+            24 * analyser.dominant_frequencies
+        )
+        interpretar_p_valores(
+            frequencies_report, analyser.p_value, analyser.peak_indices
+        )
+
+        render_template(template)
+
+
+def visualizar_capturas(
+    bt_timeseries: Any,
+    bt_filled_timeseries: Any,
+    bt_mean_timeseries: Any,
+    bt_gap_indices: Any,
+    settings: _Settings,
+    parameters: _Settings,
+) -> None:
+    from goesdl.experimental.plotting import plot_timeseries
+    from goesdl.experimental.sequence import Sequencer
+
+    sampling_rate = settings["algorithm"]["sampling_rate"]
+    series_lenght = parameters["series_length"]
+    delta_hr = settings["algorithm"]["delta"]
+
+    sequencer = Sequencer(sampling_rate)
+
+    times_days = sequencer.build_times(series_lenght) / 24
+    samples_per_day = int(24 * sampling_rate)
+    radii_km = parameters["radii_km"]
+
+    title_right = (
+        f"(fs = {samples_per_day} muestras/d, dt={delta_hr:0.1f}h)",
+        "right",
+    )
+    radii_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+
+    xlim = (0, times_days[-1])
+    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
+
+    timeseries = [
+        bt_timeseries,
+        bt_filled_timeseries,
+        [
+            bt_mean_timeseries["incoherent_mean_timeseries"],
+            bt_mean_timeseries["incoherent_mean_timeseries"][bt_gap_indices],
+        ],
+    ]
+
+    params = [
+        {
+            "title": [["Valores capturados", "center"], title_right],
+            "label": radii_label,
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+            "linestyle": "o-",
+        },
+        {
+            "title": [["Series imputadas", "center"], title_right],
+            "label": radii_label,
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+            "linestyle": "--",
+        },
+        {
+            "title": [
+                ["Promedio incoherente y puntos imputados", "center"],
+                title_right,
+            ],
+            "label": ["Serie promedio", "Puntos imputados"],
+            "xarray": [times_days, times_days[bt_gap_indices]],
+            "xlim": xlim,
+            "ylabel": ylabel,
+            "linestyle": ["o-", "x"],
+            "markersize": [3, 8],
+            "color": [None, "red"],
+        },
+    ]
+
+    plot_timeseries(timeseries, settings, params, "series")
+
+
+def visualizar_normalizados(
+    bt_detrended_timeseries: Any,
+    bt_mean_timeseries: Any,
+    settings: _Settings,
+    parameters: _Settings,
+) -> None:
+    from goesdl.experimental.plotting import plot_timeseries
+    from goesdl.experimental.sequence import Sequencer
+
+    sampling_rate = settings["algorithm"]["sampling_rate"]
+    series_lenght = parameters["series_length"]
+    delta_hr = settings["algorithm"]["delta"]
+
+    sequencer = Sequencer(sampling_rate)
+
+    times_days = sequencer.build_times(series_lenght) / 24
+    samples_per_day = int(24 * sampling_rate)
+    radii_km = parameters["radii_km"]
+
+    title_right = (
+        f"(fs = {samples_per_day} muestras/d, dt={delta_hr:0.1f}h)",
+        "right",
+    )
+    radii_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+
+    xlim = (0, times_days[-1])
+    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
+
+    timeseries = [
+        bt_detrended_timeseries,
+        [
+            bt_mean_timeseries["detrended_mean_timeseries"],
+            bt_mean_timeseries["incoherent_mean_timeseries"],
+        ],
+        [
+            bt_mean_timeseries["coherent_mean_timeseries"],
+            bt_mean_timeseries["detrended_mean_timeseries"],
+        ],
+    ]
+
+    params = [
+        {
+            "title": [["Series sin tendencia", "center"], title_right],
+            "label": radii_label,
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+        },
+        {
+            "title": [["Promedios incoherentes", "center"], title_right],
+            "label": ["Serie sin tendencia", "Serie original"],
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+            "linestyle": ["-", "--"],
+        },
+        {
+            "title": [["Promedios sin tendencia", "center"], title_right],
+            "label": ["Promedio coherente", "Promedio incoherente"],
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+            "linestyle": ["-", "-."],
+            "color": [None, "red"],
+        },
+    ]
+
+    plot_timeseries(timeseries, settings, params, "series")
+
+
+def visualizar_filtrados(
+    bt_filtered_timeseries: Any,
+    bt_filtered_mean_timeseries: Any,
+    settings: _Settings,
+    parameters: _Settings,
+) -> None:
+    from goesdl.experimental.plotting import plot_timeseries
+    from goesdl.experimental.sequence import Sequencer
+
+    sampling_rate = settings["algorithm"]["sampling_rate"]
+    series_lenght = parameters["series_length"]
+    delta_hr = settings["algorithm"]["delta"]
+
+    sequencer = Sequencer(sampling_rate)
+
+    times_days = sequencer.build_times(series_lenght) / 24
+    samples_per_day = int(24 * sampling_rate)
+    radii_km = parameters["radii_km"]
+
+    radii_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+
+    xlim = (0, times_days[-1])
+    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
+
+    filter_frequency = settings["algorithm"]["filter_frequency"]
+    title_right = (
+        f"(fs = {samples_per_day} muestras/d, dt={delta_hr:0.1f}h, fc = {filter_frequency} c/d)",
+        "right",
+    )
+
+    timeseries = [
+        bt_filtered_timeseries,
+        [
+            bt_filtered_mean_timeseries["coherent_mean_timeseries"],
+            bt_filtered_mean_timeseries["detrended_mean_timeseries"],
+        ],
+    ]
+
+    params = [
+        {
+            "title": [["Series filtradas", "center"], title_right],
+            "label": radii_label,
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+        },
+        {
+            "title": [["Promedios sin tendencia", "center"], title_right],
+            "label": ["Promedio coherente", "Promedio incoherente"],
+            "xarray": times_days,
+            "xlim": xlim,
+            "ylabel": ylabel,
+            "linestyle": ["-", "-."],
+            "color": [None, "red"],
+        },
+    ]
+
+    if filter_frequency != 0:
+        plot_timeseries(timeseries, settings, params, "series")
