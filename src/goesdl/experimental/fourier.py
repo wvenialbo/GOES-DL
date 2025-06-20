@@ -333,6 +333,13 @@ class FourierAnalysis:
         is_dominant = self._is_dominant(level, upper)
         return peak_frequencies[is_dominant]
 
+    def significant_p_values(
+        self, level: float, upper: float = 0.0
+    ) -> ArrayFloat:
+        peak_p_values = self.dominant_p_values
+        is_dominant = self._is_dominant(level, upper)
+        return peak_p_values[is_dominant]
+
     def significant_peaks(self, level: float) -> ArrayFloat:
         psd_observed = self.density_spectrum
         threshold = self.confidence_threshold(level)
@@ -427,6 +434,10 @@ class FourierAnalysis:
             The dominant frequencies in the signal.
         """
         return self.peak_values[:, 0]
+
+    @property
+    def dominant_p_values(self) -> ArrayFloat:
+        return self.p_value[self.peak_indices]
 
     @property
     def has_nyquist(self) -> bool:
