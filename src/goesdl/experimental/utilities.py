@@ -1535,7 +1535,7 @@ def get_date_markers(
 
 
 def combine_tick_labels(
-    tick_positions: list[float],
+    tick_positions: list[float] | _Array,
     tick_labels_hours: list[int],
     midnight_positions: list[float],
     midnight_labels_dates: list[str],

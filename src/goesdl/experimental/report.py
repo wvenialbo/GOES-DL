@@ -1,9 +1,14 @@
 from typing import Any
 
 import numpy as np
+from numpy import all as npall
+from numpy import floating
+from numpy.typing import NDArray
 
 from ..utils.array import ArrayFloat, ArrayIndex, ToIndex
 
+_Array = NDArray[floating[Any]]
+_Series = list[_Array]
 _Settings = dict[str, Any]
 
 
@@ -260,7 +265,7 @@ def interpretar_p_valores(
     print("\n" + "=" * 60)
 
 
-def crear_espectrogramas(
+def visualizar_espectrogramas(
     analysers_: Any,
     average_analysers_: Any,
     settings: _Settings,
@@ -619,3 +624,144 @@ def visualizar_filtrados(
 
     if filter_frequency != 0:
         plot_timeseries(timeseries, settings, params, "series")
+
+
+def visualizar_ciclos_dominantes(
+    diurnal_cycle: Any,
+    mean_diurnal_cycle: Any,
+    dominant_cycle: Any,
+    mean_dominant_cycle: Any,
+    analysers_: Any,
+    average_analysers_: Any,
+    bt_detrended_timeseries: Any,
+    bt_filtered_timeseries: Any,
+    bt_mean_timeseries: Any,
+    bt_filtered_mean_timeseries: Any,
+    settings: _Settings,
+    parameters: _Settings,
+) -> None:
+    from goesdl.experimental.fourier import FourierAnalysis
+    from goesdl.experimental.plotting import plot_timeseries
+    from goesdl.experimental.sequence import Sequencer
+    from goesdl.experimental.utilities import (
+        combine_tick_labels,
+        get_date_markers,
+        get_time_ticks,
+    )
+
+    analysers: list[FourierAnalysis] = analysers_
+    average_analysers: dict[str, FourierAnalysis] = average_analysers_
+
+    sampling_rate = settings["algorithm"]["sampling_rate"]
+    series_lenght = parameters["series_length"]
+    delta_hr = settings["algorithm"]["delta"]
+
+    sequencer = Sequencer(sampling_rate)
+
+    times_days = sequencer.build_times(series_lenght) / 24
+    radii_km = parameters["radii_km"]
+
+    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
+
+    ext_analysers = analysers + [average_analysers["coherent_mean_timeseries"]]
+    ext_detrended_timeseries = bt_detrended_timeseries + [
+        bt_mean_timeseries["coherent_mean_timeseries"]
+    ]
+    ext_filtered_timeseries = bt_filtered_timeseries + [
+        bt_filtered_mean_timeseries["coherent_mean_timeseries"]
+    ]
+    ext_dominant_cycle = dominant_cycle + [
+        mean_dominant_cycle["coherent_mean_timeseries"]
+    ]
+    ext_diurnal_cycle = diurnal_cycle + [
+        mean_diurnal_cycle["coherent_mean_timeseries"]
+    ]
+
+    amp_factor = 3
+
+    dalpha = [
+        (0 if npall(dcycle == 0) else 0.8) for dcycle in ext_diurnal_cycle
+    ]
+    talpha = [
+        (0 if npall(dcycle == tcycle) else 1)
+        for dcycle, tcycle in zip(ext_diurnal_cycle, ext_dominant_cycle)
+    ]
+
+    dlable = [
+        (None if npall(dcycle == 0) else f"Ciclo diurno {amp_factor}×")
+        for dcycle in ext_diurnal_cycle
+    ]
+    tlabel = [
+        (None if npall(dcycle == tcycle) else f"Ciclo dominante {amp_factor}×")
+        for dcycle, tcycle in zip(ext_diurnal_cycle, ext_dominant_cycle)
+    ]
+
+    sav_suptitle = settings["plotting"]["series"]["suptitle"]
+    settings["plotting"]["series"]["suptitle"] = None
+
+    sav_height = settings["plotting"]["series"]["height"]
+    settings["plotting"]["series"]["height"] = [4.5]
+
+    title_inset = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+    title_inset.append("(promedio coherente)")
+
+    tick_label: list[str]
+    tick_position, tick_ilabel, time_hours = get_time_ticks(
+        settings, parameters
+    )
+    mark_position, mark_label = get_date_markers(settings, parameters)
+    tick_label = combine_tick_labels(
+        tick_position, tick_ilabel, mark_position, mark_label
+    )
+
+    xmarkers = [
+        {"x": pos, "color": "black", "linestyle": "--", "alpha": 0.7}
+        for pos in mark_position
+    ]
+
+    for i, inset in enumerate(title_inset):
+        dominant_frequency = 24 * ext_analysers[i].dominant_frequencies[0]
+        dominant_period = 24 / dominant_frequency
+        title_center = [f"Serie de tiempo {inset}", "center"]
+        title_right = (
+            f"(f = {dominant_frequency:.2f} c/d, T = {dominant_period:.2f} h/c)",
+            "right",
+        )
+        timeseries: list[_Series] = [
+            [
+                ext_detrended_timeseries[i],
+                ext_filtered_timeseries[i],
+                amp_factor * ext_dominant_cycle[i],
+                amp_factor * ext_diurnal_cycle[i],
+            ],
+        ]
+        params = [
+            {
+                "title": [title_center, title_right],
+                "label": [
+                    "Serie original",
+                    "Serie filtrada",
+                    tlabel[i],
+                    dlable[i],
+                ],
+                "xarray": 24 * times_days,
+                "xlabel": "Fecha  [h]",
+                "ylabel": ylabel,
+                "suptitle": None,
+                "alpha": [0.6, 0.6, talpha[i], dalpha[i]],
+                "linestyle": ["-", "-.", ":", "--"],
+                "xmarkers": xmarkers,
+                "xticks": tick_position,
+                "xticklabels": {
+                    "labels": tick_label,
+                    "rotation": 45,
+                    "ha": "right",
+                },
+                "xlim": (0, time_hours),
+            },
+        ]
+
+        plot_timeseries(timeseries, settings, params, "series")
+
+    settings["plotting"]["series"]["height"] = sav_height
+    settings["plotting"]["series"]["suptitle"] = sav_suptitle
