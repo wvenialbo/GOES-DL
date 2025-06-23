@@ -1,5 +1,5 @@
 import math
-from typing import cast
+from typing import Any, cast
 
 import gudhi as gd
 import matplotlib.pyplot as plt
@@ -23,8 +23,8 @@ def remove_small_blobs(binary_image: ArrayInt32, size: int) -> ArrayInt32:
     return binary_image
 
 
-def create_complex(field_map: ArrayInt32, verbose: bool = False):
-    # Crear el complejo cúbico
+def create_complex(field_map: Any, verbose: bool = False) -> Any:
+    # Crear el complejo
     cubical_complex = gd.CubicalComplex(top_dimensional_cells=field_map)
 
     if verbose:
@@ -35,7 +35,9 @@ def create_complex(field_map: ArrayInt32, verbose: bool = False):
     return cubical_complex
 
 
-def maximum_persistence(n, persistence_pairs):
+def maximum_persistence(
+    n: Any, persistence_pairs: Any
+) -> tuple[Any, tuple[Any]]:
     max_birth = 0
     max_death = 0
     max_lifetime = 0

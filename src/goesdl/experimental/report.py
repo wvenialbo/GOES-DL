@@ -6,6 +6,7 @@ from numpy import floating
 from numpy.typing import NDArray
 
 from ..utils.array import ArrayFloat, ArrayIndex, ToIndex
+from .config import ConfigDict
 
 _Array = NDArray[floating[Any]]
 _Series = list[_Array]
@@ -266,10 +267,7 @@ def interpretar_p_valores(
 
 
 def visualizar_espectrogramas(
-    analysers_: Any,
-    average_analysers_: Any,
-    settings: _Settings,
-    parameters: _Settings,
+    analysers_: Any, average_analysers_: Any, settings: ConfigDict
 ) -> None:
     from goesdl.experimental.fourier import FourierAnalysis
     from goesdl.experimental.plotting import get_template, render_template
@@ -281,21 +279,30 @@ def visualizar_espectrogramas(
     mean_analyser = average_analysers["coherent_mean_timeseries"]
 
     frequencies = 24 * analysers[0].frequencies
-    noise_type = settings["algorithm"]["noise_type"]
+    noise_type = settings.as_str("evaluation.noise_model")
     noise_map = {"red": "rojo", "white": "blanco"}
 
     global_dominant_frequency = mean_analyser.dominant_frequencies[0] * 24
     global_dominant_density = mean_analyser.dominant_densities[0]
 
-    # > settings = reload_project("../event.yaml", "../settings.yaml", False)
+    algorithm_id = settings.as_str("algorithm_id")
+
+    if algorithm_id == "algorithm_0":
+        radii_km = settings.get_astype("parameters.radii_km", list[float])
+        data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+        ylabel = "Densidad espectral de potencia  [K²d/c]"
+    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_thresholds = settings.get_astype(
+            "parameters.bt_thresholds", list[int]
+        )
+        data_label = [
+            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+        ]
+        ylabel = "Densidad espectral de potencia  [km²d/c]"
 
     selected_analysers = analysers + [mean_analyser]
 
     for i, analyser in enumerate(selected_analysers):
-        radius_km = (
-            parameters["radii_km"][i] if analyser is not mean_analyser else 0.0
-        )
-
         significant_frequencies = 24 * analyser.significant_frequencies(
             0.95, 0.99
         )
@@ -305,13 +312,14 @@ def visualizar_espectrogramas(
         )
         very_significant_densities = analyser.significant_densities(0.99)
 
-        template = get_template(settings, "spectrogram")
+        template = get_template(settings.to_dict(), "spectrogram")
         periodogram = template["subplots"]["periodogram"]
+        periodogram["ylabel"] = ylabel
         plot = periodogram["plot"]
 
         plot[0] |= {"x": frequencies, "y": analyser.density_spectrum}
         if analyser is not mean_analyser:
-            plot[0]["label"] = plot[0]["label"] % radius_km
+            plot[0]["label"] = plot[0]["label"] % data_label[i]
 
         plot[1] |= {"x": frequencies, "y": mean_analyser.density_spectrum}
 
@@ -380,13 +388,12 @@ def visualizar_espectrogramas(
 
         title = periodogram["title"]
         if analyser is not mean_analyser:
-            title[0]["label"] = title[0]["label"] % radius_km
+            title[0]["label"] = title[0]["label"] % data_label[i]
         else:
             title[0]["label"] = periodogram["global_title"]
         title[1]["label"] = title[1]["label"] % (
             dominant_frequency,
             dominant_period,
-            dominant_p_value,
             noise_map[noise_type],
             analyser.dof,
         )
@@ -396,7 +403,7 @@ def visualizar_espectrogramas(
 
         plot[0] |= {"x": frequencies, "y": analyser.p_value}
         if analyser is not mean_analyser:
-            plot[0]["label"] = plot[0]["label"] % radius_km
+            plot[0]["label"] = plot[0]["label"] % data_label[i]
         else:
             plot[0]["label"] = p_valuegram["global_title"]
 
@@ -406,9 +413,13 @@ def visualizar_espectrogramas(
 
         title = p_valuegram["title"]
         if analyser is not mean_analyser:
-            title["label"] = title["label"] % radius_km
+            title[0]["label"] = title[0]["label"] % data_label[i]
         else:
-            title["label"] = p_valuegram["global_title"]
+            title[0]["label"] = p_valuegram["global_title"]
+        title[1]["label"] = title[1]["label"] % (
+            dominant_p_value,
+            100 * (1.0 - dominant_p_value),
+        )
 
         frequencies_report = frequencies.copy()
         frequencies_report[analyser.peak_indices] = (
@@ -426,30 +437,41 @@ def visualizar_capturas(
     bt_filled_timeseries: Any,
     bt_mean_timeseries: Any,
     bt_gap_indices: Any,
-    settings: _Settings,
-    parameters: _Settings,
+    settings: ConfigDict,
 ) -> None:
     from goesdl.experimental.plotting import plot_timeseries
     from goesdl.experimental.sequence import Sequencer
 
-    sampling_rate = settings["algorithm"]["sampling_rate"]
-    series_lenght = parameters["series_length"]
-    delta_hr = settings["algorithm"]["delta"]
+    samples_per_day = settings.as_int("subsampling.sampling_rate")
+    sampling_rate = samples_per_day // 24
+    series_length = settings.as_int("parameters.series_length")
+    timedelta_h = settings.as_int("algorithm.delta_t")
 
     sequencer = Sequencer(sampling_rate)
 
-    times_days = sequencer.build_times(series_lenght) / 24
-    samples_per_day = int(24 * sampling_rate)
-    radii_km = parameters["radii_km"]
+    times_days = sequencer.build_times(series_length) / 24
+
+    algorithm_id = settings.as_str("algorithm_id")
+
+    if algorithm_id == "algorithm_0":
+        radii_km = settings.get_astype("parameters.radii_km", list[float])
+        data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+        ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
+    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_thresholds = settings.get_astype(
+            "parameters.bt_thresholds", list[int]
+        )
+        data_label = [
+            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+        ]
+        ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
 
     title_right = (
-        f"(fs = {samples_per_day} muestras/d, dt={delta_hr:0.1f}h)",
+        f"(fs = {samples_per_day} muestras/d, dt={timedelta_h:0.1f}h)",
         "right",
     )
-    radii_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
 
     xlim = (0, times_days[-1])
-    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
 
     timeseries = [
         bt_timeseries,
@@ -463,7 +485,7 @@ def visualizar_capturas(
     params = [
         {
             "title": [["Valores capturados", "center"], title_right],
-            "label": radii_label,
+            "label": data_label,
             "xarray": times_days,
             "xlim": xlim,
             "ylabel": ylabel,
@@ -471,7 +493,7 @@ def visualizar_capturas(
         },
         {
             "title": [["Series imputadas", "center"], title_right],
-            "label": radii_label,
+            "label": data_label,
             "xarray": times_days,
             "xlim": xlim,
             "ylabel": ylabel,
@@ -492,36 +514,47 @@ def visualizar_capturas(
         },
     ]
 
-    plot_timeseries(timeseries, settings, params, "series")
+    plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
 
 def visualizar_normalizados(
     bt_detrended_timeseries: Any,
     bt_mean_timeseries: Any,
-    settings: _Settings,
-    parameters: _Settings,
+    settings: ConfigDict,
 ) -> None:
     from goesdl.experimental.plotting import plot_timeseries
     from goesdl.experimental.sequence import Sequencer
 
-    sampling_rate = settings["algorithm"]["sampling_rate"]
-    series_lenght = parameters["series_length"]
-    delta_hr = settings["algorithm"]["delta"]
+    samples_per_day = settings.as_int("subsampling.sampling_rate")
+    sampling_rate = samples_per_day // 24
+    series_length = settings.as_int("parameters.series_length")
+    timedelta_h = settings.as_int("algorithm.delta_t")
 
     sequencer = Sequencer(sampling_rate)
 
-    times_days = sequencer.build_times(series_lenght) / 24
-    samples_per_day = int(24 * sampling_rate)
-    radii_km = parameters["radii_km"]
+    times_days = sequencer.build_times(series_length) / 24
+
+    algorithm_id = settings.as_str("algorithm_id")
+
+    if algorithm_id == "algorithm_0":
+        radii_km = settings.get_astype("parameters.radii_km", list[float])
+        data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+        ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
+    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_thresholds = settings.get_astype(
+            "parameters.bt_thresholds", list[int]
+        )
+        data_label = [
+            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+        ]
+        ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
 
     title_right = (
-        f"(fs = {samples_per_day} muestras/d, dt={delta_hr:0.1f}h)",
+        f"(fs = {samples_per_day} muestras/d, dt={timedelta_h:0.1f}h)",
         "right",
     )
-    radii_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
 
     xlim = (0, times_days[-1])
-    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
 
     timeseries = [
         bt_detrended_timeseries,
@@ -538,7 +571,7 @@ def visualizar_normalizados(
     params = [
         {
             "title": [["Series sin tendencia", "center"], title_right],
-            "label": radii_label,
+            "label": data_label,
             "xarray": times_days,
             "xlim": xlim,
             "ylabel": ylabel,
@@ -562,36 +595,46 @@ def visualizar_normalizados(
         },
     ]
 
-    plot_timeseries(timeseries, settings, params, "series")
+    plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
 
 def visualizar_filtrados(
     bt_filtered_timeseries: Any,
     bt_filtered_mean_timeseries: Any,
-    settings: _Settings,
-    parameters: _Settings,
+    settings: ConfigDict,
 ) -> None:
     from goesdl.experimental.plotting import plot_timeseries
     from goesdl.experimental.sequence import Sequencer
 
-    sampling_rate = settings["algorithm"]["sampling_rate"]
-    series_lenght = parameters["series_length"]
-    delta_hr = settings["algorithm"]["delta"]
+    samples_per_day = settings.as_int("subsampling.sampling_rate")
+    sampling_rate = samples_per_day // 24
+    series_length = settings.as_int("parameters.series_length")
+    timedelta_h = settings.as_int("algorithm.delta_t")
 
     sequencer = Sequencer(sampling_rate)
 
-    times_days = sequencer.build_times(series_lenght) / 24
-    samples_per_day = int(24 * sampling_rate)
-    radii_km = parameters["radii_km"]
+    times_days = sequencer.build_times(series_length) / 24
 
-    radii_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+    algorithm_id = settings.as_str("algorithm_id")
+
+    if algorithm_id == "algorithm_0":
+        radii_km = settings.get_astype("parameters.radii_km", list[float])
+        data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+        ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
+    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_thresholds = settings.get_astype(
+            "parameters.bt_thresholds", list[int]
+        )
+        data_label = [
+            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+        ]
+        ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
 
     xlim = (0, times_days[-1])
-    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
 
-    filter_frequency = settings["algorithm"]["filter_frequency"]
+    filter_frequency = settings.as_float("filter.frequency")
     title_right = (
-        f"(fs = {samples_per_day} muestras/d, dt={delta_hr:0.1f}h, fc = {filter_frequency} c/d)",
+        f"(fs = {samples_per_day} muestras/d, dt={timedelta_h:0.1f}h, fc = {filter_frequency} c/d)",
         "right",
     )
 
@@ -606,7 +649,7 @@ def visualizar_filtrados(
     params = [
         {
             "title": [["Series filtradas", "center"], title_right],
-            "label": radii_label,
+            "label": data_label,
             "xarray": times_days,
             "xlim": xlim,
             "ylabel": ylabel,
@@ -623,7 +666,7 @@ def visualizar_filtrados(
     ]
 
     if filter_frequency != 0:
-        plot_timeseries(timeseries, settings, params, "series")
+        plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
 
 def visualizar_ciclos_dominantes(
@@ -637,8 +680,7 @@ def visualizar_ciclos_dominantes(
     bt_filtered_timeseries: Any,
     bt_mean_timeseries: Any,
     bt_filtered_mean_timeseries: Any,
-    settings: _Settings,
-    parameters: _Settings,
+    settings: ConfigDict,
 ) -> None:
     from goesdl.experimental.fourier import FourierAnalysis
     from goesdl.experimental.plotting import plot_timeseries
@@ -652,16 +694,28 @@ def visualizar_ciclos_dominantes(
     analysers: list[FourierAnalysis] = analysers_
     average_analysers: dict[str, FourierAnalysis] = average_analysers_
 
-    sampling_rate = settings["algorithm"]["sampling_rate"]
-    series_lenght = parameters["series_length"]
-    delta_hr = settings["algorithm"]["delta"]
+    sampling_rate = settings.as_int("subsampling.sampling_rate") // 24
+    series_length = settings.as_int("parameters.series_length")
+    timedelta_h = settings.as_int("algorithm.delta_t")
 
     sequencer = Sequencer(sampling_rate)
 
-    times_days = sequencer.build_times(series_lenght) / 24
-    radii_km = parameters["radii_km"]
+    times_days = sequencer.build_times(series_length) / 24
 
-    ylabel = f"Tbb(t) − Tbb(t+{delta_hr:0.0f}h)  [K]"
+    algorithm_id = settings.as_str("algorithm_id")
+
+    if algorithm_id == "algorithm_0":
+        radii_km = settings.get_astype("parameters.radii_km", list[float])
+        title_inset = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+        ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
+    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_thresholds = settings.get_astype(
+            "parameters.bt_thresholds", list[int]
+        )
+        title_inset = [
+            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+        ]
+        ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
 
     ext_analysers = analysers + [average_analysers["coherent_mean_timeseries"]]
     ext_detrended_timeseries = bt_detrended_timeseries + [
@@ -696,20 +750,18 @@ def visualizar_ciclos_dominantes(
         for dcycle, tcycle in zip(ext_diurnal_cycle, ext_dominant_cycle)
     ]
 
-    sav_suptitle = settings["plotting"]["series"]["suptitle"]
-    settings["plotting"]["series"]["suptitle"] = None
+    config = settings.section("plotting.series")
+    sav_suptitle = config["suptitle"]
+    config["suptitle"] = None
 
-    sav_height = settings["plotting"]["series"]["height"]
-    settings["plotting"]["series"]["height"] = [4.5]
+    sav_height = config["height"]
+    config["height"] = [4.5]
 
-    title_inset = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
     title_inset.append("(promedio coherente)")
 
     tick_label: list[str]
-    tick_position, tick_ilabel, time_hours = get_time_ticks(
-        settings, parameters
-    )
-    mark_position, mark_label = get_date_markers(settings, parameters)
+    tick_position, tick_ilabel, time_hours = get_time_ticks(settings)
+    mark_position, mark_label = get_date_markers(settings)
     tick_label = combine_tick_labels(
         tick_position, tick_ilabel, mark_position, mark_label
     )
@@ -761,7 +813,7 @@ def visualizar_ciclos_dominantes(
             },
         ]
 
-        plot_timeseries(timeseries, settings, params, "series")
+        plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
-    settings["plotting"]["series"]["height"] = sav_height
-    settings["plotting"]["series"]["suptitle"] = sav_suptitle
+    config["height"] = sav_height
+    config["suptitle"] = sav_suptitle

@@ -141,7 +141,8 @@ class Sequencer:
 
         return detrended_signal - nanmean(detrended_signal)
 
-    def gap_indices(self, signal: SequenceFloat) -> ArrayInt:
+    @staticmethod
+    def gap_indices(signal: SequenceFloat) -> ArrayInt:
         signal = validate_1d_signal(signal)
         return nonzero(isnan(signal))[0]
 
