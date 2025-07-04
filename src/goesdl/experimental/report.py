@@ -467,7 +467,7 @@ def visualizar_capturas(
         ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
 
     title_right = (
-        f"(fs = {samples_per_day} muestras/d, dt={timedelta_h:0.1f}h)",
+        f"(fs ≈ {samples_per_day} muestras/d, dt ≈ {timedelta_h:0.1f}h)",
         "right",
     )
 
@@ -550,7 +550,7 @@ def visualizar_normalizados(
         ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
 
     title_right = (
-        f"(fs = {samples_per_day} muestras/d, dt={timedelta_h:0.1f}h)",
+        f"(fs ≈ {samples_per_day} muestras/d, dt ≈ {timedelta_h:0.1f}h)",
         "right",
     )
 
@@ -634,7 +634,7 @@ def visualizar_filtrados(
 
     filter_frequency = settings.as_float("filter.frequency")
     title_right = (
-        f"(fs = {samples_per_day} muestras/d, dt={timedelta_h:0.1f}h, fc = {filter_frequency} c/d)",
+        f"(fs ≈ {samples_per_day} muestras/d, dt ≈ {timedelta_h:0.1f}h, fc ≈ {filter_frequency} c/d)",
         "right",
     )
 
@@ -776,7 +776,7 @@ def visualizar_ciclos_dominantes(
         dominant_period = 24 / dominant_frequency
         title_center = [f"Serie de tiempo {inset}", "center"]
         title_right = (
-            f"(f = {dominant_frequency:.2f} c/d, T = {dominant_period:.2f} h/c)",
+            f"(f ≈ {dominant_frequency:.2f} c/d, T ≈ {dominant_period:.2f} h/c)",
             "right",
         )
         timeseries: list[_Series] = [

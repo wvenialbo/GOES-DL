@@ -26,7 +26,7 @@
   ]
 
   # The dependencies for your project
-  dependencies = ["boto3", "cartopy", "matplotlib", "netCDF4", "numpy", "pillow", "pyproj", "requests"]
+  dependencies = ["boto3", "cartopy", "matplotlib", "netCDF4", "numpy", "pillow", "pyproj", "pyyaml", "requests"]
 
   # The description for your project
   description = "GOES-DL — GOES Satellite Imagery Dataset Accessing Toolbox"

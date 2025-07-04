@@ -170,17 +170,17 @@ def _compute_spatial_parameters_w(
     x_max = spatial_resolution * window
 
     # Create a list of radii for the analysis
-    radius_max = x_max + radius_step
+    radius_km = spatial_resolution * radius
+    radius_max = radius_km + 1
     nrange = ceil((radius_max - radius_min) / radius_step)
 
-    radii = [
-        floor(i * radius_step / spatial_resolution)
+    radii_km = [
+        radius_min + i * radius_step
         for i in range(nrange)
-        if x_min <= i * radius_step <= x_max
+        if (radius_min + i * radius_step) <= x_max
     ]
 
-    radii_km = [spatial_resolution * r for r in radii]
-    radius_km = spatial_resolution * radius
+    radii = [floor(r_km / spatial_resolution) for r_km in radii_km]
 
     return {
         "radii": radii,

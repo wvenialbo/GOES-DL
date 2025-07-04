@@ -4,7 +4,11 @@ from numpy import floating, integer
 from numpy.typing import NDArray
 
 from .config import ConfigDict
-from .report_tools import print_bar, print_filtering_parameters_report
+from .report_tools import (
+    print_bar,
+    print_filtering_parameters_report,
+    print_line,
+)
 from .utilities import fill_inner_missing_values
 
 _Array = NDArray[floating[Any]]
@@ -52,11 +56,22 @@ def subsample_timeseries(
     sampling_rate = subsampling.as_int("sampling_rate")
     series_length = parameters.as_int("series_length")
 
-    print(f"Sequence length    : {sequence_length:>4d} samples")
-    print(f"Sampling rate      : {sampling_rate:>4d} samples/d")
-    print(f"Sampling offset    : {sampling_offset:>4d} samples")
-    print(f"Sampling interval  : {sampling_interval:>4d} samples")
-    print(f"Time series lenght : {series_length:>4d} samples")
+    print(f"Sequence length      : {sequence_length:>4d} samples")
+    print(f"Sampling rate        : {sampling_rate:>4d} samples/d")
+    print(f"Sampling offset      : {sampling_offset:>4d} samples")
+    print(f"Sampling interval    : {sampling_interval:>4d} samples")
+    print(f"Time series lenght   : {series_length:>4d} samples")
+
+    current_nseries = len(output_series)
+
+    output_series = remove_empty_timeseries(output_series, settings)
+
+    updated_nseries = len(output_series)
+
+    if current_nseries != updated_nseries:
+        actual_nseries = current_nseries - updated_nseries
+        print_line()
+        print(f"Removed empty series : {actual_nseries:>4d}")
 
     print_bar()
 
@@ -86,9 +101,38 @@ def _subsample_timeseries(
 
     step = sampling_interval
     begin = sampling_offset
-    end = series_length + step
+    end = series_length * step + begin + 1
 
     return [time_series[begin:end:step] for time_series in input_series]
+
+
+def remove_empty_timeseries(
+    input_series: _Series, settings: ConfigDict
+) -> _Series:
+    from numpy import nanmax, nanmin
+
+    ouput_series: _Series = []
+
+    algorithm_id = settings.as_str("algorithm_id")
+    updated_parameters: list[Any] = []
+
+    parameter_key = (
+        "parameters.radii_km"
+        if algorithm_id == "algorithm_0"
+        else "parameters.bt_thresholds"
+    )
+
+    parameter_list = settings.get_astype(parameter_key, list[Any])
+
+    for parameter_value, time_series in zip(parameter_list, input_series):
+        if nanmin(time_series) == nanmax(time_series):
+            continue
+        updated_parameters.append(parameter_value)
+        ouput_series.append(time_series)
+
+    settings[parameter_key] = updated_parameters
+
+    return ouput_series
 
 
 def trim_timeseries(

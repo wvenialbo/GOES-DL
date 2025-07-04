@@ -580,5 +580,10 @@
     ],
     // VSCode specifics settings
     "json.schemaDownload.enable": true,
+    "yaml.schemas": {
+        "./.vscode/catalogue.schema.json": [
+            "products.yaml"
+        ],
+    },
     // End of settings.json
 }
