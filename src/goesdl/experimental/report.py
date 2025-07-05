@@ -1,3 +1,4 @@
+from math import ceil
 from typing import Any
 
 import numpy as np
@@ -10,7 +11,24 @@ from .config import ConfigDict
 
 _Array = NDArray[floating[Any]]
 _Series = list[_Array]
-_Settings = dict[str, Any]
+
+
+_MAX_ITEMS = 10
+
+_DESCRIPTIONS = {
+    0.001: "EXTREMADAMENTE SIGNIFICATIVAS",
+    0.01: "MUY SIGNIFICATIVAS",
+    0.05: "SIGNIFICATIVAS",
+}
+
+_ICONS = {
+    0.001: "🌟",  # Una estrella dorada para lo más significativo, indicando la "excelencia" o lo "más brillante", como CH.
+    0.01: "🚀",  # Un cohete para "muy significativo", sugiriendo un despegue o un impacto fuerte. "Va a salir como un cohete esto, creo..."
+    0.05: "🔔",  # Una campana para "significativo", como una "alerta" de algo notable
+}
+
+_LEVELS = [0.001, 0.01, 0.05]
+_LEVEL = _LEVELS[-1]
 
 
 def interpretar_p_valores(
@@ -21,21 +39,22 @@ def interpretar_p_valores(
     """
     Genera interpretación automática de la curva de p-valores.
 
-    Se enfoca en los picos dominantes señalados por 'indices' para las estadísticas de conteo
-    y listado de picos significativos, mientras que las estadísticas generales (min, median)
-    y las proporciones se basan en todo el espectro de p-valores.
+    Se enfoca en los picos dominantes señalados por 'indices' para las
+    estadísticas de conteo y listado de picos significativos, mientras
+    que las estadísticas generales (min, median) y las proporciones se
+    basan en todo el espectro de p-valores.
 
-    Args:
-        frecuencias (np.array): Array de frecuencias de todo el espectro.
-        p_valores (np.array): Array de p-valores correspondientes a todas las frecuencias.
-        indices (np.array, list, optional): Índices de las "cimas de los picos"
-                                            que se desean analizar para los conteos
-                                            y listados específicos.
-                                            Si es None (por defecto), se considerarán
-                                            todos los índices del array de frecuencias
-                                            como 'picos' para este propósito.
-        umbral (float, optional): Umbral de significancia para los p-valores.
-                                  Por defecto es 0.05.
+    Parameters
+    ----------
+    frecuencias (np.array)
+        Array de frecuencias de todo el espectro.
+    p_valores (np.array)
+        Array de p-valores correspondientes a todas las frecuencias.
+    indices_picos_reales (np.array, list, optional)
+        Índices de las "cimas de los picos" que se desean analizar para
+        los conteos y listados específicos.  Si es None (por defecto),
+        se considerarán todos los índices del array de frecuencias como
+        'picos' para este propósito.
     """
     print("\n" + "=" * 60)
     print("INTERPRETACIÓN AUTOMÁTICA DE P-VALORES ESPECTRALES")
@@ -46,7 +65,8 @@ def interpretar_p_valores(
     if indices_picos_reales is None:
         indices_a_analizar: ArrayIndex = np.arange(len(frecuencias))
         print(
-            "\nℹ️  'indices_picos_reales' no fue proporcionado. Analizando el espectro completo."
+            "\nℹ️ 'indices_picos_reales' no fue proporcionado. "
+            "Analizando el espectro completo."
         )
     else:
         # Asegurarse de que 'indices_picos_reales' sea un array de numpy para indexación
@@ -54,12 +74,14 @@ def interpretar_p_valores(
         indices_a_analizar = np.asarray(indices_picos_reales)
         if len(indices_a_analizar) == 0:
             print(
-                "⚠️  Advertencia: 'indices_picos_reales' fue proporcionado pero está vacío. No se contarán picos específicos."
+                "⚠️ Advertencia: 'indices_picos_reales' fue proporcionado "
+                "pero está vacío. No se contarán picos específicos."
             )
             indices_a_analizar = np.arange(len(frecuencias))
         else:
             print(
-                f"\nℹ️  Preselección: Analizando {len(indices_a_analizar)} frecuencias específicas"
+                f"\nℹ️ Preselección: Analizando {len(indices_a_analizar)} "
+                "frecuencias específicas."
             )
 
     # Extraer los subconjuntos de p-valores y frecuencias una sola vez.
@@ -105,71 +127,58 @@ def interpretar_p_valores(
 
     # --- 3. Evaluación estadística ---
     print("\n📈 EVALUACIÓN ESTADÍSTICA:")
+    mensaje_base = f"{prop_05:.1%} vs {esperado_05:.1%} esperado"
     if n_total == 0:
         print("   • No hay datos para realizar una evaluación estadística.")
     elif prop_05 > esperado_05 * 2:
-        print(
-            f"   ⚠️  SEÑALES DETECTADAS: {prop_05:.1%} vs {esperado_05:.1%} esperado"
-        )
-        print("       → Evidencia fuerte de componentes no-aleatorias")
+        print(f"   ⚠️ SEÑALES DETECTADAS: {mensaje_base}")
+        print("       → Evidencia fuerte de componentes no-aleatorias.")
     elif prop_05 > esperado_05 * 1.5:
-        print(
-            f"   ⚡ POSIBLES SEÑALES: {prop_05:.1%} vs {esperado_05:.1%} esperado"
-        )
-        print("       → Evidencia moderada de componentes no-aleatorias")
+        print(f"   ⚡ POSIBLES SEÑALES: {mensaje_base}")
+        print("       → Evidencia moderada de componentes no-aleatorias.")
     elif prop_05 < esperado_05 * 0.5:
+        print(f"   💤 ESPECTRO MUY SILENCIOSO: {mensaje_base}")
         print(
-            f"   💤 ESPECTRO MUY SILENCIOSO: {prop_05:.1%} vs {esperado_05:.1%} esperado"
-        )
-        print(
-            "       → Posible preselección, sobre-filtrado o señal muy débil"
+            "       → Posible preselección, sobre-filtrado o señal muy débil."
         )
     else:
-        print(
-            f"   ✅ COMPORTAMIENTO NORMAL: {prop_05:.1%} vs {esperado_05:.1%} esperado"
-        )
-        print("       → Consistente con ruido de fondo")
+        print(f"   ✅ COMPORTAMIENTO NORMAL: {mensaje_base}")
+        print("       → Consistente con ruido de fondo.")
 
-    umbral = 0.05
-
-    print(f"\n🔍 RESUMEN EJECUTIVO (> percentil {umbral:.1%}):")
+    print(f"\n🔍 RESUMEN EJECUTIVO (> percentil {_LEVEL:.1%}):")
     if n_total == 0:
         print("No se puede generar un resumen ejecutivo sin datos.")
     elif prop_05 > 0.1:
         print(
-            f"   🔴 ALTA ACTIVIDAD: {prop_05:.1%} del espectro es significativo"
+            f"   🔴 ALTA ACTIVIDAD: {prop_05:.1%} "
+            "del espectro es significativo"
         )
     elif prop_05 > 0.075:
         print(
-            f"   🟡 ACTIVIDAD MODERADA: {prop_05:.1%} del espectro es significativo"
+            f"   🟡 ACTIVIDAD MODERADA: {prop_05:.1%} "
+            "del espectro es significativo"
         )
     elif prop_05 > 0.025:
         print(
-            f"   🟢 ACTIVIDAD NORMAL: {prop_05:.1%} del espectro es significativo"
+            f"   🟢 ACTIVIDAD NORMAL: {prop_05:.1%} "
+            "del espectro es significativo"
         )
     else:
         print(
-            f"   🔵 BAJA ACTIVIDAD: {prop_05:.1%} del espectro es significativo)"
+            f"   🔵 BAJA ACTIVIDAD: {prop_05:.1%} "
+            "del espectro es significativo)"
         )
 
     # --- 4. Identificar picos más significativos---
-    descripciones = {
-        0.001: "EXTREMADAMENTE SIGNIFICATIVAS",
-        0.01: "MUY SIGNIFICATIVAS",
-        0.05: "SIGNIFICATIVAS",
-    }
-    icons = {
-        0.001: "🌟",  # Una estrella dorada para lo más significativo, indicando la "excelencia" o lo "más brillante", como CH.
-        0.01: "🚀",  # Un cohete para "muy significativo", sugiriendo un despegue o un impacto fuerte. "Va a salir como un cohete esto, creo..."
-        0.05: "🔔",  # Una campana para "significativo", como una "alerta" de algo notable
-    }
 
     indices_ya_reportados: set[ToIndex] = set()
-    n_count = 5
 
     if n_total > 0:
-        umbral_niveles = [0.001, 0.01, 0.05]
-        for umbral_actual in umbral_niveles:
+        n_count = 5
+
+        n_reportados = 0
+
+        for umbral_actual in _LEVELS:
             # Filtra p_valores_analisis para excluir los que ya fueron reportados
             mascara_no_reportados: ArrayIndex = np.array(
                 [
@@ -189,15 +198,17 @@ def interpretar_p_valores(
             )[0]
 
             n_extremos = len(indices_extremos_locales)
-            descripcion = descripciones[umbral_actual]
-            icon = icons[umbral_actual]
-
-            # Obtenemos los índices originales de los elementos no reportados
-            indices_originales_no_reportados = np.nonzero(
-                mascara_no_reportados
-            )[0]
+            n_reportados += n_extremos
 
             if n_extremos > 0 and n_count > 0:
+                descripcion = _DESCRIPTIONS[umbral_actual]
+                icon = _ICONS[umbral_actual]
+
+                # Obtenemos los índices originales de los elementos no reportados
+                indices_originales_no_reportados = np.nonzero(
+                    mascara_no_reportados
+                )[0]
+
                 print(
                     f"\n{icon} FRECUENCIAS {descripcion} (p < {umbral_actual}):"
                 )
@@ -232,15 +243,23 @@ def interpretar_p_valores(
                     )
                     # Agrega el índice original al conjunto de índices ya reportados
                     indices_ya_reportados.add(indice_original)
-                    n_count = n_count - 1
+                    n_count -= 1
                     n_extremos = n_extremos - 1
                 if n_extremos > n_count:
                     print(f"       ... y {n_extremos-n_count} más")
-        print(
-            "\n⚠️ Advertencia: Las frecuencias estadísticamente "
-            "significativas\n\u2800\u2800 pueden diferir ligeramente de las "
-            "físicamente significativas."
-        )
+
+        if n_reportados:
+            print(
+                "\n⚠️ Advertencia: Las frecuencias estadísticamente "
+                "significativas\n\u2800\u2800 pueden diferir ligeramente de "
+                "las físicamente significativas."
+            )
+        else:
+            print(
+                "\nℹ️ Observación: No se encontraron frecuencias significativas"
+                "\n\u2800\u2800 con un nivel significancia estadística "
+                f"de {_LEVEL:0.1%}."
+            )
     else:
         print(
             "\nNo hay picos que mostrar debido a la falta de datos analizados."
@@ -292,13 +311,23 @@ def visualizar_espectrogramas(
         data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
         ylabel = "Densidad espectral de potencia  [K²d/c]"
     elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_scale = settings.as_int("algorithm.bt_scale", 1)
         bt_thresholds = settings.get_astype(
             "parameters.bt_thresholds", list[int]
         )
-        data_label = [
-            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
-        ]
+        if bt_scale > 1:
+            data_label = [
+                f"µ = {bt_threshold/bt_scale:.1f} K"
+                for bt_threshold in bt_thresholds
+            ]
+        else:
+            data_label = [
+                f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+            ]
         ylabel = "Densidad espectral de potencia  [km²d/c]"
+    else:
+        data_label = []
+        ylabel = ""
 
     selected_analysers = analysers + [mean_analyser]
 
@@ -439,6 +468,30 @@ def visualizar_capturas(
     bt_gap_indices: Any,
     settings: ConfigDict,
 ) -> None:
+    nseries = len(bt_timeseries)
+    ngroups = ceil(nseries / 10)
+
+    for nblock in range(ngroups + 1):
+        _visualizar_capturas(
+            bt_timeseries,
+            bt_filled_timeseries,
+            bt_mean_timeseries,
+            bt_gap_indices,
+            settings,
+            nblock,
+            nblock == ngroups,
+        )
+
+
+def _visualizar_capturas(
+    bt_timeseries: Any,
+    bt_filled_timeseries: Any,
+    bt_mean_timeseries: Any,
+    bt_gap_indices: Any,
+    settings: ConfigDict,
+    nblock: int,
+    last: bool,
+) -> None:
     from goesdl.experimental.plotting import plot_timeseries
     from goesdl.experimental.sequence import Sequencer
 
@@ -458,13 +511,23 @@ def visualizar_capturas(
         data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
         ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
     elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_scale = settings.as_int("algorithm.bt_scale", 1)
         bt_thresholds = settings.get_astype(
             "parameters.bt_thresholds", list[int]
         )
-        data_label = [
-            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
-        ]
+        if bt_scale > 1:
+            data_label = [
+                f"µ = {bt_threshold/bt_scale:.1f} K"
+                for bt_threshold in bt_thresholds
+            ]
+        else:
+            data_label = [
+                f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+            ]
         ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
+    else:
+        data_label = []
+        ylabel = ""
 
     title_right = (
         f"(fs ≈ {samples_per_day} muestras/d, dt ≈ {timedelta_h:0.1f}h)",
@@ -473,46 +536,56 @@ def visualizar_capturas(
 
     xlim = (0, times_days[-1])
 
-    timeseries = [
-        bt_timeseries,
-        bt_filled_timeseries,
-        [
-            bt_mean_timeseries["incoherent_mean_timeseries"],
-            bt_mean_timeseries["incoherent_mean_timeseries"][bt_gap_indices],
-        ],
-    ]
-
-    params = [
-        {
-            "title": [["Valores capturados", "center"], title_right],
-            "label": data_label,
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-            "linestyle": "o-",
-        },
-        {
-            "title": [["Series imputadas", "center"], title_right],
-            "label": data_label,
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-            "linestyle": "--",
-        },
-        {
-            "title": [
-                ["Promedio incoherente y puntos imputados", "center"],
-                title_right,
+    if last:
+        timeseries = [
+            [
+                bt_mean_timeseries["incoherent_mean_timeseries"],
+                bt_mean_timeseries["incoherent_mean_timeseries"][
+                    bt_gap_indices
+                ],
             ],
-            "label": ["Serie promedio", "Puntos imputados"],
-            "xarray": [times_days, times_days[bt_gap_indices]],
-            "xlim": xlim,
-            "ylabel": ylabel,
-            "linestyle": ["o-", "x"],
-            "markersize": [3, 8],
-            "color": [None, "red"],
-        },
-    ]
+        ]
+        params = [
+            {
+                "title": [
+                    ["Promedio incoherente y puntos imputados", "center"],
+                    title_right,
+                ],
+                "label": ["Serie promedio", "Puntos imputados"],
+                "xarray": [times_days, times_days[bt_gap_indices]],
+                "xlim": xlim,
+                "ylabel": ylabel,
+                "linestyle": ["o-", "x"],
+                "markersize": [3, 8],
+                "color": [None, "red"],
+            },
+        ]
+    else:
+        m = nblock * _MAX_ITEMS
+        n = m + _MAX_ITEMS
+
+        timeseries = [
+            bt_timeseries[m:n],
+            bt_filled_timeseries[m:n],
+        ]
+        params = [
+            {
+                "title": [["Valores capturados", "center"], title_right],
+                "label": data_label[m:n],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+                "linestyle": "o-",
+            },
+            {
+                "title": [["Series imputadas", "center"], title_right],
+                "label": data_label[m:n],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+                "linestyle": "--",
+            },
+        ]
 
     plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
@@ -522,86 +595,25 @@ def visualizar_normalizados(
     bt_mean_timeseries: Any,
     settings: ConfigDict,
 ) -> None:
-    from goesdl.experimental.plotting import plot_timeseries
-    from goesdl.experimental.sequence import Sequencer
+    nseries = len(bt_detrended_timeseries)
+    ngroups = ceil(nseries / 10)
 
-    samples_per_day = settings.as_int("subsampling.sampling_rate")
-    sampling_rate = samples_per_day // 24
-    series_length = settings.as_int("parameters.series_length")
-    timedelta_h = settings.as_int("algorithm.delta_t")
-
-    sequencer = Sequencer(sampling_rate)
-
-    times_days = sequencer.build_times(series_length) / 24
-
-    algorithm_id = settings.as_str("algorithm_id")
-
-    if algorithm_id == "algorithm_0":
-        radii_km = settings.get_astype("parameters.radii_km", list[float])
-        data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
-        ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
-    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
-        bt_thresholds = settings.get_astype(
-            "parameters.bt_thresholds", list[int]
+    for nblock in range(ngroups + 1):
+        _visualizar_normalizados(
+            bt_detrended_timeseries,
+            bt_mean_timeseries,
+            settings,
+            nblock,
+            nblock == ngroups,
         )
-        data_label = [
-            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
-        ]
-        ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
-
-    title_right = (
-        f"(fs ≈ {samples_per_day} muestras/d, dt ≈ {timedelta_h:0.1f}h)",
-        "right",
-    )
-
-    xlim = (0, times_days[-1])
-
-    timeseries = [
-        bt_detrended_timeseries,
-        [
-            bt_mean_timeseries["detrended_mean_timeseries"],
-            bt_mean_timeseries["incoherent_mean_timeseries"],
-        ],
-        [
-            bt_mean_timeseries["coherent_mean_timeseries"],
-            bt_mean_timeseries["detrended_mean_timeseries"],
-        ],
-    ]
-
-    params = [
-        {
-            "title": [["Series sin tendencia", "center"], title_right],
-            "label": data_label,
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-        },
-        {
-            "title": [["Promedios incoherentes", "center"], title_right],
-            "label": ["Serie sin tendencia", "Serie original"],
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-            "linestyle": ["-", "--"],
-        },
-        {
-            "title": [["Promedios sin tendencia", "center"], title_right],
-            "label": ["Promedio coherente", "Promedio incoherente"],
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-            "linestyle": ["-", "-."],
-            "color": [None, "red"],
-        },
-    ]
-
-    plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
 
-def visualizar_filtrados(
-    bt_filtered_timeseries: Any,
-    bt_filtered_mean_timeseries: Any,
+def _visualizar_normalizados(
+    bt_detrended_timeseries: Any,
+    bt_mean_timeseries: Any,
     settings: ConfigDict,
+    nblock: int,
+    last: bool,
 ) -> None:
     from goesdl.experimental.plotting import plot_timeseries
     from goesdl.experimental.sequence import Sequencer
@@ -622,13 +634,147 @@ def visualizar_filtrados(
         data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
         ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
     elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_scale = settings.as_int("algorithm.bt_scale", 1)
         bt_thresholds = settings.get_astype(
             "parameters.bt_thresholds", list[int]
         )
-        data_label = [
-            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
-        ]
+        if bt_scale > 1:
+            data_label = [
+                f"µ = {bt_threshold/bt_scale:.1f} K"
+                for bt_threshold in bt_thresholds
+            ]
+        else:
+            data_label = [
+                f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+            ]
         ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
+    else:
+        data_label = []
+        ylabel = ""
+
+    title_right = (
+        f"(fs ≈ {samples_per_day} muestras/d, dt ≈ {timedelta_h:0.1f}h)",
+        "right",
+    )
+
+    xlim = (0, times_days[-1])
+
+    if last:
+        timeseries = [
+            [
+                bt_mean_timeseries["detrended_mean_timeseries"],
+                bt_mean_timeseries["incoherent_mean_timeseries"],
+            ],
+            [
+                bt_mean_timeseries["coherent_mean_timeseries"],
+                bt_mean_timeseries["detrended_mean_timeseries"],
+            ],
+        ]
+        params = [
+            {
+                "title": [["Promedios incoherentes", "center"], title_right],
+                "label": ["Serie sin tendencia", "Serie original"],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+                "linestyle": ["-", "--"],
+            },
+            {
+                "title": [["Promedios sin tendencia", "center"], title_right],
+                "label": ["Promedio coherente", "Promedio incoherente"],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+                "linestyle": ["-", "-."],
+                "color": [None, "red"],
+            },
+        ]
+    else:
+        m = nblock * _MAX_ITEMS
+        n = m + _MAX_ITEMS
+
+        timeseries = [
+            bt_detrended_timeseries[m:n],
+        ]
+        params = [
+            {
+                "title": [["Series sin tendencia", "center"], title_right],
+                "label": data_label[m:n],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+            },
+        ]
+
+    plot_timeseries(timeseries, settings.to_dict(), params, "series")
+
+
+def visualizar_filtrados(
+    bt_filtered_timeseries: Any,
+    bt_filtered_mean_timeseries: Any,
+    settings: ConfigDict,
+) -> None:
+    filter_frequency = settings.as_float("filter.frequency", 0.0)
+
+    if filter_frequency == 0:
+        return
+
+    nseries = len(bt_filtered_timeseries)
+    ngroups = ceil(nseries / _MAX_ITEMS)
+
+    for nblock in range(ngroups + 1):
+        _visualizar_filtrados(
+            bt_filtered_timeseries,
+            bt_filtered_mean_timeseries,
+            settings,
+            nblock,
+            nblock == ngroups,
+        )
+
+
+def _visualizar_filtrados(
+    bt_filtered_timeseries: Any,
+    bt_filtered_mean_timeseries: Any,
+    settings: ConfigDict,
+    nblock: int,
+    last: bool,
+) -> None:
+    from goesdl.experimental.plotting import plot_timeseries
+    from goesdl.experimental.sequence import Sequencer
+
+    samples_per_day = settings.as_int("subsampling.sampling_rate")
+    sampling_rate = samples_per_day // 24
+    series_length = settings.as_int("parameters.series_length")
+    timedelta_h = settings.as_int("algorithm.delta_t")
+
+    sequencer = Sequencer(sampling_rate)
+
+    times_days = sequencer.build_times(series_length) / 24
+
+    algorithm_id = settings.as_str("algorithm_id")
+
+    if algorithm_id == "algorithm_0":
+        radii_km = settings.get_astype("parameters.radii_km", list[float])
+        data_label = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
+        ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
+    elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_scale = settings.as_int("algorithm.bt_scale", 1)
+        bt_thresholds = settings.get_astype(
+            "parameters.bt_thresholds", list[int]
+        )
+        if bt_scale > 1:
+            data_label = [
+                f"µ = {bt_threshold/bt_scale:.1f} K"
+                for bt_threshold in bt_thresholds
+            ]
+        else:
+            data_label = [
+                f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+            ]
+        ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
+    else:
+        data_label = []
+        ylabel = ""
 
     xlim = (0, times_days[-1])
 
@@ -638,35 +784,40 @@ def visualizar_filtrados(
         "right",
     )
 
-    timeseries = [
-        bt_filtered_timeseries,
-        [
-            bt_filtered_mean_timeseries["coherent_mean_timeseries"],
-            bt_filtered_mean_timeseries["detrended_mean_timeseries"],
-        ],
-    ]
+    if last:
+        timeseries = [
+            [
+                bt_filtered_mean_timeseries["coherent_mean_timeseries"],
+                bt_filtered_mean_timeseries["detrended_mean_timeseries"],
+            ],
+        ]
+        params = [
+            {
+                "title": [["Promedios sin tendencia", "center"], title_right],
+                "label": ["Promedio coherente", "Promedio incoherente"],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+                "linestyle": ["-", "-."],
+                "color": [None, "red"],
+            },
+        ]
+    else:
+        m = nblock * _MAX_ITEMS
+        n = m + _MAX_ITEMS
 
-    params = [
-        {
-            "title": [["Series filtradas", "center"], title_right],
-            "label": data_label,
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-        },
-        {
-            "title": [["Promedios sin tendencia", "center"], title_right],
-            "label": ["Promedio coherente", "Promedio incoherente"],
-            "xarray": times_days,
-            "xlim": xlim,
-            "ylabel": ylabel,
-            "linestyle": ["-", "-."],
-            "color": [None, "red"],
-        },
-    ]
+        timeseries = [bt_filtered_timeseries[m:n]]
+        params = [
+            {
+                "title": [["Series filtradas", "center"], title_right],
+                "label": data_label[m:n],
+                "xarray": times_days,
+                "xlim": xlim,
+                "ylabel": ylabel,
+            },
+        ]
 
-    if filter_frequency != 0:
-        plot_timeseries(timeseries, settings.to_dict(), params, "series")
+    plot_timeseries(timeseries, settings.to_dict(), params, "series")
 
 
 def visualizar_ciclos_dominantes(
@@ -709,13 +860,23 @@ def visualizar_ciclos_dominantes(
         title_inset = [f"r = {radius_km:.0f}-km" for radius_km in radii_km]
         ylabel = f"Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)  [K]"
     elif algorithm_id in {"algorithm_1", "algorithm_2"}:
+        bt_scale = settings.as_int("algorithm.bt_scale", 1)
         bt_thresholds = settings.get_astype(
             "parameters.bt_thresholds", list[int]
         )
-        title_inset = [
-            f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
-        ]
+        if bt_scale > 1:
+            title_inset = [
+                f"µ = {bt_threshold/bt_scale:.1f} K"
+                for bt_threshold in bt_thresholds
+            ]
+        else:
+            title_inset = [
+                f"µ = {bt_threshold:.0f} K" for bt_threshold in bt_thresholds
+            ]
         ylabel = f"Max PH₀[Tbb(t) − Tbb(t+{timedelta_h:0.0f}h)]  [km]"
+    else:
+        title_inset = []
+        ylabel = ""
 
     ext_analysers = analysers + [average_analysers["coherent_mean_timeseries"]]
     ext_detrended_timeseries = bt_detrended_timeseries + [

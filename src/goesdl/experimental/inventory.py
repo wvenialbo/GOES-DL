@@ -99,7 +99,19 @@ def _load_inventory_gr(settings: ConfigDict) -> tuple[list[str], list[float]]:
 
     print("... using GOES-R imagery product locator")
 
+    origin: str | list[str]
+    channel: str | list[str]
+    scene: str
+    time_resolution: int
     origin, channel, scene, time_resolution = _get_datasource_info(settings)
+
+    if isinstance(origin, list):
+        if len(origin) != 1:
+            raise ValueError(
+                "When 'origin' is a list, it must contain exactly one element, "
+                f"received {len(origin)} elements"
+            )
+        origin = origin[0]
 
     # Initialise the product locator for GOES-R datasets
     grlocator = GOESProductLocatorCMIP(
@@ -138,6 +150,7 @@ def _load_inventory_gb(settings: ConfigDict) -> tuple[list[str], list[float]]:
     # Initialize the product locator for GridSat datasets
     gslocator = GridSatProductLocatorB1()
 
+    time_resolution: int
     _, _, _, time_resolution = _get_datasource_info(settings)
 
     time_start, time_end, date_format, repository_path = _get_inventory_info(
@@ -169,6 +182,9 @@ def _load_inventory_gs(settings: ConfigDict) -> tuple[list[str], list[float]]:
 
     print("... using GridSat-GOES/CONUS imagery product locator")
 
+    origin: str | list[str]
+    scene: str
+    time_resolution: int
     origin, _, scene, time_resolution = _get_datasource_info(settings)
 
     # Initialize the product locator for GridSat datasets

@@ -264,6 +264,8 @@ def _run_algorithm_v(
 
     verbose = settings.as_bool("display.verbose")
 
+    bt_scale = settings.as_int("algorithm.bt_scale", 1)
+
     raw_time_series: list[list[float]] = [[] for _ in range(threshold_count)]
 
     # Execute the algorithm
@@ -285,6 +287,9 @@ def _run_algorithm_v(
         difference = _algorithm_v_step1(
             profile_directory, lht_path, rht_path, window, invert_difference
         )
+
+        if bt_scale > 1:
+            difference *= bt_scale
 
         for k, threshold in enumerate(bt_thresholds):
             # Compute the H0 maximum persistence
@@ -380,6 +385,7 @@ def _get_algorithm_filename_v(settings: ConfigDict) -> Path:
     threshold_max = algorithm_config.as_int("bt_threshold_max")
     threshold_step = algorithm_config.as_int("bt_threshold_step")
     small_blob_size = algorithm_config.as_int("small_blob_size")
+    bt_scale = algorithm_config.as_int("bt_scale", 1)
 
     invert = settings.as_bool(_INVERT_DIFFERENCE)
 
@@ -388,7 +394,7 @@ def _get_algorithm_filename_v(settings: ConfigDict) -> Path:
     algorithm_id = settings.as_str("algorithm_id")
 
     filename_parts = [
-        f"dt{timedelta_h:d}",
+        f"dt{timedelta_h:d}_x{bt_scale:d}",
         f"th{threshold_min:d}-{threshold_max:d}-{threshold_step:d}",
         f"w{windows_size:0.1f}-{central_mask:0.1f}",
         f"sb{small_blob_size}_a[{algorithm_id}]{inverted}",

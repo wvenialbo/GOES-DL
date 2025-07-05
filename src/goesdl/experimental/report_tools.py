@@ -1,4 +1,4 @@
-from math import floor
+from math import floor, isnan
 from typing import Any
 
 from .config import ConfigDict
@@ -316,7 +316,7 @@ def print_algorithm_parameters_report_w(settings: ConfigDict) -> None:
     delta_t = algorithm_config.as_int("delta_t")
     radius_min = algorithm_config.as_float("radius_min")
     radius_step = algorithm_config.as_float("radius_step")
-    central_mask = algorithm_config.as_float("central_mask")
+    central_mask = algorithm_config.as_float("central_mask", 0.0)
     windows_size = algorithm_config.as_float("windows_size")
     invert_difference = algorithm_config.as_bool("invert_difference")
 
@@ -353,6 +353,9 @@ def print_algorithm_parameters_report_v(settings: ConfigDict) -> None:
     windows_size = algorithm_config.as_float("windows_size")
     invert_difference = algorithm_config.as_bool("invert_difference")
 
+    df_min = settings.as_float("parameters.dmin")
+    df_max = settings.as_float("parameters.dmax")
+
     # Print values
     print_bar()
     print("Algorithm Parameters")
@@ -361,6 +364,12 @@ def print_algorithm_parameters_report_v(settings: ConfigDict) -> None:
     print_line()
     print(f"Profile difference offset : {delta_t} hours")
     print(f"Invert profile difference : {invert_difference}")
+
+    if not isnan(df_min):
+        print_line()
+        print(f"Minimum difference        : {df_min}-Kelvin")
+        print(f"Maximum difference        : {df_max}-Kelvin")
+
     print_line()
     print(f"Minimum threshold         : {th_min}-Kelvin")
     print(f"Maximum threshold         : {th_max}-Kelvin")

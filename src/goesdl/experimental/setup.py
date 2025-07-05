@@ -55,13 +55,11 @@ def initialize_project(
     # --- Initialise data (for remote environments)
     _initialize_data(settings, verbose)
 
+    settings["file_path"] = config_settings_filepath
+
     if verbose:
         print("Project initialised!")
         print_setup_report(settings)
-
-    project_settings["file_path"] = config_settings_filepath
-    project_settings["event_id"] = event_name_or_id
-    project_settings["algorithm_id"] = algorithm_id
 
     return settings
 
@@ -110,37 +108,119 @@ def _initialize_settings(
     if verbose:
         print("Initialising configuration...")
 
+    # Load the 'event' section
+    settings = _initialize_event(settings, event_name_or_id, verbose)
+
+    # Load the 'datasource' section
+    settings = _initialize_datasource(settings, verbose)
+
+    # Load the 'algorithm' section
+    settings = _initialize_algorithm(settings, algorithm_id, verbose)
+
+    # Initialise an empty parameters secction
+    settings["parameters"] = {}
+
+    # Initialise working paths
+    _initialize_paths(settings, verbose)
+
+    if verbose:
+        print("Configuration initialised...")
+
+    return settings
+
+
+def _initialize_algorithm(
+    settings: ConfigDict,
+    algorithm_id: str,
+    verbose: bool,
+) -> ConfigDict:
+    if verbose:
+        print("Initialising algorithm...")
+
+    # Replaces the entire 'algorithm' section with the selected
+    # algorithm
+    algorithm_keypath = f"algorithm.{algorithm_id}"
+
+    if algorithm_keypath not in settings:
+        raise ValueError(f"Algorithm '{algorithm_id}' is not registered")
+
+    settings["algorithm"] = settings[algorithm_keypath]
+
+    # Replace event specific configuration for the current algorithm
+    algorithm_keypath = f"event.{algorithm_id}"
+
+    if algorithm_keypath in settings:
+        settings["algorithm"] |= settings[algorithm_keypath]
+
+    settings["algorithm_id"] = algorithm_id
+
+    if verbose:
+        print("Algorithm initialised...")
+
+    return settings
+
+
+def _initialize_datasource(
+    settings: ConfigDict,
+    verbose: bool,
+) -> ConfigDict:
+    if verbose:
+        print("Initialising datasource...")
+
+    # Replaces the entire 'datasource' section with the selected event's
+    # datasource
+    datasource_keypath = "event.datasource"
+
+    if datasource_keypath not in settings:
+        event_name = _get_event_name(settings)
+        raise ValueError(f"Event '{event_name}' has no associated datasource")
+
+    datasource_id = settings[datasource_keypath]
+
+    datasource_keypath = f"datasource.{datasource_id}"
+
+    if datasource_keypath not in settings:
+        raise ValueError(f"Datasource '{datasource_id}' is not registered")
+
+    settings["datasource"] = settings[datasource_keypath]
+
+    if verbose:
+        print("Datasource initialised...")
+
+    return settings
+
+
+def _initialize_event(
+    settings: ConfigDict,
+    event_name_or_id: str,
+    verbose: bool,
+) -> ConfigDict:
+    if verbose:
+        print("Initialising event...")
+
     # Replaces the entire 'event' section with the selected event
     event_keypath = f"event.{event_name_or_id}"
+
     if event_keypath in settings:
         settings["event"] = settings[event_keypath]
+
     else:
         event_found: bool = False
+
         for event_data in settings.section("event").values():
             event = cast(ConfigDict.Settings, event_data)
             if event["name"] == event_name_or_id:
                 event_found = True
                 settings["event"] = event
+                break
+
         if not event_found:
             raise ValueError(f"Event '{event_name_or_id}' is not registered")
 
-    # Replaces the entire 'datasource' section with the selected event's
-    # datasource
-    datasource_id = settings["event.datasource"]
-    datasource_keypath = f"datasource.{datasource_id}"
-    settings["datasource"] = settings[datasource_keypath]
-
-    # Replaces the entire 'algorithm' section with the selected
-    # algorithm
-    algorithm_keypath = f"algorithm.{algorithm_id}"
-    settings["algorithm"] = settings[algorithm_keypath]
-
-    settings["parameters"] = {}
-
-    _initialize_paths(settings, verbose)
+    settings["event_id"] = event_name_or_id
 
     if verbose:
-        print("Configuration initialised...")
+        print("Event initialised...")
 
     return settings
 
@@ -157,7 +237,7 @@ def _initialize_data(settings: ConfigDict, verbose: bool) -> None:
 
     repository_config = settings.section("repository")
 
-    event_name = settings.as_str("event.name")
+    event_name = _get_event_name(settings)
     repository_path: Path = repository_config["path"]
 
     for archive in _data_archives:
@@ -179,6 +259,10 @@ def _initialize_data(settings: ConfigDict, verbose: bool) -> None:
         print("Uploaded data mounted...")
 
 
+def _get_event_name(settings: ConfigDict) -> str:
+    return settings.as_str("event.name")
+
+
 def _initialize_paths(settings: ConfigDict, verbose: bool) -> None:
     if verbose:
         print("Initialising repository paths...")
@@ -190,7 +274,7 @@ def _initialize_paths(settings: ConfigDict, verbose: bool) -> None:
     repository_config["root"] = root
 
     # Set the path of the datasets repository for the event
-    event_name = settings.as_str("event.name")
+    event_name = _get_event_name(settings)
     path = _set_working_path(repository_config, root, event_name)
 
     # Set the path for the project product folders
@@ -288,8 +372,6 @@ def reload_project(
         print("Project settings reloaded!")
         print_setup_report(settings)
 
-    project_settings["file_path"] = config_settings_filepath
-    project_settings["event_id"] = event_name_or_id
-    project_settings["algorithm_id"] = algorithm_id
+    settings["file_path"] = config_settings_filepath
 
     return settings
